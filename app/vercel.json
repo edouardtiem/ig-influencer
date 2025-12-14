@@ -11,21 +11,10 @@
     },
     "src/app/api/daily-trends/route.ts": {
       "maxDuration": 30
-    }
-  },
-  "crons": [
-    {
-      "path": "/api/auto-post",
-      "schedule": "30 5 * * *"
     },
-    {
-      "path": "/api/auto-post?slot=midday",
-      "schedule": "30 10 * * *"
-    },
-    {
-      "path": "/api/auto-post?slot=evening",
-      "schedule": "0 17 * * *"
+    "src/app/api/smart-comment/route.ts": {
+      "maxDuration": 60
     }
-  ]
+  }
 }
 
