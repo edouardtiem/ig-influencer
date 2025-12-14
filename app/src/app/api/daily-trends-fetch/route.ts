@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDailyTrends, selectRelevantTopic, DailyTrends } from '@/lib/perplexity';
+import { fetchDailyTrends, DailyTrends } from '@/lib/perplexity';
 
 /**
  * POST /api/daily-trends-fetch
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
 
     console.log('[Daily Trends] Fetching trends for', date.toISOString().split('T')[0]);
 
-    const trends = await getDailyTrends(date);
+    const trends = await fetchDailyTrends();
 
     if (!trends) {
       return NextResponse.json({
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    console.log('[Daily Trends] ✅ Fetched', trends.topics.length, 'topics and', trends.hashtags.length, 'hashtags');
+    console.log('[Daily Trends] ✅ Fetched', trends.topics.length, 'topics and', trends.trendingHashtags.length, 'hashtags');
 
     // TODO: Save to Supabase when implemented
     // await saveDailyTrends(trends);
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
     const dateStr = searchParams.get('date');
     const date = dateStr ? new Date(dateStr) : new Date();
 
-    const trends = await getDailyTrends(date);
+    const trends = await fetchDailyTrends();
 
     if (!trends) {
       return NextResponse.json({
@@ -82,9 +82,9 @@ export async function GET(request: NextRequest) {
       success: true,
       trends,
       usage: {
-        selectTopic: 'Use selectRelevantTopic(trends.topics, context)',
-        generateCaption: 'Use generateCaptionWithTrend(topic, baseCaption)',
-        selectHashtags: 'Use selectHashtags(trends.hashtags, postType)',
+        selectTopic: 'Use trends.topics to get relevant topics',
+        generateCaption: 'Use generateCaption from @/lib/perplexity',
+        selectHashtags: 'Use trends.trendingHashtags for hashtags',
       },
     });
 

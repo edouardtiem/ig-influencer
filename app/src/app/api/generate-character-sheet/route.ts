@@ -119,7 +119,7 @@ export async function POST(request: Request) {
       try {
         // Build prompt
         const clothingPart = shot.clothing ? `wearing ${shot.clothing}` : '';
-        const prompt = `Professional high-quality photograph of ${physical.base}, ${physical.face}, ${physical.hair}, ${physical.eyes}, ${physical.skin}, ${physical.body}, ${physical.features}. ${signature.necklace} clearly visible. ${clothingPart}. ${shot.angle}, ${shot.pose}. Clean background, professional studio lighting, photorealistic, sharp focus, high resolution, 8K quality, natural skin texture. Same person, consistent identity throughout.`;
+        const prompt = `Professional high-quality photograph of ${physical.base}, ${physical.face}, ${physical.hair}, ${physical.eyes}, ${physical.skin}, ${physical.body}. ${signature.necklace} clearly visible. ${clothingPart}. ${shot.angle}, ${shot.pose}. Clean background, professional studio lighting, photorealistic, sharp focus, high resolution, 8K quality, natural skin texture. Same person, consistent identity throughout.`;
 
         const output = await client.run(
           "black-forest-labs/flux-kontext-pro",

@@ -31,7 +31,7 @@ interface GenerateImageResult {
 function buildPrompt(template: ContentTemplate): string {
   const { physical } = CHARACTER;
   
-  return `A photorealistic Instagram photo of a ${physical.base}, ${physical.face}, ${physical.hair}, ${physical.eyes}, ${physical.skin}, ${physical.body}, ${physical.features}, wearing thin gold necklace with small star pendant. She is wearing ${template.clothing}. ${template.pose}. Setting: ${template.setting}. Shot on iPhone 15 Pro, natural Instagram aesthetic, warm tones, high resolution, sharp focus, natural skin texture. Same person, consistent identity.`;
+  return `A photorealistic Instagram photo of a ${physical.base}, ${physical.face}, ${physical.hair}, ${physical.eyes}, ${physical.skin}, ${physical.body}, wearing thin gold necklace with small star pendant. She is wearing ${template.clothing}. ${template.pose}. Setting: ${template.setting}. Shot on iPhone 15 Pro, natural Instagram aesthetic, warm tones, high resolution, sharp focus, natural skin texture. Same person, consistent identity.`;
 }
 
 /**
