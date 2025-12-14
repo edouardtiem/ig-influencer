@@ -26,7 +26,8 @@ docs/
 │   ├── 06-NANO-BANANA-PRO-MIGRATION.md ← Solution actuelle (Nano Banana Pro)
 │   ├── 07-LIFE-CALENDAR.md           ← Système rotation géographique
 │   ├── 12-DEPLOYMENT.md              ← Guide de déploiement Vercel
-│   └── 14-POST-NOW-WORKFLOW.md       ← Workflow "Copy & Adapt" ⭐ NEW
+│   ├── 14-POST-NOW-WORKFLOW.md       ← Workflow "Copy & Adapt"
+│   └── 15-SMART-COMMENTS.md          ← Commentaires IG via iOS Shortcut ⭐ NEW
 │
 ├── 📊 PROJECTIONS
 │   ├── 05-PROJECTIONS-CROISSANCE.md  ← Projections détaillées
@@ -52,6 +53,7 @@ docs/
 | [11-LIEUX-ACTIFS](./11-LIEUX-ACTIFS.md) | Lieux en rotation | Déc 2024 |
 | [12-DEPLOYMENT](./12-DEPLOYMENT.md) | Déploiement Vercel | Déc 2024 |
 | [14-POST-NOW-WORKFLOW](./14-POST-NOW-WORKFLOW.md) | Workflow création rapide | Déc 2024 |
+| [15-SMART-COMMENTS](./15-SMART-COMMENTS.md) | Commentaires IG via iOS Shortcut | Déc 2024 |
 
 ### 📝 Référence (moins fréquemment mis à jour)
 
@@ -120,4 +122,4 @@ git checkout archive/nsfw-experiments
 
 ---
 
-*Dernière mise à jour : 14 décembre 2024*
+*Dernière mise à jour : 14 décembre 2024 (v2.5)*

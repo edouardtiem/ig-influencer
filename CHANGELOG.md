@@ -4,6 +4,60 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 
 ---
 
+## [2.5.0] - 2024-12-14
+
+### 💬 Smart Comments — Commentaires IG automatisés via iOS Shortcut
+
+Nouveau système de génération de commentaires Instagram personnalisés "Mila-style" depuis un screenshot.
+
+### Added
+
+**Nouveau document : `docs/15-SMART-COMMENTS.md`**
+
+- **Workflow iOS Shortcut complet**
+  - Screenshot → Partager → Raccourci → Commentaire copié
+  - Temps total : 3-5 secondes
+  - Intégration Claude Vision API (claude-3-haiku)
+
+- **API Endpoint `/api/smart-comment`**
+  - POST : Reçoit image base64, retourne commentaire + alternatives
+  - GET : Health check
+  - Support JSON et multipart/form-data
+
+- **Prompt Mila optimisé pour commentaires**
+  - Règle langue : EN par défaut, FR si post FR
+  - Style : 1 phrase max 12 mots, jamais générique
+  - Formules punchy : "X > Y", "This is what...", "Proof that..."
+  - Angle unique : photographe (lumière) + PT (mindset)
+
+- **Interface test web**
+  - `/smart-comment` : Upload/paste screenshot pour tester
+
+**Fichiers créés :**
+- `app/src/lib/smart-comments.ts` — Logique Claude Vision + prompt
+- `app/src/app/api/smart-comment/route.ts` — API endpoint
+- `app/src/app/smart-comment/page.tsx` — Interface test
+
+### Fixed
+
+- **Base64 invalide depuis iOS** : Fonction `cleanBase64()` pour strip prefixes/whitespace
+- **Modèle Claude introuvable** : Migration vers `claude-3-haiku-20240307`
+- **Erreurs build** : Création `lib/make.ts` stub, fix imports `perplexity.ts`
+- **Vulnérabilité Next.js** : Upgrade vers 16.0.10 (CVE-2025-66478)
+- **Cron jobs Vercel** : Suppression (limite Hobby plan)
+
+### Changed
+
+- `docs/README.md` — Ajout entrée 15-SMART-COMMENTS.md
+- `app/src/app/page.tsx` — Liens vers /smart-comment et /api/smart-comment
+
+### Notes
+
+- Requiert `Claude_key` dans les variables d'environnement
+- iOS Shortcut à créer manuellement (voir doc)
+
+---
+
 ## [2.4.0] - 2024-12-04
 
 ### 💎 Stratégie Monétisation V2 — Chatbot & Univers d'Influenceurs
@@ -539,5 +593,5 @@ Cette mise à jour implémente un système complet de training LoRA pour atteind
 
 ---
 
-*Dernière mise à jour : 2 décembre 2024 (v2.3)*
+*Dernière mise à jour : 14 décembre 2024 (v2.5)*
 
