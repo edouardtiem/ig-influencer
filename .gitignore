@@ -38,3 +38,6 @@ coverage/
 *.log
 .turbo
 
+# Generated images (local only)
+app/generated/
+

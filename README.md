@@ -44,16 +44,13 @@ npm run dev
 | Composant | Technologie |
 |-----------|-------------|
 | Backend | Next.js 14 + TypeScript |
-| Génération images | 🍌 **Nano Banana Pro** (Google DeepMind) |
+| Génération images | 🍌 **Nano Banana Pro** (via Replicate) |
 | Consistance faciale | 4 images de référence (95%+ natif) |
-| Base de données | Supabase (Life Calendar System) |
 | Hébergement images | Cloudinary |
-| Publication | Make.com → Buffer → Instagram |
+| Publication | **Instagram Graph API** (direct) |
 | Hosting | Vercel |
 
-> **🔴 MISE À JOUR MAJEURE (2 Déc 2024)** : Migration de Flux Kontext Pro vers Nano Banana Pro pour consistance native supérieure. Voir [docs/06-NANO-BANANA-PRO-MIGRATION.md](docs/06-NANO-BANANA-PRO-MIGRATION.md)
-
-> **📍 NOUVEAUTÉ (2 Déc 2024)** : Life Calendar System avec Supabase pour rotation géographique cohérente. Voir [docs/07-LIFE-CALENDAR.md](docs/07-LIFE-CALENDAR.md)
+> **📍 Workflow "Copy & Adapt"** : Reproduire rapidement un post influencer pour Mila. Voir [docs/14-POST-NOW-WORKFLOW.md](docs/14-POST-NOW-WORKFLOW.md)
 
 **Coût estimé :** ~$2-5/mois (0-10K followers)
 
@@ -65,8 +62,8 @@ npm run dev
 
 - 🏋️‍♀️ **Style** : Athleisure chic (60% lifestyle, 40% fitness)
 - 🇫🇷 **Contenu** : Posts en français, hashtags mixtes
-- ⭐ **Signes distinctifs** : Cheveux cuivre, pendentif étoile, piercing langue
-- 📸 **Format** : 2 posts/jour (10h, 18h)
+- ⭐ **Signes distinctifs** : Cheveux cuivre, pendentif étoile
+- 📸 **Format** : 2 posts/jour
 
 → Voir [docs/03-PERSONNAGE.md](docs/03-PERSONNAGE.md) pour le character sheet complet
 
@@ -79,53 +76,44 @@ npm run dev
 - **[⚡ Quick Start](docs/QUICKSTART.md)** — Démarrer en 5 minutes
 - **[📖 Documentation complète](docs/README.md)** — Index de toute la doc
 - **[🛠️ Implémentation](docs/04-IMPLEMENTATION.md)** — Architecture technique
+- **[📸 Workflow "Copy & Adapt"](docs/14-POST-NOW-WORKFLOW.md)** — Créer un post rapidement
 
 ### Stratégie
 
 - [PRD](docs/01-PRD.md) — Vision produit
 - [Monétisation](docs/02-MONETISATION.md) — Stratégie revenus
 - [Personnage](docs/03-PERSONNAGE.md) — Character design
-- **[📍 Life Calendar](docs/07-LIFE-CALENDAR.md)** — Rotation géographique & contextes ✨ NEW
-- **[🎬 Vidéo Strategy](docs/08-VIDEO-STRATEGY.md)** — Contenu vidéo & animation ✨ NEW
-
-### Plan d'Action
-
-- **[📋 TODO Semaine](TODO-SEMAINE.md)** — Prochaines étapes prioritaires
+- [📍 Life Calendar](docs/07-LIFE-CALENDAR.md) — Rotation géographique & contextes
 
 ---
 
-## 🚀 Pipeline Automatique
+## 🚀 Pipeline de Génération
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│  Cron Job (cron-job.org)                           │
-│  Trigger : 10h & 18h                               │
+│  Workflow "Copy & Adapt"                            │
+│  Screenshots post influencer → Analyse IA           │
 └────────────────┬────────────────────────────────────┘
                  ↓
 ┌─────────────────────────────────────────────────────┐
-│  Next.js API (/api/auto-post)                      │
-│  • Sélection template aléatoire                    │
-│  • Génération prompt                               │
+│  Replicate (Nano Banana Pro)                        │
+│  • Génération image haute qualité                   │
+│  • Consistance native avec 4 références             │
+│  • Temps : ~40-60 secondes                          │
+│  • Coût : ~$0.05/image                              │
 └────────────────┬────────────────────────────────────┘
                  ↓
 ┌─────────────────────────────────────────────────────┐
-│  Replicate (Nano Banana Pro)                       │
-│  • Génération image haute qualité                  │
-│  • Consistance native avec 4 références            │
-│  • Temps : ~60-90 secondes                         │
-│  • Coût : ~$0.05-0.06/image                        │
+│  Cloudinary                                         │
+│  • Hébergement permanent                            │
+│  • URLs publiques                                   │
 └────────────────┬────────────────────────────────────┘
                  ↓
 ┌─────────────────────────────────────────────────────┐
-│  Make.com (Webhook)                                │
-│  • Réception image + caption                       │
-│  • Routage vers Buffer                             │
-└────────────────┬────────────────────────────────────┘
-                 ↓
-┌─────────────────────────────────────────────────────┐
-│  Buffer → Instagram                                │
-│  • Publication automatique                         │
-│  • Post live ! 📱                                  │
+│  Instagram Graph API                                │
+│  • Publication directe                              │
+│  • Carrousels supportés                             │
+│  • Post live ! 📱                                   │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -136,19 +124,11 @@ npm run dev
 | Phase | Status |
 |-------|--------|
 | Configuration | ✅ Complété |
-| Développement Pipeline Base | ✅ Complété |
-| Life Calendar System | 🚧 Documentation complète, implémentation en cours |
-| Stratégie Vidéo | 🚧 Documentation complète, recherche modèle en cours |
-| Tests locaux | ✅ Validé |
-| Déploiement | 📝 Planifié (cette semaine) |
-| Production | 📝 Planifié (semaine prochaine) |
-
-**Derniers développements (v2.3 - 2 Déc) :**
-- ✅ Life Calendar System documenté (rotation géographique Paris/Nice/Travel)
-- ✅ Stratégie vidéo complète (photos + reels animés)
-- ✅ Architecture Supabase (6 tables)
-- 🚧 Recherche modèle animation en cours
-- 🚧 Setup Supabase à effectuer
+| Pipeline Génération | ✅ Complété |
+| Publication Graph API | ✅ Complété |
+| Workflow "Copy & Adapt" | ✅ Complété |
+| Life Calendar System | 🚧 En cours |
+| Scheduling automatique | 📝 Planifié (Vercel Cron) |
 
 ---
 
@@ -171,12 +151,11 @@ npm run dev
 # Démarrer le serveur
 npm run dev
 
-# Tester génération d'image
-curl http://localhost:3000/api/test-generate
+# Générer un carrousel
+node scripts/generate-cafe-backshot-carousel.mjs
 
-# Publier un post Instagram
-curl -X POST http://localhost:3000/api/auto-post \
-  -H "Authorization: Bearer test-secret"
+# Publier sur Instagram
+node scripts/post-carousel-instagram.mjs
 
 # Vérifier le status
 curl http://localhost:3000/api/status
@@ -198,17 +177,11 @@ cd app && vercel --prod
 
 ---
 
-## 🤝 Contribution
-
-Ce projet est actuellement en développement privé. La documentation est maintenue à jour avec chaque itération.
-
----
-
 ## 📝 Changelog
 
 Voir [CHANGELOG.md](CHANGELOG.md) pour l'historique complet des versions.
 
-**Version actuelle :** 2.3.0 (Life Calendar + Vidéo documentés)
+**Version actuelle :** 3.0.0 (Graph API direct, nettoyage codebase)
 
 ---
 
@@ -231,7 +204,6 @@ Private project — All rights reserved
 
 **Made with ❤️ and lots of AI**
 
-*Propulsé par Replicate, Cloudinary, Make.com & Vercel*
+*Propulsé par Replicate, Cloudinary & Vercel*
 
 </div>
-
