@@ -269,9 +269,12 @@ export async function generateImage(options: GenerateImageOptions): Promise<Gene
     const { primaryFaceUrl, referenceUrls } = getBasePortraits();
     const allReferenceUrls: string[] = [];
     
-    // Add character references (Mila's 6 base photos)
+    // Add character references (Mila's photos - limited to 3 for API payload size)
     if (useReferences) {
-      allReferenceUrls.push(primaryFaceUrl, ...referenceUrls);
+      // Use primary + first 2 references (3 total) to keep payload manageable
+      const limitedRefs = referenceUrls.slice(0, 2);
+      allReferenceUrls.push(primaryFaceUrl, ...limitedRefs);
+      console.log('[Nano Banana Pro] Using', allReferenceUrls.length, 'character references (limited from', referenceUrls.length + 1, ')');
     }
     
     // Add location reference if available

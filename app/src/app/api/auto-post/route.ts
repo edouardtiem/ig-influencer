@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateFromCalendar } from '@/lib/nanobanana';
-import { publishToInstagram } from '@/lib/make';
+import { postSingleImage, checkInstagramConnection } from '@/lib/instagram';
 import { generateCaption, fetchDailyTrends, DailyTrends } from '@/lib/perplexity';
 import { 
   getPostingSlotsForDate, 
@@ -237,10 +237,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<AutoPostR
     
     console.log(`[${timestamp}] 📤 Publishing to Instagram...`);
     
-    const publishResult = await publishToInstagram({
-      imageUrl: imageResult.imageUrl,
-      caption: fullCaption,
-    });
+    const publishResult = await postSingleImage(imageResult.imageUrl, fullCaption);
     
     if (!publishResult.success) {
       console.error(`[${timestamp}] ❌ Publish failed:`, publishResult.error);
@@ -253,7 +250,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<AutoPostR
       }, { status: 500 });
     }
     
-    console.log(`[${timestamp}] ✅ Published successfully!`);
+    console.log(`[${timestamp}] ✅ Published successfully! Post ID: ${publishResult.postId}`);
     
     // ─────────────────────────────────────────────────────────────
     // SUCCESS
@@ -261,10 +258,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<AutoPostR
     
     return NextResponse.json({
       success: true,
-      imageUrl: publishResult.cloudinaryUrl || imageResult.imageUrl,
+      imageUrl: imageResult.imageUrl,
       caption: fullCaption,
       hashtags,
       timestamp,
+      postId: publishResult.postId,
       metadata: {
         location: location.name,
         action: brief.selectedPose,

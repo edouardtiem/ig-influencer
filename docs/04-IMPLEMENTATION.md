@@ -46,23 +46,22 @@ Cette session a consisté à implémenter l'infrastructure complète pour Mila V
 
 **Architecture retenue :**
 ```
-Next.js API (/api/auto-post)
+cron-job.org déclenche → /api/auto-post
     ↓
-Replicate (génération + face swap)
+Replicate (génération Nano Banana Pro)
     ↓
-Cloudinary (hébergement permanent) [optionnel dans v1]
+Perplexity (génération caption)
     ↓
-Make.com (webhook)
-    ↓
-Buffer (publication Instagram)
+Instagram Graph API (publication directe)
     ↓
 Instagram
 ```
 
-**Pourquoi Make.com et pas Buffer API directement ?**
-- ❌ Buffer API deprecated pour nouvelles applications
-- ❌ Meta Instagram Graph API complexe (nécessite Page FB, validation app)
-- ✅ Make.com : Simple, gratuit, workflow visuel
+**Pourquoi Instagram Graph API directement ?**
+- ✅ Pas de dépendance à des services tiers (Make.com, Buffer)
+- ✅ Gratuit et sans limites de publication
+- ✅ Support natif des carrousels
+- ✅ Contrôle total sur le processus
 
 ### 4. Gestion des portraits de référence ✅
 
@@ -145,19 +144,18 @@ checkCloudinaryStatus()    // Health check
 - Folder: `mila-verne/`
 - Nommage: `unique_filename: true`
 
-#### 3. `make.ts`
+#### 3. `instagram.ts`
 
 ```typescript
-publishToInstagram()       // POST vers webhook Make.com
+postSingleImage()          // Publier une image
+postCarousel()             // Publier un carrousel (2-10 images)
+checkInstagramConnection() // Vérifier la connexion API
 ```
 
-**Payload :**
-```json
-{
-  "image": "https://res.cloudinary.com/...",
-  "caption": "Caption + hashtags"
-}
-```
+**Prérequis :**
+- Token permanent Instagram Graph API
+- Compte Instagram Business/Creator
+- Page Facebook connectée
 
 ### Variables d'environnement
 
@@ -170,8 +168,9 @@ CLOUDINARY_CLOUD_NAME=dxxxxx
 CLOUDINARY_API_KEY=123456789
 CLOUDINARY_API_SECRET=xxxxx
 
-# Make.com (publication)
-MAKE_WEBHOOK_URL=https://hook.eu1.make.com/xxxxx
+# Instagram Graph API (publication directe)
+INSTAGRAM_ACCESS_TOKEN=ton-token-permanent
+INSTAGRAM_ACCOUNT_ID=17841400000000000
 
 # Portraits de référence
 MILA_BASE_FACE_URL=https://res.cloudinary.com/.../primary.jpg
@@ -228,11 +227,11 @@ CRON_SECRET=votre-secret-fort
 **Endpoint :** `POST /api/auto-post`
 
 **Process :**
-1. Sélection template aléatoire pondéré
-2. Génération image (Nano Banana Pro avec 4 références)
-3. Face swap (FaceFusion avec référence aléatoire)
-4. Génération caption en français
-5. Publication via Make.com → Buffer → Instagram
+1. Détermination du slot (morning/midday/evening) basé sur le calendrier
+2. Génération content brief (lieu, tenue, action, props)
+3. Génération image (Nano Banana Pro)
+4. Génération caption via Perplexity
+5. Publication directe via Instagram Graph API
 
 **Authentification :**
 ```bash
@@ -260,25 +259,25 @@ Permet de :
 
 ---
 
-## 🛠️ Configuration Make.com
+## 🛠️ Configuration cron-job.org
 
-### Scénario Make.com
+### Créer les 3 cron jobs
 
-**Modules :**
-1. **Custom Webhook** (trigger)
-   - URL : `https://hook.eu1.make.com/{id}`
-   - Method : POST
-   - Data structure : `{ image, caption }`
+1. **Morning (6h30 Paris)**
+   - URL: `https://ton-app.vercel.app/api/auto-post`
+   - Schedule: `30 5 * * *` (5h30 UTC = 6h30 Paris hiver)
+   
+2. **Midday (11h30 Paris)**
+   - URL: `https://ton-app.vercel.app/api/auto-post?slot=midday`
+   - Schedule: `30 10 * * *` (10h30 UTC)
+   
+3. **Evening (18h00 Paris)**
+   - URL: `https://ton-app.vercel.app/api/auto-post?slot=evening`
+   - Schedule: `0 17 * * *` (17h00 UTC)
 
-2. **Buffer - Create an Update**
-   - Profile : Votre profil Instagram
-   - Text : `{{1.caption}}`
-   - Link to an image : `{{1.image}}`
-   - Thumbnail : `{{1.image}}`
-
-**Activation :**
-- Mode : **"Immediately"** (écoute en temps réel)
-- ⚠️ Pas "Run once" (pour production)
+**Configuration commune :**
+- Method: POST
+- Headers: `Authorization: Bearer TON_CRON_SECRET`
 
 ---
 
@@ -288,11 +287,11 @@ Permet de :
 
 | Service | Coût | Fréquence |
 |---------|------|-----------|
-| Replicate | ~$0.04/image | 2 posts/jour |
+| Replicate | ~$0.04/image | 3 posts/jour |
 | Cloudinary | Gratuit | (25 GB, 25K transformations) |
-| Make.com | Gratuit | (1,000 opérations/mois) |
-| Buffer | Gratuit | (1 compte social) |
-| **Total** | **~$2.40/mois** | |
+| cron-job.org | Gratuit | (illimité) |
+| Instagram API | Gratuit | - |
+| **Total** | **~$3.60/mois** | |
 
 ### Optimisations futures
 
@@ -315,9 +314,9 @@ Permet de :
 - ⚠️ URLs Replicate expirent après ~1h (confirmé)
 
 ### Test 3 : Publication Instagram
-- ✅ Webhook Make.com reçoit données
-- ✅ Buffer traite l'image
-- ✅ Post publié sur Instagram
+- ✅ Instagram Graph API connecté
+- ✅ Single image publication fonctionne
+- ✅ Carousel publication fonctionne
 - ✅ Caption en français affichée correctement
 
 ### Test 4 : Gestion des références

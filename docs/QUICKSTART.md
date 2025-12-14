@@ -32,8 +32,9 @@ CLOUDINARY_CLOUD_NAME=dxxxxx
 CLOUDINARY_API_KEY=123456789
 CLOUDINARY_API_SECRET=xxxxx
 
-# Make.com (publication Instagram)
-MAKE_WEBHOOK_URL=https://hook.eu1.make.com/xxxxx
+# Instagram Graph API (publication directe)
+INSTAGRAM_ACCESS_TOKEN=ton-token-permanent
+INSTAGRAM_ACCOUNT_ID=17841400000000000
 
 # Portraits de référence (depuis Cloudinary)
 MILA_BASE_FACE_URL=https://res.cloudinary.com/.../primary.jpg
@@ -81,8 +82,9 @@ curl http://localhost:3000/api/test-generate
 ### Publier un post sur Instagram
 
 **Prérequis :**
-- Scenario Make.com activé en mode "Immediately"
-- Buffer connecté au compte Instagram
+- `INSTAGRAM_ACCESS_TOKEN` configuré (token permanent)
+- `INSTAGRAM_ACCOUNT_ID` configuré
+- Page Facebook liée au compte Instagram Business
 
 ```bash
 curl -X POST http://localhost:3000/api/auto-post \
@@ -198,10 +200,11 @@ const weights: Record<ContentType, number> = {
 → Vérifier que `.env.local` existe et contient `REPLICATE_API_TOKEN`
 → Redémarrer le serveur
 
-### Erreur : "Webhook returned 410"
+### Erreur : "Instagram API error"
 
-→ Le scenario Make.com n'est pas activé
-→ Aller sur Make.com → activer en mode "Immediately"
+→ Vérifier que `INSTAGRAM_ACCESS_TOKEN` n'est pas expiré
+→ Vérifier que le compte Instagram est bien Business/Creator
+→ Vérifier que la Page Facebook est connectée
 
 ### Images ne se génèrent pas
 
@@ -215,9 +218,9 @@ const weights: Record<ContentType, number> = {
 
 ### Les posts n'apparaissent pas sur Instagram
 
-→ Vérifier Buffer dans Make.com (profil correctement connecté)
-→ Vérifier les logs Make.com pour erreurs
-→ Tester avec une URL publique (ex: Unsplash) pour isoler le problème
+→ Vérifier les logs Vercel pour erreurs API Instagram
+→ Vérifier que l'URL de l'image est publiquement accessible
+→ Tester avec `curl http://localhost:3000/api/test-publish?dryrun=true`
 
 ---
 
@@ -233,8 +236,8 @@ Le terminal affiche les logs en temps réel :
 [2024-12-02T14:17:14.559Z] Generating image with face swap...
 [2024-12-02T14:17:44.123Z] Image generated: https://replicate.delivery/...
 [2024-12-02T14:17:44.123Z] Caption: Corps et esprit alignés...
-[2024-12-02T14:17:44.123Z] Publishing to Instagram via Make.com...
-[2024-12-02T14:17:45.456Z] Published successfully!
+[2024-12-02T14:17:44.123Z] Publishing to Instagram...
+[2024-12-02T14:17:45.456Z] Published successfully! Post ID: 17895...
 ```
 
 ### Vérifier les coûts Replicate
@@ -259,11 +262,9 @@ Voir [04-IMPLEMENTATION.md](./04-IMPLEMENTATION.md) section "Déploiement"
 
 2. **Ajouter les variables d'environnement sur Vercel Dashboard**
 
-3. **Configurer cron job sur [cron-job.org](https://cron-job.org)**
-   - URL : `https://votre-app.vercel.app/api/auto-post`
-   - Method : POST
-   - Header : `Authorization: Bearer YOUR_CRON_SECRET`
-   - Schedule : 10h et 18h (2x/jour)
+3. **Configurer cron jobs sur [cron-job.org](https://cron-job.org)**
+   - Créer 3 cron jobs (morning, midday, evening)
+   - Voir [12-DEPLOYMENT.md](./12-DEPLOYMENT.md) pour la config détaillée
 
 ---
 

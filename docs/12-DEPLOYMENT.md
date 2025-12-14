@@ -7,8 +7,10 @@ Avant de déployer, assure-toi d'avoir :
 - [ ] Compte Vercel (https://vercel.com)
 - [ ] Compte Replicate avec crédits (https://replicate.com)
 - [ ] Compte Cloudinary (https://cloudinary.com)
-- [ ] Compte Make.com avec scénario Buffer/Instagram configuré
+- [ ] Page Facebook + Compte Instagram Pro Business connectés
+- [ ] Token Instagram Graph API (permanent)
 - [ ] (Optionnel) Compte Perplexity API (https://perplexity.ai)
+- [ ] Compte cron-job.org (gratuit)
 
 ---
 
@@ -22,7 +24,8 @@ Avant de déployer, assure-toi d'avoir :
 | `CLOUDINARY_CLOUD_NAME` | Nom du cloud Cloudinary | ✅ Oui |
 | `CLOUDINARY_API_KEY` | Clé API Cloudinary | ✅ Oui |
 | `CLOUDINARY_API_SECRET` | Secret API Cloudinary | ✅ Oui |
-| `MAKE_WEBHOOK_URL` | URL webhook Make.com | ✅ Oui |
+| `INSTAGRAM_ACCESS_TOKEN` | Token permanent Instagram Graph API | ✅ Oui |
+| `INSTAGRAM_ACCOUNT_ID` | ID du compte Instagram Business | ✅ Oui |
 | `CRON_SECRET` | Secret pour auth cron jobs | ✅ Oui (prod) |
 | `PERPLEXITY_API_KEY` | Clé API Perplexity | ❌ Optionnel |
 | `MILA_BASE_FACE_URL` | URL portrait principal Mila | ✅ Oui |
@@ -193,9 +196,10 @@ curl https://ton-app.vercel.app/api/daily-trends
 
 ### Image pas publiée
 
-- Vérifier `MAKE_WEBHOOK_URL`
-- Vérifier scénario Make.com activé
-- Vérifier connexion Buffer → Instagram
+- Vérifier `INSTAGRAM_ACCESS_TOKEN` valide (non expiré)
+- Vérifier `INSTAGRAM_ACCOUNT_ID` correct
+- Vérifier que l'image URL est publiquement accessible
+- Regarder logs pour message d'erreur Instagram API
 
 ### Timeout (504)
 
@@ -218,7 +222,7 @@ curl https://ton-app.vercel.app/api/daily-trends
 ## 🔄 Workflow Complet
 
 ```
-Cron déclenche → /api/auto-post
+Cron-job.org déclenche → /api/auto-post
          ↓
     Calendrier détermine slot + lieu
          ↓
@@ -228,9 +232,7 @@ Cron déclenche → /api/auto-post
          ↓
     Perplexity génère caption + hashtags
          ↓
-    Cloudinary héberge l'image
-         ↓
-    Make.com → Buffer → Instagram
+    Instagram Graph API publie directement
          ↓
     ✅ Post publié !
 ```
@@ -242,11 +244,12 @@ Cron déclenche → /api/auto-post
 | Service | Coût/mois (3 posts/jour) |
 |---------|--------------------------|
 | Replicate | ~$15-25 |
-| Vercel | $0 (Hobby) ou $20 (Pro) |
+| Vercel | $0 (Hobby) |
 | Cloudinary | $0 (Free tier) |
-| Make.com | $0-9 |
+| cron-job.org | $0 (Free) |
 | Perplexity | $0-5 |
-| **Total** | **~$15-60/mois** |
+| Instagram API | $0 (Gratuit) |
+| **Total** | **~$15-30/mois** |
 
 ---
 
