@@ -34,6 +34,27 @@ export interface CommentResponse {
 const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
 
 /**
+ * Clean base64 string from iOS Shortcuts
+ * Removes: data:... prefix, newlines, spaces, invalid chars
+ */
+function cleanBase64(base64: string): string {
+  let cleaned = base64;
+  
+  // Remove data:image/...;base64, prefix if present
+  if (cleaned.includes('base64,')) {
+    cleaned = cleaned.split('base64,')[1];
+  }
+  
+  // Remove whitespace, newlines, carriage returns
+  cleaned = cleaned.replace(/[\s\r\n]/g, '');
+  
+  // Remove any non-base64 characters (keep only A-Z, a-z, 0-9, +, /, =)
+  cleaned = cleaned.replace(/[^A-Za-z0-9+/=]/g, '');
+  
+  return cleaned;
+}
+
+/**
  * Generate a smart comment from an Instagram post screenshot
  */
 export async function generateSmartComment(
@@ -44,6 +65,20 @@ export async function generateSmartComment(
   if (!apiKey) {
     return { success: false, error: 'Claude_key not configured in .env.local' };
   }
+  
+  // Clean the base64 data (iOS Shortcuts often adds newlines/spaces)
+  const cleanedBase64 = cleanBase64(request.imageBase64);
+  
+  // #region agent log
+  console.log('[SmartComments] Base64 debug:', {
+    originalLength: request.imageBase64.length,
+    cleanedLength: cleanedBase64.length,
+    originalFirst50: request.imageBase64.substring(0, 50),
+    cleanedFirst50: cleanedBase64.substring(0, 50),
+    hasDataPrefix: request.imageBase64.includes('data:'),
+    hasNewlines: request.imageBase64.includes('\n') || request.imageBase64.includes('\r'),
+  });
+  // #endregion
 
   const systemPrompt = `Tu es Mila, une influenceuse IA lifestyle/fitness de 23 ans basée entre Paris et Nice. 
 Tu commentes des posts Instagram d'autres créateurs pour engager et te faire remarquer.
@@ -110,7 +145,7 @@ Réponds en JSON:
                 source: {
                   type: 'base64',
                   media_type: request.mimeType,
-                  data: request.imageBase64,
+                  data: cleanedBase64,
                 },
               },
               {
