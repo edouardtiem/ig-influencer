@@ -224,6 +224,24 @@ curl -X POST http://localhost:3000/api/smart-comment \
 **Symptôme** : `404 model not found`
 **Fix** : Utiliser `claude-3-haiku-20240307` (accessible avec clé standard)
 
+### 4. Claude retourne du texte avant le JSON
+**Symptôme** : `SyntaxError: Unexpected token 'A', "Analyse :..."` 
+**Cause** : Claude ajoute du texte explicatif ("Analyse :", "Voici le JSON :") avant l'objet JSON
+**Fix** : 
+1. Prompt renforcé avec warning explicite :
+   ```
+   ⚠️ CRITICAL: Réponds UNIQUEMENT avec un objet JSON valide. 
+   Pas de texte avant, pas de texte après.
+   ```
+2. Parsing robuste avec regex fallback :
+   ```typescript
+   // Extrait le JSON même s'il y a du texte autour
+   const jsonMatch = content.match(/\{[\s\S]*\}/);
+   if (jsonMatch) {
+     jsonStr = jsonMatch[0];
+   }
+   ```
+
 ---
 
 ## 📈 Évolutions Futures
