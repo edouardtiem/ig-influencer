@@ -76,6 +76,18 @@ export default function Home() {
           
           <div className="grid gap-4 md:grid-cols-2">
             <Link 
+              href="/smart-comment"
+              className="block p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 hover:border-purple-300 transition-colors group"
+            >
+              <span className="text-2xl mb-3 block">💬</span>
+              <h3 className="font-medium text-gray-900 group-hover:text-purple-600 transition-colors">
+                Smart Comment
+              </h3>
+              <p className="text-sm text-gray-500 mt-1">
+                Generate personalized comments from IG screenshots
+              </p>
+            </Link>
+            <Link 
               href="/select-base"
               className="block p-6 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-200 hover:border-amber-300 transition-colors group"
             >
@@ -109,6 +121,11 @@ export default function Home() {
           </h2>
           
           <div className="space-y-4">
+            <EndpointItem 
+              method="POST" 
+              path="/api/smart-comment" 
+              description="Generate smart comment from screenshot"
+            />
             <EndpointItem 
               method="POST" 
               path="/api/auto-post" 
