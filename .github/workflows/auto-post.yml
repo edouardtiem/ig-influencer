@@ -1,0 +1,110 @@
+name: Mila Auto Post
+
+on:
+  schedule:
+    # Morning - 6h30 Paris (5h30 UTC hiver, 4h30 UTC été)
+    - cron: '30 5 * * *'
+    # Midday - 11h30 Paris (10h30 UTC hiver, 9h30 UTC été)  
+    - cron: '30 10 * * *'
+    # Evening - 18h00 Paris (17h00 UTC hiver, 16h00 UTC été)
+    - cron: '0 17 * * *'
+  
+  # Permet de déclencher manuellement
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: 'Time slot (morning, midday, evening)'
+        required: false
+        default: ''
+      test_mode:
+        description: 'Test mode (no publish)'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  auto-post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      - name: Determine slot from schedule
+        id: slot
+        run: |
+          HOUR=$(date -u +%H)
+          MINUTE=$(date -u +%M)
+          
+          # Manual trigger with specific slot
+          if [ -n "${{ github.event.inputs.slot }}" ]; then
+            echo "slot=${{ github.event.inputs.slot }}" >> $GITHUB_OUTPUT
+            echo "Using manual slot: ${{ github.event.inputs.slot }}"
+            exit 0
+          fi
+          
+          # Determine slot based on current UTC time
+          if [ "$HOUR" -eq 5 ] || [ "$HOUR" -eq 4 ]; then
+            echo "slot=morning" >> $GITHUB_OUTPUT
+            echo "Detected morning slot"
+          elif [ "$HOUR" -eq 10 ] || [ "$HOUR" -eq 9 ]; then
+            echo "slot=midday" >> $GITHUB_OUTPUT
+            echo "Detected midday slot"
+          elif [ "$HOUR" -eq 17 ] || [ "$HOUR" -eq 16 ]; then
+            echo "slot=evening" >> $GITHUB_OUTPUT
+            echo "Detected evening slot"
+          else
+            echo "slot=morning" >> $GITHUB_OUTPUT
+            echo "Defaulting to morning slot"
+          fi
+
+      - name: Build URL
+        id: url
+        run: |
+          BASE_URL="${{ secrets.VERCEL_APP_URL }}/api/auto-post"
+          SLOT="${{ steps.slot.outputs.slot }}"
+          TEST="${{ github.event.inputs.test_mode }}"
+          
+          URL="${BASE_URL}"
+          PARAMS=""
+          
+          if [ -n "$SLOT" ] && [ "$SLOT" != "morning" ]; then
+            PARAMS="slot=${SLOT}"
+          fi
+          
+          if [ "$TEST" = "true" ]; then
+            if [ -n "$PARAMS" ]; then
+              PARAMS="${PARAMS}&test=true"
+            else
+              PARAMS="test=true"
+            fi
+          fi
+          
+          if [ -n "$PARAMS" ]; then
+            URL="${URL}?${PARAMS}"
+          fi
+          
+          echo "url=${URL}" >> $GITHUB_OUTPUT
+          echo "Calling: ${URL}"
+
+      - name: Trigger Auto Post
+        run: |
+          echo "🚀 Starting auto-post for slot: ${{ steps.slot.outputs.slot }}"
+          echo "📍 URL: ${{ steps.url.outputs.url }}"
+          
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${{ steps.url.outputs.url }}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --max-time 180)
+          
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          
+          echo "📊 Response code: $HTTP_CODE"
+          echo "📝 Response body:"
+          echo "$BODY" | jq '.' 2>/dev/null || echo "$BODY"
+          
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo "✅ Auto-post successful!"
+          else
+            echo "❌ Auto-post failed with code $HTTP_CODE"
+            exit 1
+          fi
