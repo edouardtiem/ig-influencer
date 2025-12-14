@@ -178,21 +178,11 @@ PROCESS :
 2. Choisis LA stratégie la plus adaptée (curiosity gap, peer positioning, opinion forte, ou rebond caption)
 3. Génère un commentaire court (8-15 mots) qui intrigue
 
-RAPPEL : Tu n'es PAS une fan. Tu es une photographe/coach qui COMPREND le game. Ton commentaire doit donner envie de savoir qui tu es.
+RAPPEL : Tu n'es PAS une fan. Tu es une photographe/coach qui COMPREND le game.
 
-JSON :
-{
-  "analysis": {
-    "accountType": "photographer|fitness|lifestyle|fashion|travel|other",
-    "contentType": "portrait|selfie|gym|landscape|outfit|other",
-    "language": "en|fr",
-    "hasQuestion": true|false,
-    "specificElement": "l'élément unique sur lequel tu rebondis"
-  },
-  "strategy": "curiosity_gap|peer_positioning|opinion|caption_rebond",
-  "comment": "Le commentaire (8-15 mots)",
-  "alternatives": ["option 2", "option 3"]
-}`;
+⚠️ CRITICAL: Réponds UNIQUEMENT avec un objet JSON valide. Pas de texte avant, pas de texte après. Pas de "Analyse :", pas de "Voici le JSON :". JUSTE le JSON.
+
+{"analysis":{"accountType":"...","contentType":"...","language":"en|fr","hasQuestion":true|false,"specificElement":"..."},"strategy":"curiosity_gap|peer_positioning|opinion|caption_rebond","comment":"...","alternatives":["...","..."]}`;
 
   try {
     const response = await fetch(CLAUDE_API_URL, {
@@ -258,12 +248,20 @@ JSON :
       return { success: false, error: 'No content in Claude response' };
     }
 
-    // Parse JSON from response
+    // Parse JSON from response - robust extraction
     let jsonStr = content;
+    
+    // Try to extract JSON from markdown code blocks
     if (content.includes('```json')) {
       jsonStr = content.split('```json')[1].split('```')[0];
     } else if (content.includes('```')) {
       jsonStr = content.split('```')[1].split('```')[0];
+    } else {
+      // Try to find JSON object in the response (starts with { ends with })
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        jsonStr = jsonMatch[0];
+      }
     }
 
     const parsed = JSON.parse(jsonStr.trim());
