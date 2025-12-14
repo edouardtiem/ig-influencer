@@ -134,7 +134,7 @@ Réponds en JSON:
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-3-5-sonnet-20241022',
         max_tokens: 1024,
         messages: [
           {
@@ -162,7 +162,24 @@ Réponds en JSON:
     if (!response.ok) {
       const errorData = await response.text();
       console.error('[SmartComments] Claude API error:', response.status, errorData);
-      return { success: false, error: `Claude API error: ${response.status}` };
+      
+      // Parse error message for better feedback
+      let errorMessage = `Claude API error: ${response.status}`;
+      try {
+        const errorJson = JSON.parse(errorData);
+        if (errorJson.error?.message) {
+          errorMessage = errorJson.error.message;
+        }
+      } catch {
+        // Keep default message
+      }
+      
+      // Return error with comment field empty so iOS shortcut knows it failed
+      return { 
+        success: false, 
+        error: errorMessage,
+        comment: '', // Empty so shortcut copies nothing meaningful
+      };
     }
 
     const data = await response.json();
