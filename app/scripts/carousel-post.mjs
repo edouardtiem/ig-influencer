@@ -124,45 +124,83 @@ const LOCATIONS = {
 };
 
 // ═══════════════════════════════════════════════════════════════
-// OUTFITS - Sexy but filter-safe (tested prompts)
+// OUTFITS - Sexy but filter-safe (with brand references)
 // ═══════════════════════════════════════════════════════════════
 
 const OUTFITS = {
   home_bedroom: [
-    'fitted ribbed gray bodysuit with thin spaghetti straps, fabric hugging curves elegantly',
-    'oversized white cotton t-shirt slipping off one shoulder, bare legs, just woke up',
-    'silk champagne camisole top with thin delicate straps, matching shorts',
-    'oversized cream knit sweater falling off shoulder, cotton boyshort underneath',
-    'loose mens dress shirt in white, unbuttoned showing décolleté, sleeves rolled up',
-    'matching cotton underwear set in neutral tone, soft bralette and high-waisted brief',
-    'fitted black ribbed tank top thin straps, high-waisted cotton panties',
+    'fitted ribbed gray bodysuit Skims style with thin spaghetti straps, fabric hugging curves elegantly',
+    'oversized white cotton t-shirt slipping off one shoulder, bare legs, just woke up authentic',
+    'silk champagne camisole Intimissimi style with thin delicate straps, matching shorts',
+    'oversized cream knit sweater falling off shoulder, Savage x Fenty cotton boyshort underneath',
+    'loose mens dress shirt in white unbuttoned showing décolleté, sleeves rolled up casual',
+    'matching cotton underwear set Etam style neutral tone, soft bralette and high-waisted brief',
+    'fitted black ribbed tank top thin straps Alo Yoga style, high-waisted cotton panties',
+    'delicate lace bralette Livy Paris style visible under loose tank top, cozy morning',
   ],
   home_living_room: [
-    'fitted ribbed bodysuit in heather gray, thin straps, barefoot',
+    'fitted ribbed bodysuit Skims style heather gray, thin straps, barefoot on sofa',
     'oversized cream sweater slipping off one shoulder revealing skin, bare legs tucked',
-    'matching loungewear set, cropped top and high-waisted leggings in beige',
-    'silk camisole in soft pink, loose pajama pants, cozy evening',
-    'fitted tank top no visible bra natural silhouette, cotton shorts',
-    'oversized hoodie as dress, sleeves covering hands, casual sexy',
-    'yoga set, fitted crop top and high-waisted leggings showing midriff',
+    'matching loungewear set Alo Yoga style, cropped top and high-waisted leggings beige',
+    'silk camisole Intimissimi style soft pink, loose pajama pants, cozy evening',
+    'fitted tank top no visible bra natural silhouette, cotton shorts casual home',
+    'oversized hoodie as dress Brandy Melville style, sleeves covering hands',
+    'yoga set Lululemon style, fitted crop top and high-waisted leggings showing midriff',
   ],
   paris_cafe: [
-    'fitted ribbed top in white, high-waisted jeans, effortless chic',
-    'silk blouse slightly unbuttoned, tailored trousers, Parisian elegant',
-    'fitted sundress with thin straps, subtle décolletage, summer style',
-    'cropped cardigan over fitted tank, showing hint of midriff',
-    'linen blazer over simple black bodysuit, casual sophistication',
-    'off-shoulder top, fitted jeans, feminine street style',
+    'fitted ribbed top Sézane style white, high-waisted jeans, effortless Parisian chic',
+    'silk blouse Rouje style slightly unbuttoned, tailored trousers elegant',
+    'fitted sundress Réalisation Par style thin straps, subtle décolletage summer',
+    'cropped cardigan over fitted tank, showing hint of midriff, café style',
+    'linen blazer over simple black bodysuit, casual sophistication French girl',
+    'off-shoulder top feminine, fitted jeans, Parisian street style',
   ],
   paris_street: [
-    'leather jacket over fitted white t-shirt, high-waisted jeans, cool style',
-    'long coat open over fitted dress, legs visible, elegant walk',
-    'cropped sweater showing midriff, high-waisted wide pants',
-    'fitted turtleneck, leather pants, confident city look',
-    'oversized blazer as dress, bare legs, fashion forward',
-    'simple black dress, figure-hugging, classic Parisian',
+    'leather jacket over fitted white t-shirt, high-waisted jeans, cool Parisian style',
+    'long coat open over fitted dress, legs visible, elegant confident walk',
+    'cropped sweater showing midriff, high-waisted wide pants Zara style',
+    'fitted turtleneck, leather pants, confident city look editorial',
+    'oversized blazer as dress The Frankie Shop style, bare legs fashion forward',
+    'simple black dress figure-hugging Rouje style, classic Parisian elegance',
   ],
 };
+
+// ═══════════════════════════════════════════════════════════════
+// FALLBACK - Safer versions when flagged
+// ═══════════════════════════════════════════════════════════════
+
+// Words to remove/replace when prompt is flagged
+const SENSITIVE_REPLACEMENTS = [
+  { from: /\bbare legs\b/gi, to: 'legs visible' },
+  { from: /\bno visible bra\b/gi, to: 'relaxed fit' },
+  { from: /\bboyshort\b/gi, to: 'shorts' },
+  { from: /\bpanties\b/gi, to: 'bottoms' },
+  { from: /\bbralette\b/gi, to: 'soft top' },
+  { from: /\bunderwear\b/gi, to: 'loungewear' },
+  { from: /\blingerie\b/gi, to: 'sleepwear' },
+  { from: /\bslipping off\b/gi, to: 'relaxed on' },
+  { from: /\bunbuttoned\b/gi, to: 'loosely worn' },
+  { from: /\bshowing décolleté\b/gi, to: 'casual neckline' },
+  { from: /\bbare shoulders\b/gi, to: 'shoulders visible' },
+  { from: /\bsensual\b/gi, to: 'confident' },
+  { from: /\bsexy\b/gi, to: 'stylish' },
+  { from: /\bintimate\b/gi, to: 'cozy' },
+  { from: /\balluring\b/gi, to: 'charming' },
+  { from: /\bcurves\b/gi, to: 'silhouette' },
+];
+
+function makeSaferPrompt(prompt) {
+  let saferPrompt = prompt;
+  for (const { from, to } of SENSITIVE_REPLACEMENTS) {
+    saferPrompt = saferPrompt.replace(from, to);
+  }
+  // Also add extra safe keywords
+  saferPrompt = saferPrompt.replace(
+    'ultra realistic',
+    'ultra realistic, tasteful fashion photography, editorial style'
+  );
+  return saferPrompt;
+}
 
 // ═══════════════════════════════════════════════════════════════
 // SLOTS - 4 posts per day
@@ -304,9 +342,7 @@ async function urlToBase64(url) {
   return `data:${contentType};base64,${base64}`;
 }
 
-async function generateImage(replicate, prompt, referenceUrls) {
-  log(`  Generating with ${referenceUrls.length} references...`);
-  
+async function generateImageInternal(replicate, prompt, base64Images) {
   const input = {
     prompt,
     aspect_ratio: "4:5",
@@ -315,13 +351,8 @@ async function generateImage(replicate, prompt, referenceUrls) {
     safety_filter_level: "block_only_high",
   };
 
-  if (referenceUrls.length > 0) {
-    log(`  Converting ${referenceUrls.length} images to base64...`);
-    const base64Images = await Promise.all(
-      referenceUrls.map(url => urlToBase64(url))
-    );
+  if (base64Images && base64Images.length > 0) {
     input.image_input = base64Images;
-    log(`  ✅ Converted to base64`);
   }
 
   const output = await replicate.run(NANO_BANANA_MODEL, { input });
@@ -357,6 +388,59 @@ async function generateImage(replicate, prompt, referenceUrls) {
   if (Array.isArray(output) && output[0]) return output[0];
 
   throw new Error('Could not process API response');
+}
+
+async function generateImage(replicate, prompt, referenceUrls) {
+  log(`  Generating with ${referenceUrls.length} references...`);
+  
+  // Convert references to base64 once
+  let base64Images = null;
+  if (referenceUrls.length > 0) {
+    log(`  Converting ${referenceUrls.length} images to base64...`);
+    base64Images = await Promise.all(
+      referenceUrls.map(url => urlToBase64(url))
+    );
+    log(`  ✅ Converted to base64`);
+  }
+
+  // Try original prompt first
+  try {
+    return await generateImageInternal(replicate, prompt, base64Images);
+  } catch (error) {
+    const isSensitiveError = error.message.includes('flagged') || 
+                            error.message.includes('sensitive') ||
+                            error.message.includes('E005');
+    
+    if (isSensitiveError) {
+      log(`  ⚠️ Prompt flagged as sensitive, trying safer version...`);
+      
+      // Create safer version of prompt
+      const saferPrompt = makeSaferPrompt(prompt);
+      log(`  🔄 Retrying with modified prompt...`);
+      
+      try {
+        return await generateImageInternal(replicate, saferPrompt, base64Images);
+      } catch (retryError) {
+        // If still fails, try even simpler prompt
+        if (retryError.message.includes('flagged') || retryError.message.includes('sensitive')) {
+          log(`  ⚠️ Still flagged, trying minimal prompt...`);
+          
+          const minimalPrompt = `${MILA_BASE},
+natural relaxed pose, casual comfortable moment,
+wearing comfortable loungewear, cozy home setting,
+soft natural lighting, authentic lifestyle moment,
+style photography editorial, natural beauty,
+ultra realistic, 8k, professional photography`;
+          
+          return await generateImageInternal(replicate, minimalPrompt, base64Images);
+        }
+        throw retryError;
+      }
+    }
+    
+    // Re-throw non-sensitive errors
+    throw error;
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
