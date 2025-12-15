@@ -48,6 +48,10 @@ interface GenerateImageOptions {
   height?: number;
   useReferences?: boolean;
   useLocationReference?: boolean;
+  
+  // Scene consistency (for carousels)
+  sceneReferenceUrl?: string; // URL of previous image for scene consistency
+  forceSceneConsistency?: boolean; // Double the scene ref for stronger consistency
 }
 
 interface GenerateImageResult {
@@ -229,6 +233,8 @@ export async function generateImage(options: GenerateImageOptions): Promise<Gene
     contentBrief,
     useReferences = true,
     useLocationReference = true,
+    sceneReferenceUrl,
+    forceSceneConsistency = false,
   } = options;
   
   const apiToken = process.env.REPLICATE_API_TOKEN;
@@ -269,16 +275,29 @@ export async function generateImage(options: GenerateImageOptions): Promise<Gene
     const { primaryFaceUrl, referenceUrls } = getBasePortraits();
     const allReferenceUrls: string[] = [];
     
-    // Add character references (Mila's photos - limited to 3 for API payload size)
-    if (useReferences) {
-      // Use primary + first 2 references (3 total) to keep payload manageable
-      const limitedRefs = referenceUrls.slice(0, 2);
-      allReferenceUrls.push(primaryFaceUrl, ...limitedRefs);
-      console.log('[Nano Banana Pro] Using', allReferenceUrls.length, 'character references (limited from', referenceUrls.length + 1, ')');
+    // FIRST: Add scene reference for carousel consistency (strongest weight)
+    if (sceneReferenceUrl) {
+      allReferenceUrls.push(sceneReferenceUrl);
+      console.log('[Nano Banana Pro] 🎬 Added scene reference for consistency');
+      
+      // Double the reference for stronger consistency
+      if (forceSceneConsistency) {
+        allReferenceUrls.push(sceneReferenceUrl);
+        console.log('[Nano Banana Pro] 🎬 Doubled scene reference (strong consistency mode)');
+      }
     }
     
-    // Add location reference if available
-    if (useLocationReference && location?.referenceImageUrl) {
+    // Add character references (Mila's photos - limited to 2 for API payload size when scene ref present)
+    if (useReferences) {
+      // Use fewer face refs when scene ref is present to keep payload manageable
+      const maxFaceRefs = sceneReferenceUrl ? 2 : 3;
+      const limitedRefs = referenceUrls.slice(0, maxFaceRefs - 1);
+      allReferenceUrls.push(primaryFaceUrl, ...limitedRefs);
+      console.log('[Nano Banana Pro] Using', limitedRefs.length + 1, 'character references');
+    }
+    
+    // Add location reference if available (only for first image, not when scene ref is used)
+    if (useLocationReference && location?.referenceImageUrl && !sceneReferenceUrl) {
       allReferenceUrls.push(location.referenceImageUrl);
       console.log('[Nano Banana Pro] Added location reference:', location.name);
     }
@@ -388,6 +407,9 @@ export async function generateImage(options: GenerateImageOptions): Promise<Gene
 /**
  * Generate image from calendar content brief
  * This is the main function for automated posting
+ * 
+ * @param sceneReferenceUrl - URL of previous image for scene consistency (carousel mode)
+ * @param forceSceneConsistency - Double the scene ref for stronger consistency
  */
 export async function generateFromCalendar(
   locationId: string,
@@ -396,7 +418,9 @@ export async function generateFromCalendar(
   outfit: string,
   lighting: LightingCondition,
   mood: string,
-  props?: string[]
+  props?: string[],
+  sceneReferenceUrl?: string,
+  forceSceneConsistency?: boolean
 ): Promise<GenerateImageResult> {
   return generateImage({
     locationId,
@@ -408,6 +432,8 @@ export async function generateFromCalendar(
       mood,
       props,
     },
+    sceneReferenceUrl,
+    forceSceneConsistency,
   });
 }
 

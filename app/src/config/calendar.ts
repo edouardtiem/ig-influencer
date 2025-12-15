@@ -415,7 +415,7 @@ const LOCATION_OUTFITS: Record<string, string[]> = {
 // DYNAMIC ACTIONS — Active, not just posing
 // ═══════════════════════════════════════════════════════════════
 
-const LOCATION_ACTIONS: Record<string, string[]> = {
+export const LOCATION_ACTIONS: Record<string, string[]> = {
   nice_gym: [
     'mid-squat on smith machine, weights loaded, focused determination, athletic form',
     'doing cable rows, pulling weight toward body, muscles engaged, concentrated',

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateFromCalendar } from '@/lib/nanobanana';
-import { postSingleImage, checkInstagramConnection } from '@/lib/instagram';
+import { postCarousel } from '@/lib/instagram';
 import { uploadImageFromUrl } from '@/lib/cloudinary';
 import { generateCaption, fetchDailyTrends, DailyTrends } from '@/lib/perplexity';
 import { 
@@ -8,8 +8,31 @@ import {
   generateContentBrief, 
   getCurrentSlot,
   PostingSlot,
+  LOCATION_ACTIONS,
 } from '@/config/calendar';
 import { getActiveLocationById } from '@/config/locations';
+
+// ═══════════════════════════════════════════════════════════════
+// CAROUSEL CONFIG
+// ═══════════════════════════════════════════════════════════════
+
+const CAROUSEL_SIZE = 3; // Number of images per carousel
+
+// Hero expressions (Photo 1 - most engaging)
+const HERO_EXPRESSIONS = [
+  'confident sultry gaze, slight smile playing on lips, direct eye contact',
+  'warm inviting smile, eyes sparkling, approachable but alluring',
+  'confident stare, slight smile, powerful feminine energy',
+];
+
+// Secondary expressions (Photo 2, 3 - varied)
+const SECONDARY_EXPRESSIONS = [
+  'soft sensual expression, eyes slightly hooded, natural allure',
+  'playful smirk, knowing look, effortless confidence',
+  'pensive look with soft smile, gazing slightly away, mysterious charm',
+  'genuine laugh, eyes crinkled, natural beauty',
+  'candid moment, caught mid-action, authentic',
+];
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES
@@ -18,17 +41,19 @@ import { getActiveLocationById } from '@/config/locations';
 interface AutoPostResult {
   success: boolean;
   error?: string;
-  imageUrl?: string;
+  imageUrls?: string[]; // Carousel images
   caption?: string;
   hashtags?: string[];
   timestamp: string;
+  postId?: string;
   metadata?: {
     location: string;
-    action: string;
+    actions: string[]; // Multiple actions for carousel
     outfit: string;
     lighting: string;
     slot: string;
     contentType: string;
+    carouselSize: number;
   };
 }
 
@@ -79,12 +104,13 @@ async function getTodaysTrends(): Promise<DailyTrends | null> {
 /**
  * POST /api/auto-post
  * 
- * Main endpoint called by cron-job.org to:
+ * Main endpoint for automated carousel posting:
  * 1. Determine current slot from calendar
- * 2. Generate content brief (location, outfit, action, props)
- * 3. Generate image with Nano Banana Pro
- * 4. Generate caption with Perplexity (or fallback)
- * 5. Publish to Instagram via Make.com → Buffer
+ * 2. Generate content brief (location, outfit, actions, props)
+ * 3. Generate 3 images with scene consistency chain
+ * 4. Upload each to Cloudinary
+ * 5. Generate caption with Perplexity
+ * 6. Publish carousel to Instagram
  * 
  * Optional query params:
  * - ?test=true : Don't publish, just generate
@@ -105,7 +131,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<AutoPostR
     );
   }
   
-  console.log(`[${timestamp}] 🚀 Starting auto-post...`);
+  console.log(`[${timestamp}] 🚀 Starting auto-post (CAROUSEL MODE - ${CAROUSEL_SIZE} images)...`);
   if (isTest) console.log(`[${timestamp}] 🧪 TEST MODE - won't publish`);
   
   try {
@@ -142,55 +168,124 @@ export async function POST(request: NextRequest): Promise<NextResponse<AutoPostR
     console.log(`[${timestamp}] 📅 Slot: ${slot.id} (${slot.hour}:${slot.minute.toString().padStart(2, '0')})`);
     
     // ─────────────────────────────────────────────────────────────
-    // STEP 2: Generate content brief
+    // STEP 2: Generate content briefs for carousel (3 different poses)
     // ─────────────────────────────────────────────────────────────
     
-    const brief = generateContentBrief(slot);
-    const location = getActiveLocationById(brief.location);
+    // Generate base brief
+    const baseBrief = generateContentBrief(slot);
+    const location = getActiveLocationById(baseBrief.location);
     
     if (!location) {
       return NextResponse.json({
         success: false,
-        error: `Location not found: ${brief.location}`,
+        error: `Location not found: ${baseBrief.location}`,
         timestamp,
       }, { status: 500 });
+    }
+    
+    // Generate 3 different poses/actions for the carousel from LOCATION_ACTIONS
+    const locationActions = LOCATION_ACTIONS[baseBrief.location] || [];
+    const poses: string[] = [baseBrief.selectedPose];
+    
+    // Get more poses from location actions (avoid duplicates)
+    const availablePoses = locationActions.filter(p => p !== baseBrief.selectedPose);
+    const shuffled = availablePoses.sort(() => Math.random() - 0.5);
+    poses.push(...shuffled.slice(0, CAROUSEL_SIZE - 1));
+    
+    // Fallback: generate slight variations if not enough poses
+    while (poses.length < CAROUSEL_SIZE) {
+      poses.push(baseBrief.selectedPose + ', slightly different angle and expression');
     }
     
     console.log(`[${timestamp}] 📍 Location: ${location.name}`);
-    console.log(`[${timestamp}] 🎬 Content type: ${brief.contentType}`);
-    console.log(`[${timestamp}] 👗 Outfit: ${brief.selectedOutfit.slice(0, 50)}...`);
-    console.log(`[${timestamp}] 🎭 Action: ${brief.selectedPose.slice(0, 50)}...`);
-    console.log(`[${timestamp}] 💡 Lighting: ${brief.lighting}`);
+    console.log(`[${timestamp}] 🎬 Content type: ${baseBrief.contentType}`);
+    console.log(`[${timestamp}] 👗 Outfit: ${baseBrief.selectedOutfit.slice(0, 50)}...`);
+    console.log(`[${timestamp}] 🎭 Actions (${CAROUSEL_SIZE}):`, poses.map(p => p.slice(0, 30) + '...'));
+    console.log(`[${timestamp}] 💡 Lighting: ${baseBrief.lighting}`);
     
     // ─────────────────────────────────────────────────────────────
-    // STEP 3: Generate image with Nano Banana Pro
+    // STEP 3: Generate carousel images with scene consistency
     // ─────────────────────────────────────────────────────────────
     
-    console.log(`[${timestamp}] 🎨 Generating image...`);
-    const startTime = Date.now();
+    const cloudinaryUrls: string[] = [];
+    const actions: string[] = [];
+    let previousImageUrl: string | undefined;
     
-    const imageResult = await generateFromCalendar(
-      brief.location,
-      brief.selectedPose,
-      brief.selectedExpression,
-      brief.selectedOutfit,
-      brief.lighting,
-      brief.mood,
-      brief.selectedProps
-    );
-    
-    const genDuration = ((Date.now() - startTime) / 1000).toFixed(1);
-    
-    if (!imageResult.success || !imageResult.imageUrl) {
-      console.error(`[${timestamp}] ❌ Image generation failed:`, imageResult.error);
-      return NextResponse.json({
-        success: false,
-        error: imageResult.error || 'Image generation failed',
-        timestamp,
-      }, { status: 500 });
+    for (let i = 0; i < CAROUSEL_SIZE; i++) {
+      const photoNum = i + 1;
+      const pose = poses[i];
+      const isHeroShot = i === 0;
+      
+      // Hero shot gets confident expression, others get varied expressions
+      const expression = isHeroShot
+        ? HERO_EXPRESSIONS[Math.floor(Math.random() * HERO_EXPRESSIONS.length)]
+        : SECONDARY_EXPRESSIONS[Math.floor(Math.random() * SECONDARY_EXPRESSIONS.length)];
+      
+      console.log(`[${timestamp}] 🎨 Generating Photo ${photoNum}/${CAROUSEL_SIZE}...`);
+      if (previousImageUrl) {
+        console.log(`[${timestamp}]    ↳ Using Photo ${photoNum - 1} as scene reference`);
+      }
+      
+      const startTime = Date.now();
+      
+      const imageResult = await generateFromCalendar(
+        baseBrief.location,
+        pose,
+        expression,
+        baseBrief.selectedOutfit,
+        baseBrief.lighting,
+        baseBrief.mood,
+        baseBrief.selectedProps,
+        previousImageUrl, // Scene reference from previous photo
+        true // Force strong consistency
+      );
+      
+      const genDuration = ((Date.now() - startTime) / 1000).toFixed(1);
+      
+      if (!imageResult.success || !imageResult.imageUrl) {
+        console.error(`[${timestamp}] ❌ Photo ${photoNum} generation failed:`, imageResult.error);
+        // Continue with partial carousel if we have at least 2 images
+        if (cloudinaryUrls.length >= 2) {
+          console.log(`[${timestamp}] ⚠️ Continuing with ${cloudinaryUrls.length} images`);
+          break;
+        }
+        return NextResponse.json({
+          success: false,
+          error: `Photo ${photoNum} generation failed: ${imageResult.error}`,
+          timestamp,
+        }, { status: 500 });
+      }
+      
+      console.log(`[${timestamp}] ✅ Photo ${photoNum} generated in ${genDuration}s`);
+      
+      // Upload to Cloudinary immediately
+      console.log(`[${timestamp}] ☁️ Uploading Photo ${photoNum} to Cloudinary...`);
+      
+      const cloudinaryResult = await uploadImageFromUrl(imageResult.imageUrl);
+      
+      if (!cloudinaryResult.success || !cloudinaryResult.url) {
+        console.error(`[${timestamp}] ❌ Cloudinary upload failed for Photo ${photoNum}:`, cloudinaryResult.error);
+        if (cloudinaryUrls.length >= 2) {
+          console.log(`[${timestamp}] ⚠️ Continuing with ${cloudinaryUrls.length} images`);
+          break;
+        }
+        return NextResponse.json({
+          success: false,
+          error: `Cloudinary upload failed for Photo ${photoNum}: ${cloudinaryResult.error}`,
+          timestamp,
+        }, { status: 500 });
+      }
+      
+      console.log(`[${timestamp}] ✅ Photo ${photoNum} uploaded: ${cloudinaryResult.url}`);
+      
+      cloudinaryUrls.push(cloudinaryResult.url);
+      actions.push(pose);
+      
+      // Use THIS photo's Cloudinary URL as reference for the NEXT photo
+      previousImageUrl = cloudinaryResult.url;
     }
     
-    console.log(`[${timestamp}] ✅ Image generated in ${genDuration}s`);
+    console.log(`[${timestamp}] 📸 Carousel ready: ${cloudinaryUrls.length} images`);
     
     // ─────────────────────────────────────────────────────────────
     // STEP 4: Generate caption with Perplexity
@@ -200,9 +295,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<AutoPostR
     
     const trends = await getTodaysTrends();
     const captionResult = await generateCaption(
-      brief.contentType,
+      baseBrief.contentType,
       location.name,
-      brief.selectedPose,
+      actions[0], // Use main action for caption
       trends || undefined
     );
     
@@ -214,72 +309,52 @@ export async function POST(request: NextRequest): Promise<NextResponse<AutoPostR
     console.log(`[${timestamp}] # Hashtags: ${hashtags.length}`);
     
     // ─────────────────────────────────────────────────────────────
-    // STEP 5: Upload to Cloudinary (Instagram needs public URL)
+    // STEP 5: Skip publish in test mode
     // ─────────────────────────────────────────────────────────────
     
     if (isTest) {
-      console.log(`[${timestamp}] 🧪 TEST MODE - skipping upload & publish`);
+      console.log(`[${timestamp}] 🧪 TEST MODE - skipping publish`);
       return NextResponse.json({
         success: true,
-        imageUrl: imageResult.imageUrl,
+        imageUrls: cloudinaryUrls,
         caption: fullCaption,
         hashtags,
         timestamp,
         metadata: {
           location: location.name,
-          action: brief.selectedPose,
-          outfit: brief.selectedOutfit,
-          lighting: brief.lighting,
+          actions,
+          outfit: baseBrief.selectedOutfit,
+          lighting: baseBrief.lighting,
           slot: slot.id,
-          contentType: brief.contentType,
+          contentType: baseBrief.contentType,
+          carouselSize: cloudinaryUrls.length,
         },
       });
     }
     
-    console.log(`[${timestamp}] ☁️ Uploading to Cloudinary...`);
-    
-    const cloudinaryResult = await uploadImageFromUrl(imageResult.imageUrl);
-    
-    if (!cloudinaryResult.success || !cloudinaryResult.url) {
-      console.error(`[${timestamp}] ❌ Cloudinary upload failed:`, cloudinaryResult.error);
-      return NextResponse.json({
-        success: false,
-        error: cloudinaryResult.error || 'Cloudinary upload failed',
-        imageUrl: imageResult.imageUrl,
-        caption: fullCaption,
-        timestamp,
-      }, { status: 500 });
-    }
-    
-    console.log(`[${timestamp}] ✅ Uploaded to Cloudinary: ${cloudinaryResult.url}`);
-    
     // ─────────────────────────────────────────────────────────────
-    // STEP 6: Publish to Instagram
+    // STEP 6: Publish carousel to Instagram
     // ─────────────────────────────────────────────────────────────
     
-    console.log(`[${timestamp}] 📤 Publishing to Instagram...`);
+    console.log(`[${timestamp}] 📤 Publishing carousel to Instagram (${cloudinaryUrls.length} images)...`);
     if (location.instagramLocationId) {
       console.log(`[${timestamp}] 📍 With location: ${location.name} (${location.instagramLocationId})`);
     }
     
-    const publishResult = await postSingleImage(
-      cloudinaryResult.url, 
-      fullCaption,
-      location.instagramLocationId
-    );
+    const publishResult = await postCarousel(cloudinaryUrls, fullCaption);
     
     if (!publishResult.success) {
       console.error(`[${timestamp}] ❌ Publish failed:`, publishResult.error);
       return NextResponse.json({
         success: false,
         error: publishResult.error || 'Publish failed',
-        imageUrl: imageResult.imageUrl,
+        imageUrls: cloudinaryUrls,
         caption: fullCaption,
         timestamp,
       }, { status: 500 });
     }
     
-    console.log(`[${timestamp}] ✅ Published successfully! Post ID: ${publishResult.postId}`);
+    console.log(`[${timestamp}] ✅ Carousel published successfully! Post ID: ${publishResult.postId}`);
     
     // ─────────────────────────────────────────────────────────────
     // SUCCESS
@@ -287,18 +362,19 @@ export async function POST(request: NextRequest): Promise<NextResponse<AutoPostR
     
     return NextResponse.json({
       success: true,
-      imageUrl: cloudinaryResult.url,
+      imageUrls: cloudinaryUrls,
       caption: fullCaption,
       hashtags,
       timestamp,
       postId: publishResult.postId,
       metadata: {
         location: location.name,
-        action: brief.selectedPose,
-        outfit: brief.selectedOutfit,
-        lighting: brief.lighting,
+        actions,
+        outfit: baseBrief.selectedOutfit,
+        lighting: baseBrief.lighting,
         slot: slot.id,
-        contentType: brief.contentType,
+        contentType: baseBrief.contentType,
+        carouselSize: cloudinaryUrls.length,
       },
     });
     
