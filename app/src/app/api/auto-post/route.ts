@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateFromCalendar } from '@/lib/nanobanana';
 import { postSingleImage, checkInstagramConnection } from '@/lib/instagram';
+import { uploadImageFromUrl } from '@/lib/cloudinary';
 import { generateCaption, fetchDailyTrends, DailyTrends } from '@/lib/perplexity';
 import { 
   getPostingSlotsForDate, 
@@ -213,11 +214,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<AutoPostR
     console.log(`[${timestamp}] # Hashtags: ${hashtags.length}`);
     
     // ─────────────────────────────────────────────────────────────
-    // STEP 5: Publish to Instagram (unless test mode)
+    // STEP 5: Upload to Cloudinary (Instagram needs public URL)
     // ─────────────────────────────────────────────────────────────
     
     if (isTest) {
-      console.log(`[${timestamp}] 🧪 TEST MODE - skipping publish`);
+      console.log(`[${timestamp}] 🧪 TEST MODE - skipping upload & publish`);
       return NextResponse.json({
         success: true,
         imageUrl: imageResult.imageUrl,
@@ -235,9 +236,30 @@ export async function POST(request: NextRequest): Promise<NextResponse<AutoPostR
       });
     }
     
+    console.log(`[${timestamp}] ☁️ Uploading to Cloudinary...`);
+    
+    const cloudinaryResult = await uploadImageFromUrl(imageResult.imageUrl);
+    
+    if (!cloudinaryResult.success || !cloudinaryResult.url) {
+      console.error(`[${timestamp}] ❌ Cloudinary upload failed:`, cloudinaryResult.error);
+      return NextResponse.json({
+        success: false,
+        error: cloudinaryResult.error || 'Cloudinary upload failed',
+        imageUrl: imageResult.imageUrl,
+        caption: fullCaption,
+        timestamp,
+      }, { status: 500 });
+    }
+    
+    console.log(`[${timestamp}] ✅ Uploaded to Cloudinary: ${cloudinaryResult.url}`);
+    
+    // ─────────────────────────────────────────────────────────────
+    // STEP 6: Publish to Instagram
+    // ─────────────────────────────────────────────────────────────
+    
     console.log(`[${timestamp}] 📤 Publishing to Instagram...`);
     
-    const publishResult = await postSingleImage(imageResult.imageUrl, fullCaption);
+    const publishResult = await postSingleImage(cloudinaryResult.url, fullCaption);
     
     if (!publishResult.success) {
       console.error(`[${timestamp}] ❌ Publish failed:`, publishResult.error);
@@ -258,7 +280,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<AutoPostR
     
     return NextResponse.json({
       success: true,
-      imageUrl: imageResult.imageUrl,
+      imageUrl: cloudinaryResult.url,
       caption: fullCaption,
       hashtags,
       timestamp,
