@@ -2,18 +2,20 @@ name: Mila Auto Post
 
 on:
   schedule:
-    # Morning - 6h30 Paris (5h30 UTC hiver, 4h30 UTC été)
-    - cron: '30 5 * * *'
-    # Midday - 11h30 Paris (10h30 UTC hiver, 9h30 UTC été)  
-    - cron: '30 10 * * *'
-    # Evening - 18h00 Paris (17h00 UTC hiver, 16h00 UTC été)
-    - cron: '0 17 * * *'
+    # 4 posts per day (UTC times - Paris is UTC+1 winter, UTC+2 summer)
+    # Morning - 8h30 Paris = 7h30 UTC (winter) / 6h30 UTC (summer)
+    - cron: '30 7 * * *'
+    # Late Morning - 11h00 Paris = 10h00 UTC (winter) / 9h00 UTC (summer)
+    - cron: '0 10 * * *'
+    # Afternoon - 17h00 Paris = 16h00 UTC (winter) / 15h00 UTC (summer)
+    - cron: '0 16 * * *'
+    # Evening - 21h15 Paris = 20h15 UTC (winter) / 19h15 UTC (summer)
+    - cron: '15 20 * * *'
   
-  # Permet de déclencher manuellement
   workflow_dispatch:
     inputs:
       slot:
-        description: 'Time slot (morning, midday, evening)'
+        description: 'Time slot (morning, late_morning, afternoon, evening)'
         required: false
         default: ''
       test_mode:
@@ -25,7 +27,7 @@ on:
 jobs:
   auto-post:
     runs-on: ubuntu-latest
-    timeout-minutes: 10  # 10 minutes pour 3 images
+    timeout-minutes: 10
     
     steps:
       - name: Checkout repository
@@ -44,6 +46,7 @@ jobs:
         id: slot
         run: |
           HOUR=$(date -u +%H)
+          MINUTE=$(date -u +%M)
           
           # Manual trigger with specific slot
           if [ -n "${{ github.event.inputs.slot }}" ]; then
@@ -53,15 +56,18 @@ jobs:
           fi
           
           # Determine slot based on current UTC time
-          if [ "$HOUR" -eq 5 ] || [ "$HOUR" -eq 4 ]; then
+          if [ "$HOUR" -eq 7 ] || [ "$HOUR" -eq 6 ]; then
             echo "slot=morning" >> $GITHUB_OUTPUT
-            echo "Detected morning slot"
+            echo "Detected morning slot (8h30 Paris)"
           elif [ "$HOUR" -eq 10 ] || [ "$HOUR" -eq 9 ]; then
-            echo "slot=midday" >> $GITHUB_OUTPUT
-            echo "Detected midday slot"
-          elif [ "$HOUR" -eq 17 ] || [ "$HOUR" -eq 16 ]; then
+            echo "slot=late_morning" >> $GITHUB_OUTPUT
+            echo "Detected late_morning slot (11h00 Paris)"
+          elif [ "$HOUR" -eq 16 ] || [ "$HOUR" -eq 15 ]; then
+            echo "slot=afternoon" >> $GITHUB_OUTPUT
+            echo "Detected afternoon slot (17h00 Paris)"
+          elif [ "$HOUR" -eq 20 ] || [ "$HOUR" -eq 19 ]; then
             echo "slot=evening" >> $GITHUB_OUTPUT
-            echo "Detected evening slot"
+            echo "Detected evening slot (21h15 Paris)"
           else
             echo "slot=morning" >> $GITHUB_OUTPUT
             echo "Defaulting to morning slot"
