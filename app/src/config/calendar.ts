@@ -152,7 +152,7 @@ export function getPostingSlotsForDate(date: Date = new Date()): PostingSlot[] {
     hour: 6,
     minute: 30,
     locations: dayType === 'weekday' 
-      ? ['home_bedroom', 'nice_gym', 'home_kitchen'] // Weekday: routine PT
+      ? ['home_bedroom', 'nice_gym'] // Weekday: routine PT
       : ['home_bedroom'], // Weekend: grasse mat
     contentTypes: dayType === 'weekday'
       ? ['morning_routine', 'pre_workout', 'coffee_prep']
@@ -594,7 +594,7 @@ export const CALENDAR_INFO = {
   timezone: 'Europe/Paris',
   defaultSlots: ['6:30', '11:30', '18:00'],
   locations: {
-    morning: ['home_bedroom', 'nice_gym', 'home_kitchen'],
+    morning: ['home_bedroom', 'nice_gym'],
     midday: ['nice_gym', 'nice_old_town_cafe'],
     evening: ['home_living_room', 'home_bedroom'],
   },
