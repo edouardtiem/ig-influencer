@@ -15,6 +15,7 @@ export interface Location {
   referenceImageUrl?: string; // Cloudinary URL for reference image
   status?: 'active' | 'pending'; // 'active' = ready to use, 'pending' = future (default)
   compatibleSlots?: ('morning' | 'midday' | 'evening' | 'night')[]; // Calendar slots
+  instagramLocationId?: string; // Instagram/Facebook location ID for geotagging
 }
 
 // ═══════════════════════════════════════════════════════════════

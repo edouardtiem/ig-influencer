@@ -37,11 +37,13 @@ function getConfig(): InstagramConfig {
 /**
  * Create a media container for a single image
  * For carousel items, set isCarouselItem: true
+ * Optional locationId for geotagging
  */
 async function createMediaContainer(
   imageUrl: string,
   caption?: string,
-  isCarouselItem: boolean = false
+  isCarouselItem: boolean = false,
+  locationId?: string
 ): Promise<MediaContainer> {
   const config = getConfig();
 
@@ -54,6 +56,12 @@ async function createMediaContainer(
     params.append('is_carousel_item', 'true');
   } else if (caption) {
     params.append('caption', caption);
+  }
+  
+  // Add location if provided
+  if (locationId && !isCarouselItem) {
+    params.append('location_id', locationId);
+    console.log('[Instagram] Adding location:', locationId);
   }
 
   const response = await fetch(
@@ -165,14 +173,16 @@ async function waitForMediaReady(containerId: string, maxWaitMs: number = 60000)
 
 /**
  * Post a single image to Instagram
+ * Optional locationId for geotagging (Instagram location/page ID)
  */
 export async function postSingleImage(
   imageUrl: string,
-  caption: string
+  caption: string,
+  locationId?: string
 ): Promise<PublishResult> {
   try {
     console.log('[Instagram] Creating media container...');
-    const container = await createMediaContainer(imageUrl, caption, false);
+    const container = await createMediaContainer(imageUrl, caption, false, locationId);
 
     console.log('[Instagram] Waiting for processing...');
     await waitForMediaReady(container.id);

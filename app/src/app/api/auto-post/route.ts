@@ -258,8 +258,15 @@ export async function POST(request: NextRequest): Promise<NextResponse<AutoPostR
     // ─────────────────────────────────────────────────────────────
     
     console.log(`[${timestamp}] 📤 Publishing to Instagram...`);
+    if (location.instagramLocationId) {
+      console.log(`[${timestamp}] 📍 With location: ${location.name} (${location.instagramLocationId})`);
+    }
     
-    const publishResult = await postSingleImage(cloudinaryResult.url, fullCaption);
+    const publishResult = await postSingleImage(
+      cloudinaryResult.url, 
+      fullCaption,
+      location.instagramLocationId
+    );
     
     if (!publishResult.success) {
       console.error(`[${timestamp}] ❌ Publish failed:`, publishResult.error);
