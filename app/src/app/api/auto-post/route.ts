@@ -209,7 +209,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<AutoPostR
     
     const cloudinaryUrls: string[] = [];
     const actions: string[] = [];
-    let previousImageUrl: string | undefined;
+    let heroImageUrl: string | undefined; // Photo 1 URL used as reference for Photos 2 & 3
     
     for (let i = 0; i < CAROUSEL_SIZE; i++) {
       const photoNum = i + 1;
@@ -222,8 +222,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<AutoPostR
         : SECONDARY_EXPRESSIONS[Math.floor(Math.random() * SECONDARY_EXPRESSIONS.length)];
       
       console.log(`[${timestamp}] 🎨 Generating Photo ${photoNum}/${CAROUSEL_SIZE}...`);
-      if (previousImageUrl) {
-        console.log(`[${timestamp}]    ↳ Using Photo ${photoNum - 1} as scene reference`);
+      if (!isHeroShot && heroImageUrl) {
+        console.log(`[${timestamp}]    ↳ Using Photo 1 as scene reference`);
       }
       
       const startTime = Date.now();
@@ -236,7 +236,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<AutoPostR
         baseBrief.lighting,
         baseBrief.mood,
         baseBrief.selectedProps,
-        previousImageUrl, // Scene reference from previous photo
+        isHeroShot ? undefined : heroImageUrl, // Photos 2 & 3 use Photo 1 as reference
         true // Force strong consistency
       );
       
@@ -281,8 +281,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<AutoPostR
       cloudinaryUrls.push(cloudinaryResult.url);
       actions.push(pose);
       
-      // Use THIS photo's Cloudinary URL as reference for the NEXT photo
-      previousImageUrl = cloudinaryResult.url;
+      // Save Photo 1 URL as the reference for Photos 2 & 3
+      if (isHeroShot) {
+        heroImageUrl = cloudinaryResult.url;
+      }
     }
     
     console.log(`[${timestamp}] 📸 Carousel ready: ${cloudinaryUrls.length} images`);
