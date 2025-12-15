@@ -17,10 +17,10 @@ const CAROUSEL_SIZE = 3;
 const NANO_BANANA_MODEL = 'google/nano-banana-pro';
 
 // Mila's reference photos for face consistency
-const PRIMARY_FACE_URL = 'https://res.cloudinary.com/drbuzwipe/image/upload/v1733692068/mila_1_original_high_res_face_kkdzpz.jpg';
+const PRIMARY_FACE_URL = 'https://res.cloudinary.com/dily60mr0/image/upload/v1764767097/Photo_1_ewwkky.png';
 const FACE_REFS = [
-  'https://res.cloudinary.com/drbuzwipe/image/upload/v1733692068/mila_2_face_sxwswy.jpg',
-  'https://res.cloudinary.com/drbuzwipe/image/upload/v1733692068/mila_3_face_jqhfxi.jpg',
+  'https://res.cloudinary.com/dily60mr0/image/upload/v1764767099/Photo_2_q8kxit.png',
+  'https://res.cloudinary.com/dily60mr0/image/upload/v1764767098/Photo_3_nopedx.png',
 ];
 
 // Hero expressions (Photo 1)
