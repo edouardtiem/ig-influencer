@@ -4,7 +4,7 @@
   "regions": ["cdg1"],
   "functions": {
     "src/app/api/auto-post/route.ts": {
-      "maxDuration": 120
+      "maxDuration": 300
     },
     "src/app/api/generate-contextual/route.ts": {
       "maxDuration": 120
