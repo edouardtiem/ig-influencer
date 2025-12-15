@@ -31,6 +31,7 @@ export const ACTIVE_LOCATIONS: Location[] = [
     name: 'Chambre Mila',
     category: 'home',
     description: 'Cozy bohemian bedroom, artiste sportive punk rock fun aesthetic',
+    instagramLocationId: '101156775033710', // Paris 18e
     prompt: `Cozy bohemian bedroom with edgy artistic vibe, windows with curtains.
 
 Unmade bed with rumpled grey linen sheets, chunky knit terracotta throw blanket. Mix of pillows - some solid black, olive green, one with abstract pattern.
@@ -56,6 +57,7 @@ Lived-in aesthetic, creative messy-chic. Shot on iPhone. The room of a 22-year-o
     name: 'Salon Mila',
     category: 'home',
     description: 'Parisian living room with rooftop view, bohemian-artistic vibe',
+    instagramLocationId: '101156775033710', // Paris 18e
     prompt: `Based on the reference bedroom image provided, create the matching living room of the same apartment. Maintain exact same aesthetic, color palette, and vibe.
 
 Cozy Parisian apartment living room in 18th arrondissement Montmartre, bohemian-artistic vibe matching the bedroom.
