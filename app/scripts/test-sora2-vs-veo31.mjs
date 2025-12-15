@@ -125,7 +125,7 @@ async function main() {
         prompt: SORA_2_PROMPT,
         image: imageInput,
         duration: 8,
-        aspect_ratio: "9:16",
+        aspect_ratio: "portrait", // Sora 2 uses "portrait"/"landscape"
         resolution: "720p"
       }
     });

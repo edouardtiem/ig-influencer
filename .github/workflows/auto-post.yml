@@ -25,14 +25,25 @@ on:
 jobs:
   auto-post:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10  # 10 minutes pour 3 images
     
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: ./app
+        run: npm install replicate
+
       - name: Determine slot from schedule
         id: slot
         run: |
           HOUR=$(date -u +%H)
-          MINUTE=$(date -u +%M)
           
           # Manual trigger with specific slot
           if [ -n "${{ github.event.inputs.slot }}" ]; then
@@ -56,55 +67,21 @@ jobs:
             echo "Defaulting to morning slot"
           fi
 
-      - name: Build URL
-        id: url
+      - name: Generate and Post Carousel
+        working-directory: ./app
+        env:
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_ACCOUNT_ID: ${{ secrets.INSTAGRAM_ACCOUNT_ID }}
         run: |
-          BASE_URL="${{ secrets.VERCEL_APP_URL }}/api/auto-post"
           SLOT="${{ steps.slot.outputs.slot }}"
           TEST="${{ github.event.inputs.test_mode }}"
           
-          URL="${BASE_URL}"
-          PARAMS=""
+          echo "🚀 Starting carousel generation"
+          echo "📅 Slot: $SLOT"
+          echo "🧪 Test mode: $TEST"
           
-          if [ -n "$SLOT" ] && [ "$SLOT" != "morning" ]; then
-            PARAMS="slot=${SLOT}"
-          fi
-          
-          if [ "$TEST" = "true" ]; then
-            if [ -n "$PARAMS" ]; then
-              PARAMS="${PARAMS}&test=true"
-            else
-              PARAMS="test=true"
-            fi
-          fi
-          
-          if [ -n "$PARAMS" ]; then
-            URL="${URL}?${PARAMS}"
-          fi
-          
-          echo "url=${URL}" >> $GITHUB_OUTPUT
-          echo "Calling: ${URL}"
-
-      - name: Trigger Auto Post
-        run: |
-          echo "🚀 Starting auto-post for slot: ${{ steps.slot.outputs.slot }}"
-          echo "📍 URL: ${{ steps.url.outputs.url }}"
-          
-          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${{ steps.url.outputs.url }}" \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            -H "Content-Type: application/json" \
-            --max-time 180)
-          
-          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
-          BODY=$(echo "$RESPONSE" | sed '$d')
-          
-          echo "📊 Response code: $HTTP_CODE"
-          echo "📝 Response body:"
-          echo "$BODY" | jq '.' 2>/dev/null || echo "$BODY"
-          
-          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
-            echo "✅ Auto-post successful!"
-          else
-            echo "❌ Auto-post failed with code $HTTP_CODE"
-            exit 1
-          fi
+          node scripts/carousel-post.mjs "$SLOT" "$TEST"
