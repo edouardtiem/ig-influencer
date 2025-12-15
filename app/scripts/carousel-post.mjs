@@ -14,7 +14,7 @@ import Replicate from 'replicate';
 // ═══════════════════════════════════════════════════════════════
 
 const CAROUSEL_SIZE = 3;
-const NANO_BANANA_MODEL = 'thecatservant/nano-banana-pro:894e208243dc8b3e7c9ab7eb590da86e390d85a07aa5dc93fdd2564de813d37f';
+const NANO_BANANA_MODEL = 'google/nano-banana-pro';
 
 // Mila's reference photos for face consistency
 const PRIMARY_FACE_URL = 'https://res.cloudinary.com/drbuzwipe/image/upload/v1733692068/mila_1_original_high_res_face_kkdzpz.jpg';
@@ -203,30 +203,84 @@ async function uploadToCloudinary(imageUrl) {
 // IMAGE GENERATION
 // ═══════════════════════════════════════════════════════════════
 
+/**
+ * Convert image URL to base64 data URI
+ */
+async function urlToBase64(url) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch image: ${response.status}`);
+  }
+  const arrayBuffer = await response.arrayBuffer();
+  const base64 = Buffer.from(arrayBuffer).toString('base64');
+  const contentType = response.headers.get('content-type') || 'image/png';
+  return `data:${contentType};base64,${base64}`;
+}
+
 async function generateImage(replicate, prompt, referenceUrls) {
   log(`  Generating with ${referenceUrls.length} references...`);
   
   const input = {
     prompt,
-    negative_prompt: 'ugly, blurry, low quality, distorted face, extra limbs, bad anatomy, text, watermark, signature',
-    width: 1024,
-    height: 1024,
-    num_inference_steps: 30,
-    guidance_scale: 7.5,
+    aspect_ratio: "4:5",
+    resolution: "2K",
+    output_format: "jpg",
+    safety_filter_level: "block_only_high",
   };
 
-  // Add reference images
-  referenceUrls.forEach((url, i) => {
-    input[`img${i + 1}`] = url;
-  });
+  // Convert reference URLs to base64 data URIs
+  if (referenceUrls.length > 0) {
+    log(`  Converting ${referenceUrls.length} images to base64...`);
+    const base64Images = await Promise.all(
+      referenceUrls.map(url => urlToBase64(url))
+    );
+    input.image_input = base64Images;
+    log(`  ✅ Converted to base64`);
+  }
 
   const output = await replicate.run(NANO_BANANA_MODEL, { input });
 
-  if (!output || !output[0]) {
+  // Handle different output formats
+  if (!output) {
     throw new Error('No output from Nano Banana Pro');
   }
 
-  return output[0];
+  // If it's an async iterable (stream), collect chunks
+  if (typeof output === 'object' && Symbol.asyncIterator in output) {
+    const chunks = [];
+    for await (const chunk of output) {
+      if (chunk instanceof Uint8Array) {
+        chunks.push(chunk);
+      } else if (typeof chunk === 'string') {
+        return chunk; // Direct URL
+      }
+    }
+    
+    if (chunks.length > 0) {
+      // Combine binary chunks and convert to base64 data URI
+      const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+      const combined = new Uint8Array(totalLength);
+      let offset = 0;
+      for (const chunk of chunks) {
+        combined.set(chunk, offset);
+        offset += chunk.length;
+      }
+      const base64 = Buffer.from(combined).toString('base64');
+      return `data:image/jpeg;base64,${base64}`;
+    }
+  }
+
+  // Direct URL string
+  if (typeof output === 'string') {
+    return output;
+  }
+
+  // Array with URL
+  if (Array.isArray(output) && output[0]) {
+    return output[0];
+  }
+
+  throw new Error('Could not process API response');
 }
 
 // ═══════════════════════════════════════════════════════════════
