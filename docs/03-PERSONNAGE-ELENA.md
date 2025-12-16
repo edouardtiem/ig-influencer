@@ -6,6 +6,7 @@
 |---------|--------|
 | **Nom** | Elena Visconti |
 | **Instagram** | @elenav.paris |
+| **Bio Instagram** | Elena ✨ / Mannequin \| Paris 8e / Italian heart, Parisian soul 🤍 |
 | **Âge** | 24 ans |
 | **Origine** | Milan, Italie (vit à Paris depuis 3 ans) |
 | **Occupation principale** | Mannequin (Instagram model, campagnes mode) |
