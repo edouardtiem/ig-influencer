@@ -2,7 +2,7 @@
 
 > Ajouter un deuxième personnage Instagram (Elena) best friend de Mila, avec des posts en duo réguliers
 
-**Status** : 📋 Validated — Prêt à implémenter  
+**Status** : 🚧 In Progress — Branche `feature/elena-character`  
 **Impact** : 🔴 High — Double l'audience potentielle + effet réseau  
 **Effort** : 🔴 High — ~10-15h de développement  
 **Proposé** : 16 décembre 2024  
@@ -27,7 +27,7 @@ Créer **Elena**, un personnage complémentaire à Mila :
 | **Origine** | Milan, Italie (vit à Paris) |
 | **Occupation** | Model / Fashion Stylist |
 | **Style** | Luxe sensuel, habits moulants, classe italienne |
-| **Physique** | Plus grande (175cm), brune, traits sharp, lèvres pulpeuses |
+| **Physique** | Plus grande (175cm), brune lisse, traits sharp, lèvres pulpeuses, poitrine généreuse (F-cup) |
 | **Signature** | Bracelet en or massif, rouge à lèvres nude, regard intense |
 
 ### Différenciation Mila vs Elena
@@ -267,30 +267,41 @@ ROI attendu : Audience 2-3x → Revenue 2.5x pour +$13/mois
 - **Valentina** (trop long)
 - **Giulia** (prononciation française difficile)
 
-### Backstory suggérée
+### Backstory (validé)
 
-> Elena et Mila se sont rencontrées à Paris lors d'un shooting photo. Elena était le model, Mila la photographe. Elles sont devenues inséparables. Elena a convaincu Mila de passer "devant" l'objectif de temps en temps.
+> Elena et Mila se sont rencontrées sur un shooting à Paris. Elena, mannequin pour une marque luxe, semblait inaccessible avec son blazer Bottega et son regard glacial. Jusqu'à ce que Mila (la photographe) remarque son t-shirt Blondie vintage caché dessous. "T'écoutes Blondie ?!" — elles ont fini la soirée dans un bar rock du 11e arrondissement. Depuis, inséparables.
+
+### Concept clé : "Opposées en surface, similaires au fond"
+
+| | **Elena** | **Mila** |
+|---|-----------|----------|
+| **Apparence** | Luxe, chic, inaccessible | Athleisure, punk rock, accessible |
+| **Au fond** | Punk rock, rebelle cachée | Peut être ultra glam quand elle veut |
+| **Ce qu'on voit** | La fashionista froide | La sportive cool |
+| **Ce qu'on découvre** | Elle écoute du Nirvana en secret | Elle sort en soirée Tour Eiffel |
 
 ---
 
 ## 🔗 Références
 
 - [Lucataco FaceSwap](https://replicate.com/lucataco/faceswap) — Modèle face-swap recommandé
-- [docs/03-PERSONNAGE.md](../../docs/03-PERSONNAGE.md) — Template character sheet
+- [docs/03-PERSONNAGE.md](../../docs/03-PERSONNAGE.md) — Character sheet Mila
+- [docs/03-PERSONNAGE-ELENA.md](../../docs/03-PERSONNAGE-ELENA.md) — Character sheet Elena ✨ NEW
 - [docs/06-NANO-BANANA-PRO-MIGRATION.md](../../docs/06-NANO-BANANA-PRO-MIGRATION.md) — Fonctionnement références
 
 ---
 
 ## ✅ Prochaines étapes
 
-1. [ ] Valider le concept Elena (nom, style, personnalité)
-2. [ ] Créer le dataset initial (4-6 photos)
-3. [ ] Créer le compte Instagram Elena
-4. [ ] Implémenter Phase 1 (character setup)
-5. [ ] Implémenter Phase 2 (solo posts Elena)
-6. [ ] Implémenter Phase 3 (duo posts)
-7. [ ] Tests complets
-8. [ ] Go live !
+1. [x] Valider le concept Elena (nom, style, personnalité) ✅
+2. [x] Character sheet créé (`docs/03-PERSONNAGE-ELENA.md`) ✅
+3. [x] Config code créée (`app/src/config/character-elena.ts`) ✅
+4. [ ] Créer le dataset initial (4-6 photos)
+5. [ ] Créer le compte Instagram Elena
+6. [ ] Implémenter Phase 2 (solo posts Elena)
+7. [ ] Implémenter Phase 3 (duo posts)
+8. [ ] Tests complets
+9. [ ] Go live !
 
 ---
 
