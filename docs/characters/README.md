@@ -28,7 +28,7 @@ characters/
 | Personnage | Style | Status | Instagram |
 |------------|-------|--------|-----------|
 | **Mila Verne** | Athleisure punk rock | ✅ Actif | @mila_verne |
-| **Elena Visconti** | Street-luxe Paris | 🚧 En création | @elena.visconti (TBD) |
+| **Elena Visconti** | Street-luxe Paris | 🚧 En création | @elenav.paris (TBD) |
 
 ---
 

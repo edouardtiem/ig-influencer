@@ -66,7 +66,7 @@
 ---
 
 ## 📋 À faire prochaine session :
-- [ ] Créer compte Instagram @elena.visconti (ou disponible)
+- [x] Créer compte Instagram @elenav.paris ✅
 - [ ] Configurer Business Account + tokens API
 - [ ] Adapter script `carousel-post-elena.mjs`
 - [ ] Créer workflow `auto-post-elena.yml`

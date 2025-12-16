@@ -52,7 +52,7 @@
 
 ### 📋 À faire prochaine session :
 
-- [ ] Créer le compte Instagram @elena.visconti
+- [x] Créer le compte Instagram @elenav.paris ✅
 - [ ] Configurer Business Account + API tokens
 - [ ] Upload 6 photos de référence Elena sur Cloudinary
 - [ ] Ajouter secrets GitHub :
@@ -117,7 +117,7 @@ ELENA_FACE_REF_2                # Face ref secondaire 2
 ✅ Audience target Elena
 ✅ Script carousel-post-elena.mjs    ← NEW
 ✅ Workflow auto-post-elena.yml      ← NEW
-⬜ Compte Instagram @elena.visconti
+✅ Compte Instagram @elenav.paris
 ⬜ Business Account + API
 ⬜ Upload face refs Cloudinary
 ⬜ Premiers posts

@@ -17,7 +17,7 @@ Le projet dispose de **4 systèmes d'auto-post automatisés** qui fonctionnent v
 
 **Total Mila : 5 posts automatiques par jour** 🚀
 
-### Elena (@elena.visconti) — NEW
+### Elena (@elenav.paris) — NEW
 
 | Système | Format | Fréquence | Horaires |
 |---------|--------|-----------|----------|

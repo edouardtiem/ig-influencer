@@ -301,7 +301,7 @@ ROI attendu : Audience 2-3x → Revenue 2.5x pour +$13/mois
 6. [x] Audience target Elena créée (`docs/characters/elena/AUDIENCE.md`) ✅
 7. [x] Script `carousel-post-elena.mjs` créé ✅
 8. [x] Workflow `auto-post-elena.yml` créé ✅
-9. [ ] Créer le compte Instagram @elena.visconti
+9. [x] Créer le compte Instagram @elenav.paris ✅
 10. [ ] Configurer Business Account + tokens API
 11. [ ] Upload face refs sur Cloudinary + secrets GitHub
 12. [ ] Premiers posts manuels Elena
