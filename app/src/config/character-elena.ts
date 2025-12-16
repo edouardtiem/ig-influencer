@@ -1,7 +1,7 @@
 /**
  * Character Configuration — Elena Visconti
  * Model & Fashion Stylist — Paris Street-Luxe
- * VERSION 2 — Pivot Street-Luxe Parisien
+ * VERSION 3 — Photos de référence validées
  */
 
 export const CHARACTER_ELENA = {
@@ -19,8 +19,14 @@ export const CHARACTER_ELENA = {
     howTheyMet: 'On a photo shoot in Paris. Mila noticed Elena\'s vintage Blondie t-shirt under her oversized blazer.',
   },
   
+  // Tech
+  phone: {
+    model: 'iPhone 17 Pro',
+    color: 'Bleu',
+  },
+  
   // ═══════════════════════════════════════════════════════════════
-  // PHYSICAL DESCRIPTION — Ultra-Detailed for AI
+  // PHYSICAL DESCRIPTION — Validé avec photos de référence
   // ═══════════════════════════════════════════════════════════════
   
   physical: {
@@ -29,50 +35,76 @@ export const CHARACTER_ELENA = {
     height: '170-172cm',
     
     // Face Details - SOFT, NOT ANGULAR
-    face: 'soft round pleasant face, not angular, warm approachable features',
+    face: 'soft round pleasant face not angular, warm approachable features',
     eyes: 'honey brown warm eyes, inviting gaze',
     nose: 'small refined nose with soft tip',
     lips: 'naturally full lips nude-pink color',
     eyebrows: 'soft natural brows, not overdone',
     skin: 'glowing sun-kissed skin with warm undertones',
+    beautyMark: 'small beauty mark on right cheekbone',
     
     // Hair — Critical for consistency
-    hair: 'bronde hair (dark roots with golden blonde balayage) long voluminous beach waves, natural texture',
+    hair: 'bronde hair (dark roots with golden blonde balayage) long voluminous beach waves',
     
-    // Body Proportions - CURVY
-    body: 'curvy voluptuous figure not skinny, very large natural F-cup breasts prominent and emphasized, visible cleavage, soft feminine curves, narrow waist, wide hips, thick thighs, healthy curvy body',
+    // Body Proportions - CURVY with large bust
+    body: 'curvy voluptuous figure not skinny, very large natural F-cup breasts prominent emphasized visible cleavage, soft feminine curves, narrow waist, wide hips, thick thighs, healthy curvy body',
   },
   
   // ═══════════════════════════════════════════════════════════════
-  // DISTINCTIVE MARKS — Critical for consistency
+  // SIGNATURE ELEMENTS — Always include
   // ═══════════════════════════════════════════════════════════════
   
-  distinctiveMarks: {
-    beautyMark: 'small beauty mark on cheekbone',
-  },
-  
-  // Signature elements (ALWAYS include)
   signature: {
-    bracelet: 'gold chunky bracelet on wrist',
-    necklaces: 'layered gold necklaces with pendant',
+    bracelet: 'gold chunky chain bracelet on wrist',
+    necklaces: 'layered gold necklaces with medallion pendant',
+    beautyMark: 'small beauty mark on right cheekbone',
   },
   
-  // Style keywords — Street-luxe Paris 2025
-  style: 'Instagram model aesthetic 2025, street-luxe Paris, revealing but tasteful, young and trendy, oversized jackets with tiny tops, leggings, lots of skin showing',
+  // ═══════════════════════════════════════════════════════════════
+  // STYLE — Paris Street-Luxe 2025
+  // ═══════════════════════════════════════════════════════════════
   
-  // Primary setting
-  setting: {
-    type: 'luxurious bright Parisian loft apartment',
-    location: '8th arrondissement',
-    features: 'huge windows with natural daylight flooding in, Paris rooftops view, high ceilings, minimalist expensive decor, white walls, velvet sofa, plants, parquet floor',
+  style: {
+    aesthetic: 'Instagram model aesthetic 2025, street-luxe Paris, revealing but tasteful',
+    colors: ['beige', 'cream', 'nude', 'white', 'black', 'plaid'],
+    jewelry: 'gold only, chunky chain bracelet, layered necklaces',
+    
+    // Signature outfits
+    outfits: {
+      hero: 'oversized plaid blazer open + beige crop top tight + beige leggings',
+      mirrorSelfie: 'white ribbed tank top showing cleavage + black leggings',
+      cozyHome: 'cream oversized knit sweater off-shoulder + tiny black shorts',
+      gettingReady: 'white shirt unbuttoned open + black lace bralette + black pants',
+      cafeParis: 'beige cropped cardigan unbuttoned showing cleavage + cream trousers',
+      spaVacation: 'cream one-piece swimsuit plunging neckline',
+    },
   },
   
-  // Quality settings
-  quality: {
-    resolution: 'high resolution',
-    lighting: 'natural lighting',
-    skin: 'realistic skin texture',
-    style: 'lifestyle photography',
+  // ═══════════════════════════════════════════════════════════════
+  // SETTINGS — Primary locations
+  // ═══════════════════════════════════════════════════════════════
+  
+  settings: {
+    loft: {
+      description: 'luxurious bright Parisian loft apartment 8th arrondissement',
+      features: 'huge windows with natural daylight, Paris rooftops view, high ceilings, white walls, parquet floor, velvet mauve sofa, plants',
+    },
+    bathroom: {
+      description: 'luxurious Parisian bathroom',
+      features: 'white marble walls with grey veins, gold fixtures and faucets, large window with Paris view',
+    },
+    bedroom: {
+      description: 'elegant Parisian apartment bedroom',
+      features: 'vanity table with Hollywood mirror lights, neutral tones beige and white, Haussmann windows',
+    },
+    cafeParis: {
+      description: 'classic Parisian cafe terrace',
+      features: 'rattan bistro chairs, marble table, Haussmann buildings background, cobblestone street',
+    },
+    spaSki: {
+      description: 'luxury ski resort spa in the Alps',
+      features: 'outdoor heated infinity pool, steam rising, snowy mountain panorama, pine trees, clear blue winter sky',
+    },
   },
   
   // ═══════════════════════════════════════════════════════════════
@@ -81,17 +113,14 @@ export const CHARACTER_ELENA = {
   
   negative: {
     global: [
-      // Face
-      'angular face', 'sharp jawline', 'square face', 'classic model face', 'editorial model',
-      // Body
-      'skinny thin body', 'flat chest', 'small breasts', 'medium breasts', 
+      'different face', 'different person',
+      'angular face', 'sharp jawline', 'square face', 'classic model face',
+      'skinny thin body', 'flat chest', 'small breasts', 'medium breasts',
       'A-cup', 'B-cup', 'C-cup', 'D-cup', 'average bust',
-      // Style
-      'conservative outfit', 'covered up', 'modest clothing', 'old fashioned style', 'formal business attire',
-      // Technical
-      'studio lighting', 'dark apartment', 'small windows', 'cheap decor',
-      'stiff pose', 'cold expression', 'unfriendly',
-      'airbrushed skin', 'fake looking', 'oversaturated', 'HDR', 'too perfect', 'plastic skin',
+      'conservative outfit', 'covered up', 'modest clothing',
+      'dark room', 'cheap decor',
+      'stiff pose', 'cold expression',
+      'airbrushed skin', 'fake looking', 'oversaturated', 'plastic skin',
     ],
   },
 } as const;
@@ -101,26 +130,44 @@ export const CHARACTER_ELENA = {
 // ═══════════════════════════════════════════════════════════════
 
 /**
- * Build the complete CHARACTER section of the prompt
+ * Build the base character prompt (to use with reference image)
  */
-export function buildElenaCharacterPrompt(): string {
-  const { physical, distinctiveMarks, signature } = CHARACTER_ELENA;
+export function buildElenaBasePrompt(): string {
+  const { physical, signature } = CHARACTER_ELENA;
   
-  return `Instagram photo of young woman, ${physical.base},
+  return `Based on the provided reference image, same woman same face same features,
 
-FACE: ${physical.face}, ${physical.hair}, ${physical.eyes}, ${physical.lips}, ${physical.eyebrows}, ${physical.skin}, ${distinctiveMarks.beautyMark},
+Instagram photo, young woman ${physical.base},
 
-BODY: ${physical.body},
+FACE: exactly like reference image, ${physical.face}, ${physical.hair}, ${physical.eyes}, ${physical.lips}, ${physical.skin}, ${physical.beautyMark},
 
-DISTINCTIVE: ${signature.bracelet}, ${signature.necklaces}`;
+BODY: exactly like reference image, ${physical.body},
+
+ACCESSORIES: ${signature.bracelet}, ${signature.necklaces}`;
 }
 
 /**
- * Build the setting section
+ * Build full prompt with outfit and setting
  */
-export function buildElenaSettingPrompt(): string {
-  const { setting } = CHARACTER_ELENA;
-  return `SETTING: inside ${setting.type} ${setting.location}, ${setting.features}`;
+export function buildFullElenaPrompt(
+  outfit: string, 
+  setting: string, 
+  expression: string = 'confident relaxed smile, effortlessly sexy'
+): string {
+  const base = buildElenaBasePrompt();
+  const { style } = CHARACTER_ELENA;
+  
+  return `${base},
+
+OUTFIT: ${outfit},
+
+SETTING: ${setting},
+
+EXPRESSION: ${expression},
+
+STYLE: ${style.aesthetic},
+
+QUALITY: high resolution, natural lighting, realistic skin texture, lifestyle photography`;
 }
 
 /**
@@ -131,21 +178,16 @@ export function getElenaNegativePrompt(): string {
 }
 
 /**
- * Build full prompt with outfit and setting
+ * Get a predefined outfit
  */
-export function buildFullElenaPrompt(outfit: string, setting: string, expression: string = 'confident relaxed smile, effortlessly sexy'): string {
-  const character = buildElenaCharacterPrompt();
-  const { style, quality } = CHARACTER_ELENA;
-  
-  return `${character},
+export function getElenaOutfit(type: keyof typeof CHARACTER_ELENA.style.outfits): string {
+  return CHARACTER_ELENA.style.outfits[type];
+}
 
-OUTFIT: ${outfit},
-
-SETTING: ${setting},
-
-EXPRESSION: ${expression},
-
-STYLE: ${style},
-
-QUALITY: ${Object.values(quality).join(', ')}`;
+/**
+ * Get a predefined setting
+ */
+export function getElenaSetting(type: keyof typeof CHARACTER_ELENA.settings): string {
+  const setting = CHARACTER_ELENA.settings[type];
+  return `${setting.description}, ${setting.features}`;
 }

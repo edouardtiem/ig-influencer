@@ -36,24 +36,25 @@
 
 ### Visage — Détails Précis
 
-| Élément | Description Ultra-Détaillée |
-|---------|---------------------------|
+| Élément | Description |
+|---------|-------------|
 | **Type** | Européenne, origine italienne, vibe parisienne |
 | **Forme du visage** | Doux et rond, PAS anguleux, traits harmonieux et agréables |
-| **Cheveux** | Bronde (racines foncées + balayage blond doré), longs, beach waves volumineuses, texture naturelle |
+| **Cheveux** | Bronde (racines foncées + balayage blond doré), longs (mi-dos), beach waves volumineuses |
 | **Yeux** | Marron miel chauds, regard warm et invitant |
 | **Nez** | Petit et raffiné, bout doux |
 | **Lèvres** | Naturellement pleines, couleur nude-rose |
 | **Sourcils** | Doux et naturels, pas trop dessinés |
 | **Peau** | Sun-kissed, glowy, teint chaud et lumineux |
+| **Grain de beauté** | Petit, sur la pommette droite |
 
 ### Signes Distinctifs (CRITIQUE pour consistance IA)
 
 | Élément | Description | Importance |
 |---------|-------------|------------|
-| **Grain de beauté** | Petit, sur la pommette (côté à définir) | 🔴 Signature |
-| **Bracelet** | Chunky gold bracelet, grosse maille | 🔴 Signature |
-| **Colliers** | Layered gold necklaces avec pendentif | 🔴 Signature |
+| **Grain de beauté** | Petit, sur la pommette droite | 🔴 Signature |
+| **Bracelet** | Chunky gold chain bracelet, grosse maille | 🔴 Signature |
+| **Colliers** | Layered gold necklaces avec pendentif médaillon | 🔴 Signature |
 | **Visage** | Agréable, sympa à regarder, PAS mannequin classique anguleux | 🔴 Signature |
 
 ### Corps — Proportions
@@ -62,11 +63,12 @@
 |---------|-------------|
 | **Silhouette** | Curvy et voluptueuse, PAS skinny |
 | **Taille** | ~170-172cm |
-| **Poitrine** | Très généreuse, naturelle, F/G-cup, proéminente |
+| **Poitrine** | Très généreuse, naturelle, F/G-cup, proéminente, décolleté marqué |
 | **Taille** | Fine et marquée (contraste avec poitrine/hanches) |
 | **Hanches** | Larges, féminines |
-| **Cuisses** | Épaisses, healthy |
-| **Overall** | Corps de femme, pas de mannequin maigre — curvy fit |
+| **Cuisses** | Épaisses, healthy, galbées |
+| **Ventre** | Plat mais pas ultra-musclé, naturel |
+| **Overall** | Corps de femme curvy fit, pas de mannequin maigre |
 
 ### À éviter (pour consistance)
 
@@ -75,7 +77,7 @@
 - ❌ Petite poitrine
 - ❌ Cheveux foncés/bruns/noirs
 - ❌ Cheveux raides
-- ❌ Style "Paris blazer chic" classique
+- ❌ Style "Paris blazer chic" classique fermé
 - ❌ Look froid/inaccessible
 
 ---
@@ -86,23 +88,24 @@
 
 **"Paris Street-Luxe Mannequin 2025"** — Osé mais stylé, près du corps, tendance
 
-### Ce qu'elle porte
+### Tenues Signature (basées sur les photos de référence)
 
-| Type | Exemples |
-|------|----------|
-| **Signature** | Oversized blazer/jacket ouvert + crop top tiny en dessous |
-| **Bas** | Leggings près du corps, cycling shorts, pantalons taille haute |
-| **Hauts** | Crop tops, brassières, décolletés, tops moulants |
-| **Outerwear** | Grandes vestes oversize (plaid, denim, leather) |
-| **Vibe** | Beaucoup de peau visible, curves assumées |
+| Type | Description |
+|------|-------------|
+| **Look Principal** | Blazer oversize plaid ouvert + crop top beige moulant + legging beige |
+| **Mirror Selfie** | Tank top blanc très échancré + legging noir |
+| **Cozy Home** | Pull oversize cream off-shoulder + mini short noir |
+| **Getting Ready** | Chemise blanche ouverte + bralette noire dentelle + pantalon noir |
+| **Café Paris** | Cardigan beige cropped déboutonné (décolleté) + pantalon cream |
+| **Spa/Vacances** | Maillot une-pièce cream échancré, plongeant |
 
 ### Palette de Couleurs
 
 | Type | Couleurs |
 |------|----------|
-| **Dominantes** | Beige, camel, nude, blanc cassé |
-| **Accents** | Noir, plaid/tartan, kaki |
-| **Bijoux** | Or uniquement (gold) |
+| **Dominantes** | Beige, cream, nude, blanc cassé, noir |
+| **Accents** | Plaid/tartan (vestes), kaki |
+| **Bijoux** | Or uniquement (gold chunky) |
 
 ### Ce n'est PAS
 
@@ -114,18 +117,49 @@
 
 ---
 
+## 📱 Tech & Accessoires
+
+### Téléphone
+
+| Élément | Valeur |
+|---------|--------|
+| **Modèle** | iPhone 17 Pro |
+| **Couleur** | Bleu |
+| **Usage** | Selfies, stories, contenu Instagram |
+
+### Bijoux Signature
+
+| Bijou | Description | Fréquence |
+|-------|-------------|-----------|
+| **Bracelet** | Chunky gold chain bracelet (grosse maille) | TOUJOURS |
+| **Colliers** | 2-3 chaînes or superposées + pendentif médaillon | TOUJOURS |
+| **Boucles** | Petites créoles or ou studs | Souvent |
+
+---
+
 ## 🏠 Son Univers
 
 ### L'appartement (Setting principal)
 
 | Élément | Description |
 |---------|-------------|
-| **Type** | Grand loft parisien |
+| **Type** | Grand loft parisien haussmannien |
 | **Quartier** | 8e arrondissement |
-| **Lumière** | Énormes fenêtres, luminosité maximale, vue toits Paris |
-| **Déco** | Minimaliste luxe, murs blancs, parquet |
-| **Meubles** | Canapé velours (mauve/beige), plantes vertes |
+| **Lumière** | Énormes fenêtres, luminosité maximale, vue toits Paris zinc |
+| **Déco** | Minimaliste luxe, murs blancs, parquet chevron |
+| **Meubles** | Canapé velours mauve/rose, plantes vertes, déco minimale |
+| **Salle de bain** | Marbre blanc veiné gris, robinetterie dorée, grande fenêtre |
+| **Chambre** | Lit beige/blanc, vanity avec miroir Hollywood lights |
 | **Vibe** | Expensive but lived-in, Instagram-ready |
+
+### Lieux récurrents
+
+| Lieu | Type de contenu |
+|------|-----------------|
+| **Loft Paris** | Home content, cozy, getting ready |
+| **Cafés parisiens** | Terrasse, lifestyle, golden hour |
+| **Spa ski (Alpes)** | Vacances luxe, maillot de bain |
+| **Rues Paris** | Street style, Haussmann background |
 
 ---
 
@@ -147,6 +181,8 @@
 | **Confident** | "This light though" |
 | **Playful** | "Oops" |
 | **French touch** | "Chez moi 🏠" |
+| **Cozy** | "Staying in today" |
+| **Travel** | "Ski season 🎿" |
 
 ---
 
@@ -155,19 +191,23 @@
 ### Prompt de Base (VALIDÉ)
 
 ```
-Instagram photo of young woman, 24 years old, Italian origin living in Paris, successful model,
+Based on the provided reference image, same woman same face same features,
 
-FACE: soft round pleasant face, not angular, warm approachable features, bronde hair (dark roots with golden blonde balayage) long voluminous beach waves, honey brown warm eyes, naturally full lips nude-pink, soft natural brows, glowing sun-kissed skin, small beauty mark on cheekbone,
+Instagram photo, young woman 24 years old Italian origin living in Paris successful model,
 
-BODY: curvy voluptuous figure not skinny, very large natural F-cup breasts prominent and emphasized, visible cleavage, soft feminine curves, narrow waist, wide hips, thick thighs, healthy curvy body,
+FACE: exactly like reference image, soft round pleasant face not angular, warm approachable features, bronde hair dark roots with golden blonde balayage long voluminous beach waves, honey brown warm eyes, naturally full lips nude-pink, glowing sun-kissed skin, small beauty mark on right cheekbone,
 
-OUTFIT: [INSÉRER TENUE - Paris street-luxe 2025 style],
+BODY: exactly like reference image, curvy voluptuous figure not skinny, very large natural F-cup breasts prominent emphasized visible cleavage, soft feminine curves, narrow waist, wide hips, thick thighs, healthy curvy body,
+
+OUTFIT: [INSÉRER TENUE],
 
 SETTING: [INSÉRER LIEU],
 
-EXPRESSION: confident relaxed smile, effortlessly sexy, casual vibe,
+ACCESSORIES: gold chunky chain bracelet on wrist, layered gold necklaces with medallion pendant,
 
-STYLE: Instagram model aesthetic 2025, street-luxe Paris, revealing but tasteful, young and trendy,
+EXPRESSION: [INSÉRER EXPRESSION],
+
+STYLE: Instagram model aesthetic 2025, street-luxe Paris, revealing but tasteful,
 
 QUALITY: high resolution, natural lighting, realistic skin texture, lifestyle photography
 ```
@@ -175,8 +215,21 @@ QUALITY: high resolution, natural lighting, realistic skin texture, lifestyle ph
 ### Negative Prompt (VALIDÉ)
 
 ```
-angular face, sharp jawline, square face, classic model face, editorial model, conservative outfit, covered up, modest clothing, skinny thin body, flat chest, small breasts, medium breasts, A-cup, B-cup, C-cup, D-cup, average bust, old fashioned style, formal business attire, studio lighting, dark apartment, small windows, cheap decor, stiff pose, cold expression, unfriendly, airbrushed skin, fake looking, oversaturated, HDR, too perfect, plastic skin
+different face, different person, angular face, sharp jawline, square face, classic model face, skinny thin body, flat chest, small breasts, medium breasts, A-cup, B-cup, C-cup, D-cup, average bust, conservative outfit, covered up, modest clothing, dark room, cheap decor, stiff pose, cold expression, airbrushed skin, fake looking, oversaturated, plastic skin
 ```
+
+---
+
+## 📸 Photos de Référence
+
+6 photos validées couvrant les situations suivantes :
+
+1. **Loft principal** — Blazer plaid + crop top beige + legging (HERO SHOT)
+2. **Mirror selfie** — Salle de bain marbre, tank top blanc, iPhone visible
+3. **Spa ski** — Maillot cream, piscine extérieure, montagnes enneigées
+4. **Canapé cozy** — Pull cream off-shoulder, shorts noirs, barefoot
+5. **Getting ready** — Vanity, chemise ouverte + bralette noire
+6. **Café Paris** — Terrasse, cardigan beige, espresso, golden hour
 
 ---
 
@@ -184,11 +237,12 @@ angular face, sharp jawline, square face, classic model face, editorial model, c
 
 ### Toujours Présent
 
-- ✅ Cheveux bronde beach waves
+- ✅ Cheveux bronde beach waves longs
 - ✅ Visage doux et agréable (pas anguleux)
-- ✅ Grosse poitrine visible
-- ✅ Bracelet or chunky
-- ✅ Colliers layered or
+- ✅ Grosse poitrine visible / mise en valeur
+- ✅ Bracelet or chunky chain
+- ✅ Colliers layered or avec médaillon
+- ✅ Grain de beauté pommette droite
 - ✅ Sourire warm/confident
 
 ### Jamais
@@ -199,6 +253,7 @@ angular face, sharp jawline, square face, classic model face, editorial model, c
 - ❌ Corps très mince
 - ❌ Style couvert/modeste
 - ❌ Expression froide
+- ❌ Bijoux argent
 
 ---
 
@@ -210,4 +265,4 @@ angular face, sharp jawline, square face, classic model face, editorial model, c
 ---
 
 *Créé le 16 décembre 2024*  
-*Mis à jour le 16 décembre 2024 — VERSION 2 (Pivot Street-Luxe)*
+*Mis à jour le 16 décembre 2024 — VERSION 3 (Photos de référence validées)*
