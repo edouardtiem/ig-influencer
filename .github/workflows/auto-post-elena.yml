@@ -1,0 +1,103 @@
+name: Elena Auto Post
+
+on:
+  schedule:
+    # 5 posts per day - Focus evening/night for sexy content engagement
+    # (UTC times - Paris is UTC+1 winter, UTC+2 summer)
+    
+    # Morning - 9h00 Paris = 8h00 UTC (winter) / 7h00 UTC (summer)
+    - cron: '0 8 * * *'
+    # Midday - 12h30 Paris = 11h30 UTC (winter) / 10h30 UTC (summer)
+    - cron: '30 11 * * *'
+    # Evening - 19h00 Paris = 18h00 UTC (winter) / 17h00 UTC (summer)
+    - cron: '0 18 * * *'
+    # Night PRIME - 21h30 Paris = 20h30 UTC (winter) / 19h30 UTC (summer)
+    - cron: '30 20 * * *'
+    # Late Night - 23h00 Paris = 22h00 UTC (winter) / 21h00 UTC (summer)
+    - cron: '0 22 * * *'
+  
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: 'Time slot (morning, midday, evening, night, late_night)'
+        required: false
+        default: ''
+      test_mode:
+        description: 'Test mode (no publish)'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  auto-post-elena:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: ./app
+        run: npm install replicate
+
+      - name: Determine slot from schedule
+        id: slot
+        run: |
+          HOUR=$(date -u +%H)
+          
+          # Manual trigger with specific slot
+          if [ -n "${{ github.event.inputs.slot }}" ]; then
+            echo "slot=${{ github.event.inputs.slot }}" >> $GITHUB_OUTPUT
+            echo "Using manual slot: ${{ github.event.inputs.slot }}"
+            exit 0
+          fi
+          
+          # Determine slot based on current UTC time
+          if [ "$HOUR" -eq 8 ] || [ "$HOUR" -eq 7 ]; then
+            echo "slot=morning" >> $GITHUB_OUTPUT
+            echo "Detected morning slot (9h00 Paris)"
+          elif [ "$HOUR" -eq 11 ] || [ "$HOUR" -eq 10 ]; then
+            echo "slot=midday" >> $GITHUB_OUTPUT
+            echo "Detected midday slot (12h30 Paris)"
+          elif [ "$HOUR" -eq 18 ] || [ "$HOUR" -eq 17 ]; then
+            echo "slot=evening" >> $GITHUB_OUTPUT
+            echo "Detected evening slot (19h00 Paris)"
+          elif [ "$HOUR" -eq 20 ] || [ "$HOUR" -eq 19 ]; then
+            echo "slot=night" >> $GITHUB_OUTPUT
+            echo "Detected night slot (21h30 Paris) - PRIME TIME"
+          elif [ "$HOUR" -eq 22 ] || [ "$HOUR" -eq 21 ]; then
+            echo "slot=late_night" >> $GITHUB_OUTPUT
+            echo "Detected late_night slot (23h00 Paris)"
+          else
+            echo "slot=evening" >> $GITHUB_OUTPUT
+            echo "Defaulting to evening slot"
+          fi
+
+      - name: Generate and Post Elena Carousel
+        working-directory: ./app
+        env:
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          INSTAGRAM_ACCESS_TOKEN_ELENA: ${{ secrets.INSTAGRAM_ACCESS_TOKEN_ELENA }}
+          INSTAGRAM_ACCOUNT_ID_ELENA: ${{ secrets.INSTAGRAM_ACCOUNT_ID_ELENA }}
+          ELENA_PRIMARY_FACE_URL: ${{ secrets.ELENA_PRIMARY_FACE_URL }}
+          ELENA_FACE_REF_1: ${{ secrets.ELENA_FACE_REF_1 }}
+          ELENA_FACE_REF_2: ${{ secrets.ELENA_FACE_REF_2 }}
+        run: |
+          SLOT="${{ steps.slot.outputs.slot }}"
+          TEST="${{ github.event.inputs.test_mode }}"
+          
+          echo "🌟 Starting Elena carousel generation"
+          echo "📅 Slot: $SLOT"
+          echo "🧪 Test mode: $TEST"
+          
+          node scripts/carousel-post-elena.mjs "$SLOT" "$TEST"
+

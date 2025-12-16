@@ -298,12 +298,14 @@ ROI attendu : Audience 2-3x → Revenue 2.5x pour +$13/mois
 3. [x] Config code créée (`app/src/config/character-elena.ts`) ✅
 4. [x] Dataset initial généré (6 photos de référence) ✅
 5. [x] Premier post duo Mila + Elena testé (Café de Flore) ✅
-6. [ ] Créer le compte Instagram @elena.visconti
-7. [ ] Configurer Business Account + tokens API
-8. [ ] Adapter script `carousel-post-elena.mjs`
-9. [ ] Créer workflow `auto-post-elena.yml`
-10. [ ] Premiers posts manuels Elena
-11. [ ] Go live !
+6. [x] Audience target Elena créée (`docs/characters/elena/AUDIENCE.md`) ✅
+7. [x] Script `carousel-post-elena.mjs` créé ✅
+8. [x] Workflow `auto-post-elena.yml` créé ✅
+9. [ ] Créer le compte Instagram @elena.visconti
+10. [ ] Configurer Business Account + tokens API
+11. [ ] Upload face refs sur Cloudinary + secrets GitHub
+12. [ ] Premiers posts manuels Elena
+13. [ ] Go live !
 
 ---
 

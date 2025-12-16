@@ -88,7 +88,8 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
-| 16/12/2024 | **Création Elena Visconti** — Character sheet + 6 photos ref + duo test | [→](./docs/SESSION-16-DEC-2024-ELENA.md) |
+| 16/12/2024 (PM) | **Elena V2** — Script carousel + Workflow GitHub Actions + Audience | [→](./docs/SESSION-16-DEC-2024-ELENA-V2.md) |
+| 16/12/2024 (AM) | **Création Elena Visconti** — Character sheet + 6 photos ref + duo test | [→](./docs/SESSION-16-DEC-2024-ELENA.md) |
 | 16/12/2024 | Planification intégration Supabase | [→](./roadmap/todo/TODO-004-supabase-integration.md) |
 | 16/12/2024 | Analyse multi-personnages (Elena) | [→](./docs/SESSION-16-DEC-2024.md) |
 | 15/12/2024 | Cron jobs + Carousel + Vacation Reels | [→](./docs/SESSION-15-DEC-2024.md) |

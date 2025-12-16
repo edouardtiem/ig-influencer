@@ -6,14 +6,26 @@
 
 ## 📋 Vue d'ensemble
 
-Le projet dispose de **2 systèmes d'auto-post automatisés** qui fonctionnent via GitHub Actions :
+Le projet dispose de **4 systèmes d'auto-post automatisés** qui fonctionnent via GitHub Actions :
+
+### Mila (@mila.aurorae)
 
 | Système | Format | Fréquence | Horaires |
 |---------|--------|-----------|----------|
 | **Carousel Auto-Post** | 3 photos carrousel | 4x/jour | 8h30, 11h, 17h, 21h15 |
 | **Vacation Reels** | Vidéo slideshow 9s | 1x/jour | 19h |
 
-**Total : 5 posts automatiques par jour** 🚀
+**Total Mila : 5 posts automatiques par jour** 🚀
+
+### Elena (@elena.visconti) — NEW
+
+| Système | Format | Fréquence | Horaires |
+|---------|--------|-----------|----------|
+| **Elena Carousel Auto-Post** | 3 photos carrousel | 5x/jour | 9h, 12h30, 19h, 21h30, 23h |
+
+**Total Elena : 5 posts automatiques par jour** 🌟
+
+**Note** : Les slots d'Elena sont décalés vs Mila pour éviter la cannibalisation et optimisés pour l'engagement de son audience (plus sexy → plus de posts soir/nuit)
 
 ---
 
@@ -98,7 +110,64 @@ Prompt minimal (loungewear cozy ultra safe)
 
 ---
 
-## 🎬 Système 2 : Vacation Reels
+## 🌟 Système 2 : Elena Carousel Auto-Post
+
+### Description
+
+Génère et publie automatiquement un carrousel de 3 photos lifestyle très sexy d'Elena.
+
+### Fichiers
+
+| Fichier | Description |
+|---------|-------------|
+| `app/scripts/carousel-post-elena.mjs` | Script principal |
+| `.github/workflows/auto-post-elena.yml` | GitHub Action |
+
+### Horaires (5x/jour — focus soir/nuit)
+
+| Slot | Heure Paris | UTC (hiver) | Lieux |
+|------|-------------|-------------|-------|
+| `morning` | 9h00 | 8h00 | loft_bedroom, bathroom_luxe |
+| `midday` | 12h30 | 11h30 | cafe_paris, loft_living |
+| `evening` | 19h00 | 18h00 | loft_living, cafe_paris |
+| `night` **PRIME** | 21h30 | 20h30 | loft_bedroom, loft_living |
+| `late_night` | 23h00 | 22h00 | loft_bedroom, bathroom_luxe |
+
+### Locations Elena
+
+| Location | Description |
+|----------|-------------|
+| `loft_living` | Loft luxueux Paris 8e, grandes fenêtres, vue toits |
+| `loft_bedroom` | Chambre élégante, literie blanche, vanity mirror |
+| `bathroom_luxe` | Salle de bain marbre blanc, fixtures or |
+| `cafe_paris` | Terrasse café chic, style haussmannien |
+| `spa_luxe` | Spa/jacuzzi montagne ou indoor |
+
+### Secrets GitHub requis
+
+```
+INSTAGRAM_ACCESS_TOKEN_ELENA
+INSTAGRAM_ACCOUNT_ID_ELENA
+ELENA_PRIMARY_FACE_URL
+ELENA_FACE_REF_1
+ELENA_FACE_REF_2
+```
+
+### Commandes
+
+```bash
+# Test local (sans publier)
+node scripts/carousel-post-elena.mjs morning test
+node scripts/carousel-post-elena.mjs night test
+
+# Publication réelle
+node scripts/carousel-post-elena.mjs morning
+node scripts/carousel-post-elena.mjs night
+```
+
+---
+
+## 🎬 Système 3 : Vacation Reels
 
 ### Description
 
@@ -205,21 +274,38 @@ node scripts/vacation-reel-post.mjs beach     # Forcer thème beach
 
 Les secrets suivants doivent être configurés dans **GitHub → Settings → Secrets → Actions** :
 
+#### Secrets communs
+
 | Secret | Description |
 |--------|-------------|
 | `REPLICATE_API_TOKEN` | Token API Replicate (Nano Banana Pro) |
 | `CLOUDINARY_CLOUD_NAME` | Nom du cloud Cloudinary |
 | `CLOUDINARY_API_KEY` | Clé API Cloudinary |
 | `CLOUDINARY_API_SECRET` | Secret API Cloudinary |
-| `INSTAGRAM_ACCESS_TOKEN` | Token Instagram Graph API |
-| `INSTAGRAM_ACCOUNT_ID` | ID du compte Instagram Business |
+
+#### Secrets Mila
+
+| Secret | Description |
+|--------|-------------|
+| `INSTAGRAM_ACCESS_TOKEN` | Token Instagram Graph API Mila |
+| `INSTAGRAM_ACCOUNT_ID` | ID du compte Instagram Business Mila |
+
+#### Secrets Elena
+
+| Secret | Description |
+|--------|-------------|
+| `INSTAGRAM_ACCESS_TOKEN_ELENA` | Token Instagram Graph API Elena |
+| `INSTAGRAM_ACCOUNT_ID_ELENA` | ID du compte Instagram Business Elena |
+| `ELENA_PRIMARY_FACE_URL` | URL Cloudinary face ref principale |
+| `ELENA_FACE_REF_1` | URL Cloudinary face ref secondaire 1 |
+| `ELENA_FACE_REF_2` | URL Cloudinary face ref secondaire 2 |
 
 ### Déclencher manuellement
 
-Les deux workflows peuvent être déclenchés manuellement depuis l'onglet **Actions** sur GitHub :
+Les workflows peuvent être déclenchés manuellement depuis l'onglet **Actions** sur GitHub :
 
 1. Aller sur `github.com/[user]/[repo]/actions`
-2. Sélectionner le workflow (`Mila Auto Post` ou `Mila Vacation Reel`)
+2. Sélectionner le workflow (`Mila Auto Post`, `Elena Auto Post`, ou `Mila Vacation Reel`)
 3. Cliquer **Run workflow**
 4. Choisir les options (slot/theme, test mode)
 5. Cliquer **Run workflow** (vert)
