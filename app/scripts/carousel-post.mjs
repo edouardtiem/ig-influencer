@@ -36,6 +36,9 @@ small dark beauty mark above left lip corner,
 thin gold necklace with minimalist star pendant always visible,
 slim athletic physique 168cm, natural full feminine curves, defined waist`;
 
+// Mila's signature phone - always the same for consistency
+const MILA_PHONE = 'iPhone Air in cream white color, ultra-thin minimalist design, matte finish';
+
 // ═══════════════════════════════════════════════════════════════
 // EXPRESSIONS - Sensual but tasteful
 // ═══════════════════════════════════════════════════════════════
@@ -68,9 +71,9 @@ const LOCATIONS = {
     actions: [
       'sitting on edge of bed, one leg tucked under, sheets draped around her, relaxed morning moment',
       'standing by window looking out, silhouette backlit by soft light, contemplative',
-      'lying on bed propped on elbow, body curved naturally, scrolling phone',
+      `lying on bed propped on elbow, body curved naturally, scrolling on her ${MILA_PHONE}`,
       'stretching arms above head while sitting in bed, morning awakening',
-      'taking mirror selfie with phone, natural casual pose',
+      `taking mirror selfie with her ${MILA_PHONE}, natural casual pose`,
       'sitting cross-legged on bed, coffee cup in hands, cozy moment',
       'adjusting hair in vanity mirror, getting ready routine',
       'lying on stomach on bed, legs kicked up playfully behind her',
