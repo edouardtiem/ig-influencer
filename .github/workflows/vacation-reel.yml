@@ -1,0 +1,67 @@
+name: Mila Vacation Reel
+
+on:
+  schedule:
+    # 19h Paris = 18h UTC (winter) / 17h UTC (summer)
+    - cron: '0 18 * * *'
+  
+  workflow_dispatch:
+    inputs:
+      theme:
+        description: 'Vacation theme (ski, beach, city, auto)'
+        required: false
+        default: 'auto'
+        type: choice
+        options:
+          - auto
+          - ski
+          - beach
+          - city
+      test_mode:
+        description: 'Test mode (no publish)'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  vacation-reel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Install dependencies
+        working-directory: ./app
+        run: npm install replicate
+
+      - name: Generate and Post Vacation Reel
+        working-directory: ./app
+        env:
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_ACCOUNT_ID: ${{ secrets.INSTAGRAM_ACCOUNT_ID }}
+        run: |
+          THEME="${{ github.event.inputs.theme || 'auto' }}"
+          TEST="${{ github.event.inputs.test_mode }}"
+          
+          echo "🎬 Starting vacation reel generation"
+          echo "🏖️ Theme: $THEME"
+          echo "🧪 Test mode: $TEST"
+          
+          node scripts/vacation-reel-post.mjs "$THEME" "$TEST"
+

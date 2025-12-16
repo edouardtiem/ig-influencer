@@ -390,6 +390,36 @@ async function generateImageInternal(replicate, prompt, base64Images) {
   throw new Error('Could not process API response');
 }
 
+// Minimax Image-01 fallback for sexy content
+async function generateWithMinimax(replicate, prompt, faceRefUrl) {
+  log(`  🔄 Fallback to Minimax Image-01 (more permissive)...`);
+  
+  const input = {
+    prompt,
+    aspect_ratio: '3:4', // Closest to 4:5 that Minimax supports
+    subject_reference: faceRefUrl,
+  };
+
+  const output = await replicate.run('minimax/image-01', { input });
+
+  // Parse Minimax output
+  if (typeof output === 'string') return output;
+  if (Array.isArray(output) && output[0]) {
+    const first = output[0];
+    if (typeof first === 'string') return first;
+    if (first && typeof first.toString === 'function') {
+      const str = first.toString();
+      if (str.startsWith('http')) return str;
+    }
+  }
+  if (output && typeof output.toString === 'function') {
+    const str = output.toString();
+    if (str.startsWith('http')) return str;
+  }
+
+  throw new Error('Could not parse Minimax output');
+}
+
 async function generateImage(replicate, prompt, referenceUrls) {
   log(`  Generating with ${referenceUrls.length} references...`);
   
@@ -403,7 +433,7 @@ async function generateImage(replicate, prompt, referenceUrls) {
     log(`  ✅ Converted to base64`);
   }
 
-  // Try original prompt first
+  // Try Nano Banana Pro first
   try {
     return await generateImageInternal(replicate, prompt, base64Images);
   } catch (error) {
@@ -412,29 +442,19 @@ async function generateImage(replicate, prompt, referenceUrls) {
                             error.message.includes('E005');
     
     if (isSensitiveError) {
-      log(`  ⚠️ Prompt flagged as sensitive, trying safer version...`);
+      log(`  ⚠️ Nano Banana Pro flagged as sensitive`);
+      log(`  🔥 Using Minimax Image-01 fallback (keeps sexy prompt intact)`);
       
-      // Create safer version of prompt
-      const saferPrompt = makeSaferPrompt(prompt);
-      log(`  🔄 Retrying with modified prompt...`);
-      
+      // Use Minimax with the ORIGINAL sexy prompt (not diluted!)
       try {
+        return await generateWithMinimax(replicate, prompt, PRIMARY_FACE_URL);
+      } catch (minimaxError) {
+        log(`  ❌ Minimax also failed: ${minimaxError.message}`);
+        
+        // Last resort: try safer prompt on Nano Banana
+        log(`  🔄 Last resort: safer prompt on Nano Banana...`);
+        const saferPrompt = makeSaferPrompt(prompt);
         return await generateImageInternal(replicate, saferPrompt, base64Images);
-      } catch (retryError) {
-        // If still fails, try even simpler prompt
-        if (retryError.message.includes('flagged') || retryError.message.includes('sensitive')) {
-          log(`  ⚠️ Still flagged, trying minimal prompt...`);
-          
-          const minimalPrompt = `${MILA_BASE},
-natural relaxed pose, casual comfortable moment,
-wearing comfortable loungewear, cozy home setting,
-soft natural lighting, authentic lifestyle moment,
-style photography editorial, natural beauty,
-ultra realistic, 8k, professional photography`;
-          
-          return await generateImageInternal(replicate, minimalPrompt, base64Images);
-        }
-        throw retryError;
       }
     }
     
@@ -446,6 +466,44 @@ ultra realistic, 8k, professional photography`;
 // ═══════════════════════════════════════════════════════════════
 // INSTAGRAM PUBLISH
 // ═══════════════════════════════════════════════════════════════
+
+/**
+ * Wait for Instagram media container to be ready for publishing
+ * Instagram needs time to process uploaded media
+ */
+async function waitForMediaReady(containerId, accessToken, maxWaitMs = 120000) {
+  const startTime = Date.now();
+  const pollInterval = 3000; // Check every 3 seconds
+  
+  while (Date.now() - startTime < maxWaitMs) {
+    const statusUrl = `https://graph.facebook.com/v18.0/${containerId}?fields=status_code,status&access_token=${accessToken}`;
+    
+    try {
+      const response = await fetch(statusUrl);
+      const data = await response.json();
+      
+      if (data.status_code === 'FINISHED') {
+        log('  ✅ Media ready!');
+        return true;
+      }
+      
+      if (data.status_code === 'ERROR') {
+        throw new Error(`Media processing failed: ${data.status || 'Unknown error'}`);
+      }
+      
+      // Status is IN_PROGRESS or PUBLISHED, keep waiting
+      log(`  ⏳ Status: ${data.status_code || 'processing'}...`);
+      
+    } catch (error) {
+      // If we can't check status, just wait and retry
+      log(`  ⏳ Checking status...`);
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, pollInterval));
+  }
+  
+  throw new Error('Media processing timeout - Instagram took too long');
+}
 
 async function publishCarousel(imageUrls, caption, locationId) {
   const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
@@ -505,6 +563,10 @@ async function publishCarousel(imageUrls, caption, locationId) {
 
   const carouselResult = await carouselResponse.json();
   const carouselId = carouselResult.id;
+
+  // Wait for media to be ready (Instagram needs time to process)
+  log('  Waiting for media to be ready...');
+  await waitForMediaReady(carouselId, accessToken);
 
   log('  Publishing...');
   const publishParams = new URLSearchParams({

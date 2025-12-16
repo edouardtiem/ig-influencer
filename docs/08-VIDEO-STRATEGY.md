@@ -4,6 +4,42 @@
 
 ---
 
+## ✅ IMPLÉMENTÉ : Vacation Reels (Slideshow)
+
+> **Voir [16-AUTO-POST-SYSTEM.md](./16-AUTO-POST-SYSTEM.md) pour la documentation complète**
+
+### Système actif depuis Décembre 2024
+
+| Élément | Détail |
+|---------|--------|
+| **Script** | `app/scripts/vacation-reel-post.mjs` |
+| **Workflow** | `.github/workflows/vacation-reel.yml` |
+| **Horaire** | 19h Paris (quotidien) |
+| **Format** | Slideshow 9s (3 photos × 3s) via FFmpeg |
+| **Thèmes** | 🎿 Ski, 🏖️ Beach, 🌆 City (rotation auto) |
+
+### Pipeline simplifié (vs Veo animation)
+
+```
+Photos générées (Nano Banana Pro)
+    ↓
+FFmpeg slideshow
+    ↓
+Upload Cloudinary
+    ↓
+Instagram Graph API (media_type: REELS)
+```
+
+**Avantage** : Pas besoin de modèle d'animation coûteux, 100% fiable.
+
+---
+
+## 🔮 FUTUR : Animation IA avec Veo 3.1
+
+> Le reste de ce document décrit la stratégie future pour animer les images avec de l'IA.
+
+---
+
 ## 📋 Vue d'ensemble
 
 L'ajout de contenu vidéo via l'animation d'images statiques permet de :
