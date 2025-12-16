@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 16 décembre 2024 (session Supabase)
+**Dernière mise à jour** : 16 décembre 2024 (session Elena)
 
 ---
 
@@ -21,9 +21,9 @@ roadmap/
 
 ## 🚧 EN COURS
 
-| ID | Feature | Priorité | Assigné | Lien |
+| ID | Feature | Priorité | Branche | Lien |
 |----|---------|----------|---------|------|
-| - | - | - | - | - |
+| IDEA-001 | Univers multi-personnages (Elena) | 🔴 High | `feature/elena-character` | [→](./roadmap/ideas/IDEA-001-multi-characters.md) |
 
 ---
 
@@ -64,7 +64,7 @@ roadmap/
 
 | ID | Idée | Impact | Effort | Status | Lien |
 |----|------|--------|--------|--------|------|
-| IDEA-001 | Univers multi-personnages (Elena) | 🔴 High | 🔴 High | 📋 Validated | [→](./roadmap/ideas/IDEA-001-multi-characters.md) |
+| IDEA-001 | Univers multi-personnages (Elena) | 🔴 High | 🔴 High | 🚧 In Progress | [→](./roadmap/ideas/IDEA-001-multi-characters.md) |
 | IDEA-002 | Chatbot Mila payant | 🔴 High | 🟡 Medium | 💡 Idea | [→](./roadmap/ideas/IDEA-002-chatbot.md) |
 | IDEA-003 | TikTok cross-post | 🟡 Medium | 🟢 Low | 💡 Idea | [→](./roadmap/ideas/IDEA-003-tiktok.md) |
 | IDEA-004 | Stories automatiques | 🟡 Medium | 🟡 Medium | 💡 Idea | [→](./roadmap/ideas/IDEA-004-auto-stories.md) |
@@ -76,10 +76,10 @@ roadmap/
 ```
 Total Features:
 ├── ✅ Done        : 7
-├── 🚧 In Progress : 0
+├── 🚧 In Progress : 1 (Elena)
 ├── 📋 Todo        : 4
 ├── 🐛 Bugs        : 1
-└── 💡 Ideas       : 4 (1 validated)
+└── 💡 Ideas       : 4 (1 in progress)
 ```
 
 ---
@@ -88,6 +88,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 16/12/2024 | **Création Elena Visconti** — Character sheet + 6 photos ref + duo test | [→](./docs/SESSION-16-DEC-2024-ELENA.md) |
 | 16/12/2024 | Planification intégration Supabase | [→](./roadmap/todo/TODO-004-supabase-integration.md) |
 | 16/12/2024 | Analyse multi-personnages (Elena) | [→](./docs/SESSION-16-DEC-2024.md) |
 | 15/12/2024 | Cron jobs + Carousel + Vacation Reels | [→](./docs/SESSION-15-DEC-2024.md) |
@@ -114,4 +115,3 @@ Total Features:
 ---
 
 *Mis à jour automatiquement ou manuellement après chaque session*
-

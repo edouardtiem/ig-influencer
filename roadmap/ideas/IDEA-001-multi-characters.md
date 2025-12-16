@@ -294,14 +294,16 @@ ROI attendu : Audience 2-3x → Revenue 2.5x pour +$13/mois
 ## ✅ Prochaines étapes
 
 1. [x] Valider le concept Elena (nom, style, personnalité) ✅
-2. [x] Character sheet créé (`docs/03-PERSONNAGE-ELENA.md`) ✅
+2. [x] Character sheet créé (`docs/03-PERSONNAGE-ELENA.md`) ✅ — VERSION 3
 3. [x] Config code créée (`app/src/config/character-elena.ts`) ✅
-4. [ ] Créer le dataset initial (4-6 photos)
-5. [ ] Créer le compte Instagram Elena
-6. [ ] Implémenter Phase 2 (solo posts Elena)
-7. [ ] Implémenter Phase 3 (duo posts)
-8. [ ] Tests complets
-9. [ ] Go live !
+4. [x] Dataset initial généré (6 photos de référence) ✅
+5. [x] Premier post duo Mila + Elena testé (Café de Flore) ✅
+6. [ ] Créer le compte Instagram @elena.visconti
+7. [ ] Configurer Business Account + tokens API
+8. [ ] Adapter script `carousel-post-elena.mjs`
+9. [ ] Créer workflow `auto-post-elena.yml`
+10. [ ] Premiers posts manuels Elena
+11. [ ] Go live !
 
 ---
 
