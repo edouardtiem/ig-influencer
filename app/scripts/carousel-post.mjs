@@ -568,24 +568,45 @@ async function publishCarousel(imageUrls, caption, locationId) {
   log('  Waiting for media to be ready...');
   await waitForMediaReady(carouselId, accessToken);
 
-  log('  Publishing...');
-  const publishParams = new URLSearchParams({
-    creation_id: carouselId,
-    access_token: accessToken,
-  });
+  // Retry publishing up to 5 times with increasing delays
+  const maxRetries = 5;
+  const baseDelay = 5000; // Start with 5 seconds
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    log(`  Publishing... (attempt ${attempt}/${maxRetries})`);
+    
+    const publishParams = new URLSearchParams({
+      creation_id: carouselId,
+      access_token: accessToken,
+    });
 
-  const publishResponse = await fetch(
-    `https://graph.facebook.com/v18.0/${accountId}/media_publish?${publishParams}`,
-    { method: 'POST' }
-  );
+    const publishResponse = await fetch(
+      `https://graph.facebook.com/v18.0/${accountId}/media_publish?${publishParams}`,
+      { method: 'POST' }
+    );
 
-  if (!publishResponse.ok) {
-    const error = await publishResponse.json();
-    throw new Error(`Failed to publish: ${JSON.stringify(error)}`);
+    const result = await publishResponse.json();
+    
+    // Success!
+    if (result.id) {
+      return result.id;
+    }
+    
+    // Check if it's the "not ready" error
+    if (result.error?.error_subcode === 2207027) {
+      if (attempt < maxRetries) {
+        const delay = baseDelay * attempt; // 5s, 10s, 15s, 20s, 25s
+        log(`  ⏳ Media not ready, waiting ${delay/1000}s before retry...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+    }
+    
+    // Other error or max retries reached
+    throw new Error(`Failed to publish: ${JSON.stringify(result)}`);
   }
-
-  const publishResult = await publishResponse.json();
-  return publishResult.id;
+  
+  throw new Error('Max retries reached - Instagram never became ready');
 }
 
 // ═══════════════════════════════════════════════════════════════
