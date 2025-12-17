@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 17 décembre 2024 (Smart Comments V2)
+**Dernière mise à jour** : 17 décembre 2024 (Merge Elena + Smart Comments V2 → main)
 
 ---
 
@@ -25,7 +25,8 @@ roadmap/
 |----|---------|----------|---------|------|
 | - | *Aucun en cours* | - | - | - |
 
-> **Elena Phase 1 terminée** — Compte lancé avec 9 posts le 17/12/2024
+> **Elena Phase 1 terminée** — Compte lancé avec 9 posts le 17/12/2024  
+> **Merge done** — `feature/elena-character` → `main` (28 files, +4919 lines)
 
 ---
 
@@ -33,7 +34,7 @@ roadmap/
 
 | ID | Feature | Priorité | Estimation | Lien |
 |----|---------|----------|------------|------|
-| TODO-010 | **Premier Post Elena** — Quand queue Replicate OK | 🔴 High | 10min | - |
+| TODO-010 | **Targeting Actif** — 20 comments/jour/compte sur niches cibles | 🔴 High | ongoing | - |
 | TODO-006 | Elena Stories Highlights (Travel, Home, BTS) | 🟡 Medium | 2h | - |
 | TODO-007 | Premier Reel Elena (Kling/Minimax) | 🟡 Medium | 2h | - |
 | TODO-008 | Crossover Mila x Elena | 🟡 Medium | 3h | - |

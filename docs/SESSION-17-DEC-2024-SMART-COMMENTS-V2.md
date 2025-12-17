@@ -1,7 +1,7 @@
 # 📝 Session 17 Décembre 2024 — Smart Comments V2
 
 **Date** : 17 décembre 2024  
-**Durée** : ~30min
+**Durée** : ~1h
 
 ---
 
@@ -10,17 +10,24 @@
 1. **Smart Comments V2** — Upgrade complet du système de commentaires IG
    - Migration de `claude-3-haiku` vers `claude-sonnet-4-20250514`
    - Ajout Extended Thinking (budget 10K tokens)
-   - 8 stratégies de commentaires (vs 4 avant)
+   - 7 stratégies de commentaires variées
    - Anti-repetition explicite (patterns bannis)
    - Universal (plus de nom de personnage, fonctionne pour Mila ET Elena)
 
-2. **Targeting Strategy** — Documentation des comptes à cibler
+2. **Fix Pattern Répétitif** — Le modèle générait toujours "The X + the Y. Intentional?"
+   - Ajout warning agressif en haut du prompt
+   - Backend filter regex pour catch et remplacer les patterns bannis
+   - Simplification du prompt pour meilleure compliance
+
+3. **Targeting Strategy** — Documentation des comptes à cibler
    - Analyse des audiences Mila vs Elena
    - Listes de niches à cibler pour commentaires/likes/follows
    - Stratégie de cross-promotion
 
-3. **API Update** — Backward compatibility
-   - Accepte maintenant `image` ET `imageBase64` comme clés
+4. **Merge feature/elena-character → main**
+   - 28 fichiers, +4919 lignes
+   - Elena + Smart Comments V2 maintenant en production
+   - Vercel auto-deploy sur main
 
 ---
 
@@ -56,24 +63,38 @@ thinking: {
 // Patterns explicitement bannis
 ```
 
-### 8 Nouvelles Stratégies
+### 7 Stratégies (V5 final)
 
-1. 🧠 **Curiosity Gap** — Hint without revealing
-2. 👁️ **Hyper-Specific Observation** — Notice unique details
-3. 🔥 **Hot Take** — Bold opinion
-4. 💬 **Caption Response** — React to what they wrote
-5. 🎯 **Insider Question** — Technical/niche question
-6. 😏 **Playful Tease** — Light challenge
-7. 🌟 **Unexpected Angle** — Compliment something unusual
-8. 🤝 **Shared Experience** — Show you live this too
+1. 🧠 **Mystery** — Hint at your own experience
+2. 🔥 **Bold Take** — State an opinion
+3. 😏 **Tease** — Playful challenge
+4. 🎯 **Nerd Out** — Technical insider talk
+5. 💬 **React to Caption** — If they wrote something
+6. 🌟 **Unexpected Praise** — Not the obvious thing
+7. 🤝 **Solidarity** — Creator to creator
 
-### Patterns Bannis
+### Patterns Bannis (V5 - plus agressif)
 
 ```
-❌ "[Thing A] + [Thing B]. Intentional?"
-❌ "[Thing A] against [Thing B]. Was that the plan?"
-❌ "[X] on [Y]. Calculated or chance?"
-❌ "Natural [X] doing the heavy lifting"
+❌ "The [A] + the [B]. Intentional?"
+❌ "The [A] and the [B]. Was this planned?"
+❌ "[X] framing [Y]. Lucky find?"
+❌ Any "intentional or accident" question
+❌ Any "[noun] + [noun]" followed by question
+❌ "Beautiful!" / "Stunning!" / "Love this!"
+```
+
+### Backend Filter (regex)
+
+Si le modèle génère quand même un pattern banni, le backend le détecte et utilise une alternative :
+
+```typescript
+const bannedPatterns = [
+  /the .+ \+ the .+\./i,
+  /intentional (or|choice|\?)|planned (or|shot|\?)|accident\s*\?/i,
+  /c'est .+ (calculé|étudié|accident|spontané)/i,
+  // ...
+];
 ```
 
 ---
@@ -112,6 +133,8 @@ thinking: {
 - **iOS Shortcut inchangé** — Backward compatible, même endpoint, même format
 - **Cost increase** — Sonnet + Extended Thinking plus cher que Haiku, mais bien meilleure qualité
 - **Universal** — Plus besoin de personnage, fonctionne pour tous les comptes
+- **Merge done** — `feature/elena-character` → `main` (28 files, +4919 lines)
+- **Production** — Vercel auto-deploy depuis main, Smart Comments V2 live
 
 ---
 
