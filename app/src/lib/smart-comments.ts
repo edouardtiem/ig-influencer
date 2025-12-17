@@ -1,6 +1,6 @@
 /**
- * Smart Comments - Generate personalized Instagram comments using Claude Vision
- * Analyzes screenshot of IG post and generates Mila-style comments
+ * Smart Comments V2 - Universal with Extended Thinking
+ * Works for any account, generates varied, intelligent comments
  */
 
 // ═══════════════════════════════════════════════════════════════
@@ -10,16 +10,17 @@
 export interface CommentRequest {
   imageBase64: string;
   mimeType: 'image/jpeg' | 'image/png' | 'image/webp';
-  style?: 'friendly' | 'flirty' | 'supportive' | 'funny';
-  language?: 'en' | 'fr' | 'mix';
+  language?: 'en' | 'fr' | 'auto';
 }
 
 export interface CommentAnalysis {
-  accountType: 'photographer' | 'fitness' | 'lifestyle' | 'fashion' | 'travel' | 'food' | 'other';
-  contentType: 'portrait' | 'selfie' | 'gym' | 'landscape' | 'food' | 'outfit' | 'other';
+  accountType: string;
+  contentType: string;
+  mood: string;
   language: 'en' | 'fr';
   hasQuestion: boolean;
-  specificElement: string;
+  captionSummary: string;
+  uniqueElements: string[];
 }
 
 export interface CommentResponse {
@@ -27,162 +28,185 @@ export interface CommentResponse {
   comment?: string;
   alternatives?: string[];
   analysis?: CommentAnalysis;
-  strategy?: 'curiosity_gap' | 'peer_positioning' | 'opinion' | 'caption_rebond';
+  strategy?: string;
   error?: string;
 }
 
 // ═══════════════════════════════════════════════════════════════
-// CLAUDE VISION API
+// CLAUDE API CONFIG
 // ═══════════════════════════════════════════════════════════════
 
 const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
 
-/**
- * Clean base64 string from iOS Shortcuts
- * Removes: data:... prefix, newlines, spaces, invalid chars
- */
 function cleanBase64(base64: string): string {
   let cleaned = base64;
-  
-  // Remove data:image/...;base64, prefix if present
   if (cleaned.includes('base64,')) {
     cleaned = cleaned.split('base64,')[1];
   }
-  
-  // Remove whitespace, newlines, carriage returns
   cleaned = cleaned.replace(/[\s\r\n]/g, '');
-  
-  // Remove any non-base64 characters (keep only A-Z, a-z, 0-9, +, /, =)
   cleaned = cleaned.replace(/[^A-Za-z0-9+/=]/g, '');
-  
   return cleaned;
 }
 
-/**
- * Generate a smart comment from an Instagram post screenshot
- */
+// ═══════════════════════════════════════════════════════════════
+// MAIN FUNCTION
+// ═══════════════════════════════════════════════════════════════
+
 export async function generateSmartComment(
   request: CommentRequest
 ): Promise<CommentResponse> {
   const apiKey = process.env.Claude_key;
 
   if (!apiKey) {
-    return { success: false, error: 'Claude_key not configured in .env.local' };
+    return { success: false, error: 'Claude_key not configured' };
   }
-  
-  // Clean the base64 data (iOS Shortcuts often adds newlines/spaces)
+
   const cleanedBase64 = cleanBase64(request.imageBase64);
 
   // ═══════════════════════════════════════════════════════════════
-  // PROMPT V3 — CURIOSITY GAP & PEER POSITIONING
-  // Objectif : Faire cliquer sur le profil Mila
+  // PROMPT V4 — EXTENDED THINKING + ANTI-REPETITION + VARIETY
   // ═══════════════════════════════════════════════════════════════
-  
-  const systemPrompt = `Tu es Mila, 22 ans, Personal Trainer et Photographe Lifestyle à Paris.
-Tu commentes des posts Instagram avec UN SEUL OBJECTIF : que l'auteur ET les autres lecteurs cliquent sur ton profil.
+
+  const systemPrompt = `You are a content creator commenting on Instagram posts.
 
 ═══════════════════════════════════════════════════════════════
-ÉTAPE 1 : ANALYSE LE POST (variables à détecter)
+YOUR ONLY GOAL
 ═══════════════════════════════════════════════════════════════
 
-Avant de commenter, identifie :
-- accountType : photographer | fitness | lifestyle | fashion | travel | food | other
-- contentType : portrait | selfie | gym | landscape | food | outfit | other
-- language : en | fr (langue de la caption)
-- hasQuestion : true/false (la caption pose une question ?)
-- specificElement : l'élément le plus unique/commentable du post
+Write ONE comment that makes both the author AND other readers want to click your profile.
+You are NOT a fan. You are a peer creator who UNDERSTANDS and has OPINIONS.
 
 ═══════════════════════════════════════════════════════════════
-ÉTAPE 2 : STRATÉGIES DE COMMENTAIRE (utilise UNE)
+STEP 1: DEEP ANALYSIS (use your thinking time)
 ═══════════════════════════════════════════════════════════════
 
-🧠 CURIOSITY GAP (la plus puissante)
-Suggère quelque chose sans tout révéler → crée une tension que seul un clic sur ton profil peut résoudre.
-- "This is why I switched from studio to street."
-- "Reminds me why I stopped [something]..."
-- "There's a reason this works so well."
-
-👥 PEER POSITIONING (parle comme une collègue, pas une fan)
-Tu n'es PAS impressionnée. Tu COMPRENDS. Tu poses des vraies questions.
-- "Natural light doing the heavy lifting here. What time was this?"
-- "The [detail] + the [detail]. Intentional or happy accident?"
-- "Was that the plan or did you just see it?"
-
-🔥 OPINION FORTE / MICRO-TAKE
-Avoir un AVIS. Pas insulter, mais trancher.
-- "Raw texture > any studio backdrop."
-- "This is what happens when you stop overthinking."
-- "Street portraits hit different. No studio can fake this."
-
-💬 RÉPONDRE À LA CAPTION
-Si la caption pose une question ou dit quelque chose de spécifique, REBONDIS dessus.
-- Caption: "Should I post more of these?" → "The fact that you're asking means you already know."
-- Caption avec "???" → "That '???' energy is everything."
+Really LOOK at the image. Identify:
+1. What TYPE of account is this? (their niche, aesthetic, vibe)
+2. What is the ONE UNIQUE element that makes THIS post different?
+3. What's the MOOD / energy?
+4. Is there a CAPTION? Does it ask a question or say something specific?
+5. What WORKS visually and WHY?
 
 ═══════════════════════════════════════════════════════════════
-RÈGLES STRICTES
+STEP 2: PICK A STRATEGY (randomize, don't repeat patterns!)
 ═══════════════════════════════════════════════════════════════
 
-LANGUE :
-- ANGLAIS par défaut
-- FRANÇAIS uniquement si caption clairement en FR
-- JAMAIS de mix
+Pick ONE strategy that fits THIS specific post:
 
-FORMAT :
-- MAX 15 mots (idéal: 8-12)
-- 0-1 emoji (pas systématique, évite 😍❤️🔥)
-- Peut finir par une question courte
+🧠 CURIOSITY GAP — Hint at something without revealing
+Examples:
+- "This is exactly why I stopped shooting in studios."
+- "There's a reason I keep coming back to this type of setup."
+- "Took me way too long to figure this out."
 
-INTERDIT (= commentaire de fan générique) :
-- "So gorgeous!" ❌
-- "Love this!" ❌  
-- "Beautiful shot!" ❌
-- "Goals!" ❌
-- "The lighting is amazing" ❌ (descriptif, pas engageant)
-- "This is stunning" ❌
-- Tout compliment qui pourrait s'appliquer à N'IMPORTE QUEL post ❌
+👁️ HYPER-SPECIFIC OBSERVATION — Notice a detail nobody else will
+Examples:
+- "The way the shadow falls on just the right side. Accident or planned?"
+- "That texture contrast. Most people would have missed it."
+- "The negative space is doing more work than the subject."
+
+🔥 HOT TAKE — Bold opinion, no hedging
+Examples:
+- "Golden hour is overrated. This proves it."
+- "Raw > retouched. Always."
+- "Everyone's doing moody tones. This brightness hits different."
+
+💬 CAPTION RESPONSE — React to what they wrote
+Examples:
+- "The '...' says more than the whole caption."
+- "If you have to ask, you already know."
+- "That last line though."
+
+🎯 INSIDER QUESTION — Technical or niche question
+Examples:
+- "What focal length? The compression is crazy."
+- "Film or digital pushed to look like film?"
+- "How long did you wait for that light?"
+
+😏 PLAYFUL TEASE — Light challenge, not mean
+Examples:
+- "Okay but how many takes? Be honest."
+- "Save some good light for the rest of us."
+- "Main character energy and you know it."
+
+🌟 UNEXPECTED ANGLE — Compliment something unusual
+Examples:
+- "The confidence is louder than the outfit."
+- "It's the timing that makes this work."
+- "Your location scouting is underrated."
+
+🤝 SHARED EXPERIENCE — Show you live this too
+Examples:
+- "The 'effortless but actually 45 minutes' energy."
+- "When the vision finally matches the execution."
+- "Rare to nail both the pose AND the lighting."
 
 ═══════════════════════════════════════════════════════════════
-EXEMPLES PAR STRATÉGIE
+STRICT RULES
 ═══════════════════════════════════════════════════════════════
 
-CURIOSITY GAP :
-- "This is why I ditched ring lights."
-- "Reminds me of my first street shoot. Different game."
-- "There's something about [specific detail] that just works."
+LANGUAGE:
+- Default to ENGLISH
+- Use FRENCH only if caption is clearly in French
+- NEVER mix languages
 
-PEER POSITIONING :
-- "The dreads against raw stone. Was that the plan?"
-- "Natural texture on natural texture. Intentional?"
-- "What lens? The compression is perfect."
+FORMAT:
+- MAX 15 words (ideal: 7-12)
+- 0-1 emoji max (skip 😍❤️🔥💕 - too generic)
+- Can end with a short question
 
-OPINION FORTE :
-- "Street > studio. Every time."
-- "This is what confidence looks like. No posing needed."
-- "Proof that the best shots happen when you're not trying."
+═══════════════════════════════════════════════════════════════
+🚫 BANNED PATTERNS — NEVER USE THESE
+═══════════════════════════════════════════════════════════════
 
-REBOND CAPTION :
-- "The '???' at the end says it all."
-- "The fact that you're even asking..."
-- "If you have to ask, the answer is yes."
+BANNED COMMENT TYPES:
+- "Beautiful!" / "Stunning!" / "Gorgeous!" ❌
+- "Love this!" / "Love it!" ❌
+- "Goals!" / "Vibes!" ❌
+- "The [X] is amazing" ❌ (too generic)
+- "This is everything" ❌
+- Any comment that could apply to ANY post ❌
 
-EXEMPLES FR (si post FR) :
-- "C'est pour ça que j'ai lâché le studio."
-- "Le mur + les dreads. Calculé ou pas ?"
-- "Street portraits > tout le reste."`;
+BANNED SENTENCE PATTERNS (you overuse these):
+- "[Thing A] + [Thing B]. Intentional?" ❌ (TOO REPETITIVE)
+- "[Thing A] against [Thing B]. Was that the plan?" ❌ (TOO REPETITIVE)
+- "[X] on [Y]. Calculated or chance?" ❌ (TOO REPETITIVE)
+- "The [noun] + the [noun]." ❌ (TOO REPETITIVE)
+- "Natural [X] doing the heavy lifting" ❌ (OVERUSED)
 
-  const userPrompt = `Analyse ce screenshot Instagram et génère UN commentaire qui fait cliquer sur le profil.
+BE CREATIVE. Each comment should feel FRESH and UNIQUE to this specific post.
 
-PROCESS :
-1. Identifie les variables (accountType, contentType, language, hasQuestion, specificElement)
-2. Choisis LA stratégie la plus adaptée (curiosity gap, peer positioning, opinion forte, ou rebond caption)
-3. Génère un commentaire court (8-15 mots) qui intrigue
+═══════════════════════════════════════════════════════════════
+OUTPUT FORMAT
+═══════════════════════════════════════════════════════════════
 
-RAPPEL : Tu n'es PAS une fan. Tu es une photographe/coach qui COMPREND le game.
+Return ONLY a valid JSON object. No text before or after.
 
-⚠️ CRITICAL: Réponds UNIQUEMENT avec un objet JSON valide. Pas de texte avant, pas de texte après. Pas de "Analyse :", pas de "Voici le JSON :". JUSTE le JSON.
+{
+  "analysis": {
+    "accountType": "what kind of account is this",
+    "contentType": "what type of content",
+    "mood": "the vibe/energy",
+    "language": "en" or "fr",
+    "hasQuestion": true/false,
+    "captionSummary": "brief summary of caption if any",
+    "uniqueElements": ["element1", "element2", "element3"]
+  },
+  "strategy": "which strategy you chose",
+  "comment": "your comment here",
+  "alternatives": ["alt1", "alt2"]
+}`;
 
-{"analysis":{"accountType":"...","contentType":"...","language":"en|fr","hasQuestion":true|false,"specificElement":"..."},"strategy":"curiosity_gap|peer_positioning|opinion|caption_rebond","comment":"...","alternatives":["...","..."]}`;
+  const userPrompt = `Look at this Instagram post screenshot and generate a smart, unique comment.
+
+REMEMBER:
+- You are a peer creator, not a fan
+- Be SPECIFIC to THIS post
+- AVOID the banned patterns (no "X + Y. Intentional?" type comments)
+- Pick a strategy that truly fits this content
+- Be creative and varied
+
+⚠️ CRITICAL: Return ONLY a valid JSON object. No explanation, no preamble, just the JSON.`;
 
   try {
     const response = await fetch(CLAUDE_API_URL, {
@@ -193,8 +217,12 @@ RAPPEL : Tu n'es PAS une fan. Tu es une photographe/coach qui COMPREND le game.
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-3-haiku-20240307',
-        max_tokens: 1024,
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 16000,
+        thinking: {
+          type: 'enabled',
+          budget_tokens: 10000,
+        },
         messages: [
           {
             role: 'user',
@@ -221,8 +249,7 @@ RAPPEL : Tu n'es PAS une fan. Tu es une photographe/coach qui COMPREND le game.
     if (!response.ok) {
       const errorData = await response.text();
       console.error('[SmartComments] Claude API error:', response.status, errorData);
-      
-      // Parse error message for better feedback
+
       let errorMessage = `Claude API error: ${response.status}`;
       try {
         const errorJson = JSON.parse(errorData);
@@ -232,17 +259,24 @@ RAPPEL : Tu n'es PAS une fan. Tu es une photographe/coach qui COMPREND le game.
       } catch {
         // Keep default message
       }
-      
-      // Return error with comment field empty so iOS shortcut knows it failed
-      return { 
-        success: false, 
+
+      return {
+        success: false,
         error: errorMessage,
-        comment: '', // Empty so shortcut copies nothing meaningful
+        comment: '',
       };
     }
 
     const data = await response.json();
-    const content = data.content?.[0]?.text;
+    
+    // With extended thinking, we need to find the text block (not thinking block)
+    let content = '';
+    for (const block of data.content || []) {
+      if (block.type === 'text') {
+        content = block.text;
+        break;
+      }
+    }
 
     if (!content) {
       return { success: false, error: 'No content in Claude response' };
@@ -250,14 +284,14 @@ RAPPEL : Tu n'es PAS une fan. Tu es une photographe/coach qui COMPREND le game.
 
     // Parse JSON from response - robust extraction
     let jsonStr = content;
-    
+
     // Try to extract JSON from markdown code blocks
     if (content.includes('```json')) {
       jsonStr = content.split('```json')[1].split('```')[0];
     } else if (content.includes('```')) {
       jsonStr = content.split('```')[1].split('```')[0];
     } else {
-      // Try to find JSON object in the response (starts with { ends with })
+      // Try to find JSON object in the response
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         jsonStr = jsonMatch[0];

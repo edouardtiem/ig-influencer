@@ -1,8 +1,9 @@
-# 💬 Smart Comments — Commentaires IG automatisés via iOS Shortcut
+# 💬 Smart Comments V2 — Commentaires IG automatisés via iOS Shortcut
 
-> Système de génération de commentaires Instagram personnalisés "Mila-style" à partir d'un screenshot.
+> Système de génération de commentaires Instagram intelligents avec Extended Thinking. Fonctionne pour tous les comptes.
 
-**Date création** : 14 décembre 2024
+**Date création** : 14 décembre 2024  
+**Dernière MAJ** : 17 décembre 2024 (V2 - Extended Thinking)
 
 ---
 
@@ -19,10 +20,20 @@ Commenter les posts Instagram d'autres créateurs de manière "smart" pour :
 
 | Composant | Technologie |
 |-----------|-------------|
-| Analyse image | Claude Vision API (claude-3-haiku) |
+| Analyse image | Claude Vision API (**claude-sonnet-4-20250514** + Extended Thinking) |
 | Backend | Next.js API Route |
 | Trigger | iOS Shortcuts |
 | Output | Presse-papier iPhone |
+
+### V2 Améliorations
+
+| Avant (V1) | Après (V2) |
+|------------|------------|
+| `claude-3-haiku` | `claude-sonnet-4-20250514` |
+| Pas de thinking | **Extended Thinking** (10K tokens) |
+| 4 stratégies | **8 stratégies** variées |
+| Patterns répétitifs | **Anti-repetition** explicite |
+| Mila-only | **Universel** (tous comptes) |
 
 ---
 
@@ -94,36 +105,47 @@ Faire cliquer sur le profil Mila (pas juste "engager").
 | `hasQuestion` | true/false | Rebondir sur la question |
 | `specificElement` | string | L'élément unique sur lequel réagir |
 
-### 🧠 4 Stratégies de Commentaire
+### 🧠 8 Stratégies de Commentaire (V2)
 
-#### 1. CURIOSITY GAP (la plus puissante)
-Suggère quelque chose sans tout révéler → crée une tension.
+#### 1. 🧠 CURIOSITY GAP
+Suggère quelque chose sans tout révéler.
+- "This is exactly why I stopped shooting in studios."
+- "Took me way too long to figure this out."
 
-| ❌ Avant | ✅ Après |
-|---------|---------|
-| "The lighting is amazing" | "This is why I ditched ring lights." |
-| "Love the vibe" | "Reminds me of my first street shoot. Different game." |
+#### 2. 👁️ HYPER-SPECIFIC OBSERVATION
+Remarque un détail que personne d'autre ne verra.
+- "The way the shadow falls on just the right side. Accident or planned?"
+- "The negative space is doing more work than the subject."
 
-#### 2. PEER POSITIONING
-Parle comme une collègue, pas une fan. Tu COMPRENDS.
+#### 3. 🔥 HOT TAKE
+Opinion tranchée, assumée.
+- "Golden hour is overrated. This proves it."
+- "Everyone's doing moody tones. This brightness hits different."
 
-| ❌ Fan | ✅ Peer |
-|--------|--------|
-| "Beautiful shot!" | "Natural light doing the heavy lifting. What time was this?" |
-| "So cool!" | "The dreads against raw stone. Was that the plan?" |
+#### 4. 💬 CAPTION RESPONSE
+Réponds à ce qu'ils ont écrit.
+- "The '...' says more than the whole caption."
+- "If you have to ask, you already know."
 
-#### 3. OPINION FORTE / MICRO-TAKE
-Avoir un AVIS. Trancher.
+#### 5. 🎯 INSIDER QUESTION
+Question technique d'insider.
+- "What focal length? The compression is crazy."
+- "How long did you wait for that light?"
 
-- "Street > studio. Every time."
-- "This is what confidence looks like. No posing needed."
-- "Proof that the best shots happen when you're not trying."
+#### 6. 😏 PLAYFUL TEASE
+Taquinerie légère.
+- "Okay but how many takes? Be honest."
+- "Save some good light for the rest of us."
 
-#### 4. REBOND CAPTION
-Si la caption pose une question ou dit quelque chose de spécifique.
+#### 7. 🌟 UNEXPECTED ANGLE
+Compliment quelque chose d'inhabituel.
+- "The confidence is louder than the outfit."
+- "Your location scouting is underrated."
 
-- Caption: "Should I post more?" → "The fact that you're asking means you already know."
-- Caption avec "???" → "That '???' energy is everything."
+#### 8. 🤝 SHARED EXPERIENCE
+Montre que tu vis la même chose.
+- "The 'effortless but actually 45 minutes' energy."
+- "Rare to nail both the pose AND the lighting."
 
 ### Règles Strictes
 
@@ -141,6 +163,15 @@ Si la caption pose une question ou dit quelque chose de spécifique.
 - "Goals!"
 - "The lighting is amazing" (descriptif, pas engageant)
 - Tout ce qui pourrait s'appliquer à N'IMPORTE QUEL post
+
+### 🚫 PATTERNS BANNIS (V2 anti-repetition)
+Ces formules étaient sur-utilisées en V1 :
+- "[Thing A] + [Thing B]. Intentional?" ❌
+- "[Thing A] against [Thing B]. Was that the plan?" ❌
+- "[X] on [Y]. Calculated or chance?" ❌
+- "Natural [X] doing the heavy lifting" ❌
+
+Le modèle est maintenant explicitement instruit de les éviter.
 
 ---
 

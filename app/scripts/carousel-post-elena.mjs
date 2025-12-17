@@ -17,12 +17,14 @@ const CAROUSEL_SIZE = 3;
 const NANO_BANANA_MODEL = 'google/nano-banana-pro';
 
 // Elena's reference photos for face consistency
-// TODO: Upload Elena refs to Cloudinary and update these URLs
-const PRIMARY_FACE_URL = process.env.ELENA_PRIMARY_FACE_URL || 'https://res.cloudinary.com/dily60mr0/image/upload/elena/primary.png';
-const FACE_REFS = [
-  process.env.ELENA_FACE_REF_1 || 'https://res.cloudinary.com/dily60mr0/image/upload/elena/ref1.png',
-  process.env.ELENA_FACE_REF_2 || 'https://res.cloudinary.com/dily60mr0/image/upload/elena/ref2.png',
-];
+const PRIMARY_FACE_URL = process.env.ELENA_BASE_FACE_URL;
+const ELENA_REFS_RAW = process.env.ELENA_REFERENCE_URLS || '';
+const FACE_REFS = ELENA_REFS_RAW ? ELENA_REFS_RAW.split(',').filter(Boolean) : [];
+
+if (!PRIMARY_FACE_URL) {
+  console.error('❌ ELENA_BASE_FACE_URL is required in .env.local');
+  process.exit(1);
+}
 
 // ═══════════════════════════════════════════════════════════════
 // ELENA CHARACTER - Based on docs/characters/elena/PERSONNAGE.md

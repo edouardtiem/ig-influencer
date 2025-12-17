@@ -50,17 +50,18 @@ export async function POST(request: NextRequest) {
         mimeType = 'image/jpeg';
       }
     } else {
-      // Handle JSON body
+      // Handle JSON body (accept both 'image' and 'imageBase64' keys)
       const body = await request.json();
+      const imageData = body.image || body.imageBase64;
 
-      if (!body.image) {
+      if (!imageData) {
         return NextResponse.json(
-          { success: false, error: 'No image provided' },
+          { success: false, error: 'No image provided (use "image" or "imageBase64" key)' },
           { status: 400 }
         );
       }
 
-      imageBase64 = body.image;
+      imageBase64 = imageData;
       mimeType = body.mimeType || 'image/jpeg';
     }
 
