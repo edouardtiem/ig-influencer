@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 17 décembre 2024 (Merge Elena + Smart Comments V2 → main)
+**Dernière mise à jour** : 17 décembre 2024 (Simplification références images Mila + Elena)
 
 ---
 
@@ -34,10 +34,11 @@ roadmap/
 
 | ID | Feature | Priorité | Estimation | Lien |
 |----|---------|----------|------------|------|
+| TODO-011 | **Premier Post Elena** — Carousel (quand Replicate OK) | 🔴 High | 10min | - |
 | TODO-010 | **Targeting Actif** — 20 comments/jour/compte sur niches cibles | 🔴 High | ongoing | - |
 | TODO-006 | Elena Stories Highlights (Travel, Home, BTS) | 🟡 Medium | 2h | - |
 | TODO-007 | Premier Reel Elena (Kling/Minimax) | 🟡 Medium | 2h | - |
-| TODO-008 | Crossover Mila x Elena | 🟡 Medium | 3h | - |
+| TODO-008 | Crossover Mila x Elena NYC — Prompt prêt 🎨 | 🟡 Medium | 20min | - |
 | TODO-004 | Intégration Supabase (posts + conversations) | 🔴 High | 3h | [→](./roadmap/todo/TODO-004-supabase-integration.md) |
 | TODO-001 | Multi-shot Reels (carousel → video) | 🔴 High | 4h | [→](./roadmap/todo/TODO-001-multi-shot-reels.md) |
 | TODO-002 | Auto-post Reels via cron | 🟡 Medium | 2h | [→](./roadmap/todo/TODO-002-auto-post-reels.md) |
@@ -49,6 +50,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-010 | **Reference Simplification** — 2 refs (face+body) pour Mila & Elena | 17/12/2024 | v2.9.1 | [→](./docs/SESSION-17-DEC-2024-REFERENCE-SIMPLIFICATION.md) |
 | DONE-009 | **Smart Comments V2** — Extended Thinking + 8 stratégies + anti-repetition | 17/12/2024 | v2.9.0 | [→](./roadmap/done/DONE-009-smart-comments-v2.md) |
 | DONE-009 | **Elena Reference Images** — 6 images Cloudinary + config | 17/12/2024 | v2.8.2 | [→](./docs/SESSION-17-DEC-2024-ELENA-GRAPH-API.md) |
 | DONE-008 | **Elena Graph API** — Token permanent + auto-post ready | 17/12/2024 | v2.8.1 | [→](./docs/SESSION-17-DEC-2024-ELENA-GRAPH-API.md) |
@@ -67,6 +69,7 @@ roadmap/
 
 | ID | Bug | Sévérité | Status | Lien |
 |----|-----|----------|--------|------|
+| BUG-002 | GitHub Actions génère images mais ne poste pas sur Instagram | 🔴 High | Open | - |
 | BUG-001 | Rate limit Replicate sur batch | 🟡 Medium | Open | [→](./roadmap/bugs/BUG-001-rate-limit.md) |
 
 ---
@@ -87,10 +90,10 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 10 (+Elena Graph API, +Elena Refs)
+├── ✅ Done        : 11 (+Reference Simplification)
 ├── 🚧 In Progress : 0
 ├── 📋 Todo        : 8
-├── 🐛 Bugs        : 1
+├── 🐛 Bugs        : 2 (+Instagram posting issue)
 └── 💡 Ideas       : 5 (incl. Intelligent Content Engine)
 ```
 
@@ -100,6 +103,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 17/12/2024 | **🖼️ Reference Simplification** — 2 refs (face+body) pour consistance Mila & Elena | [→](./docs/SESSION-17-DEC-2024-REFERENCE-SIMPLIFICATION.md) |
 | 17/12/2024 | **🧠 Smart Comments V2** — Extended Thinking + 8 stratégies + anti-repetition | [→](./docs/SESSION-17-DEC-2024-SMART-COMMENTS-V2.md) |
 | 17/12/2024 | **🔌 Elena Graph API** — Connexion @elenav.paris au Graph API | [→](./docs/SESSION-17-DEC-2024-ELENA-GRAPH-API.md) |
 | 17/12/2024 | **🚀 Elena Launch** — 9 photos générées + publiées sur @elenav.paris | [→](./docs/SESSION-17-DEC-2024-ELENA-LAUNCH.md) |

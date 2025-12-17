@@ -16,15 +16,10 @@ import Replicate from 'replicate';
 const CAROUSEL_SIZE = 3;
 const NANO_BANANA_MODEL = 'google/nano-banana-pro';
 
-// Elena's reference photos for face consistency
-const PRIMARY_FACE_URL = process.env.ELENA_BASE_FACE_URL;
-const ELENA_REFS_RAW = process.env.ELENA_REFERENCE_URLS || '';
-const FACE_REFS = ELENA_REFS_RAW ? ELENA_REFS_RAW.split(',').filter(Boolean) : [];
-
-if (!PRIMARY_FACE_URL) {
-  console.error('❌ ELENA_BASE_FACE_URL is required in .env.local');
-  process.exit(1);
-}
+// Elena's reference photos - SIMPLIFIED for better consistency
+// Only 2 references: face + body (less confusion for the model)
+const ELENA_FACE_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v1765967140/replicate-prediction-qh51japkxxrma0cv52x8qs7mnc_ltc9ra.png';
+const ELENA_BODY_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v1765967073/replicate-prediction-ws5fpmjpfsrma0cv538t79j8jm_wx9nap.png';
 
 // ═══════════════════════════════════════════════════════════════
 // ELENA CHARACTER - Based on docs/characters/elena/PERSONNAGE.md
@@ -411,7 +406,7 @@ async function generateImage(replicate, prompt, referenceUrls) {
       log(`  🔥 Using Minimax Image-01 fallback (keeps sexy prompt intact)`);
       
       try {
-        return await generateWithMinimax(replicate, prompt, PRIMARY_FACE_URL);
+        return await generateWithMinimax(replicate, prompt, ELENA_FACE_REF);
       } catch (minimaxError) {
         log(`  ❌ Minimax also failed: ${minimaxError.message}`);
         log(`  🔄 Last resort: safer prompt on Nano Banana...`);
@@ -635,8 +630,8 @@ shot on iPhone, natural photography, lifestyle content, high fashion model aesth
 
     log(`  Prompt preview: ${prompt.substring(0, 100)}...`);
 
-    // Pick reference images
-    const refs = [PRIMARY_FACE_URL, ...randomSubset(FACE_REFS, 1)];
+    // Build references - simplified: just face + body for consistency
+    const refs = [ELENA_FACE_REF, ELENA_BODY_REF];
 
     try {
       const imageUrl = await generateImage(replicate, prompt, refs);

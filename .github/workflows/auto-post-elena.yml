@@ -88,9 +88,6 @@ jobs:
           CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
           INSTAGRAM_ACCESS_TOKEN_ELENA: ${{ secrets.INSTAGRAM_ACCESS_TOKEN_ELENA }}
           INSTAGRAM_ACCOUNT_ID_ELENA: ${{ secrets.INSTAGRAM_ACCOUNT_ID_ELENA }}
-          ELENA_PRIMARY_FACE_URL: ${{ secrets.ELENA_PRIMARY_FACE_URL }}
-          ELENA_FACE_REF_1: ${{ secrets.ELENA_FACE_REF_1 }}
-          ELENA_FACE_REF_2: ${{ secrets.ELENA_FACE_REF_2 }}
         run: |
           SLOT="${{ steps.slot.outputs.slot }}"
           TEST="${{ github.event.inputs.test_mode }}"

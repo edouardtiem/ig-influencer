@@ -16,12 +16,10 @@ import Replicate from 'replicate';
 const CAROUSEL_SIZE = 3;
 const NANO_BANANA_MODEL = 'google/nano-banana-pro';
 
-// Mila's reference photos for face consistency
-const PRIMARY_FACE_URL = 'https://res.cloudinary.com/dily60mr0/image/upload/v1764767097/Photo_1_ewwkky.png';
-const FACE_REFS = [
-  'https://res.cloudinary.com/dily60mr0/image/upload/v1764767099/Photo_2_q8kxit.png',
-  'https://res.cloudinary.com/dily60mr0/image/upload/v1764767098/Photo_3_nopedx.png',
-];
+// Mila's reference photos - SIMPLIFIED for better consistency
+// Only 2 references: face + body (less confusion for the model)
+const MILA_FACE_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v1764767097/Photo_1_ewwkky.png';
+const MILA_BODY_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v1764767097/Photo_5_kyx12v.png';
 
 // ═══════════════════════════════════════════════════════════════
 // MILA CHARACTER - Based on docs/03-PERSONNAGE.md
@@ -450,7 +448,7 @@ async function generateImage(replicate, prompt, referenceUrls) {
       
       // Use Minimax with the ORIGINAL sexy prompt (not diluted!)
       try {
-        return await generateWithMinimax(replicate, prompt, PRIMARY_FACE_URL);
+        return await generateWithMinimax(replicate, prompt, MILA_FACE_REF);
       } catch (minimaxError) {
         log(`  ❌ Minimax also failed: ${minimaxError.message}`);
         
@@ -686,21 +684,17 @@ async function main() {
 
     // Step 2: Generate images
     const cloudinaryUrls = [];
-    let heroImageUrl = null;
 
     for (let i = 0; i < CAROUSEL_SIZE; i++) {
       const photoNum = i + 1;
-      const isHero = i === 0;
       const action = actions[i];
+      const isHero = i === 0;
       const expression = isHero
         ? randomFrom(HERO_EXPRESSIONS)
         : randomFrom(SECONDARY_EXPRESSIONS);
 
       log(`\n🎨 Generating Photo ${photoNum}/${CAROUSEL_SIZE}...`);
       log(`  Action: ${action.slice(0, 60)}...`);
-      if (!isHero && heroImageUrl) {
-        log(`  ↳ Using Photo 1 as scene reference`);
-      }
 
       // Build artistic prompt
       const prompt = buildPrompt(
@@ -712,15 +706,11 @@ async function main() {
         slotConfig.mood
       );
 
-      // Build references
-      const refs = [PRIMARY_FACE_URL, ...FACE_REFS.slice(0, 2)];
-      if (!isHero && heroImageUrl) {
-        refs.unshift(heroImageUrl);
-        refs.unshift(heroImageUrl);
-      }
+      // Build references - simplified: just face + body for consistency
+      const refs = [MILA_FACE_REF, MILA_BODY_REF];
 
       const startTime = Date.now();
-      const imageUrl = await generateImage(replicate, prompt, refs.slice(0, 5));
+      const imageUrl = await generateImage(replicate, prompt, refs);
       const duration = ((Date.now() - startTime) / 1000).toFixed(1);
       log(`  ✅ Generated in ${duration}s`);
 
@@ -729,10 +719,6 @@ async function main() {
       log(`  ✅ Uploaded: ${cloudinaryUrl}`);
 
       cloudinaryUrls.push(cloudinaryUrl);
-
-      if (isHero) {
-        heroImageUrl = cloudinaryUrl;
-      }
     }
 
     log(`\n📸 Carousel ready: ${cloudinaryUrls.length} images`);
