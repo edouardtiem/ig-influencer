@@ -13,21 +13,10 @@ export interface CommentRequest {
   language?: 'en' | 'fr' | 'auto';
 }
 
-export interface CommentAnalysis {
-  accountType: string;
-  contentType: string;
-  mood: string;
-  language: 'en' | 'fr';
-  hasQuestion: boolean;
-  captionSummary: string;
-  uniqueElements: string[];
-}
-
 export interface CommentResponse {
   success: boolean;
   comment?: string;
   alternatives?: string[];
-  analysis?: CommentAnalysis;
   strategy?: string;
   error?: string;
 }
@@ -64,149 +53,95 @@ export async function generateSmartComment(
   const cleanedBase64 = cleanBase64(request.imageBase64);
 
   // ═══════════════════════════════════════════════════════════════
-  // PROMPT V4 — EXTENDED THINKING + ANTI-REPETITION + VARIETY
+  // PROMPT V5 — AGGRESSIVE ANTI-PATTERN + VARIETY
   // ═══════════════════════════════════════════════════════════════
 
-  const systemPrompt = `You are a content creator commenting on Instagram posts.
+  const systemPrompt = `You write Instagram comments as a fellow content creator.
+
+⛔️⛔️⛔️ CRITICAL — YOU HAVE A BAD HABIT ⛔️⛔️⛔️
+
+You keep writing comments like:
+- "The [X] + the [Y]. Intentional or accident?"
+- "The fit + the pose. Was this planned?"
+- "The street framing the subject. Lucky find?"
+- "[A] et [B]. C'est calculé ou spontané?"
+
+THIS PATTERN IS BANNED. DO NOT USE IT. EVER.
 
 ═══════════════════════════════════════════════════════════════
-YOUR ONLY GOAL
+PICK ONE APPROACH (vary it!)
 ═══════════════════════════════════════════════════════════════
 
-Write ONE comment that makes both the author AND other readers want to click your profile.
-You are NOT a fan. You are a peer creator who UNDERSTANDS and has OPINIONS.
+1. 🧠 MYSTERY — Hint at your own experience
+   "This is why I switched to natural light."
+   "Took me 2 years to understand why this works."
+   "Finally someone who gets it."
+
+2. 🔥 BOLD TAKE — State an opinion
+   "Proof that less editing wins."
+   "This energy can't be faked."
+   "Overcast > golden hour. Fight me."
+
+3. 😏 TEASE — Playful challenge
+   "How many tries though? Be honest 😂"
+   "Save some swag for the rest of us."
+   "The audacity to make this look easy."
+
+4. 🎯 NERD OUT — Technical insider talk
+   "35mm vibes. Am I close?"
+   "The depth of field here though."
+   "Where even is this? Need to shoot there."
+
+5. 💬 REACT TO CAPTION — If they wrote something
+   "That caption energy though."
+   "The way you worded that 👌"
+   "Felt that last line."
+
+6. 🌟 UNEXPECTED PRAISE — Not the obvious thing
+   "Your timing is underrated."
+   "The color grading is chef's kiss."
+   "Location choice > everything else here."
+
+7. 🤝 SOLIDARITY — Creator to creator
+   "When it finally comes together."
+   "The 'effortless' photo that took 40 minutes."
+   "POV: you actually planned this one."
 
 ═══════════════════════════════════════════════════════════════
-STEP 1: DEEP ANALYSIS (use your thinking time)
+RULES
 ═══════════════════════════════════════════════════════════════
 
-Really LOOK at the image. Identify:
-1. What TYPE of account is this? (their niche, aesthetic, vibe)
-2. What is the ONE UNIQUE element that makes THIS post different?
-3. What's the MOOD / energy?
-4. Is there a CAPTION? Does it ask a question or say something specific?
-5. What WORKS visually and WHY?
+- 5-12 words max
+- 0-1 emoji (not 😍❤️🔥)
+- English default, French only if caption is French
+- NO "intentional/planned/accident" questions
+- NO "[A] + [B]" structure
 
 ═══════════════════════════════════════════════════════════════
-STEP 2: PICK A STRATEGY (randomize, don't repeat patterns!)
+🚫 BANNED (will be rejected)
 ═══════════════════════════════════════════════════════════════
 
-Pick ONE strategy that fits THIS specific post:
-
-🧠 CURIOSITY GAP — Hint at something without revealing
-Examples:
-- "This is exactly why I stopped shooting in studios."
-- "There's a reason I keep coming back to this type of setup."
-- "Took me way too long to figure this out."
-
-👁️ HYPER-SPECIFIC OBSERVATION — Notice a detail nobody else will
-Examples:
-- "The way the shadow falls on just the right side. Accident or planned?"
-- "That texture contrast. Most people would have missed it."
-- "The negative space is doing more work than the subject."
-
-🔥 HOT TAKE — Bold opinion, no hedging
-Examples:
-- "Golden hour is overrated. This proves it."
-- "Raw > retouched. Always."
-- "Everyone's doing moody tones. This brightness hits different."
-
-💬 CAPTION RESPONSE — React to what they wrote
-Examples:
-- "The '...' says more than the whole caption."
-- "If you have to ask, you already know."
-- "That last line though."
-
-🎯 INSIDER QUESTION — Technical or niche question
-Examples:
-- "What focal length? The compression is crazy."
-- "Film or digital pushed to look like film?"
-- "How long did you wait for that light?"
-
-😏 PLAYFUL TEASE — Light challenge, not mean
-Examples:
-- "Okay but how many takes? Be honest."
-- "Save some good light for the rest of us."
-- "Main character energy and you know it."
-
-🌟 UNEXPECTED ANGLE — Compliment something unusual
-Examples:
-- "The confidence is louder than the outfit."
-- "It's the timing that makes this work."
-- "Your location scouting is underrated."
-
-🤝 SHARED EXPERIENCE — Show you live this too
-Examples:
-- "The 'effortless but actually 45 minutes' energy."
-- "When the vision finally matches the execution."
-- "Rare to nail both the pose AND the lighting."
+❌ "The [A] + the [B]. Intentional?"
+❌ "The [A] and the [B]. Was this planned?"
+❌ "[X] framing [Y]. Lucky find?"
+❌ Any "intentional or accident" question
+❌ Any "[noun] + [noun]" followed by question
+❌ "Beautiful!" / "Stunning!" / "Love this!"
 
 ═══════════════════════════════════════════════════════════════
-STRICT RULES
+OUTPUT
 ═══════════════════════════════════════════════════════════════
 
-LANGUAGE:
-- Default to ENGLISH
-- Use FRENCH only if caption is clearly in French
-- NEVER mix languages
+JSON only: {"strategy":"...","comment":"...","alternatives":["...",".."]}`;
 
-FORMAT:
-- MAX 15 words (ideal: 7-12)
-- 0-1 emoji max (skip 😍❤️🔥💕 - too generic)
-- Can end with a short question
+  const userPrompt = `Write a comment for this Instagram post.
 
-═══════════════════════════════════════════════════════════════
-🚫 BANNED PATTERNS — NEVER USE THESE
-═══════════════════════════════════════════════════════════════
+⛔️ DO NOT write "The [X] + the [Y]. Intentional?" — that pattern is BANNED.
+⛔️ DO NOT ask if something was "planned" or "an accident".
 
-BANNED COMMENT TYPES:
-- "Beautiful!" / "Stunning!" / "Gorgeous!" ❌
-- "Love this!" / "Love it!" ❌
-- "Goals!" / "Vibes!" ❌
-- "The [X] is amazing" ❌ (too generic)
-- "This is everything" ❌
-- Any comment that could apply to ANY post ❌
+Be creative. Use one of the 7 approaches.
 
-BANNED SENTENCE PATTERNS (you overuse these):
-- "[Thing A] + [Thing B]. Intentional?" ❌ (TOO REPETITIVE)
-- "[Thing A] against [Thing B]. Was that the plan?" ❌ (TOO REPETITIVE)
-- "[X] on [Y]. Calculated or chance?" ❌ (TOO REPETITIVE)
-- "The [noun] + the [noun]." ❌ (TOO REPETITIVE)
-- "Natural [X] doing the heavy lifting" ❌ (OVERUSED)
-
-BE CREATIVE. Each comment should feel FRESH and UNIQUE to this specific post.
-
-═══════════════════════════════════════════════════════════════
-OUTPUT FORMAT
-═══════════════════════════════════════════════════════════════
-
-Return ONLY a valid JSON object. No text before or after.
-
-{
-  "analysis": {
-    "accountType": "what kind of account is this",
-    "contentType": "what type of content",
-    "mood": "the vibe/energy",
-    "language": "en" or "fr",
-    "hasQuestion": true/false,
-    "captionSummary": "brief summary of caption if any",
-    "uniqueElements": ["element1", "element2", "element3"]
-  },
-  "strategy": "which strategy you chose",
-  "comment": "your comment here",
-  "alternatives": ["alt1", "alt2"]
-}`;
-
-  const userPrompt = `Look at this Instagram post screenshot and generate a smart, unique comment.
-
-REMEMBER:
-- You are a peer creator, not a fan
-- Be SPECIFIC to THIS post
-- AVOID the banned patterns (no "X + Y. Intentional?" type comments)
-- Pick a strategy that truly fits this content
-- Be creative and varied
-
-⚠️ CRITICAL: Return ONLY a valid JSON object. No explanation, no preamble, just the JSON.`;
+JSON only: {"strategy":"...","comment":"...","alternatives":["...","..."]}`;
 
   try {
     const response = await fetch(CLAUDE_API_URL, {
@@ -268,8 +203,8 @@ REMEMBER:
     }
 
     const data = await response.json();
-    
-    // With extended thinking, we need to find the text block (not thinking block)
+
+    // With extended thinking, find the text block (not thinking block)
     let content = '';
     for (const block of data.content || []) {
       if (block.type === 'text') {
@@ -282,16 +217,14 @@ REMEMBER:
       return { success: false, error: 'No content in Claude response' };
     }
 
-    // Parse JSON from response - robust extraction
+    // Parse JSON from response
     let jsonStr = content;
 
-    // Try to extract JSON from markdown code blocks
     if (content.includes('```json')) {
       jsonStr = content.split('```json')[1].split('```')[0];
     } else if (content.includes('```')) {
       jsonStr = content.split('```')[1].split('```')[0];
     } else {
-      // Try to find JSON object in the response
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         jsonStr = jsonMatch[0];
@@ -300,11 +233,32 @@ REMEMBER:
 
     const parsed = JSON.parse(jsonStr.trim());
 
+    // Check if comment matches banned pattern and use alternative if so
+    let finalComment = parsed.comment;
+    const bannedPatterns = [
+      /the .+ \+ the .+\./i,
+      /the .+ and the .+\. (was|intentional|planned)/i,
+      /.+ framing .+\. (lucky|intentional)/i,
+      /intentional (or|choice|\?)|planned (or|shot|\?)|accident\s*\?/i,
+      /c'est .+ (calculé|étudié|accident|spontané)/i,
+      /savamment étudié/i,
+      /heureux accident/i,
+    ];
+
+    const isBanned = bannedPatterns.some((p) => p.test(finalComment));
+    if (isBanned && parsed.alternatives?.length > 0) {
+      for (const alt of parsed.alternatives) {
+        if (!bannedPatterns.some((p) => p.test(alt))) {
+          finalComment = alt;
+          break;
+        }
+      }
+    }
+
     return {
       success: true,
-      comment: parsed.comment,
+      comment: finalComment,
       alternatives: parsed.alternatives || [],
-      analysis: parsed.analysis,
       strategy: parsed.strategy,
     };
   } catch (error) {

@@ -33,7 +33,7 @@ roadmap/
 
 | ID | Feature | Priorité | Estimation | Lien |
 |----|---------|----------|------------|------|
-| TODO-009 | **Elena Reference Images** — Upload Cloudinary + config | 🔴 High | 30min | - |
+| TODO-010 | **Premier Post Elena** — Quand queue Replicate OK | 🔴 High | 10min | - |
 | TODO-006 | Elena Stories Highlights (Travel, Home, BTS) | 🟡 Medium | 2h | - |
 | TODO-007 | Premier Reel Elena (Kling/Minimax) | 🟡 Medium | 2h | - |
 | TODO-008 | Crossover Mila x Elena | 🟡 Medium | 3h | - |
@@ -49,6 +49,7 @@ roadmap/
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
 | DONE-009 | **Smart Comments V2** — Extended Thinking + 8 stratégies + anti-repetition | 17/12/2024 | v2.9.0 | [→](./roadmap/done/DONE-009-smart-comments-v2.md) |
+| DONE-009 | **Elena Reference Images** — 6 images Cloudinary + config | 17/12/2024 | v2.8.2 | [→](./docs/SESSION-17-DEC-2024-ELENA-GRAPH-API.md) |
 | DONE-008 | **Elena Graph API** — Token permanent + auto-post ready | 17/12/2024 | v2.8.1 | [→](./docs/SESSION-17-DEC-2024-ELENA-GRAPH-API.md) |
 | DONE-007 | **Elena Launch** — 9 posts @elenav.paris | 17/12/2024 | v2.8.0 | [→](./docs/SESSION-17-DEC-2024-ELENA-LAUNCH.md) |
 | DONE-006 | Dual-Model Sexy Strategy (Nano + Minimax) | 16/12/2024 | v2.7.0 | [→](./roadmap/done/DONE-006-dual-model-strategy.md) |
@@ -85,7 +86,7 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 9 (+1 Smart Comments V2)
+├── ✅ Done        : 10 (+Elena Graph API, +Elena Refs)
 ├── 🚧 In Progress : 0
 ├── 📋 Todo        : 8
 ├── 🐛 Bugs        : 1
