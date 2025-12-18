@@ -33,17 +33,35 @@ const LOCATION_REFS = {
 
 // ═══════════════════════════════════════════════════════════════
 // ELENA CHARACTER - Based on docs/characters/elena/PERSONNAGE.md
+// CRITICAL: Must match provided reference images exactly
 // ═══════════════════════════════════════════════════════════════
 
-const ELENA_BASE = `Elena, 24 year old Italian woman living in Paris, successful model,
-soft round pleasant face not angular, warm approachable features,
-bronde hair dark roots with golden blonde balayage long voluminous beach waves,
-honey brown warm eyes, naturally full lips nude-pink,
-glowing sun-kissed skin, small beauty mark on right cheekbone,
-gold chunky chain bracelet on left wrist always visible,
-layered gold necklaces with medallion pendant,
-curvy voluptuous figure 172cm, very large natural F-cup breasts prominent,
-narrow defined waist, wide feminine hips, thick thighs, healthy curvy body`;
+// Instruction to match reference images (MUST be at start of prompt)
+const REFERENCE_INSTRUCTION = `BASED ON THE PROVIDED REFERENCE IMAGES, generate the EXACT SAME PERSON with identical face features, body proportions, and distinctive marks. The reference images are the source of truth for appearance.`;
+
+// Detailed face description (critical for consistency)
+const ELENA_FACE = `soft round pleasant face NOT angular, warm approachable features,
+smooth feminine jawline, rounded chin, soft cheekbones,
+bronde hair dark roots with golden blonde balayage, long voluminous beach waves past shoulders,
+honey brown warm almond-shaped eyes, naturally thick eyebrows well-groomed,
+small straight nose, naturally full lips nude-pink color`;
+
+// Distinctive marks (CRITICAL for recognition)
+const ELENA_MARKS = `small beauty mark on right cheekbone (SIGNATURE),
+glowing sun-kissed Italian skin tone,
+gold chunky chain bracelet on left wrist ALWAYS visible,
+layered gold necklaces with medallion pendant ALWAYS visible`;
+
+// Body description
+const ELENA_BODY = `curvy voluptuous figure 172cm tall,
+very large natural F-cup breasts prominent and natural shape,
+narrow defined waist, wide feminine hips, thick thighs,
+healthy curvy Italian body, confident posture`;
+
+// Combined base (used in prompts)
+const ELENA_BASE = `${ELENA_FACE},
+${ELENA_MARKS},
+${ELENA_BODY}`;
 
 // Elena's signature phone
 const ELENA_PHONE = 'iPhone 17 Pro in blue color, sleek modern design';
@@ -660,16 +678,24 @@ async function main() {
       ? randomFrom(HERO_EXPRESSIONS)
       : randomFrom(SECONDARY_EXPRESSIONS);
 
-    // Build prompt
-    const prompt = `ultra realistic Instagram photo, ${ELENA_BASE},
-wearing ${outfit},
-${action},
-${expression},
-${location.setting},
-${slot.lighting},
-${slot.mood},
-shot on iPhone, natural photography, lifestyle content, high fashion model aesthetic,
-8k quality, detailed skin texture, realistic lighting`;
+    // Build prompt with reference instruction for face consistency
+    const prompt = `${REFERENCE_INSTRUCTION}
+
+SUBJECT: Elena, 24 year old Italian woman living in Paris,
+${ELENA_BASE},
+
+EXPRESSION: ${expression},
+ACTION: ${action},
+OUTFIT: wearing ${outfit},
+
+SETTING: ${location.setting},
+LIGHTING: ${slot.lighting},
+MOOD: ${slot.mood},
+
+STYLE: ultra realistic Instagram photo, lifestyle content, high fashion model aesthetic,
+shot on iPhone, natural photography, 8k quality, detailed skin texture, realistic lighting,
+
+CRITICAL: Face must match reference images exactly - same soft round face shape, same jawline, same distinctive marks`;
 
     log(`  Prompt preview: ${prompt.substring(0, 100)}...`);
 

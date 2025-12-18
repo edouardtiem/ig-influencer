@@ -45,17 +45,36 @@ const ELENA_FACE_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v17659
 const ELENA_BODY_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v1765967073/replicate-prediction-ws5fpmjpfsrma0cv538t79j8jm_wx9nap.png';
 
 // ═══════════════════════════════════════════════════════════════
-// ELENA CHARACTER - Ultra detailed
+// ELENA CHARACTER - Ultra detailed with reference instruction
+// CRITICAL: Must match provided reference images exactly
 // ═══════════════════════════════════════════════════════════════
 
-const ELENA_BASE = `Elena, 24 year old Italian woman living in Paris, successful model,
-soft round pleasant face not angular, warm approachable features,
-bronde hair with dark roots and golden blonde balayage long voluminous beach waves,
-honey brown warm eyes, naturally full lips nude-pink,
-glowing sun-kissed skin, small beauty mark on right cheekbone,
-curvy voluptuous figure, very large natural F-cup breasts prominent visible cleavage,
-soft feminine curves, narrow waist, wide hips, thick thighs,
-gold chunky chain bracelet on wrist, layered gold necklaces with medallion pendant`;
+// Instruction to match reference images (MUST be at start of prompt)
+const REFERENCE_INSTRUCTION = `BASED ON THE PROVIDED REFERENCE IMAGES, generate the EXACT SAME PERSON with identical face features, body proportions, and distinctive marks. The reference images are the source of truth for appearance.`;
+
+// Detailed face description (critical for consistency)
+const ELENA_FACE = `soft round pleasant face NOT angular, warm approachable features,
+smooth feminine jawline, rounded chin, soft cheekbones,
+bronde hair dark roots with golden blonde balayage, long voluminous beach waves past shoulders,
+honey brown warm almond-shaped eyes, naturally thick eyebrows well-groomed,
+small straight nose, naturally full lips nude-pink color`;
+
+// Distinctive marks (CRITICAL for recognition)
+const ELENA_MARKS = `small beauty mark on right cheekbone (SIGNATURE),
+glowing sun-kissed Italian skin tone,
+gold chunky chain bracelet on left wrist ALWAYS visible,
+layered gold necklaces with medallion pendant ALWAYS visible`;
+
+// Body description
+const ELENA_BODY = `curvy voluptuous figure 172cm tall,
+very large natural F-cup breasts prominent and natural shape,
+narrow defined waist, wide feminine hips, thick thighs,
+healthy curvy Italian body, confident posture`;
+
+// Combined base (used in prompts)
+const ELENA_BASE = `${ELENA_FACE},
+${ELENA_MARKS},
+${ELENA_BODY}`;
 
 // ═══════════════════════════════════════════════════════════════
 // VACATION THEMES - Luxury vibes
@@ -514,18 +533,26 @@ async function publishReel(videoUrl, caption) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PROMPT BUILDER
+// PROMPT BUILDER - With reference instruction for face consistency
 // ═══════════════════════════════════════════════════════════════
 
 function buildPrompt(expression, action, outfit, setting) {
-  return `${ELENA_BASE},
-${expression},
-${action},
-wearing ${outfit},
-${setting},
-luxury vacation photography, authentic travel moment,
-ultra realistic, 8k, professional photography, soft focus background,
-Instagram model aesthetic 2025, street-luxe European style, golden hour lighting`;
+  return `${REFERENCE_INSTRUCTION}
+
+SUBJECT: Elena, 24 year old Italian woman living in Paris,
+${ELENA_BASE},
+
+EXPRESSION: ${expression},
+ACTION: ${action},
+OUTFIT: wearing ${outfit},
+
+SETTING: ${setting},
+
+STYLE: ultra realistic luxury vacation photography, authentic travel moment,
+8k resolution, professional photography, soft focus background,
+Instagram model aesthetic 2025, street-luxe European style, golden hour lighting,
+
+CRITICAL: Face must match reference images exactly - same soft round face shape, same jawline, same distinctive marks`;
 }
 
 // ═══════════════════════════════════════════════════════════════

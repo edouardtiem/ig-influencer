@@ -49,14 +49,29 @@ const FACE_REFS = [
   'https://res.cloudinary.com/dily60mr0/image/upload/v1764767098/Photo_3_nopedx.png',
 ];
 
-const MILA_BASE = `Mila, 22 year old French woman, Mediterranean European features,
+// Instruction to match reference images (MUST be at start of prompt)
+const REFERENCE_INSTRUCTION = `BASED ON THE PROVIDED REFERENCE IMAGES, generate the EXACT SAME PERSON with identical face features, body proportions, and distinctive marks.`;
+
+// Detailed face description (critical for consistency)
+const MILA_FACE = `oval elongated face shape with high naturally defined cheekbones,
+soft feminine jawline not angular, chin slightly pointed,
 copper auburn hair type 3A loose curls shoulder-length with natural volume,
 almond-shaped hazel-green eyes with golden flecks,
-straight nose with slightly upturned tip, naturally full lips,
-light tan Mediterranean skin tone with subtle freckles on nose and cheekbones,
-small dark beauty mark above left lip corner,
-thin gold necklace with minimalist star pendant always visible,
-slim athletic physique 168cm, natural full feminine curves, defined waist`;
+straight nose with slightly upturned tip,
+naturally full lips medium thickness, rose-nude color`;
+
+// Distinctive marks (CRITICAL for recognition)
+const MILA_MARKS = `small dark brown beauty mark 2mm above left lip corner (SIGNATURE),
+medium brown beauty mark on center of right cheekbone,
+light golden-brown freckles on nose bridge and cheekbones,
+thin gold necklace with minimalist star pendant always visible`;
+
+// Body description
+const MILA_BODY = `slim athletic physique 168cm, Mediterranean light tan skin,
+natural full feminine curves with defined waist`;
+
+// Combined base
+const MILA_BASE = `${MILA_FACE}, ${MILA_MARKS}, ${MILA_BODY}`;
 
 const NEGATIVE = `cartoon, anime, illustration, 3D render, CGI, deformed face, deformed body, blurry, bad anatomy, extra limbs, watermark, text, logo, plastic skin, wrong hair color, straight hair, tattoos, glasses, heavy makeup, steam, smoke, fog, mist, vapor, snow on hair, wet hair`;
 
@@ -64,7 +79,10 @@ const NEGATIVE = `cartoon, anime, illustration, 3D render, CGI, deformed face, d
 const SCENES = [
   {
     id: 'jacuzzi',
-    imagePrompt: `${MILA_BASE},
+    imagePrompt: `${REFERENCE_INSTRUCTION}
+
+[SUBJECT] Mila, 22 year old French woman,
+${MILA_BASE},
 
 [SETTING] Outdoor jacuzzi on luxury ski resort terrace, crystal clear water, snowy mountain peaks in background, golden hour sunset light, winter Alps landscape,
 
@@ -77,6 +95,8 @@ const SCENES = [
 [MOOD] Luxury après-ski relaxation, peaceful mountain moment, elegant wellness,
 
 [QUALITY] ultra realistic, 8k, professional photography, sharp focus, natural skin texture,
+
+CRITICAL: Face must match reference images exactly - same jawline, same cheekbones, same distinctive marks,
 
 NEGATIVE: ${NEGATIVE}`,
 
@@ -95,7 +115,10 @@ Luxury après-ski vibes, wellness moment, golden hour warmth.`
   },
   {
     id: 'sauna',
-    imagePrompt: `${MILA_BASE},
+    imagePrompt: `${REFERENCE_INSTRUCTION}
+
+[SUBJECT] Mila, 22 year old French woman,
+${MILA_BASE},
 
 [SETTING] Luxury wooden sauna interior, warm amber lighting, cedar wood walls and benches, large window with mountain view, clean minimal spa aesthetic,
 
@@ -108,6 +131,8 @@ Luxury après-ski vibes, wellness moment, golden hour warmth.`
 [MOOD] Pure relaxation, spa wellness, peaceful retreat,
 
 [QUALITY] ultra realistic, 8k, professional photography, sharp focus, natural skin texture,
+
+CRITICAL: Face must match reference images exactly - same jawline, same cheekbones, same distinctive marks,
 
 NEGATIVE: ${NEGATIVE}`,
 
@@ -126,7 +151,10 @@ Spa wellness aesthetic, pure relaxation, warm cozy atmosphere.`
   },
   {
     id: 'chalet',
-    imagePrompt: `${MILA_BASE},
+    imagePrompt: `${REFERENCE_INSTRUCTION}
+
+[SUBJECT] Mila, 22 year old French woman,
+${MILA_BASE},
 
 [SETTING] Cozy luxury chalet living room, roaring fireplace with dancing flames, rustic wooden beams, soft fur throws, warm golden lighting, mountain cabin interior,
 
@@ -139,6 +167,8 @@ Spa wellness aesthetic, pure relaxation, warm cozy atmosphere.`
 [MOOD] Hygge comfort, après-ski cozy, winter warmth,
 
 [QUALITY] ultra realistic, 8k, professional photography, sharp focus, natural skin texture,
+
+CRITICAL: Face must match reference images exactly - same jawline, same cheekbones, same distinctive marks,
 
 NEGATIVE: ${NEGATIVE}`,
 

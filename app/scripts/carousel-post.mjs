@@ -32,16 +32,35 @@ const LOCATION_REFS = {
 
 // ═══════════════════════════════════════════════════════════════
 // MILA CHARACTER - Based on docs/03-PERSONNAGE.md
+// CRITICAL: Must match provided reference images exactly
 // ═══════════════════════════════════════════════════════════════
 
-const MILA_BASE = `Mila, 22 year old French woman, Mediterranean European features,
-copper auburn hair type 3A loose curls shoulder-length with natural volume,
-almond-shaped hazel-green eyes with golden flecks,
-straight nose with slightly upturned tip, naturally full lips,
-light tan Mediterranean skin tone with subtle freckles on nose and cheekbones,
-small dark beauty mark above left lip corner,
-thin gold necklace with minimalist star pendant always visible,
-slim athletic physique 168cm, natural full feminine curves, defined waist`;
+// Instruction to match reference images (MUST be at start of prompt)
+const REFERENCE_INSTRUCTION = `BASED ON THE PROVIDED REFERENCE IMAGES, generate the EXACT SAME PERSON with identical face features, body proportions, and distinctive marks. The reference images are the source of truth for appearance.`;
+
+// Detailed face description (critical for consistency)
+const MILA_FACE = `oval elongated face shape with high naturally defined cheekbones,
+soft feminine jawline not angular, chin slightly pointed,
+copper auburn hair type 3A loose curls shoulder-length with natural volume and messy texture,
+almond-shaped hazel-green eyes with golden flecks, natural full eyebrows slightly arched,
+straight nose with slightly upturned tip (cute nose),
+naturally full lips medium thickness with subtle asymmetry, rose-nude natural color`;
+
+// Distinctive marks (CRITICAL for recognition)
+const MILA_MARKS = `small dark brown beauty mark 2mm above left lip corner (SIGNATURE),
+medium brown beauty mark on center of right cheekbone,
+20-25 light golden-brown freckles on nose bridge and cheekbones,
+thin gold necklace with minimalist star pendant always visible`;
+
+// Body description
+const MILA_BODY = `slim athletic physique 168cm, Mediterranean light tan skin,
+natural full feminine curves with defined waist,
+toned but not muscular, Pilates-sculpted shoulders`;
+
+// Combined base (used in prompts)
+const MILA_BASE = `${MILA_FACE},
+${MILA_MARKS},
+${MILA_BODY}`;
 
 // Mila's signature phone - always the same for consistency
 const MILA_PHONE = 'iPhone Air in cream white color, ultra-thin minimalist design, matte finish';
@@ -646,20 +665,27 @@ async function publishCarousel(imageUrls, caption, locationId) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PROMPT BUILDER - Artistic style for filter bypass
+// PROMPT BUILDER - With reference instruction for face consistency
 // ═══════════════════════════════════════════════════════════════
 
 function buildPrompt(expression, action, outfit, setting, lighting, mood) {
-  return `${MILA_BASE},
-${expression},
-${action},
-wearing ${outfit},
-${setting},
-${lighting},
-${mood},
-style photographie lifestyle editorial, natural feminine beauty,
-ultra realistic, 8k, professional photography, soft focus background,
-Instagram aesthetic, art photography, candid authentic moment`;
+  return `${REFERENCE_INSTRUCTION}
+
+SUBJECT: Mila, 22 year old French woman,
+${MILA_BASE},
+
+EXPRESSION: ${expression},
+ACTION: ${action},
+OUTFIT: wearing ${outfit},
+
+SETTING: ${setting},
+LIGHTING: ${lighting},
+MOOD: ${mood},
+
+STYLE: ultra realistic Instagram photo, lifestyle editorial photography, natural feminine beauty,
+8k resolution, professional photography, soft focus background, candid authentic moment,
+
+CRITICAL: Face must match reference images exactly - same jawline, same cheekbones, same distinctive marks`;
 }
 
 // ═══════════════════════════════════════════════════════════════
