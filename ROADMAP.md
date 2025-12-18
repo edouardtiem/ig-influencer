@@ -37,7 +37,6 @@ roadmap/
 | TODO-010 | **Targeting Actif** — 20 comments/jour/compte sur niches cibles | 🔴 High | ongoing | - |
 | TODO-004 | Intégration Supabase (posts + conversations) | 🔴 High | 3h | [→](./roadmap/todo/TODO-004-supabase-integration.md) |
 | TODO-001 | Multi-shot Reels (carousel → video) | 🔴 High | 4h | [→](./roadmap/todo/TODO-001-multi-shot-reels.md) |
-| TODO-011 | **Références cohérence** — Face + body + location refs pour consistance | 🟡 Medium | 1h | - |
 | TODO-006 | Elena Stories Highlights (Travel, Home, BTS) | 🟡 Medium | 2h | - |
 | TODO-007 | Premier Reel Elena (Kling/Minimax) | 🟡 Medium | 2h | - |
 | TODO-008 | Crossover Mila x Elena NYC — Prompt prêt 🎨 | 🟡 Medium | 20min | - |
@@ -49,6 +48,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-014 | **Reference System** — Face + body + location refs pour consistance | 18/12/2024 | v2.9.5 | [→](./docs/21-REFERENCE-SYSTEM.md) |
 | DONE-013 | **Reels Optimization** — Mila 4x/sem + Elena Reels créé (spa/city/yacht) | 18/12/2024 | v2.9.4 | [→](./docs/SESSION-18-DEC-2024-REELS-OPTIMIZATION.md) |
 | DONE-012 | **Token Elena Permanent + Guide** — Token permanent obtenu + doc complète | 18/12/2024 | v2.9.3 | [→](./docs/20-TOKEN-REFRESH-GUIDE.md) |
 | DONE-011 | **Elena Apartment Locations** — 3 refs lieux (salon, chambre, sdb) + config | 17/12/2024 | v2.9.2 | [→](./docs/SESSION-17-DEC-2024-ELENA-APARTMENT.md) |
@@ -93,9 +93,9 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 14
+├── ✅ Done        : 15
 ├── 🚧 In Progress : 0
-├── 📋 Todo        : 8
+├── 📋 Todo        : 7
 ├── 🐛 Bugs        : 2 (1 fixed)
 └── 💡 Ideas       : 5
 ```

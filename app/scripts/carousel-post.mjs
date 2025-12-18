@@ -22,6 +22,15 @@ const MILA_FACE_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v176476
 const MILA_BODY_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v1764767097/Photo_5_kyx12v.png';
 
 // ═══════════════════════════════════════════════════════════════
+// LOCATION REFERENCES - For consistent apartment look
+// ═══════════════════════════════════════════════════════════════
+
+const LOCATION_REFS = {
+  home_bedroom: 'https://res.cloudinary.com/dily60mr0/image/upload/v1764794597/1._Chambre_Paris_u2lyut.png',
+  home_living_room: 'https://res.cloudinary.com/dily60mr0/image/upload/v1764794600/2._Salon_Paris_ltyd8r.png',
+};
+
+// ═══════════════════════════════════════════════════════════════
 // MILA CHARACTER - Based on docs/03-PERSONNAGE.md
 // ═══════════════════════════════════════════════════════════════
 
@@ -64,7 +73,16 @@ const SECONDARY_EXPRESSIONS = [
 const LOCATIONS = {
   home_bedroom: {
     name: 'Chambre Mila',
-    setting: 'intimate Parisian bedroom, white linen sheets slightly rumpled, soft morning light filtering through sheer curtains, warm cozy atmosphere',
+    hasLocationRef: true,
+    setting: `Based on the provided location reference image, place the subject in this exact bedroom.
+
+Cozy bohemian bedroom with edgy artistic vibe, unmade bed with rumpled grey linen sheets, chunky knit terracotta throw blanket. Mix of pillows - black, olive green, one abstract pattern.
+
+Nightstand cluttered with real life items: iPhone face-down, vintage film camera (Canon AE-1). Wall behind bed: vintage rock band poster (Nirvana/Blondie style), polaroid photos taped casually.
+
+Corner elements: acoustic guitar leaning against wall, yoga mat rolled up. Large monstera plant in corner. Wooden floor with worn vintage rug.
+
+Lived-in creative messy-chic aesthetic, the room of a 22-year-old fitness girl who's also a photographer.`,
     instagramLocationId: '101156775033710', // Paris 18e
     actions: [
       'sitting on edge of bed, one leg tucked under, sheets draped around her, relaxed morning moment',
@@ -79,7 +97,16 @@ const LOCATIONS = {
   },
   home_living_room: {
     name: 'Salon Mila',
-    setting: 'stylish Parisian living room, velvet sofa, soft afternoon light, plants and candles, intimate cozy atmosphere',
+    hasLocationRef: true,
+    setting: `Based on the provided location reference image, place the subject in this exact living room.
+
+Cozy Parisian apartment living room in 18th arrondissement Montmartre, bohemian-artistic vibe. Tall ceiling, large traditional French windows with Paris zinc rooftops view.
+
+Comfortable linen sofa in warm beige/sand color with mix of throw pillows (black, olive green, terracotta). Vintage wooden coffee table cluttered with magazines (Vogue, i-D), vintage film camera, succulent, coffee cup.
+
+Wall decor: vintage rock band poster in black frame, grid of polaroid photos, black and white photography print. Large monstera plant in terracotta pot, acoustic guitar leaning against wall.
+
+Authentic Parisian apartment with rooftop view, creative messy-chic with personality.`,
     instagramLocationId: '101156775033710', // Paris 18e
     actions: [
       'curled up on sofa, bare legs tucked to side, watching something on laptop',
@@ -94,6 +121,7 @@ const LOCATIONS = {
   },
   paris_cafe: {
     name: 'Café parisien',
+    hasLocationRef: false, // No reference image yet
     setting: 'charming Parisian sidewalk café, marble bistro table, warm natural light, Montmartre atmosphere',
     instagramLocationId: null, // No geotag for generic
     actions: [
@@ -109,6 +137,7 @@ const LOCATIONS = {
   },
   paris_street: {
     name: 'Rue parisienne',
+    hasLocationRef: false, // No reference image yet
     setting: 'typical Parisian cobblestone street, Haussmann buildings, soft daylight, authentic city atmosphere',
     instagramLocationId: null, // No geotag for generic
     actions: [
@@ -712,8 +741,15 @@ async function main() {
         slotConfig.mood
       );
 
-      // Build references - simplified: just face + body for consistency
+      // Build references - face + body + location (if available)
       const refs = [MILA_FACE_REF, MILA_BODY_REF];
+      
+      // Add location reference if available for consistent apartment look
+      const locationRef = LOCATION_REFS[locationId];
+      if (locationRef && location.hasLocationRef) {
+        refs.push(locationRef);
+        log(`  📍 Including location reference for ${location.name}`);
+      }
 
       const startTime = Date.now();
       const imageUrl = await generateImage(replicate, prompt, refs);
