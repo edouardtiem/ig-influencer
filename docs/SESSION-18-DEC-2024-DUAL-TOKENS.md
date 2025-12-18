@@ -1,15 +1,16 @@
-# 📝 SESSION — 18 Décembre 2024 — Dual Tokens Fix + Duo Post
+# 📝 SESSION — 18 Décembre 2024 — Dual Tokens + Face Consistency
 
 **Date** : 18 décembre 2024
-**Durée** : ~1h
+**Durée** : ~2h
 
 ---
 
 ## ✅ Ce qui a été fait cette session :
 
 1. **Fix Token Graph API** — Créé `refresh-all-tokens.mjs` pour rafraîchir les deux tokens (Mila + Elena) en même temps
-2. **Duo Post NYC Jacuzzi** — Généré et posté une photo Mila x Elena sur rooftop NYC
-3. **Documentation Tokens** — Mis à jour la doc pour éviter les problèmes futurs
+2. **Duo Post NYC Jacuzzi** — Généré et posté une photo Mila x Elena sur rooftop NYC (Post ID: 17869903947416976)
+3. **Face Consistency Prompts** — Amélioré tous les prompts pour une meilleure cohérence des visages
+4. **Documentation Tokens** — Mis à jour la doc pour éviter les problèmes futurs
 
 ---
 
@@ -20,7 +21,12 @@
 | `scripts/refresh-all-tokens.mjs` | 🆕 Créé — Refresh les deux tokens en une session |
 | `scripts/duo-nyc-jacuzzi.mjs` | 🆕 Créé — Génère et poste des photos duo |
 | `scripts/post-duo-now.mjs` | 🆕 Créé — Poste une image existante |
-| `docs/20-TOKEN-REFRESH-GUIDE.md` | ✏️ À mettre à jour |
+| `scripts/carousel-post.mjs` | ✏️ Prompts améliorés (face consistency) |
+| `scripts/carousel-post-elena.mjs` | ✏️ Prompts améliorés (face consistency) |
+| `scripts/vacation-reel-post.mjs` | ✏️ Prompts améliorés (face consistency) |
+| `scripts/vacation-reel-post-elena.mjs` | ✏️ Prompts améliorés (face consistency) |
+| `scripts/sauna-reel-v2.mjs` | ✏️ Prompts améliorés (face consistency) |
+| `docs/20-TOKEN-REFRESH-GUIDE.md` | ✏️ Warning dual tokens ajouté |
 | `docs/SESSION-18-DEC-2024-DUAL-TOKENS.md` | 🆕 Créé |
 
 ---
@@ -94,15 +100,54 @@ Ultra realistic Instagram photo, two young women best friends relaxing in a roof
 
 ---
 
+## 🎨 Face Consistency — Amélioration des Prompts
+
+### Le Problème
+Les visages générés "dérivaient" de plus en plus des références originales. Causes identifiées :
+- Pas d'instruction explicite de matcher les images de référence
+- Description du visage trop vague (pas de jawline, face shape, cheekbones)
+- Pas de rappel en fin de prompt
+
+### La Solution
+Restructuration complète des prompts avec :
+
+```
+AVANT:
+"Mila, 22 year old French woman, Mediterranean European features..."
+
+APRÈS:
+"BASED ON THE PROVIDED REFERENCE IMAGES, generate the EXACT SAME PERSON...
+
+SUBJECT: Mila, 22 year old French woman,
+[FACE: oval elongated face shape, soft feminine jawline not angular, 
+       high naturally defined cheekbones, chin slightly pointed...]
+[MARKS: small dark brown beauty mark 2mm above left lip corner (SIGNATURE)...]
+[BODY: slim athletic physique 168cm...]
+
+...
+
+CRITICAL: Face must match reference images exactly - same jawline, 
+          same cheekbones, same distinctive marks"
+```
+
+### Scripts mis à jour
+- `carousel-post.mjs` (Mila)
+- `carousel-post-elena.mjs`
+- `vacation-reel-post.mjs` (Mila)
+- `vacation-reel-post-elena.mjs`
+- `sauna-reel-v2.mjs` (Mila)
+
+---
+
 ## 🚧 En cours (non terminé) :
 
-- Discussion sur la cohérence des photos de référence (visages)
+- Aucun
 
 ---
 
 ## 📋 À faire prochaine session :
 
-- [ ] Améliorer la cohérence des visages (références photos)
+- [ ] Tester une génération pour valider la cohérence des visages
 - [ ] Tester le duo post sur Elena aussi
 - [ ] Vérifier que les GitHub Actions fonctionnent avec les nouveaux tokens
 

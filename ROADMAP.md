@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 18 décembre 2024 (Dual Tokens Fix + Duo Post NYC)
+**Dernière mise à jour** : 18 décembre 2024 (Face Consistency + Dual Tokens)
 
 ---
 
@@ -48,6 +48,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-017 | **Face Consistency Prompts** — Restructuration prompts avec REFERENCE_INSTRUCTION | 18/12/2024 | v2.9.8 | [→](./docs/SESSION-18-DEC-2024-DUAL-TOKENS.md) |
 | DONE-016 | **Duo Post NYC** — Mila x Elena rooftop jacuzzi + script duo | 18/12/2024 | v2.9.7 | [→](./docs/SESSION-18-DEC-2024-DUAL-TOKENS.md) |
 | DONE-015 | **Dual Tokens Fix** — Script refresh-all-tokens.mjs | 18/12/2024 | v2.9.6 | [→](./docs/SESSION-18-DEC-2024-DUAL-TOKENS.md) |
 | DONE-014 | **Reference System** — Face + body + location refs pour consistance | 18/12/2024 | v2.9.5 | [→](./docs/21-REFERENCE-SYSTEM.md) |
@@ -95,7 +96,7 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 17
+├── ✅ Done        : 18
 ├── 🚧 In Progress : 0
 ├── 📋 Todo        : 6
 ├── 🐛 Bugs        : 2 (1 fixed)
