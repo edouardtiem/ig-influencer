@@ -12,20 +12,41 @@ Le projet dispose de **4 systèmes d'auto-post automatisés** qui fonctionnent v
 
 | Système | Format | Fréquence | Horaires |
 |---------|--------|-----------|----------|
-| **Carousel Auto-Post** | 3 photos carrousel | 4x/jour | 8h30, 11h, 17h, 21h15 |
-| **Vacation Reels** | Vidéo slideshow 9s | 1x/jour | 19h |
+| **Carousel Auto-Post** | 3 photos carrousel | **Variable selon jour** | Voir calendrier ci-dessous |
+| **Vacation Reels** | Vidéo slideshow 9s | **4x/semaine** | Mer, Jeu, Sam, Dim à 19h |
 
-**Total Mila : 5 posts automatiques par jour** 🚀
+#### 📅 Calendrier optimisé Mila (basé sur analytics)
 
-### Elena (@elenav.paris) — NEW
+**Carousels :**
+
+| Jour | Posts | Horaires Paris | Engagement |
+|------|-------|----------------|------------|
+| **Lundi** | 2 | 12h30, 21h | 📉 -38% (low effort) |
+| **Mardi** | 3 | 8h30, 17h, 21h15 | 📊 Moyen |
+| **Mercredi** | 3 | 8h30, 17h, 21h15 | 📊 Moyen |
+| **Jeudi** | 3 | 8h30, 17h, 21h15 | 📊 Moyen+ |
+| **Vendredi** | 3 | 12h30, 19h, 21h15 | 📊 Prépa weekend |
+| **Samedi** | 4 | 11h, 17h, 21h, 23h | 🔥 +60% |
+| **Dimanche** | 4 | 11h, 17h, 21h, 23h | 🔥 +55% |
+
+**Reels (optimisés)** : Mer 19h, Jeu 19h, Sam 19h 🔥, Dim 19h 🔥
+
+**Total Mila : 22 carousels + 4 reels = 26 posts/semaine** 🚀
+
+---
+
+### Elena (@elenav.paris)
 
 | Système | Format | Fréquence | Horaires |
 |---------|--------|-----------|----------|
 | **Elena Carousel Auto-Post** | 3 photos carrousel | 5x/jour | 9h, 12h30, 19h, 21h30, 23h |
+| **Elena Vacation Reels** | Vidéo slideshow 9s | **4x/semaine** | Mer, Jeu, Sam, Dim à 21h |
 
-**Total Elena : 5 posts automatiques par jour** 🌟
+**Reels Elena (optimisés)** : Mer 21h, Jeu 21h, Sam 21h 🔥, Dim 21h 🔥
 
-**Note** : Les slots d'Elena sont décalés vs Mila pour éviter la cannibalisation et optimisés pour l'engagement de son audience (plus sexy → plus de posts soir/nuit)
+**Total Elena : 35 carousels + 4 reels = 39 posts/semaine** 🌟
+
+**Note** : Les slots d'Elena sont décalés vs Mila pour éviter la cannibalisation. Reels à 21h (vs 19h Mila)
 
 ---
 
@@ -42,14 +63,15 @@ Génère et publie automatiquement un carrousel de 3 photos lifestyle de Mila.
 | `app/scripts/carousel-post.mjs` | Script principal |
 | `.github/workflows/auto-post.yml` | GitHub Action |
 
-### Horaires (4x/jour)
+### Slots disponibles
 
 | Slot | Heure Paris | UTC (hiver) | Lieux |
 |------|-------------|-------------|-------|
 | `morning` | 8h30 | 7h30 | home_bedroom |
-| `late_morning` | 11h00 | 10h00 | paris_cafe, paris_street |
-| `afternoon` | 17h00 | 16h00 | home_living_room, paris_cafe |
-| `evening` | 21h15 | 20h15 | home_bedroom, home_living_room |
+| `late_morning` | 11h-12h30 | 10h-11h30 | paris_cafe, paris_street |
+| `afternoon` | 17h-19h | 16h-18h | home_living_room, paris_cafe |
+| `evening` | 21h-21h15 | 20h-20h15 | home_bedroom, home_living_room |
+| `night` | 23h | 22h | home_bedroom (weekend only) |
 
 ### Pipeline technique
 
@@ -167,7 +189,7 @@ node scripts/carousel-post-elena.mjs night
 
 ---
 
-## 🎬 Système 3 : Vacation Reels
+## 🎬 Système 3 : Vacation Reels (Mila)
 
 ### Description
 
@@ -180,9 +202,11 @@ Génère et publie automatiquement un Reel vidéo (slideshow 9 secondes) sur un 
 | `app/scripts/vacation-reel-post.mjs` | Script principal |
 | `.github/workflows/vacation-reel.yml` | GitHub Action |
 
-### Horaire
+### Horaire (optimisé)
 
-**19h Paris** (18h UTC hiver) — Quotidien
+**19h Paris** (18h UTC hiver) — **4x/semaine** (Mer, Jeu, Sam, Dim)
+
+> ℹ️ Les reels performent +55-60% le weekend, d'où l'optimisation sur 4 jours au lieu de 7.
 
 ### Rotation des thèmes
 
@@ -264,6 +288,68 @@ node scripts/vacation-reel-post.mjs city true
 node scripts/vacation-reel-post.mjs auto      # Rotation automatique
 node scripts/vacation-reel-post.mjs ski       # Forcer thème ski
 node scripts/vacation-reel-post.mjs beach     # Forcer thème beach
+```
+
+---
+
+## 🌟 Système 4 : Elena Vacation Reels
+
+### Description
+
+Génère et publie automatiquement un Reel vidéo (slideshow 9 secondes) d'Elena sur un thème de vacances luxe.
+
+### Fichiers
+
+| Fichier | Description |
+|---------|-------------|
+| `app/scripts/vacation-reel-post-elena.mjs` | Script principal |
+| `.github/workflows/vacation-reel-elena.yml` | GitHub Action |
+
+### Horaire (optimisé)
+
+**21h Paris** (20h UTC hiver) — **4x/semaine** (Mer, Jeu, Sam, Dim)
+
+> ℹ️ Décalé de 2h vs Mila (19h) pour éviter la cannibalisation.
+
+### Rotation des thèmes Elena
+
+Les 3 thèmes tournent automatiquement basé sur le jour de l'année :
+
+| Thème | Settings | Outfits Sexy |
+|-------|----------|--------------|
+| **♨️ Spa** | Spa alpin luxe, infinity pool neige, chalet fireplace | Maillot plongeant, bikini designer, pull cashmere |
+| **🌆 City** | Rooftop Milan, rues Paris, piazza Rome | Silk dress décolleté, blazer cropped, top backless |
+| **⛵ Yacht** | Deck yacht Méditerranée, bow sunset, lounge interior | Bikini blanc, sarong terracotta, coverup sheer |
+
+### Captions par thème Elena
+
+**Spa :**
+- "Spa days in the Alps 🏔️✨"
+- "This view > everything 🎿"
+- "Après-ski is my sport ♨️"
+
+**City :**
+- "Milano nights 🇮🇹✨"
+- "Paris mon amour 🗼"
+- "Aperitivo hour is sacred 🥂"
+
+**Yacht :**
+- "Yacht life chose me ⛵"
+- "Mediterranean state of mind 🌊"
+- "Living the dream 🛥️"
+
+### Commandes Elena
+
+```bash
+# Test local (sans publier)
+node scripts/vacation-reel-post-elena.mjs spa true
+node scripts/vacation-reel-post-elena.mjs city true
+node scripts/vacation-reel-post-elena.mjs yacht true
+
+# Publication réelle
+node scripts/vacation-reel-post-elena.mjs auto      # Rotation automatique
+node scripts/vacation-reel-post-elena.mjs spa       # Forcer thème spa
+node scripts/vacation-reel-post-elena.mjs yacht     # Forcer thème yacht
 ```
 
 ---
@@ -391,11 +477,12 @@ app/generated/
 - [ ] Stories automatiques (5-10/jour)
 - [ ] A/B testing des captions
 - [ ] Analytics automatiques post-publication
-- [ ] Nouveaux thèmes vacances (spa, yacht, safari...)
+- [x] ~~Nouveaux thèmes vacances (spa, yacht, safari...)~~ — Elena a spa, yacht, city
+- [ ] Reels vidéo AI (Kling/Minimax au lieu de slideshow)
 
 ---
 
-*Dernière mise à jour : 15 décembre 2024*
+*Dernière mise à jour : 18 décembre 2024*
 
 
 

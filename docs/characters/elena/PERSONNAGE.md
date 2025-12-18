@@ -152,6 +152,16 @@
 | **Chambre** | Lit beige/blanc, vanity avec miroir Hollywood lights |
 | **Vibe** | Expensive but lived-in, Instagram-ready |
 
+### 🖼️ Photos de référence des lieux
+
+| Lieu | URL Cloudinary |
+|------|----------------|
+| **Salon** | `https://res.cloudinary.com/dily60mr0/image/upload/v1766009920/replicate-prediction-aphj5sddfxrmc0cv5sf8eqe2pw_c0otnl.png` |
+| **Chambre** | `https://res.cloudinary.com/dily60mr0/image/upload/v1766009918/replicate-prediction-nnns47vwgdrme0cv5shbd0b224_d0ghoj.png` |
+| **Salle de bain** | `https://res.cloudinary.com/dily60mr0/image/upload/v1766009922/replicate-prediction-cq10n9h3jsrma0cv5sgrn0x5mr_swbswr.png` |
+
+> Ces images sont utilisées comme références pour la génération d'images dans l'appartement d'Elena. Voir `app/src/config/locations-elena.ts`.
+
 ### Lieux récurrents
 
 | Lieu | Type de contenu |

@@ -215,22 +215,28 @@ const SLOTS = {
     mood: 'sensualité naturelle, intimate awakening, cozy morning energy, lumière tamisée',
   },
   late_morning: {
-    // 11h00 Paris
+    // 11h-12h30 Paris
     locations: ['paris_cafe', 'paris_street'],
     lighting: 'bright natural daylight, clear and flattering, soft shadows',
     mood: 'confident energy, Parisian chic, effortless style, natural beauty',
   },
   afternoon: {
-    // 17h00 Paris
+    // 17h-19h Paris
     locations: ['home_living_room', 'paris_cafe'],
     lighting: 'warm golden hour light beginning, soft amber tones',
     mood: 'relaxed afternoon vibes, comfortable sensuality, ambiance intime',
   },
   evening: {
-    // 21h15 Paris
+    // 21h-21h15 Paris
     locations: ['home_bedroom', 'home_living_room'],
     lighting: 'warm candlelight and soft lamp glow, intimate evening shadows, chiaroscuro',
     mood: 'intimate evening atmosphere, sensual relaxation, cozy night energy',
+  },
+  night: {
+    // 23h Paris — WEEKEND ONLY (best engagement)
+    locations: ['home_bedroom'],
+    lighting: 'soft dim lighting, intimate shadows, single warm lamp glow, boudoir atmosphere',
+    mood: 'late night intimacy, maximum sensuality, private moment energy, très intime',
   },
 };
 

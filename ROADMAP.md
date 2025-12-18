@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 17 décembre 2024 (Simplification références images Mila + Elena)
+**Dernière mise à jour** : 18 décembre 2024 (Reels Optimization + Elena Reels)
 
 ---
 
@@ -34,14 +34,13 @@ roadmap/
 
 | ID | Feature | Priorité | Estimation | Lien |
 |----|---------|----------|------------|------|
-| TODO-011 | **Premier Post Elena** — Carousel (quand Replicate OK) | 🔴 High | 10min | - |
 | TODO-010 | **Targeting Actif** — 20 comments/jour/compte sur niches cibles | 🔴 High | ongoing | - |
+| TODO-004 | Intégration Supabase (posts + conversations) | 🔴 High | 3h | [→](./roadmap/todo/TODO-004-supabase-integration.md) |
+| TODO-001 | Multi-shot Reels (carousel → video) | 🔴 High | 4h | [→](./roadmap/todo/TODO-001-multi-shot-reels.md) |
+| TODO-011 | **Références cohérence** — Face + body + location refs pour consistance | 🟡 Medium | 1h | - |
 | TODO-006 | Elena Stories Highlights (Travel, Home, BTS) | 🟡 Medium | 2h | - |
 | TODO-007 | Premier Reel Elena (Kling/Minimax) | 🟡 Medium | 2h | - |
 | TODO-008 | Crossover Mila x Elena NYC — Prompt prêt 🎨 | 🟡 Medium | 20min | - |
-| TODO-004 | Intégration Supabase (posts + conversations) | 🔴 High | 3h | [→](./roadmap/todo/TODO-004-supabase-integration.md) |
-| TODO-001 | Multi-shot Reels (carousel → video) | 🔴 High | 4h | [→](./roadmap/todo/TODO-001-multi-shot-reels.md) |
-| TODO-002 | Auto-post Reels via cron | 🟡 Medium | 2h | [→](./roadmap/todo/TODO-002-auto-post-reels.md) |
 | TODO-003 | Dashboard analytics | 🟢 Low | 6h | [→](./roadmap/todo/TODO-003-dashboard.md) |
 
 ---
@@ -50,6 +49,9 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-013 | **Reels Optimization** — Mila 4x/sem + Elena Reels créé (spa/city/yacht) | 18/12/2024 | v2.9.4 | [→](./docs/SESSION-18-DEC-2024-REELS-OPTIMIZATION.md) |
+| DONE-012 | **Token Elena Permanent + Guide** — Token permanent obtenu + doc complète | 18/12/2024 | v2.9.3 | [→](./docs/20-TOKEN-REFRESH-GUIDE.md) |
+| DONE-011 | **Elena Apartment Locations** — 3 refs lieux (salon, chambre, sdb) + config | 17/12/2024 | v2.9.2 | [→](./docs/SESSION-17-DEC-2024-ELENA-APARTMENT.md) |
 | DONE-010 | **Reference Simplification** — 2 refs (face+body) pour Mila & Elena | 17/12/2024 | v2.9.1 | [→](./docs/SESSION-17-DEC-2024-REFERENCE-SIMPLIFICATION.md) |
 | DONE-009 | **Smart Comments V2** — Extended Thinking + 8 stratégies + anti-repetition | 17/12/2024 | v2.9.0 | [→](./roadmap/done/DONE-009-smart-comments-v2.md) |
 | DONE-009 | **Elena Reference Images** — 6 images Cloudinary + config | 17/12/2024 | v2.8.2 | [→](./docs/SESSION-17-DEC-2024-ELENA-GRAPH-API.md) |
@@ -69,6 +71,7 @@ roadmap/
 
 | ID | Bug | Sévérité | Status | Lien |
 |----|-----|----------|--------|------|
+| BUG-003 | **Token Elena expiré** — Long-lived token expiré, nécessite refresh manuel | 🔴 High | ✅ Fixed | [→](./docs/20-TOKEN-REFRESH-GUIDE.md) |
 | BUG-002 | GitHub Actions génère images mais ne poste pas sur Instagram | 🔴 High | Open | - |
 | BUG-001 | Rate limit Replicate sur batch | 🟡 Medium | Open | [→](./roadmap/bugs/BUG-001-rate-limit.md) |
 
@@ -90,11 +93,11 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 11 (+Reference Simplification)
+├── ✅ Done        : 14
 ├── 🚧 In Progress : 0
 ├── 📋 Todo        : 8
-├── 🐛 Bugs        : 2 (+Instagram posting issue)
-└── 💡 Ideas       : 5 (incl. Intelligent Content Engine)
+├── 🐛 Bugs        : 2 (1 fixed)
+└── 💡 Ideas       : 5
 ```
 
 ---
@@ -103,6 +106,10 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 18/12/2024 | **🎬 Reels Optimization** — Mila 4x/sem optimisé + Elena Reels créé (spa/city/yacht) | [→](./docs/SESSION-18-DEC-2024-REELS-OPTIMIZATION.md) |
+| 18/12/2024 | **🔐 Token Elena Permanent** — Token permanent + Guide définitif Graph API | [→](./docs/SESSION-18-DEC-2024-TOKEN-ELENA-FIX.md) |
+| 17/12/2024 | **🔄 Token Refresh Elena** — Token expiré, scripts refresh créés | [→](./docs/SESSION-17-DEC-2024-TOKEN-REFRESH.md) |
+| 17/12/2024 | **🏠 Elena Apartment Locations** — 3 refs lieux (salon, chambre, sdb) pour consistance | [→](./docs/SESSION-17-DEC-2024-ELENA-APARTMENT.md) |
 | 17/12/2024 | **🖼️ Reference Simplification** — 2 refs (face+body) pour consistance Mila & Elena | [→](./docs/SESSION-17-DEC-2024-REFERENCE-SIMPLIFICATION.md) |
 | 17/12/2024 | **🧠 Smart Comments V2** — Extended Thinking + 8 stratégies + anti-repetition | [→](./docs/SESSION-17-DEC-2024-SMART-COMMENTS-V2.md) |
 | 17/12/2024 | **🔌 Elena Graph API** — Connexion @elenav.paris au Graph API | [→](./docs/SESSION-17-DEC-2024-ELENA-GRAPH-API.md) |

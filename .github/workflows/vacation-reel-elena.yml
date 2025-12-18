@@ -1,36 +1,36 @@
-name: Mila Vacation Reel
+name: Elena Vacation Reel
 
 on:
   schedule:
     # ═══════════════════════════════════════════════════════════════
-    # REELS OPTIMISÉS — 4x/semaine (Mer, Jeu, Sam, Dim)
-    # 19h Paris = 18h UTC (winter) / 17h UTC (summer)
+    # REELS ELENA — 4x/semaine (Mer, Jeu, Sam, Dim)
+    # 21h Paris = 20h UTC (winter) / 19h UTC (summer)
     # ═══════════════════════════════════════════════════════════════
     
     # Mercredi (day 3) — Reach
-    - cron: '0 18 * * 3'
+    - cron: '0 20 * * 3'
     
     # Jeudi (day 4) — Reach
-    - cron: '0 18 * * 4'
+    - cron: '0 20 * * 4'
     
     # Samedi (day 6) — BEST DAY 🔥 +60%
-    - cron: '0 18 * * 6'
+    - cron: '0 20 * * 6'
     
     # Dimanche (day 0) — BEST DAY 🔥 +55%
-    - cron: '0 18 * * 0'
+    - cron: '0 20 * * 0'
   
   workflow_dispatch:
     inputs:
       theme:
-        description: 'Vacation theme (ski, beach, city, auto)'
+        description: 'Vacation theme (spa, city, yacht, auto)'
         required: false
         default: 'auto'
         type: choice
         options:
           - auto
-          - ski
-          - beach
+          - spa
           - city
+          - yacht
       test_mode:
         description: 'Test mode (no publish)'
         required: false
@@ -38,7 +38,7 @@ on:
         type: boolean
 
 jobs:
-  vacation-reel:
+  vacation-reel-elena:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     
@@ -60,22 +60,22 @@ jobs:
         working-directory: ./app
         run: npm install replicate
 
-      - name: Generate and Post Vacation Reel
+      - name: Generate and Post Elena Vacation Reel
         working-directory: ./app
         env:
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
           CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
           CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
-          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
-          INSTAGRAM_ACCOUNT_ID: ${{ secrets.INSTAGRAM_ACCOUNT_ID }}
+          INSTAGRAM_ACCESS_TOKEN_ELENA: ${{ secrets.INSTAGRAM_ACCESS_TOKEN_ELENA }}
+          INSTAGRAM_ACCOUNT_ID_ELENA: ${{ secrets.INSTAGRAM_ACCOUNT_ID_ELENA }}
         run: |
           THEME="${{ github.event.inputs.theme || 'auto' }}"
           TEST="${{ github.event.inputs.test_mode }}"
           DAY=$(date -u +%u)
           DAY_NAME=$(date -u +%A)
           
-          echo "🎬 Starting Mila vacation reel generation"
+          echo "🌟 Starting Elena vacation reel generation"
           echo "📅 Day: $DAY_NAME"
           echo "🏖️ Theme: $THEME"
           echo "🧪 Test mode: $TEST"
@@ -85,4 +85,5 @@ jobs:
             echo "🔥 Weekend = Best reel engagement (+55-60%)"
           fi
           
-          node scripts/vacation-reel-post.mjs "$THEME" "$TEST"
+          node scripts/vacation-reel-post-elena.mjs "$THEME" "$TEST"
+

@@ -22,6 +22,16 @@ const ELENA_FACE_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v17659
 const ELENA_BODY_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v1765967073/replicate-prediction-ws5fpmjpfsrma0cv538t79j8jm_wx9nap.png';
 
 // ═══════════════════════════════════════════════════════════════
+// LOCATION REFERENCE PHOTOS — For consistent apartment generation
+// ═══════════════════════════════════════════════════════════════
+
+const LOCATION_REFS = {
+  loft_living: 'https://res.cloudinary.com/dily60mr0/image/upload/v1766009920/replicate-prediction-aphj5sddfxrmc0cv5sf8eqe2pw_c0otnl.png',
+  loft_bedroom: 'https://res.cloudinary.com/dily60mr0/image/upload/v1766009918/replicate-prediction-nnns47vwgdrme0cv5shbd0b224_d0ghoj.png',
+  bathroom_luxe: 'https://res.cloudinary.com/dily60mr0/image/upload/v1766009922/replicate-prediction-cq10n9h3jsrma0cv5sgrn0x5mr_swbswr.png',
+};
+
+// ═══════════════════════════════════════════════════════════════
 // ELENA CHARACTER - Based on docs/characters/elena/PERSONNAGE.md
 // ═══════════════════════════════════════════════════════════════
 
@@ -65,7 +75,16 @@ const SECONDARY_EXPRESSIONS = [
 const LOCATIONS = {
   loft_living: {
     name: 'Loft Elena',
-    setting: 'luxurious bright Parisian loft apartment 8th arrondissement, huge windows with natural daylight flooding in, Paris rooftops view, high ceilings, white walls, velvet mauve sofa, plants, parquet floor, minimalist expensive decor',
+    hasLocationRef: true,
+    setting: `Based on the provided location reference image, place the subject in this exact living room.
+
+Luxurious bright Parisian loft apartment 8th arrondissement with high Haussmannian ceilings, ornate white crown moldings. Large French windows with natural daylight flooding in, Paris zinc rooftops view with typical grey Haussmann buildings.
+
+Herringbone chevron parquet floor in light oak honey color. Statement vintage dusty rose mauve velvet sofa with curved armrests 1970s Italian design. Minimalist black metal and glass side table.
+
+Large indoor palm tree in terracotta pot, fiddle leaf fig plant, smaller potted plants. Fashion magazines on coffee table, gold candle holders, soft cream throw blanket on sofa.
+
+White walls, dusty rose mauve velvet, cream and beige tones, gold accents. Expensive but lived-in, Italian-Parisian luxury aesthetic.`,
     instagramLocationId: null, // Paris 8e - to add
     actions: [
       'standing confidently, hands on hips, showcasing silhouette against window light',
@@ -80,7 +99,18 @@ const LOCATIONS = {
   },
   loft_bedroom: {
     name: 'Chambre Elena',
-    setting: 'elegant Parisian apartment bedroom, luxurious white bedding, soft morning light through tall windows, Haussmann buildings visible outside, vanity table with Hollywood mirror, neutral tones beige and cream',
+    hasLocationRef: true,
+    setting: `Based on the provided location reference image, place the subject in this exact bedroom.
+
+Elegant Parisian apartment bedroom 8th arrondissement with high Haussmannian ceiling, ornate white crown moldings, herringbone chevron parquet floor light oak.
+
+Two tall French windows with sheer white linen curtains gently flowing, view of Paris rooftops.
+
+King size bed with cream linen upholstered headboard button-tufted, luxurious white and beige layered bedding, multiple pillows in cream white and dusty rose, cashmere throw blanket in camel color.
+
+Vintage-style vanity table in white lacquer with gold legs, Hollywood mirror with warm globe lights, velvet stool in dusty rose mauve. Gold and marble bedside tables, gold arc floor lamp with cream shade.
+
+Fresh white roses in glass vase, fashion books, perfume bottles, abstract feminine art print above bed in gold frame. Warm golden natural light, romantic atmosphere.`,
     instagramLocationId: null,
     actions: [
       'sitting on bed edge, leaning back on hands, legs extended',
@@ -95,7 +125,18 @@ const LOCATIONS = {
   },
   bathroom_luxe: {
     name: 'Salle de bain Elena',
-    setting: 'luxurious Parisian bathroom, white marble walls with grey veins, gold fixtures and faucets, large window with Paris rooftops view, elegant minimalist design',
+    hasLocationRef: true,
+    setting: `Based on the provided location reference image, place the subject in this exact bathroom.
+
+Luxurious Parisian apartment bathroom with high ceiling, large French window overlooking Paris zinc rooftops and Haussmann building facades.
+
+Floor to ceiling white Calacatta marble with elegant grey veining, polished finish. All brushed gold brass fixtures throughout, vintage-style gold faucet with cross handles on pedestal sink.
+
+Gold-framed rectangular mirror with subtle art deco lines, glass walk-in shower enclosure with gold hinges and gold rainfall showerhead, gold towel rack.
+
+White porcelain pedestal sink classic Parisian style. Fluffy white towels neatly rolled, minimalist amber glass bottles, white candles in gold holders.
+
+Bright natural daylight from window, clean and fresh atmosphere. Five-star Parisian hotel bathroom aesthetic.`,
     instagramLocationId: null,
     actions: [
       `taking mirror selfie with her ${ELENA_PHONE}, full body visible`,
@@ -106,6 +147,7 @@ const LOCATIONS = {
   },
   cafe_paris: {
     name: 'Café parisien chic',
+    hasLocationRef: false, // No reference image yet
     setting: 'upscale Parisian cafe terrace, classic rattan bistro chairs, marble table, Haussmann buildings in background, golden hour warm sunlight, elegant atmosphere',
     instagramLocationId: null,
     actions: [
@@ -118,6 +160,7 @@ const LOCATIONS = {
   },
   spa_luxe: {
     name: 'Spa luxe',
+    hasLocationRef: false, // No reference image yet
     setting: 'luxury spa setting, outdoor heated pool with steam rising, snowy mountain panorama or elegant indoor spa, warm water, relaxation atmosphere',
     instagramLocationId: null,
     actions: [
@@ -630,8 +673,15 @@ shot on iPhone, natural photography, lifestyle content, high fashion model aesth
 
     log(`  Prompt preview: ${prompt.substring(0, 100)}...`);
 
-    // Build references - simplified: just face + body for consistency
+    // Build references - face + body + location (if available)
     const refs = [ELENA_FACE_REF, ELENA_BODY_REF];
+    
+    // Add location reference if available for consistent apartment look
+    const locationRef = LOCATION_REFS[locationKey];
+    if (locationRef && location.hasLocationRef) {
+      refs.push(locationRef);
+      log(`  📍 Including location reference for ${location.name}`);
+    }
 
     try {
       const imageUrl = await generateImage(replicate, prompt, refs);
