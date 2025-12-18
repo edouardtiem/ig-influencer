@@ -390,6 +390,47 @@ async function urlToBase64(url) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// CLOUDINARY UPLOAD
+// ═══════════════════════════════════════════════════════════════
+
+async function uploadToCloudinary(imageUrl) {
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  const apiKey = process.env.CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+  if (!cloudName || !apiKey || !apiSecret) {
+    throw new Error('Missing Cloudinary credentials');
+  }
+
+  const timestamp = Math.floor(Date.now() / 1000);
+  const folder = 'elena-carousel';
+  
+  const crypto = await import('crypto');
+  const signatureString = `folder=${folder}&timestamp=${timestamp}${apiSecret}`;
+  const signature = crypto.createHash('sha1').update(signatureString).digest('hex');
+
+  const formData = new FormData();
+  formData.append('file', imageUrl);
+  formData.append('api_key', apiKey);
+  formData.append('timestamp', timestamp.toString());
+  formData.append('signature', signature);
+  formData.append('folder', folder);
+
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+    { method: 'POST', body: formData }
+  );
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Cloudinary upload failed: ${error}`);
+  }
+
+  const result = await response.json();
+  return result.secure_url;
+}
+
+// ═══════════════════════════════════════════════════════════════
 // IMAGE GENERATION
 // ═══════════════════════════════════════════════════════════════
 
@@ -739,15 +780,20 @@ CRITICAL: Face must match reference images exactly - same soft round face shape,
     try {
       const imageUrl = await generateImage(replicate, prompt, refs);
       const urlString = typeof imageUrl === 'string' ? imageUrl : String(imageUrl);
-      imageUrls.push(urlString);
       log(`  ✅ Generated: ${urlString.substring(0, 60)}...`);
+      
+      // Upload to Cloudinary
+      log(`  ☁️ Uploading to Cloudinary...`);
+      const cloudinaryUrl = await uploadToCloudinary(urlString);
+      imageUrls.push(cloudinaryUrl);
+      log(`  ✅ Uploaded: ${cloudinaryUrl}`);
     } catch (error) {
       log(`  ❌ Failed: ${error.message}`);
       throw error;
     }
   }
 
-  log(`\n✅ Generated ${imageUrls.length} images`);
+  log(`\n✅ Generated and uploaded ${imageUrls.length} images`);
 
   // Build caption
   const captionPool = locationKey.includes('cafe') 
