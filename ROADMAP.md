@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 18 décembre 2024 (Reels Optimization + Elena Reels)
+**Dernière mise à jour** : 18 décembre 2024 (Dual Tokens Fix + Duo Post NYC)
 
 ---
 
@@ -39,7 +39,7 @@ roadmap/
 | TODO-001 | Multi-shot Reels (carousel → video) | 🔴 High | 4h | [→](./roadmap/todo/TODO-001-multi-shot-reels.md) |
 | TODO-006 | Elena Stories Highlights (Travel, Home, BTS) | 🟡 Medium | 2h | - |
 | TODO-007 | Premier Reel Elena (Kling/Minimax) | 🟡 Medium | 2h | - |
-| TODO-008 | Crossover Mila x Elena NYC — Prompt prêt 🎨 | 🟡 Medium | 20min | - |
+| ~~TODO-008~~ | ~~Crossover Mila x Elena NYC~~ — ✅ Done | - | - | [→](./docs/SESSION-18-DEC-2024-DUAL-TOKENS.md) |
 | TODO-003 | Dashboard analytics | 🟢 Low | 6h | [→](./roadmap/todo/TODO-003-dashboard.md) |
 
 ---
@@ -48,6 +48,8 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-016 | **Duo Post NYC** — Mila x Elena rooftop jacuzzi + script duo | 18/12/2024 | v2.9.7 | [→](./docs/SESSION-18-DEC-2024-DUAL-TOKENS.md) |
+| DONE-015 | **Dual Tokens Fix** — Script refresh-all-tokens.mjs | 18/12/2024 | v2.9.6 | [→](./docs/SESSION-18-DEC-2024-DUAL-TOKENS.md) |
 | DONE-014 | **Reference System** — Face + body + location refs pour consistance | 18/12/2024 | v2.9.5 | [→](./docs/21-REFERENCE-SYSTEM.md) |
 | DONE-013 | **Reels Optimization** — Mila 4x/sem + Elena Reels créé (spa/city/yacht) | 18/12/2024 | v2.9.4 | [→](./docs/SESSION-18-DEC-2024-REELS-OPTIMIZATION.md) |
 | DONE-012 | **Token Elena Permanent + Guide** — Token permanent obtenu + doc complète | 18/12/2024 | v2.9.3 | [→](./docs/20-TOKEN-REFRESH-GUIDE.md) |
@@ -93,9 +95,9 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 15
+├── ✅ Done        : 17
 ├── 🚧 In Progress : 0
-├── 📋 Todo        : 7
+├── 📋 Todo        : 6
 ├── 🐛 Bugs        : 2 (1 fixed)
 └── 💡 Ideas       : 5
 ```
@@ -106,6 +108,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 18/12/2024 | **🔐 Dual Tokens Fix** — Refresh les deux tokens ensemble + Duo Post NYC | [→](./docs/SESSION-18-DEC-2024-DUAL-TOKENS.md) |
 | 18/12/2024 | **🎬 Reels Optimization** — Mila 4x/sem optimisé + Elena Reels créé (spa/city/yacht) | [→](./docs/SESSION-18-DEC-2024-REELS-OPTIMIZATION.md) |
 | 18/12/2024 | **🔐 Token Elena Permanent** — Token permanent + Guide définitif Graph API | [→](./docs/SESSION-18-DEC-2024-TOKEN-ELENA-FIX.md) |
 | 17/12/2024 | **🔄 Token Refresh Elena** — Token expiré, scripts refresh créés | [→](./docs/SESSION-17-DEC-2024-TOKEN-REFRESH.md) |

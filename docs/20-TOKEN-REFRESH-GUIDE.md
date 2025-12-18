@@ -5,9 +5,17 @@
 
 ---
 
+## 🚨 IMPORTANT — Refresh les DEUX tokens ensemble !
+
+**Notre app gère 2 comptes Instagram** (Mila + Elena). Quand tu génères un nouveau token, ça invalide les anciens tokens de la même session.
+
+**⚠️ NE JAMAIS refresh un seul token** — ça casse l'autre !
+
+---
+
 ## 📑 Table des matières
 
-1. [TL;DR — Refresh token existant](#-tldr--commandes-rapides)
+1. [TL;DR — Refresh TOUS les tokens](#-tldr--commandes-rapides)
 2. [Créer un token pour un NOUVEAU compte](#-créer-un-token-pour-un-nouveau-compte)
 3. [Guide complet refresh](#-guide-complet)
 4. [Pièges courants](#️-pièges-courants)
@@ -17,17 +25,23 @@
 
 ## 📋 TL;DR — Commandes Rapides
 
-Si le token est expiré, voici les étapes :
+Si un token est expiré, **refresh les DEUX en même temps** :
 
 ```bash
-# 1. Génère un User Token sur Graph API Explorer (voir Étape 1)
+# 1. Va sur https://developers.facebook.com/tools/explorer/
+# 2. App: 828334456494374
+# 3. Clique "Generate Access Token"
+# 4. ⚠️ COCHE LES DEUX PAGES (Mila Verne ET Elena Visconti)
+# 5. Permissions: pages_show_list, pages_read_engagement, instagram_basic, instagram_content_publish
 
-# 2. Lance cette commande avec ton nouveau User Token :
-cd app && node scripts/get-permanent-token-elena.mjs
+# 6. Lance cette commande avec ton User Token :
+cd app && node scripts/refresh-all-tokens.mjs "TON_USER_TOKEN"
 
-# 3. Vérifie que c'est permanent :
+# 7. Vérifie que c'est permanent :
 node scripts/check-token.mjs
 ```
+
+**Le script `refresh-all-tokens.mjs` génère les DEUX Page Tokens (Mila + Elena) en une seule session.**
 
 ---
 
