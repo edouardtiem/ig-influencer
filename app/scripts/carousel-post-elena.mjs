@@ -397,22 +397,49 @@ async function generateImageInternal(replicate, prompt, base64Images) {
   const input = {
     prompt,
     aspect_ratio: '4:5',
+    resolution: '2K',
+    output_format: 'jpg',
     safety_filter_level: 'block_only_high',
-    ...(base64Images && base64Images.length > 0 && {
-      reference_images: base64Images,
-    }),
   };
+
+  if (base64Images && base64Images.length > 0) {
+    input.image_input = base64Images;
+  }
 
   const output = await replicate.run(NANO_BANANA_MODEL, { input });
 
-  if (typeof output === 'string') return output;
-  if (output && output.url) return output.url;
-  if (Array.isArray(output) && output[0]) {
-    if (typeof output[0] === 'string') return output[0];
-    if (output[0].url) return output[0].url;
+  if (!output) {
+    throw new Error('No output from Nano Banana Pro');
   }
-  
-  throw new Error('Could not parse output');
+
+  // Handle async iterator (streamed output)
+  if (typeof output === 'object' && Symbol.asyncIterator in output) {
+    const chunks = [];
+    for await (const chunk of output) {
+      if (chunk instanceof Uint8Array) {
+        chunks.push(chunk);
+      } else if (typeof chunk === 'string') {
+        return chunk;
+      }
+    }
+    
+    if (chunks.length > 0) {
+      const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+      const combined = new Uint8Array(totalLength);
+      let offset = 0;
+      for (const chunk of chunks) {
+        combined.set(chunk, offset);
+        offset += chunk.length;
+      }
+      const base64 = Buffer.from(combined).toString('base64');
+      return `data:image/jpeg;base64,${base64}`;
+    }
+  }
+
+  if (typeof output === 'string') return output;
+  if (Array.isArray(output) && output[0]) return output[0];
+
+  throw new Error('Could not process API response');
 }
 
 async function generateWithMinimax(replicate, prompt, faceRefUrl) {
@@ -711,8 +738,9 @@ CRITICAL: Face must match reference images exactly - same soft round face shape,
 
     try {
       const imageUrl = await generateImage(replicate, prompt, refs);
-      imageUrls.push(imageUrl);
-      log(`  ✅ Generated: ${imageUrl.substring(0, 60)}...`);
+      const urlString = typeof imageUrl === 'string' ? imageUrl : String(imageUrl);
+      imageUrls.push(urlString);
+      log(`  ✅ Generated: ${urlString.substring(0, 60)}...`);
     } catch (error) {
       log(`  ❌ Failed: ${error.message}`);
       throw error;
