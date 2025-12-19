@@ -745,6 +745,7 @@ async function main() {
 
     // Step 2: Generate images
     const cloudinaryUrls = [];
+    let firstImageUrl = null; // Store first image URL for outfit consistency
 
     for (let i = 0; i < CAROUSEL_SIZE; i++) {
       const photoNum = i + 1;
@@ -776,11 +777,23 @@ async function main() {
         refs.push(locationRef);
         log(`  📍 Including location reference for ${location.name}`);
       }
+      
+      // Add first image as reference for outfit/scene consistency (images 2 and 3)
+      if (firstImageUrl && i > 0) {
+        refs.push(firstImageUrl);
+        log(`  👗 Including first image reference for outfit consistency`);
+      }
 
       const startTime = Date.now();
       const imageUrl = await generateImage(replicate, prompt, refs);
       const duration = ((Date.now() - startTime) / 1000).toFixed(1);
       log(`  ✅ Generated in ${duration}s`);
+
+      // Store first image URL for subsequent generations
+      if (i === 0) {
+        firstImageUrl = imageUrl;
+        log(`  📌 Stored as reference for outfit consistency`);
+      }
 
       log(`  ☁️ Uploading to Cloudinary...`);
       const cloudinaryUrl = await uploadToCloudinary(imageUrl);

@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 18 décembre 2024 (Face Consistency + Dual Tokens)
+**Dernière mise à jour** : 18 décembre 2024 (AI Label Workaround)
 
 ---
 
@@ -48,6 +48,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-018 | **AI Label Workaround** — Doc + solution caption/hashtags (API non supportée) | 18/12/2024 | v2.9.9 | [→](./docs/22-AI-LABEL-WORKAROUND.md) |
 | DONE-017 | **Face Consistency Prompts** — Restructuration prompts avec REFERENCE_INSTRUCTION | 18/12/2024 | v2.9.8 | [→](./docs/SESSION-18-DEC-2024-DUAL-TOKENS.md) |
 | DONE-016 | **Duo Post NYC** — Mila x Elena rooftop jacuzzi + script duo | 18/12/2024 | v2.9.7 | [→](./docs/SESSION-18-DEC-2024-DUAL-TOKENS.md) |
 | DONE-015 | **Dual Tokens Fix** — Script refresh-all-tokens.mjs | 18/12/2024 | v2.9.6 | [→](./docs/SESSION-18-DEC-2024-DUAL-TOKENS.md) |
@@ -96,7 +97,7 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 18
+├── ✅ Done        : 19
 ├── 🚧 In Progress : 0
 ├── 📋 Todo        : 6
 ├── 🐛 Bugs        : 2 (1 fixed)
@@ -109,6 +110,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 18/12/2024 | **🤖 AI Label Workaround** — Recherche API + solution caption/hashtags | [→](./docs/SESSION-18-DEC-2024-AI-LABEL.md) |
 | 18/12/2024 | **🔐 Dual Tokens Fix** — Refresh les deux tokens ensemble + Duo Post NYC | [→](./docs/SESSION-18-DEC-2024-DUAL-TOKENS.md) |
 | 18/12/2024 | **🎬 Reels Optimization** — Mila 4x/sem optimisé + Elena Reels créé (spa/city/yacht) | [→](./docs/SESSION-18-DEC-2024-REELS-OPTIMIZATION.md) |
 | 18/12/2024 | **🔐 Token Elena Permanent** — Token permanent + Guide définitif Graph API | [→](./docs/SESSION-18-DEC-2024-TOKEN-ELENA-FIX.md) |

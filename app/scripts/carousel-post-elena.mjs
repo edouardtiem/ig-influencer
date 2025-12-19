@@ -715,31 +715,21 @@ async function main() {
 
   // Generate images
   const imageUrls = [];
-  const usedOutfits = new Set();
-  const usedActions = new Set();
+  
+  // Pick ONE outfit for the entire carousel (same person = same outfit in real life!)
+  const outfit = randomFrom(OUTFITS[locationKey]);
+  log(`👗 Outfit: ${outfit.slice(0, 60)}...`);
+  
+  // Get unique actions (different poses, same outfit)
+  const shuffledActions = [...location.actions].sort(() => Math.random() - 0.5);
+  const actions = shuffledActions.slice(0, CAROUSEL_SIZE);
+
+  let firstImageUrl = null; // Store first image URL for outfit consistency
 
   for (let i = 0; i < CAROUSEL_SIZE; i++) {
     log(`\n🖼️ Generating image ${i + 1}/${CAROUSEL_SIZE}...`);
 
-    // Get unique outfit
-    let outfit;
-    const availableOutfits = OUTFITS[locationKey].filter(o => !usedOutfits.has(o));
-    if (availableOutfits.length === 0) {
-      outfit = randomFrom(OUTFITS[locationKey]);
-    } else {
-      outfit = randomFrom(availableOutfits);
-      usedOutfits.add(outfit);
-    }
-
-    // Get unique action
-    let action;
-    const availableActions = location.actions.filter(a => !usedActions.has(a));
-    if (availableActions.length === 0) {
-      action = randomFrom(location.actions);
-    } else {
-      action = randomFrom(availableActions);
-      usedActions.add(action);
-    }
+    const action = actions[i];
 
     // Pick expression
     const expression = i === 0 
@@ -776,11 +766,23 @@ CRITICAL: Face must match reference images exactly - same soft round face shape,
       refs.push(locationRef);
       log(`  📍 Including location reference for ${location.name}`);
     }
+    
+    // Add first image as reference for outfit/scene consistency (images 2 and 3)
+    if (firstImageUrl && i > 0) {
+      refs.push(firstImageUrl);
+      log(`  👗 Including first image reference for outfit consistency`);
+    }
 
     try {
       const imageUrl = await generateImage(replicate, prompt, refs);
       const urlString = typeof imageUrl === 'string' ? imageUrl : String(imageUrl);
       log(`  ✅ Generated: ${urlString.substring(0, 60)}...`);
+      
+      // Store first image URL for subsequent generations
+      if (i === 0) {
+        firstImageUrl = urlString;
+        log(`  📌 Stored as reference for outfit consistency`);
+      }
       
       // Upload to Cloudinary
       log(`  ☁️ Uploading to Cloudinary...`);

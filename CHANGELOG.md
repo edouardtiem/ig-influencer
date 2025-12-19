@@ -4,6 +4,34 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 
 ---
 
+## [2.5.1] - 2024-12-19
+
+### 👗 Cohérence tenue carrousels — Fix outfit consistency
+
+Les photos d'un même carrousel ont maintenant la même tenue garantie.
+
+### Fixed
+
+- **Tenues incohérentes sur carrousels** : La première image générée est maintenant utilisée comme référence pour les images 2 et 3, assurant une cohérence visuelle de la tenue et de la scène
+- **Elena : tenues différentes par design** : Corrigé le bug où le code choisissait intentionnellement une tenue différente pour chaque photo du carrousel
+
+### Changed
+
+- `carousel-post.mjs` (Mila) : Ajout de `firstImageUrl` comme référence pour images 2-3
+- `carousel-post-elena.mjs` (Elena) : 
+  - Même fix de référence image
+  - Correction : une seule tenue choisie au lieu de 3 différentes
+
+### Technical
+
+Le workflow de génération est maintenant :
+1. Image 1 : générée avec refs [face, body, location?]
+2. Image 2-3 : générées avec refs [face, body, location?, **image1**]
+
+Cela garantit que l'IA reproduit visuellement la même tenue/scène.
+
+---
+
 ## [2.5.0] - 2024-12-14
 
 ### 💬 Smart Comments — Commentaires IG automatisés via iOS Shortcut
