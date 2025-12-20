@@ -397,12 +397,14 @@ export async function getNextScheduledPost(character: CharacterName): Promise<Sc
 
   const today = new Date().toISOString().split('T')[0];
 
-  const { data: schedule } = await supabase
+  const { data } = await supabase
     .from('daily_schedules')
     .select('*')
     .eq('schedule_date', today)
     .eq('character', character)
     .single();
+
+  const schedule = data as DailySchedule | null;
 
   if (!schedule) {
     console.log('📅 No schedule found for today');
@@ -432,12 +434,14 @@ export async function markPostExecuted(
 
   const today = new Date().toISOString().split('T')[0];
 
-  const { data: schedule } = await supabase
+  const { data } = await supabase
     .from('daily_schedules')
     .select('*')
     .eq('schedule_date', today)
     .eq('character', character)
     .single();
+
+  const schedule = data as DailySchedule | null;
 
   if (!schedule) return false;
 
