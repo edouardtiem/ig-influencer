@@ -1,20 +1,13 @@
-name: Elena Auto Post
+name: Elena Auto Post (LEGACY)
+
+# ═══════════════════════════════════════════════════════════════════
+# ⚠️ DEPRECATED: Ce workflow est remplacé par Content Brain
+# Les CRON sont désactivés. Gardé pour déclenchement manuel uniquement.
+# ═══════════════════════════════════════════════════════════════════
 
 on:
-  schedule:
-    # 5 posts per day - Focus evening/night for sexy content engagement
-    # (UTC times - Paris is UTC+1 winter, UTC+2 summer)
-    
-    # Morning - 9h00 Paris = 8h00 UTC (winter) / 7h00 UTC (summer)
-    - cron: '0 8 * * *'
-    # Midday - 12h30 Paris = 11h30 UTC (winter) / 10h30 UTC (summer)
-    - cron: '30 11 * * *'
-    # Evening - 19h00 Paris = 18h00 UTC (winter) / 17h00 UTC (summer)
-    - cron: '0 18 * * *'
-    # Night PRIME - 21h30 Paris = 20h30 UTC (winter) / 19h30 UTC (summer)
-    - cron: '30 20 * * *'
-    # Late Night - 23h00 Paris = 22h00 UTC (winter) / 21h00 UTC (summer)
-    - cron: '0 22 * * *'
+  # CRON DÉSACTIVÉS - Utilisez content-brain.yml
+  # schedule: [...]
   
   workflow_dispatch:
     inputs:

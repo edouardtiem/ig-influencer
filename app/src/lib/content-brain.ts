@@ -453,8 +453,7 @@ export async function markPostExecuted(
   const completedCount = updatedPosts.filter((p: ScheduledPost) => p.executed).length;
   const newStatus = completedCount === updatedPosts.length ? 'completed' : 'in_progress';
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
+  const { error } = await supabase
     .from('daily_schedules')
     .update({
       scheduled_posts: updatedPosts,

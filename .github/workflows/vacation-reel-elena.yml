@@ -1,23 +1,13 @@
-name: Elena Vacation Reel
+name: Elena Vacation Reel (LEGACY)
+
+# ═══════════════════════════════════════════════════════════════════
+# ⚠️ DEPRECATED: Ce workflow est remplacé par Content Brain
+# Les CRON sont désactivés. Gardé pour déclenchement manuel uniquement.
+# ═══════════════════════════════════════════════════════════════════
 
 on:
-  schedule:
-    # ═══════════════════════════════════════════════════════════════
-    # REELS ELENA — 4x/semaine (Mer, Jeu, Sam, Dim)
-    # 21h Paris = 20h UTC (winter) / 19h UTC (summer)
-    # ═══════════════════════════════════════════════════════════════
-    
-    # Mercredi (day 3) — Reach
-    - cron: '0 20 * * 3'
-    
-    # Jeudi (day 4) — Reach
-    - cron: '0 20 * * 4'
-    
-    # Samedi (day 6) — BEST DAY 🔥 +60%
-    - cron: '0 20 * * 6'
-    
-    # Dimanche (day 0) — BEST DAY 🔥 +55%
-    - cron: '0 20 * * 0'
+  # CRON DÉSACTIVÉS - Utilisez content-brain.yml
+  # schedule: [...]
   
   workflow_dispatch:
     inputs:

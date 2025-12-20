@@ -1,23 +1,13 @@
-name: Mila Vacation Reel
+name: Mila Vacation Reel (LEGACY)
+
+# ═══════════════════════════════════════════════════════════════════
+# ⚠️ DEPRECATED: Ce workflow est remplacé par Content Brain
+# Les CRON sont désactivés. Gardé pour déclenchement manuel uniquement.
+# ═══════════════════════════════════════════════════════════════════
 
 on:
-  schedule:
-    # ═══════════════════════════════════════════════════════════════
-    # REELS OPTIMISÉS — 4x/semaine (Mer, Jeu, Sam, Dim)
-    # 19h Paris = 18h UTC (winter) / 17h UTC (summer)
-    # ═══════════════════════════════════════════════════════════════
-    
-    # Mercredi (day 3) — Reach
-    - cron: '0 18 * * 3'
-    
-    # Jeudi (day 4) — Reach
-    - cron: '0 18 * * 4'
-    
-    # Samedi (day 6) — BEST DAY 🔥 +60%
-    - cron: '0 18 * * 6'
-    
-    # Dimanche (day 0) — BEST DAY 🔥 +55%
-    - cron: '0 18 * * 0'
+  # CRON DÉSACTIVÉS - Utilisez content-brain.yml
+  # schedule: [...]
   
   workflow_dispatch:
     inputs:
