@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 20 décembre 2024 (IDEA-005 Content Brain Phase 1-2 ✅)
+**Dernière mise à jour** : 20 décembre 2024 (Content Brain Full Auto ✅)
 
 ---
 
@@ -35,7 +35,7 @@ roadmap/
 | ID | Feature | Priorité | Estimation | Lien |
 |----|---------|----------|------------|------|
 | TODO-010 | **Targeting Actif** — 20 comments/jour/compte sur niches cibles | 🔴 High | ongoing | - |
-| TODO-004 | Intégration Supabase (posts + conversations + timeline) | 🔴 High | 3h | [→](./roadmap/todo/TODO-004-supabase-integration.md) |
+| ~~TODO-004~~ | ~~Intégration Supabase~~ — ✅ Fait via Content Brain | - | - | [→](./docs/SESSION-20-DEC-2024-CONTENT-BRAIN.md) |
 | TODO-001 | Multi-shot Reels (carousel → video) | 🟡 Medium | 4h | [→](./roadmap/todo/TODO-001-multi-shot-reels.md) |
 | TODO-006 | Elena Stories Highlights (Travel, Home, BTS) | 🟡 Medium | 2h | - |
 | ~~TODO-007~~ | ~~Premier Reel Elena~~ — Scripts existants | - | - | - |
@@ -48,6 +48,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-021 | **Content Brain Full Auto** — Supabase + Claude AI planning + CRON scheduler/executor + GitHub Actions migration | 20/12/2024 | v2.12.0 | [→](./docs/SESSION-20-DEC-2024-CONTENT-BRAIN.md) |
 | DONE-020 | **Content Brain Phase 1-2** — Supabase schema + Claude API planning + Timeline lore | 20/12/2024 | v2.11.0 | [→](./docs/SESSION-20-DEC-2024-CONTENT-BRAIN.md) |
 | DONE-019 | **Growth Improvements** — Captions engageants + hashtags.ts + 7 lieux Elena + duo-post.mjs | 20/12/2024 | v2.10.0 | [→](./roadmap/done/TODO-011-growth-improvements.md) |
 | DONE-018 | **AI Label Workaround** — Doc + solution caption/hashtags (API non supportée) | 18/12/2024 | v2.9.9 | [→](./docs/22-AI-LABEL-WORKAROUND.md) |
@@ -87,7 +88,7 @@ roadmap/
 
 | ID | Idée | Impact | Effort | Status | Lien |
 |----|------|--------|--------|--------|------|
-| IDEA-005 | **Content Brain** — Full auto + Timeline + Arcs narratifs | 🔴 High | 🔴 High | 🚧 Phase 1-2 Done | [→](./roadmap/ideas/IDEA-005-intelligent-content-engine.md) |
+| ~~IDEA-005~~ | ~~Content Brain~~ — Full auto + Timeline + Arcs narratifs | 🔴 High | 🔴 High | ✅ Done | [→](./roadmap/done/DONE-021-content-brain.md) |
 | IDEA-001 | Univers multi-personnages (Elena) | 🔴 High | 🔴 High | ✅ Phase 1 Done | [→](./roadmap/ideas/IDEA-001-multi-characters.md) |
 | IDEA-002 | Chatbot Mila payant | 🔴 High | 🟡 Medium | 💡 Idea | [→](./roadmap/ideas/IDEA-002-chatbot.md) |
 | IDEA-003 | TikTok cross-post | 🟡 Medium | 🟢 Low | 💡 Idea | [→](./roadmap/ideas/IDEA-003-tiktok.md) |
@@ -99,11 +100,11 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 21
+├── ✅ Done        : 22
 ├── 🚧 In Progress : 0
-├── 📋 Todo        : 6
+├── 📋 Todo        : 5
 ├── 🐛 Bugs        : 2 (1 fixed)
-└── 💡 Ideas       : 5
+└── 💡 Ideas       : 4
 ```
 
 ---
@@ -112,6 +113,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 20/12/2024 | **🧠 Content Brain Full Auto** — Supabase + Claude AI + CRON + GitHub Actions migration | [→](./docs/SESSION-20-DEC-2024-CONTENT-BRAIN.md) |
 | 20/12/2024 | **📊 Analytics & Growth + TODO-011** — Analyse comptes + implémentation captions, hashtags, lieux, duo-post | [→](./docs/SESSION-20-DEC-2024-ANALYTICS-GROWTH.md) |
 | 18/12/2024 | **🤖 AI Label Workaround** — Recherche API + solution caption/hashtags | [→](./docs/SESSION-18-DEC-2024-AI-LABEL.md) |
 | 18/12/2024 | **🔐 Dual Tokens Fix** — Refresh les deux tokens ensemble + Duo Post NYC | [→](./docs/SESSION-18-DEC-2024-DUAL-TOKENS.md) |
