@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 18 décembre 2024 (AI Label Workaround)
+**Dernière mise à jour** : 20 décembre 2024 (TODO-011 Growth Improvements ✅)
 
 ---
 
@@ -35,10 +35,10 @@ roadmap/
 | ID | Feature | Priorité | Estimation | Lien |
 |----|---------|----------|------------|------|
 | TODO-010 | **Targeting Actif** — 20 comments/jour/compte sur niches cibles | 🔴 High | ongoing | - |
-| TODO-004 | Intégration Supabase (posts + conversations) | 🔴 High | 3h | [→](./roadmap/todo/TODO-004-supabase-integration.md) |
-| TODO-001 | Multi-shot Reels (carousel → video) | 🔴 High | 4h | [→](./roadmap/todo/TODO-001-multi-shot-reels.md) |
+| TODO-004 | Intégration Supabase (posts + conversations + timeline) | 🔴 High | 3h | [→](./roadmap/todo/TODO-004-supabase-integration.md) |
+| TODO-001 | Multi-shot Reels (carousel → video) | 🟡 Medium | 4h | [→](./roadmap/todo/TODO-001-multi-shot-reels.md) |
 | TODO-006 | Elena Stories Highlights (Travel, Home, BTS) | 🟡 Medium | 2h | - |
-| TODO-007 | Premier Reel Elena (Kling/Minimax) | 🟡 Medium | 2h | - |
+| ~~TODO-007~~ | ~~Premier Reel Elena~~ — Scripts existants | - | - | - |
 | ~~TODO-008~~ | ~~Crossover Mila x Elena NYC~~ — ✅ Done | - | - | [→](./docs/SESSION-18-DEC-2024-DUAL-TOKENS.md) |
 | TODO-003 | Dashboard analytics | 🟢 Low | 6h | [→](./roadmap/todo/TODO-003-dashboard.md) |
 
@@ -48,6 +48,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-019 | **Growth Improvements** — Captions engageants + hashtags.ts + 7 lieux Elena + duo-post.mjs | 20/12/2024 | v2.10.0 | [→](./roadmap/done/TODO-011-growth-improvements.md) |
 | DONE-018 | **AI Label Workaround** — Doc + solution caption/hashtags (API non supportée) | 18/12/2024 | v2.9.9 | [→](./docs/22-AI-LABEL-WORKAROUND.md) |
 | DONE-017 | **Face Consistency Prompts** — Restructuration prompts avec REFERENCE_INSTRUCTION | 18/12/2024 | v2.9.8 | [→](./docs/SESSION-18-DEC-2024-DUAL-TOKENS.md) |
 | DONE-016 | **Duo Post NYC** — Mila x Elena rooftop jacuzzi + script duo | 18/12/2024 | v2.9.7 | [→](./docs/SESSION-18-DEC-2024-DUAL-TOKENS.md) |
@@ -85,7 +86,7 @@ roadmap/
 
 | ID | Idée | Impact | Effort | Status | Lien |
 |----|------|--------|--------|--------|------|
-| IDEA-005 | **Intelligent Content Engine** — Analytics + History → Auto-propose | 🔴 High | 🔴 High | 💡 Idea | [→](./roadmap/ideas/IDEA-005-intelligent-content-engine.md) |
+| IDEA-005 | **Content Brain** — Full auto + Timeline + Arcs narratifs | 🔴 High | 🔴 High | 🚧 Planning | [→](./roadmap/ideas/IDEA-005-intelligent-content-engine.md) |
 | IDEA-001 | Univers multi-personnages (Elena) | 🔴 High | 🔴 High | ✅ Phase 1 Done | [→](./roadmap/ideas/IDEA-001-multi-characters.md) |
 | IDEA-002 | Chatbot Mila payant | 🔴 High | 🟡 Medium | 💡 Idea | [→](./roadmap/ideas/IDEA-002-chatbot.md) |
 | IDEA-003 | TikTok cross-post | 🟡 Medium | 🟢 Low | 💡 Idea | [→](./roadmap/ideas/IDEA-003-tiktok.md) |
@@ -97,7 +98,7 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 19
+├── ✅ Done        : 20
 ├── 🚧 In Progress : 0
 ├── 📋 Todo        : 6
 ├── 🐛 Bugs        : 2 (1 fixed)
@@ -110,6 +111,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 20/12/2024 | **📊 Analytics & Growth + TODO-011** — Analyse comptes + implémentation captions, hashtags, lieux, duo-post | [→](./docs/SESSION-20-DEC-2024-ANALYTICS-GROWTH.md) |
 | 18/12/2024 | **🤖 AI Label Workaround** — Recherche API + solution caption/hashtags | [→](./docs/SESSION-18-DEC-2024-AI-LABEL.md) |
 | 18/12/2024 | **🔐 Dual Tokens Fix** — Refresh les deux tokens ensemble + Duo Post NYC | [→](./docs/SESSION-18-DEC-2024-DUAL-TOKENS.md) |
 | 18/12/2024 | **🎬 Reels Optimization** — Mila 4x/sem optimisé + Elena Reels créé (spa/city/yacht) | [→](./docs/SESSION-18-DEC-2024-REELS-OPTIMIZATION.md) |

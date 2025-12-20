@@ -289,39 +289,48 @@ const SLOTS = {
 };
 
 // ═══════════════════════════════════════════════════════════════
-// CAPTIONS - Sexy confident vibe
+// CAPTIONS - Engaging questions + CTAs for better engagement
+// Structure: [Hook/Story] + [Question/CTA] + [Hashtags]
 // ═══════════════════════════════════════════════════════════════
 
 const CAPTIONS = {
   home: [
-    'Feeling myself today ✨',
-    'Soft mornings 🤍',
-    'This is 22 and thriving',
-    'Mood: unbothered',
-    'Slow mornings are underrated',
-    'Cozy vibes only',
-    'Natural glow only ✨',
-    'Main character energy',
-    'Sunday state of mind',
-    'Embrace your curves 🤍',
+    // Hook + Question format
+    'Ce moment où tu traînes au lit toute la matinée… Vous êtes team lève-tôt ou grasse mat? 🛏️',
+    'Soft mornings > everything else. Change my mind 🤍',
+    'This is 22 and thriving ✨ What age are you feeling your best?',
+    'Mood: unbothered. Qui d\'autre a besoin de ça aujourd\'hui?',
+    'Les matins lents sont sous-estimés. Swipe pour voir le vrai mood 👀',
+    'Cozy vibes only 🤍 Team dimanche chill ou brunch dehors?',
+    'Natural glow, no filter ✨ Skincare ou génétique? Haha les deux',
+    'Main character energy activated 💫 Votre chanson du moment?',
+    'Sunday state of mind all week long. Qui peut relate?',
+    'Embrace every part of yourself 🤍 What\'s your self-care ritual?',
+    'Cette lumière dans ma chambre >> 📸 Favourite time of day?',
+    'POV: Tu refuses de quitter le lit. Relatable or not? 😅',
   ],
   outside: [
-    'Paris at golden hour hits different',
-    'Café crème & people watching',
-    'Cette ville me surprend toujours',
-    'Living for these Paris streets',
-    'Just another day in Paris 🇫🇷',
-    'Chasing light and good vibes',
-    'Weekend energy activated',
-    'Terrasse season',
+    // Hook + Question format
+    'Paris at golden hour hits different ✨ Votre spot préféré?',
+    'Café crème & people watching. Ma définition du bonheur 🥐 Team café ou thé?',
+    'Cette ville me surprend toujours 🇫🇷 Votre quartier parisien préféré?',
+    'Living for these Paris streets 📸 What\'s your city?',
+    'Just another day in Paris... ou pas 🗼 First time visitors vs locals - comment voyez-vous la ville?',
+    'Chasing light and good vibes ☀️ Where\'s your happy place?',
+    'Weekend energy activated 🔋 Vos plans?',
+    'Terrasse season is the best season 🌸 Sweet or savory person?',
+    'Cette terrasse vs mon canapé... tough choice 😅 Vous choisissez quoi?',
+    'Paris ne m\'ennuie jamais 🥀 Votre café parisien préféré?',
   ],
 };
 
-const HASHTAGS = [
-  '#paris', '#parisienne', '#frenchgirl', '#lifestyle', '#ootd', 
-  '#instadaily', '#selfcare', '#naturalbeauty', '#confidence',
-  '#weekendvibes', '#parisian', '#frenchstyle',
-];
+// Hashtag pools by category - optimized for reach
+const HASHTAG_POOLS = {
+  lifestyle: ['#lifestyle', '#dailylife', '#instadaily', '#parisienne', '#frenchgirl', '#weekendvibes', '#goodvibes', '#aesthetic', '#vibes'],
+  paris: ['#paris', '#parisianlife', '#parisiangirl', '#montmartre', '#parisian', '#iloveparis'],
+  fitness: ['#fitnessmotivation', '#fitgirl', '#healthylifestyle', '#pilates', '#yogalife', '#fitnessgirl'],
+  selfcare: ['#selfcare', '#naturalbeauty', '#confidence', '#selflove', '#glowup', '#skincare'],
+};
 
 // ═══════════════════════════════════════════════════════════════
 // HELPERS
@@ -337,8 +346,23 @@ function log(message) {
 function generateCaption(isHome) {
   const captionList = isHome ? CAPTIONS.home : CAPTIONS.outside;
   const caption = randomFrom(captionList);
-  const selectedHashtags = [...HASHTAGS].sort(() => Math.random() - 0.5).slice(0, 6);
-  return `${caption}\n\n${selectedHashtags.join(' ')}`;
+  
+  // Mix hashtags from relevant pools
+  const pools = isHome 
+    ? ['lifestyle', 'selfcare', 'paris'] 
+    : ['paris', 'lifestyle'];
+  
+  const selectedHashtags = [];
+  for (const poolName of pools) {
+    const pool = HASHTAG_POOLS[poolName];
+    const shuffled = [...pool].sort(() => Math.random() - 0.5);
+    selectedHashtags.push(...shuffled.slice(0, 2));
+  }
+  
+  // Dedupe and limit
+  const uniqueHashtags = [...new Set(selectedHashtags)].slice(0, 6);
+  
+  return `${caption}\n\n${uniqueHashtags.join(' ')}`;
 }
 
 // ═══════════════════════════════════════════════════════════════

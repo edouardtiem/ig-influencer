@@ -129,7 +129,7 @@ Shot on iPhone, natural photography, lifestyle content.`,
     name: 'Spa luxe',
     category: 'spa',
     description: 'Luxury spa with heated pool',
-    referenceImageUrl: undefined, // No reference yet
+    referenceImageUrl: undefined,
     instagramLocationId: undefined,
     compatibleSlots: ['morning', 'midday', 'evening'],
     prompt: `Luxury spa setting, outdoor heated infinity pool with steam gently rising from warm water surface.
@@ -141,6 +141,164 @@ Minimalist modern spa architecture, clean lines, natural wood and stone material
 Exclusive five-star resort atmosphere, peaceful and serene. Ultimate relaxation destination.
 
 Shot on iPhone, natural photography.`,
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // NEW TRAVEL LOCATIONS — For more variety (40% of Elena content)
+  // ═══════════════════════════════════════════════════════════════
+
+  // ─────────────────────────────────────────────────────────────
+  // MILAN FASHION — Hotel 5*, Fashion streets
+  // ─────────────────────────────────────────────────────────────
+  milan_fashion: {
+    id: 'milan_fashion',
+    name: 'Milano Fashion District',
+    category: 'travel',
+    description: 'Milan fashion district, luxury hotels and Via Montenapoleone',
+    referenceImageUrl: undefined,
+    instagramLocationId: undefined,
+    compatibleSlots: ['morning', 'midday', 'evening', 'night'],
+    prompt: `Elegant Milan fashion district street, Via Montenapoleone luxury boutiques.
+
+Classic Italian architecture, designer storefronts (Prada, Gucci, Versace visible), cobblestone street, warm afternoon light.
+
+Sophisticated Milanese atmosphere, fashion-forward pedestrians, luxury cars parked. Duomo visible in distance.
+
+Italian elegance meets high fashion, Instagram model street style moment.
+
+Shot on iPhone, natural photography, golden hour lighting.`,
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // MILAN HOTEL — 5-star suite
+  // ─────────────────────────────────────────────────────────────
+  milan_hotel: {
+    id: 'milan_hotel',
+    name: 'Milan Luxury Hotel',
+    category: 'travel',
+    description: 'Five-star Milan hotel suite',
+    referenceImageUrl: undefined,
+    instagramLocationId: undefined,
+    compatibleSlots: ['morning', 'evening', 'night', 'late_night'],
+    prompt: `Luxurious Milan hotel suite, contemporary Italian design.
+
+King bed with crisp white linens, floor-to-ceiling windows with Milan skyline view, Duomo visible.
+
+Marble bathroom visible through open door, designer furniture, fresh flowers, champagne on ice.
+
+Five-star Italian hospitality atmosphere, elegant and refined. Fashion week accommodation aesthetic.
+
+Shot on iPhone, natural photography, warm ambient lighting.`,
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // BACKSTAGE SHOOTING — Studio, coulisses
+  // ─────────────────────────────────────────────────────────────
+  backstage_shooting: {
+    id: 'backstage_shooting',
+    name: 'Backstage Shooting',
+    category: 'travel',
+    description: 'Fashion photo studio backstage',
+    referenceImageUrl: undefined,
+    instagramLocationId: undefined,
+    compatibleSlots: ['morning', 'midday', 'evening'],
+    prompt: `Professional fashion photo studio backstage area.
+
+Makeup station with Hollywood mirror, clothing racks with designer pieces, soft lighting rigs visible.
+
+Bustling creative atmosphere, makeup brushes, styling products, polaroids pinned to wall.
+
+Behind-the-scenes fashion shoot energy, authentic model working moment.
+
+Shot on iPhone, natural photography, soft diffused studio lighting.`,
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // YACHT MEDITERRANEAN — Luxury summer
+  // ─────────────────────────────────────────────────────────────
+  yacht_mediterranean: {
+    id: 'yacht_mediterranean',
+    name: 'Yacht Méditerranée',
+    category: 'travel',
+    description: 'Luxury yacht in Mediterranean sea',
+    referenceImageUrl: undefined,
+    instagramLocationId: undefined,
+    compatibleSlots: ['morning', 'midday', 'evening'],
+    prompt: `Luxury yacht deck in crystal clear Mediterranean Sea.
+
+Pristine white deck, teak wood details, turquoise water visible, Amalfi Coast cliffs in background.
+
+Champagne and fresh fruit on deck table, plush sun loungers, nautical elegance.
+
+Ultimate summer luxury lifestyle, exclusive yacht charter atmosphere.
+
+Shot on iPhone, natural photography, bright summer daylight.`,
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // LONDON ROOFTOP — Bar, evening
+  // ─────────────────────────────────────────────────────────────
+  london_rooftop: {
+    id: 'london_rooftop',
+    name: 'London Rooftop Bar',
+    category: 'travel',
+    description: 'Trendy London rooftop bar with city views',
+    referenceImageUrl: undefined,
+    instagramLocationId: undefined,
+    compatibleSlots: ['evening', 'night'],
+    prompt: `Trendy London rooftop bar at sunset.
+
+Panoramic London skyline view, The Shard and St Paul's visible, golden hour light.
+
+Stylish outdoor seating, cocktails on marble table, fairy lights strung overhead.
+
+Sophisticated London nightlife atmosphere, fashion-forward crowd.
+
+Shot on iPhone, natural photography, warm evening light.`,
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // MALDIVES SUITE — Luxury beach vacation
+  // ─────────────────────────────────────────────────────────────
+  maldives_suite: {
+    id: 'maldives_suite',
+    name: 'Maldives Overwater Suite',
+    category: 'travel',
+    description: 'Luxury overwater bungalow in Maldives',
+    referenceImageUrl: undefined,
+    instagramLocationId: undefined,
+    compatibleSlots: ['morning', 'midday', 'evening'],
+    prompt: `Luxury Maldives overwater villa with infinity pool.
+
+Crystal clear turquoise lagoon, white sand beach visible, private deck with loungers.
+
+Minimalist tropical luxury interior visible through open doors, outdoor shower, fresh tropical flowers.
+
+Ultimate paradise escape, honeymoon destination aesthetic.
+
+Shot on iPhone, natural photography, bright tropical daylight.`,
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // AIRPORT LOUNGE — Transit, work
+  // ─────────────────────────────────────────────────────────────
+  airport_lounge: {
+    id: 'airport_lounge',
+    name: 'Airport Business Lounge',
+    category: 'travel',
+    description: 'First class airport lounge',
+    referenceImageUrl: undefined,
+    instagramLocationId: undefined,
+    compatibleSlots: ['morning', 'midday', 'evening'],
+    prompt: `Luxury first class airport lounge with runway views.
+
+Designer furniture, floor-to-ceiling windows showing planes, quiet sophisticated atmosphere.
+
+Champagne bar visible, business travelers in background, laptop and passport on table.
+
+Jet-setter lifestyle, frequent flyer aesthetic, work and travel blend.
+
+Shot on iPhone, natural photography, soft ambient lounge lighting.`,
   },
 };
 

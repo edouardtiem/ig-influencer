@@ -302,69 +302,74 @@ const SLOTS = {
 };
 
 // ═══════════════════════════════════════════════════════════════
-// CAPTIONS - Elena style (luxe + sexy + Italian touch)
+// CAPTIONS - Elena style (luxe + sexy + Italian touch + QUESTIONS/CTAs)
+// Structure: [Hook/Story] + [Question/CTA] + [Hashtags]
 // ═══════════════════════════════════════════════════════════════
 
 const CAPTIONS = {
   home: [
-    'Chez moi 🏠',
-    'This light though ✨',
-    'Mood',
-    'Sunday in the city',
-    'La dolce vita, Paris edition',
-    'Staying in today',
-    'Cozy vibes 🤍',
-    'Home is where the heart is',
-    'Ciao from my loft',
-    'Morning light hits different here',
-    'Feeling myself',
-    'Just me',
-    '...',
-    'Buongiorno ☀️',
-    'Paris mornings',
+    // Hook + Question format
+    'Cette lumière dans mon loft 🏠 Votre pièce préférée chez vous?',
+    'This light though ✨ Morning or evening person?',
+    'Mood: staying in today. Qui d\'autre cancelle ses plans? 😅',
+    'La dolce vita, Paris edition 🇮🇹🇫🇷 Best of both worlds, non?',
+    'Cozy vibes only 🤍 Netflix recommendations anyone?',
+    'Home is where the heart is… et le bon café. Team espresso ou latte?',
+    'Ciao from my loft ☀️ What does your happy place look like?',
+    'Morning light hits different here 📸 Swipe pour le mood',
+    'Feeling myself today ✨ What gives you confidence?',
+    'Just me, myself & this view. Votre vue préférée?',
+    'Buongiorno 🌅 Early bird or night owl?',
+    'Paris mornings are unmatched. Change my mind 🥐',
   ],
   cafe: [
-    'Café time ☕',
-    'The usual spot',
-    'Espresso mood',
-    'Parisian pause',
-    'Terrasse season',
-    'People watching',
-    'Aperitivo time 🍷',
-    'La vie parisienne',
+    // Hook + Question format
+    'Café time ☕ Votre commande habituelle?',
+    'The usual spot. Vous avez un café attitré?',
+    'Espresso mood only ☕ Single or double shot?',
+    'Parisian pause 🥐 Sweet or savory pour le goûter?',
+    'Terrasse season is the best season 🌸 Agree or disagree?',
+    'People watching is an art. Votre terrasse préférée à Paris?',
+    'Aperitivo time 🍷 Spritz ou Negroni?',
+    'La vie parisienne ✨ What\'s your favourite café ritual?',
   ],
   sexy: [
-    '🔥',
-    'Feeling dangerous',
-    'Handle with care',
-    'Not your average',
-    'Soft power',
-    'Temperature rising',
-    'After hours',
-    'When the city sleeps',
-    'Midnight thoughts',
-    'La nuit m\'appartient',
-    'Catch me if you can',
-    'Body language says it all',
+    // Hook + short CTA
+    '🔥 Thoughts?',
+    'Feeling dangerous tonight. Plans for the weekend?',
+    'Handle with care 💋 Vos plans ce soir?',
+    'Soft power only ✨',
+    'Temperature rising 🌡️ Summer vibes or winter cozy?',
+    'After hours 🌙 Night owls où êtes-vous?',
+    'When the city sleeps... 🌃 What time do you go to bed?',
+    'Midnight thoughts 💭 Share yours below',
+    'La nuit m\'appartient 🌙 Team sortir ou cocooning?',
+    'Catch me if you can 😏',
+    'Body language says it all. What\'s your power pose?',
+    'This or the next slide? 👀',
   ],
   spa: [
-    'Spa day 💫',
-    'R&R',
-    'Reset mode',
-    'Mountain views, warm water',
-    'This is living',
-    'Vacation state of mind',
+    // Hook + Question format
+    'Spa day finally 💫 Quand était votre dernier jour off?',
+    'R&R mode activated. Your favourite way to relax?',
+    'Reset mode ON 🧘‍♀️ Spa day or home self-care?',
+    'Mountain views, warm water ♨️ This or beach vibes?',
+    'This is living ✨ Your dream vacation spot?',
+    'Vacation state of mind 🏔️ Where would you escape right now?',
   ],
 };
 
 // ═══════════════════════════════════════════════════════════════
-// HASHTAGS - Elena style
+// HASHTAG POOLS - Elena style (luxe + fashion focus)
 // ═══════════════════════════════════════════════════════════════
 
-const HASHTAGS = [
-  '#paris', '#parisienne', '#ootd', '#lifestyle', '#model',
-  '#fashion', '#style', '#luxe', '#italia', '#frenchgirl',
-];
+const HASHTAG_POOLS = {
+  fashion: ['#parisfashion', '#ootd', '#fashionista', '#streetstyle', '#frenchstyle', '#luxurylifestyle', '#instafashion', '#styleinspo'],
+  lifestyle: ['#lifestyle', '#parisienne', '#frenchgirl', '#dailylife', '#aesthetic', '#vibes', '#livingmybestlife'],
+  model: ['#modellife', '#fashionmodel', '#modelwork', '#shootingday', '#behindthescenes'],
+  luxe: ['#luxe', '#luxurylifestyle', '#highfashion', '#chic', '#elegant'],
+  italia: ['#italia', '#italianstyle', '#ladolcevita', '#italiano', '#amore'],
+};
 
 // ═══════════════════════════════════════════════════════════════
 // UTILITY FUNCTIONS
@@ -797,7 +802,7 @@ CRITICAL: Face must match reference images exactly - same soft round face shape,
 
   log(`\n✅ Generated and uploaded ${imageUrls.length} images`);
 
-  // Build caption
+  // Build caption with engaging questions/CTAs
   const captionPool = locationKey.includes('cafe') 
     ? CAPTIONS.cafe 
     : locationKey.includes('spa')
@@ -807,8 +812,25 @@ CRITICAL: Face must match reference images exactly - same soft round face shape,
     : CAPTIONS.home;
   
   const baseCaption = randomFrom(captionPool);
-  const hashtags = randomSubset(HASHTAGS, 3).join(' ');
-  const caption = `${baseCaption}\n\n${hashtags}`;
+  
+  // Mix hashtags from relevant pools
+  const pools = locationKey.includes('cafe') 
+    ? ['lifestyle', 'fashion'] 
+    : locationKey.includes('spa')
+    ? ['lifestyle', 'luxe']
+    : ['fashion', 'lifestyle', 'italia'];
+  
+  const selectedHashtags = [];
+  for (const poolName of pools) {
+    const pool = HASHTAG_POOLS[poolName];
+    if (pool) {
+      const shuffled = [...pool].sort(() => Math.random() - 0.5);
+      selectedHashtags.push(...shuffled.slice(0, 2));
+    }
+  }
+  const uniqueHashtags = [...new Set(selectedHashtags)].slice(0, 6);
+  
+  const caption = `${baseCaption}\n\n${uniqueHashtags.join(' ')}`;
   
   log(`\n📝 Caption: ${caption}`);
 

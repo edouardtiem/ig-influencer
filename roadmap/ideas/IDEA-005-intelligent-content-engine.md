@@ -1,9 +1,10 @@
-# 💡 IDEA-005 — Intelligent Content Engine
+# 💡 IDEA-005 — Intelligent Content Engine (Content Brain)
 
-> Moteur de contenu intelligent basé sur l'historique et les analytics
+> Moteur de contenu intelligent 100% autonome avec timeline narrative
 
 **Créé** : 17 décembre 2024  
-**Status** : 💡 Idea  
+**Mis à jour** : 20 décembre 2024  
+**Status** : 💡 Idea → 🚧 Planning  
 **Impact** : 🔴 High  
 **Effort** : 🔴 High  
 
@@ -11,7 +12,11 @@
 
 ## 🎯 Objectif
 
-Automatiser la création de contenu en analysant ce qui fonctionne, pour proposer du contenu nouveau mais performant — tout en maintenant une **histoire cohérente** pour chaque personnage.
+Créer un système **100% autonome** qui :
+1. Analyse l'historique et les analytics
+2. Décide automatiquement le contenu quotidien
+3. Maintient une **histoire cohérente** avec timeline et arcs narratifs
+4. Génère et publie sans intervention humaine
 
 ---
 
@@ -250,14 +255,249 @@ app/scripts/
 
 ---
 
-## 💭 Questions Ouvertes
+## ✅ Décisions Confirmées (Session 20/12/2024)
 
-1. **Approval flow?** — Full auto ou validation humaine avant post?
-2. **Crossover frequency?** — Quelle fréquence pour les posts ensemble?
-3. **Story arcs?** — Créer des mini-arcs narratifs (vacances, fashion week, etc.)?
-4. **A/B testing?** — Tester différentes approches sur le même moment?
+| Question | Décision |
+|----------|----------|
+| Approval flow? | **Full auto** — Pas de validation humaine |
+| Crossover frequency? | **3x/semaine** — Posts duo Mila×Elena |
+| Story arcs? | **Full auto** — L'IA crée et gère les arcs |
+| A/B testing? | Future phase |
 
 ---
 
-*Créé le 17 décembre 2024*
+## 📅 Timeline Historique (à créer)
+
+Le système doit connaître le "passé" de Mila et Elena pour créer des throwbacks crédibles :
+
+```
+TIMELINE MILA & ELENA
+═══════════════════════════════════════════════════════════════
+
+2023
+────
+Juin 2023     │ 🤝 MEETING
+              │ "On se rencontre sur un shooting à Paris"
+              │
+Août 2023     │ 🏖️ PREMIER VOYAGE
+              │ "Weekend à Nice chez les parents de Mila"
+              │
+Décembre 2023 │ 🎄 PREMIER NOËL
+              │ "Réveillon ensemble à Paris"
+
+2024
+────
+Février 2024  │ 🎿 SKI TRIP COURCHEVEL
+              │ Arc: 5 posts sur 2 semaines
+              │
+Juin 2024     │ 🎂 1 AN D'AMITIÉ
+              │ "Milestone: 1 an de BFF"
+              │
+Août 2024     │ 🌴 BALI TRIP
+              │ Arc majeur: 10+ posts
+              │
+Novembre 2024 │ 🏠 ELENA NOUVEAU LOFT
+              │ "Crémaillère"
+```
+
+---
+
+## 🎬 Arcs Narratifs
+
+Les arcs sont des "mini-histoires" qui s'étendent sur plusieurs posts :
+
+```sql
+CREATE TABLE narrative_arcs (
+  id UUID PRIMARY KEY,
+  name TEXT UNIQUE NOT NULL,        -- 'alps_trip_dec_2024'
+  title TEXT NOT NULL,              -- 'Vacances aux Alpes'
+  
+  characters TEXT[] NOT NULL,       -- ['mila', 'elena']
+  status TEXT DEFAULT 'active',     -- 'planned', 'active', 'completed'
+  
+  start_date DATE,
+  end_date DATE,
+  
+  description TEXT,
+  planned_posts INT,
+  completed_posts INT DEFAULT 0,
+  
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+**Exemple d'arc :**
+```
+Arc: "Vacances Alpes Décembre 2024"
+├── Post 1: Mila - Préparation valise (teasing)
+├── Post 2: Elena - "On y va!" (aéroport/train)
+├── Post 3: Duo - Arrivée chalet
+├── Post 4: Mila - Reel ski
+├── Post 5: Elena - Spa seule
+├── Post 6: Duo - Jacuzzi ensemble
+├── Post 7: Mila - Throwback retour
+```
+
+---
+
+## 🧠 Schéma Supabase Enrichi
+
+Au-delà du schema initial, ajouter :
+
+```sql
+-- Timeline events (le lore)
+CREATE TABLE timeline_events (
+  id UUID PRIMARY KEY,
+  event_date DATE NOT NULL,
+  event_type TEXT NOT NULL,  -- 'meeting', 'trip', 'milestone'
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  characters TEXT[] NOT NULL,
+  shareable BOOLEAN DEFAULT TRUE,
+  emotional_tone TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Relationships (détails amitié)
+CREATE TABLE relationships (
+  id UUID PRIMARY KEY,
+  character_1 TEXT NOT NULL,
+  character_2 TEXT NOT NULL,
+  relationship_type TEXT NOT NULL,
+  how_they_met TEXT NOT NULL,
+  inside_jokes TEXT[],
+  shared_memories TEXT[],
+  nicknames JSONB
+);
+
+-- Caption templates
+CREATE TABLE caption_templates (
+  id UUID PRIMARY KEY,
+  character TEXT NOT NULL,
+  category TEXT NOT NULL,
+  template TEXT NOT NULL,
+  questions TEXT[],
+  ctas TEXT[],
+  hashtag_pool TEXT[]
+);
+```
+
+---
+
+## 🌐 Sources d'Intelligence Externes
+
+| Source | Ce qu'elle apporte | API |
+|--------|-------------------|-----|
+| **Perplexity** | Trending topics, hashtags | Perplexity API |
+| **Calendrier** | Noël, Fashion Week, etc. | Date + liste |
+| **Météo Paris** | Cohérence (pas plage si neige) | OpenWeather |
+| **Google Trends** | Sujets qui montent | Trends API |
+
+---
+
+## 🔄 Cycle Quotidien Autonome
+
+```
+6h00 UTC — CRON: "Plan today"
+     │
+     ▼
+┌─────────────────────┐
+│   CONTENT BRAIN     │
+│                     │
+│ 1. Fetch historique │
+│ 2. Fetch analytics  │
+│ 3. Check arcs       │
+│ 4. Check calendar   │
+│ 5. Check trends     │
+└──────────┬──────────┘
+           │
+           ▼
+    Claude API génère
+    le planning du jour
+    pour les 2 comptes
+           │
+           ▼
+┌─────────────────────┐
+│  Supabase:          │
+│  daily_schedule     │
+│                     │
+│  Mila:              │
+│  • 08h30 Carousel   │
+│  • 12h00 Reel       │
+│  • 19h00 Carousel   │
+│                     │
+│  Elena:             │
+│  • 13h00 Carousel   │
+│  • 21h30 Reel       │
+└──────────┬──────────┘
+           │
+           ▼
+    CRON jobs exécutent
+    les scripts existants
+    avec les paramètres
+```
+
+---
+
+## 🏗️ Architecture Non-Destructive
+
+**IMPORTANT** : Le Content Brain est une **couche par-dessus**, pas un remplacement.
+
+```
+┌─────────────────────────────────────────┐
+│           CONTENT BRAIN                 │
+│     (nouvelle couche intelligente)      │
+└─────────────────┬───────────────────────┘
+                  │ Génère paramètres
+                  ▼
+┌─────────────────────────────────────────┐
+│          EXECUTION LAYER                │
+│   (scripts existants INCHANGÉS)         │
+│                                         │
+│   carousel-post.mjs                     │
+│   vacation-reel-post.mjs                │
+│   carousel-post-elena.mjs               │
+│   vacation-reel-post-elena.mjs          │
+│                                         │
+│   Nano Banana Pro → Cloudinary → IG     │
+└─────────────────────────────────────────┘
+```
+
+Les scripts actuels fonctionnent toujours en standalone.
+
+---
+
+## 📅 Phases Révisées
+
+### Phase 0: Growth Improvements ✅ DONE (20/12/2024)
+- [x] Plus de Reels (scripts existants prêts)
+- [x] Améliorer captions (questions/CTAs dans tous les scripts)
+- [x] Posts duo 3x/semaine → **`duo-post.mjs` créé** (4 scénarios: shooting, brunch, workout, shopping)
+- [x] Elena voyage plus → **7 nouveaux lieux** (Milan, backstage, yacht, London, Maldives, airport)
+- [x] **`hashtags.ts` créé** avec pools optimisés par catégorie
+
+### Phase 1: Supabase + History (3h)
+- [ ] Schema complet avec timeline
+- [ ] Migration posts existants
+- [ ] Table caption_templates
+
+### Phase 2: Timeline & Arcs (2h)
+- [ ] Créer timeline 2023-2024
+- [ ] Premier arc actif
+- [ ] Table narrative_arcs
+
+### Phase 3: Content Brain v1 (4h)
+- [ ] Intégration Claude API
+- [ ] Planning quotidien
+- [ ] Paramétrage des scripts
+
+### Phase 4: Full Auto (3h)
+- [ ] CRON jobs
+- [ ] Monitoring
+- [ ] Sources externes
+
+---
+
+*Créé le 17 décembre 2024*  
+*Enrichi le 20 décembre 2024 — Full auto confirmé*
 
