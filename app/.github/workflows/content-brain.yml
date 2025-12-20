@@ -1,0 +1,195 @@
+# Content Brain — Automated Instagram Posting
+# 
+# Two workflows:
+# 1. Daily Scheduler: Runs at 6:00 UTC (7:00 Paris) to generate the day's plan
+# 2. Post Executor: Runs every 30 minutes to execute scheduled posts
+
+name: Content Brain
+
+on:
+  schedule:
+    # Scheduler: 6:00 UTC = 7:00 Paris (winter) / 8:00 Paris (summer)
+    - cron: '0 6 * * *'
+    
+    # Executor: Every 30 minutes
+    - cron: '0,30 * * * *'
+  
+  # Manual trigger for testing
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to run'
+        required: true
+        default: 'executor'
+        type: choice
+        options:
+          - scheduler
+          - executor
+          - sync-analytics
+      character:
+        description: 'Character (leave empty for both)'
+        required: false
+        default: ''
+        type: choice
+        options:
+          - ''
+          - mila
+          - elena
+      dry_run:
+        description: 'Dry run (no actual posts)'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # ===========================================
+  # DAILY SCHEDULER — Generate content plan
+  # ===========================================
+  scheduler:
+    name: 📅 Daily Scheduler
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'scheduler' ||
+      github.event.schedule == '0 6 * * *'
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: app/package-lock.json
+
+      - name: 📦 Install dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: 🧠 Generate daily schedule
+        working-directory: app
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          Claude_key: ${{ secrets.CLAUDE_KEY }}
+        run: |
+          CHARACTER="${{ github.event.inputs.character }}"
+          if [ -n "$CHARACTER" ]; then
+            node scripts/cron-scheduler.mjs $CHARACTER
+          else
+            node scripts/cron-scheduler.mjs
+          fi
+
+  # ===========================================
+  # POST EXECUTOR — Execute scheduled posts
+  # ===========================================
+  executor:
+    name: 🚀 Post Executor
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'executor' ||
+      github.event.schedule == '0,30 * * * *'
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: app/package-lock.json
+
+      - name: 📦 Install dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: 🎬 Execute scheduled posts
+        working-directory: app
+        env:
+          # Supabase
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          
+          # AI APIs
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          Claude_key: ${{ secrets.CLAUDE_KEY }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          
+          # Cloudinary
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          
+          # Instagram - Mila
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_ACCOUNT_ID: ${{ secrets.INSTAGRAM_ACCOUNT_ID }}
+          
+          # Instagram - Elena
+          INSTAGRAM_ACCESS_TOKEN_ELENA: ${{ secrets.INSTAGRAM_ACCESS_TOKEN_ELENA }}
+          INSTAGRAM_ACCOUNT_ID_ELENA: ${{ secrets.INSTAGRAM_ACCOUNT_ID_ELENA }}
+          
+          # References
+          MILA_BASE_FACE_URL: ${{ secrets.MILA_BASE_FACE_URL }}
+          MILA_REFERENCE_URLS: ${{ secrets.MILA_REFERENCE_URLS }}
+        run: |
+          CHARACTER="${{ github.event.inputs.character }}"
+          DRY_RUN="${{ github.event.inputs.dry_run }}"
+          
+          ARGS=""
+          if [ -n "$CHARACTER" ]; then
+            ARGS="$CHARACTER"
+          fi
+          if [ "$DRY_RUN" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          
+          node scripts/cron-executor.mjs $ARGS
+
+  # ===========================================
+  # SYNC ANALYTICS — Update Supabase with IG stats
+  # ===========================================
+  sync-analytics:
+    name: 📊 Sync Analytics
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'sync-analytics'
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: app/package-lock.json
+
+      - name: 📦 Install dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: 📈 Sync Instagram analytics
+        working-directory: app
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_ACCOUNT_ID: ${{ secrets.INSTAGRAM_ACCOUNT_ID }}
+          INSTAGRAM_ACCESS_TOKEN_ELENA: ${{ secrets.INSTAGRAM_ACCESS_TOKEN_ELENA }}
+          INSTAGRAM_ACCOUNT_ID_ELENA: ${{ secrets.INSTAGRAM_ACCOUNT_ID_ELENA }}
+        run: |
+          CHARACTER="${{ github.event.inputs.character }}"
+          if [ -n "$CHARACTER" ]; then
+            node scripts/sync-analytics.mjs $CHARACTER
+          else
+            node scripts/sync-analytics.mjs
+          fi
+

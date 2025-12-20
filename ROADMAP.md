@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 20 décembre 2024 (TODO-011 Growth Improvements ✅)
+**Dernière mise à jour** : 20 décembre 2024 (IDEA-005 Content Brain Phase 1-2 ✅)
 
 ---
 
@@ -48,6 +48,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-020 | **Content Brain Phase 1-2** — Supabase schema + Claude API planning + Timeline lore | 20/12/2024 | v2.11.0 | [→](./docs/SESSION-20-DEC-2024-CONTENT-BRAIN.md) |
 | DONE-019 | **Growth Improvements** — Captions engageants + hashtags.ts + 7 lieux Elena + duo-post.mjs | 20/12/2024 | v2.10.0 | [→](./roadmap/done/TODO-011-growth-improvements.md) |
 | DONE-018 | **AI Label Workaround** — Doc + solution caption/hashtags (API non supportée) | 18/12/2024 | v2.9.9 | [→](./docs/22-AI-LABEL-WORKAROUND.md) |
 | DONE-017 | **Face Consistency Prompts** — Restructuration prompts avec REFERENCE_INSTRUCTION | 18/12/2024 | v2.9.8 | [→](./docs/SESSION-18-DEC-2024-DUAL-TOKENS.md) |
@@ -86,7 +87,7 @@ roadmap/
 
 | ID | Idée | Impact | Effort | Status | Lien |
 |----|------|--------|--------|--------|------|
-| IDEA-005 | **Content Brain** — Full auto + Timeline + Arcs narratifs | 🔴 High | 🔴 High | 🚧 Planning | [→](./roadmap/ideas/IDEA-005-intelligent-content-engine.md) |
+| IDEA-005 | **Content Brain** — Full auto + Timeline + Arcs narratifs | 🔴 High | 🔴 High | 🚧 Phase 1-2 Done | [→](./roadmap/ideas/IDEA-005-intelligent-content-engine.md) |
 | IDEA-001 | Univers multi-personnages (Elena) | 🔴 High | 🔴 High | ✅ Phase 1 Done | [→](./roadmap/ideas/IDEA-001-multi-characters.md) |
 | IDEA-002 | Chatbot Mila payant | 🔴 High | 🟡 Medium | 💡 Idea | [→](./roadmap/ideas/IDEA-002-chatbot.md) |
 | IDEA-003 | TikTok cross-post | 🟡 Medium | 🟢 Low | 💡 Idea | [→](./roadmap/ideas/IDEA-003-tiktok.md) |
@@ -98,7 +99,7 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 20
+├── ✅ Done        : 21
 ├── 🚧 In Progress : 0
 ├── 📋 Todo        : 6
 ├── 🐛 Bugs        : 2 (1 fixed)

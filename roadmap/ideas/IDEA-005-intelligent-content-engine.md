@@ -476,25 +476,24 @@ Les scripts actuels fonctionnent toujours en standalone.
 - [x] Elena voyage plus → **7 nouveaux lieux** (Milan, backstage, yacht, London, Maldives, airport)
 - [x] **`hashtags.ts` créé** avec pools optimisés par catégorie
 
-### Phase 1: Supabase + History (3h)
-- [ ] Schema complet avec timeline
-- [ ] Migration posts existants
-- [ ] Table caption_templates
+### Phase 1: Supabase + History ✅ DONE (20/12/2024)
+- [x] Schema complet avec 10 tables (`supabase/schema.sql`)
+- [x] Client TypeScript avec types stricts (`src/lib/supabase.ts`)
+- [x] Timeline 2023-2024 avec 8 événements (données initiales SQL)
+- [x] Table caption_templates avec 8 templates
+- [x] Relation Mila×Elena avec inside jokes
 
-### Phase 2: Timeline & Arcs (2h)
-- [ ] Créer timeline 2023-2024
-- [ ] Premier arc actif
-- [ ] Table narrative_arcs
+### Phase 2: Content Brain v1 ✅ DONE (20/12/2024)
+- [x] Intégration Claude API (`src/lib/content-brain.ts`)
+- [x] Planning quotidien automatique
+- [x] Script CLI (`scripts/content-brain.mjs`)
+- [x] Contexte complet (historique, timeline, analytics, arcs)
 
-### Phase 3: Content Brain v1 (4h)
-- [ ] Intégration Claude API
-- [ ] Planning quotidien
-- [ ] Paramétrage des scripts
-
-### Phase 4: Full Auto (3h)
-- [ ] CRON jobs
-- [ ] Monitoring
-- [ ] Sources externes
+### Phase 3: Full Auto (restant)
+- [ ] CRON job morning (génère planning 6h UTC)
+- [ ] CRON jobs posts (exécute aux horaires planifiés)
+- [ ] GitHub Actions automation
+- [ ] Monitoring dashboard
 
 ---
 
