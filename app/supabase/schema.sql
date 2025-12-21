@@ -1,8 +1,9 @@
 -- ===========================================
 -- CONTENT BRAIN - Full Supabase Schema
 -- ===========================================
--- Version: 1.0.0
+-- Version: 1.1.0
 -- Created: 20 décembre 2024
+-- Updated: 21 décembre 2024 (Relationship Layer)
 -- 
 -- Execute this in Supabase SQL Editor
 -- ===========================================
@@ -307,8 +308,40 @@ UNIQUE(character, snapshot_date)
 );
 
 -- ===========================================
+-- TABLE: relationship_hints
+-- Track "The Secret" hints between Mila & Elena
+-- ===========================================
+CREATE TABLE IF NOT EXISTS relationship_hints (
+id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+hint_type VARCHAR(50) NOT NULL,              -- 'two_cups' | 'same_location' | 'shared_item' etc.
+hint_level INTEGER NOT NULL DEFAULT 3,       -- 1-5 teasing level
+
+-- Where it was used
+character VARCHAR(50) NOT NULL,              -- Which account posted this
+post_id UUID REFERENCES posts(id),
+schedule_id UUID REFERENCES daily_schedules(id),
+
+-- What the hint was
+description TEXT,                            -- "2 coffee cups visible on table"
+caption_element TEXT,                        -- "Cozy morning 💕"
+image_element TEXT,                          -- "two cups, feminine hand visible"
+
+-- Performance tracking
+engagement_boost DECIMAL(5,2),               -- % increase vs average post
+comments_about_relationship INTEGER,         -- "are you guys dating?!" comments
+
+used_at DATE NOT NULL DEFAULT CURRENT_DATE,
+created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ===========================================
 -- INDEXES for performance
 -- ===========================================
+CREATE INDEX IF NOT EXISTS idx_hints_type ON relationship_hints(hint_type);
+CREATE INDEX IF NOT EXISTS idx_hints_used_at ON relationship_hints(used_at DESC);
+CREATE INDEX IF NOT EXISTS idx_hints_character ON relationship_hints(character);
+
 CREATE INDEX IF NOT EXISTS idx_posts_character ON posts(character_name);
 CREATE INDEX IF NOT EXISTS idx_posts_posted_at ON posts(posted_at DESC);
 CREATE INDEX IF NOT EXISTS idx_posts_location ON posts(location_key);
@@ -357,6 +390,7 @@ ON CONFLICT (name) DO NOTHING;
 
 -- ===========================================
 -- INITIAL DATA: Relationship Mila x Elena
+-- THE SECRET: They're together but we NEVER say it
 -- ===========================================
 INSERT INTO relationships (
 character_1, character_2, relationship_type, 
@@ -365,46 +399,100 @@ inside_jokes, shared_memories, nicknames,
 see_each_other, activities_together
 ) VALUES (
 'mila', 'elena', 'best_friends',
-'Sur un shooting photo à Paris. Mila était la photographe, Elena le mannequin. Connexion immédiate.',
+'Sur un shooting photo à Paris. Mila était la photographe, Elena le mannequin. Elena portait un blazer oversize mais Mila a vu son t-shirt Blondie vintage en dessous. "T''écoutes Blondie?!" - Elles ont fini la soirée dans un bar rock du 11e. Inséparables depuis.',
 '2024-06-15',
 'Studio photo Paris 11ème',
 ARRAY[
-  'Le fameux croissant volé',
-  'La fois où Elena a raté son vol',
-  'Mila qui dit toujours "5 min" et arrive 30 min après'
+  'Le fameux croissant volé au café',
+  'La fois où Elena a raté son vol et Mila l''a récupérée en pyjama',
+  'Mila qui dit toujours "5 min" et arrive 30 min après',
+  'Le bar rock du 11e où tout a commencé',
+  'Elena qui chante Blondie faux (leur secret)'
 ],
 ARRAY[
-  'Premier weekend à Nice chez les parents de Mila',
-  'Ski trip Courchevel février 2024',
-  'Bali août 2024 - trip de rêve',
-  'Premier Noël ensemble décembre 2023'
+  'Premier weekend à Nice chez les parents de Mila (juin 2024)',
+  'Ski trip Courchevel février 2025 - Elena apprend à skier (catastrophe)',
+  'Bali août 2025 - le voyage qui a tout changé',
+  'Premier Noël ensemble décembre 2024 - champagne et promesses',
+  'Fashion Week Paris sept 2025 - Elena défile, Mila photographie'
 ],
-'{"mila_calls_elena": "E", "elena_calls_mila": "Mi", "both": "les inséparables"}',
-'3x_week',
-ARRAY['brunch', 'shopping', 'shooting photos', 'workout', 'voyage']
+'{"mila_calls_elena": "E", "elena_calls_mila": "Mi", "both": "les inséparables", "secret": "ma personne"}',
+'daily',
+ARRAY['brunch', 'shopping', 'shooting photos', 'workout', 'voyage', 'bar rock secret', 'Netflix nights', 'morning coffee ritual']
 )
-ON CONFLICT (character_1, character_2) DO NOTHING;
+ON CONFLICT (character_1, character_2) DO UPDATE SET
+  how_they_met = EXCLUDED.how_they_met,
+  inside_jokes = EXCLUDED.inside_jokes,
+  shared_memories = EXCLUDED.shared_memories,
+  nicknames = EXCLUDED.nicknames,
+  see_each_other = EXCLUDED.see_each_other,
+  activities_together = EXCLUDED.activities_together;
 
 -- ===========================================
 -- INITIAL DATA: Timeline Events (Lore 2024-2025)
 -- Current date reference: December 2025
+-- DIVERSE DESTINATIONS pour throwbacks variés
 -- ===========================================
 INSERT INTO timeline_events (event_date, event_type, title, description, characters, location, emotional_tone) VALUES
--- 2024
-('2024-06-15', 'meeting', 'La rencontre', 'Mila et Elena se rencontrent sur un shooting. Mila était photographe, Elena mannequin. Connexion immédiate autour d''un café après le shooting.', ARRAY['mila', 'elena'], 'paris', 'nostalgic'),
-('2024-08-12', 'trip', 'Premier weekend ensemble', 'Elena accompagne Mila chez ses parents à Nice. Premier vrai voyage ensemble, début de l''amitié.', ARRAY['mila', 'elena'], 'nice', 'nostalgic'),
-('2024-10-15', 'memory', 'Halloween à Paris', 'Soirée déguisées ensemble. Mila en Catwoman, Elena en Wednesday Addams. Photos iconiques.', ARRAY['mila', 'elena'], 'paris', 'funny'),
-('2024-12-24', 'milestone', 'Premier Noël ensemble', 'Réveillon à deux dans l''appartement de Mila. Champagne, cadeaux, et promesse de voyager ensemble en 2025.', ARRAY['mila', 'elena'], 'paris', 'romantic'),
 
--- 2025
-('2025-02-10', 'trip', 'Ski Trip Courchevel', 'Une semaine aux sports d''hiver. Elena apprend à skier (catastrophique mais drôle). Jacuzzi tous les soirs.', ARRAY['mila', 'elena'], 'courchevel', 'adventurous'),
-('2025-04-20', 'trip', 'Weekend Milan', 'Elena pour un shooting, Mila l''accompagne. Shopping Via Montenapoleone, pasta et Aperol.', ARRAY['mila', 'elena'], 'milan', 'adventurous'),
-('2025-06-15', 'milestone', '1 an d''amitié', 'Un an depuis leur rencontre. Dîner au Meurice pour fêter ça. Posts nostalgie sur leurs deux comptes.', ARRAY['mila', 'elena'], 'paris', 'nostalgic'),
-('2025-08-01', 'trip', 'Bali Trip', 'Le voyage de rêve. 2 semaines à Bali - villas, plages privées, yoga sunrise, cérémonies traditionnelles.', ARRAY['mila', 'elena'], 'bali', 'adventurous'),
-('2025-09-15', 'memory', 'Fashion Week Paris', 'Elena défile, Mila la photographie backstage. Moment fort de leur collaboration professionnelle.', ARRAY['mila', 'elena'], 'paris', 'excited'),
-('2025-11-01', 'milestone', 'Elena nouveau loft', 'Elena emménage dans son nouveau loft parisien du 8ème. Crémaillère avec Mila première invitée.', ARRAY['elena'], 'paris', 'excited'),
-('2025-12-01', 'memory', 'Marché de Noël', 'Première sortie au marché de Noël des Champs-Élysées. Vin chaud et photos devant les illuminations.', ARRAY['mila', 'elena'], 'paris', 'cozy'),
-('2025-12-15', 'memory', 'Shopping de Noël', 'Shopping aux Galeries Lafayette. Choix des cadeaux pour leurs familles. Mila galère, Elena est organisée.', ARRAY['mila', 'elena'], 'paris', 'funny')
+-- ═══════════════════════════════════════════════════════════════
+-- 2024 — ANNÉE DE LA RENCONTRE
+-- ═══════════════════════════════════════════════════════════════
+('2024-06-15', 'meeting', 'La rencontre', 'Mila et Elena se rencontrent sur un shooting. Mila était photographe, Elena mannequin. T-shirt Blondie sous le blazer - connexion immédiate. Soirée bar rock du 11e.', ARRAY['mila', 'elena'], 'paris', 'nostalgic'),
+('2024-07-01', 'trip', 'Nice chez les parents', 'Elena accompagne Mila chez ses parents à Nice. Premier vrai voyage ensemble, plage, apéros sunset, début de tout.', ARRAY['mila', 'elena'], 'nice', 'nostalgic'),
+('2024-07-15', 'trip', 'Road trip Côte d''Azur', 'De Nice à St Tropez en voiture. Plages, Pampelonne, rosé, Club 55. Premier bikini content ensemble.', ARRAY['mila', 'elena'], 'st_tropez', 'adventurous'),
+('2024-08-10', 'trip', 'Ibiza Girls Trip', 'Une semaine à Ibiza. Villa avec piscine, sunsets à Café del Mar, soirées, plages cachées.', ARRAY['mila', 'elena'], 'ibiza', 'adventurous'),
+('2024-09-05', 'trip', 'Milan Fashion Week', 'Premier Fashion Week ensemble. Elena défile, Mila photographie. Aperol sur les Navigli.', ARRAY['mila', 'elena'], 'milan', 'excited'),
+('2024-10-15', 'memory', 'Halloween à Paris', 'Soirée déguisées. Mila en Catwoman, Elena en Wednesday Addams. Photos iconiques au bar rock.', ARRAY['mila', 'elena'], 'paris', 'funny'),
+('2024-11-20', 'trip', 'Weekend Mykonos hors saison', 'Mykonos en novembre - calme, romantique, villas vides, sunsets privés. Le trip qui a tout changé.', ARRAY['mila', 'elena'], 'mykonos', 'romantic'),
+('2024-12-24', 'milestone', 'Premier Noël ensemble', 'Réveillon à deux chez Mila. Champagne, cadeaux, promesses de voyager le monde ensemble.', ARRAY['mila', 'elena'], 'paris', 'romantic'),
+
+-- ═══════════════════════════════════════════════════════════════
+-- 2025 — DÉBUT D''ANNÉE (Janvier-Mars)
+-- ═══════════════════════════════════════════════════════════════
+('2025-01-05', 'trip', 'Nouvel An aux Maldives', 'Bungalow sur pilotis, snorkeling, sunset dinners. Début d''année parfait.', ARRAY['mila', 'elena'], 'maldives', 'adventurous'),
+('2025-02-10', 'trip', 'Ski Trip Courchevel', 'Une semaine au ski. Elena apprend (catastrophe drôle). Jacuzzi, raclette, fous rires.', ARRAY['mila', 'elena'], 'courchevel', 'adventurous'),
+('2025-02-14', 'memory', 'Valentine''s à Courchevel', 'Saint-Valentin au chalet. Personne n''a posté mais le dîner était parfait.', ARRAY['mila', 'elena'], 'courchevel', 'romantic'),
+('2025-03-15', 'trip', 'Elena à Dubai solo', 'Shooting pour une marque luxe. Marina, désert, rooftops. Mila manquait.', ARRAY['elena'], 'dubai', 'glamorous'),
+('2025-03-20', 'trip', 'Mila surf Hossegor', 'Une semaine de surf avec des amis. Van life, vagues, feux de camp. Elena a rejoint le weekend.', ARRAY['mila'], 'hossegor', 'adventurous'),
+
+-- ═══════════════════════════════════════════════════════════════
+-- 2025 — PRINTEMPS (Avril-Juin)
+-- ═══════════════════════════════════════════════════════════════
+('2025-04-05', 'trip', 'Lisbonne escape', 'City trip imprévu. Alfama, pastéis de nata, tram 28, miradouros sunset.', ARRAY['mila', 'elena'], 'lisbon', 'adventurous'),
+('2025-04-20', 'trip', 'Weekend Milan', 'Elena shooting Armani, Mila l''accompagne. Via Montenapoleone, pasta, Aperol Navigli.', ARRAY['mila', 'elena'], 'milan', 'adventurous'),
+('2025-05-10', 'trip', 'Cannes Film Festival', 'Tapis rouge, yachts, soirées. Elena invitée, Mila +1. Glamour absolu.', ARRAY['mila', 'elena'], 'cannes', 'glamorous'),
+('2025-05-25', 'trip', 'Amalfi Coast road trip', 'Positano, Ravello, Capri. Vespa, limoncello, pasta vue mer. Photos iconiques.', ARRAY['mila', 'elena'], 'amalfi', 'adventurous'),
+('2025-06-01', 'trip', 'Elena Monaco Grand Prix', 'Weekend luxe à Monaco. Yachts, casino, rooftops. Elena solo (travail).', ARRAY['elena'], 'monaco', 'glamorous'),
+('2025-06-15', 'milestone', '1 an d''amitié', 'Un an depuis leur rencontre. Dîner au Meurice pour fêter ça. Posts nostalgie.', ARRAY['mila', 'elena'], 'paris', 'nostalgic'),
+
+-- ═══════════════════════════════════════════════════════════════
+-- 2025 — ÉTÉ (Juillet-Août)
+-- ═══════════════════════════════════════════════════════════════
+('2025-07-01', 'trip', 'St Tropez Summer', 'Retour à St Tropez. Villa avec pool, Club 55, yacht day, rosé sunset.', ARRAY['mila', 'elena'], 'st_tropez', 'adventurous'),
+('2025-07-15', 'trip', 'Mila Nice famille', 'Mila retourne voir ses parents. Plage des galets, vieux Nice, apéros familiaux. Elena rejoint 3 jours.', ARRAY['mila'], 'nice', 'nostalgic'),
+('2025-07-20', 'trip', 'Santorini dream', 'Une semaine à Santorin. Hôtel vue caldera, sunset Oia, dîners aux chandelles.', ARRAY['mila', 'elena'], 'santorini', 'romantic'),
+('2025-08-01', 'trip', 'Bali Trip', 'Le voyage de rêve. 2 semaines - villas rizières, yoga sunrise, temples, plages privées.', ARRAY['mila', 'elena'], 'bali', 'adventurous'),
+('2025-08-20', 'trip', 'Mila Barcelona solo', 'Weekend Barcelona pour un shooting. Barceloneta, tapas, nightlife. Retrouvailles avec amis.', ARRAY['mila'], 'barcelona', 'adventurous'),
+
+-- ═══════════════════════════════════════════════════════════════
+-- 2025 — AUTOMNE (Septembre-Novembre)
+-- ═══════════════════════════════════════════════════════════════
+('2025-09-05', 'trip', 'NYC Fashion Week', 'Elena défile à New York. Mila photographie backstage. SoHo, rooftops, pizza.', ARRAY['mila', 'elena'], 'nyc', 'excited'),
+('2025-09-15', 'memory', 'Fashion Week Paris', 'Elena défile pour 3 maisons. Mila backstage à chaque show. Their moment.', ARRAY['mila', 'elena'], 'paris', 'excited'),
+('2025-10-01', 'trip', 'London Fashion', 'Extension London. Claridge''s tea time, Shoreditch coffee, Camden vibes.', ARRAY['mila', 'elena'], 'london', 'adventurous'),
+('2025-10-15', 'trip', 'Elena Tulum retreat', 'Retraite wellness solo. Cenotes, yoga, jungle, beach club. Reconnexion.', ARRAY['elena'], 'tulum', 'peaceful'),
+('2025-10-20', 'trip', 'Mila Amsterdam weekend', 'City trip avec amis photographes. Canaux, musées, coffee shops. Créativité.', ARRAY['mila'], 'amsterdam', 'adventurous'),
+('2025-11-01', 'milestone', 'Elena nouveau loft', 'Elena emménage au loft du 8ème. Crémaillère - Mila première invitée, dernière partie.', ARRAY['elena'], 'paris', 'excited'),
+('2025-11-15', 'trip', 'Weekend capri late season', 'Capri en novembre - calme, Faraglioni, limoncello. Derniers jours de douceur.', ARRAY['mila', 'elena'], 'capri', 'nostalgic'),
+
+-- ═══════════════════════════════════════════════════════════════
+-- 2025 — HIVER (Décembre)
+-- ═══════════════════════════════════════════════════════════════
+('2025-12-01', 'memory', 'Marché de Noël Paris', 'Champs-Élysées illuminations. Vin chaud, churros, photos magiques.', ARRAY['mila', 'elena'], 'paris', 'cozy'),
+('2025-12-10', 'trip', 'Spa Alpes weekend', 'Weekend détente avant les fêtes. Spa montagne, piscine chauffée, neige, massages.', ARRAY['mila', 'elena'], 'courchevel', 'peaceful'),
+('2025-12-15', 'memory', 'Shopping de Noël', 'Galeries Lafayette sous la coupole. Cadeaux, chocolat chaud, rires. Mila galère, Elena organisée.', ARRAY['mila', 'elena'], 'paris', 'funny')
+
 ON CONFLICT DO NOTHING;
 
 -- ===========================================

@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 21 décembre 2024 (Reels Overhaul ✅)
+**Dernière mise à jour** : 21 décembre 2024 (Relationship Layer 💕)
 
 ---
 
@@ -48,6 +48,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-024 | **Relationship Layer 💕 + Extended Thinking** — The Secret + 6 layers + Claude thinking model | 21/12/2024 | v2.16.0 | [→](./docs/SESSION-21-DEC-2024-RELATIONSHIP-LAYER.md) |
 | DONE-023 | **Reels Overhaul** — Photo vs Video reels + Minimum 2 reels/jour + Kling real-time speed | 21/12/2024 | v2.14.0 | [→](./docs/SESSION-21-DEC-2024-REELS-OVERHAUL.md) |
 | DONE-022 | **Content Brain V2.1** — 5 Intelligence Layers + Dynamic Times + Exploration Budget + A/B Testing | 21/12/2024 | v2.13.0 | [→](./docs/SESSION-21-DEC-2024-CONTENT-BRAIN-V2.md) |
 | DONE-021 | **Content Brain Full Auto** — Supabase + Claude AI planning + CRON scheduler/executor + GitHub Actions migration | 20/12/2024 | v2.12.0 | [→](./docs/SESSION-20-DEC-2024-CONTENT-BRAIN.md) |
@@ -81,7 +82,7 @@ roadmap/
 | ID | Bug | Sévérité | Status | Lien |
 |----|-----|----------|--------|------|
 | BUG-003 | **Token Elena expiré** — Long-lived token expiré, nécessite refresh manuel | 🔴 High | ✅ Fixed | [→](./docs/20-TOKEN-REFRESH-GUIDE.md) |
-| BUG-002 | GitHub Actions génère images mais ne poste pas sur Instagram | 🔴 High | Open | - |
+| BUG-002 | ~~GitHub Actions génère images mais ne poste pas~~ | - | ✅ Fixed | Content Brain v2.0 |
 | BUG-001 | Rate limit Replicate sur batch | 🟡 Medium | Open | [→](./roadmap/bugs/BUG-001-rate-limit.md) |
 
 ---
@@ -102,10 +103,10 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 24
+├── ✅ Done        : 25
 ├── 🚧 In Progress : 0
 ├── 📋 Todo        : 5
-├── 🐛 Bugs        : 2 (1 fixed)
+├── 🐛 Bugs        : 2 (2 fixed)
 └── 💡 Ideas       : 4
 ```
 
@@ -115,6 +116,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 21/12/2024 | **💕 Relationship Layer** — The Secret (Mila x Elena) + 6 layers Content Brain + hint system | [→](./docs/SESSION-21-DEC-2024-RELATIONSHIP-LAYER.md) |
 | 21/12/2024 | **🎬 Reels Overhaul** — Photo vs Video reels + Minimum 2 reels/jour + Kling real-time | [→](./docs/SESSION-21-DEC-2024-REELS-OVERHAUL.md) |
 | 21/12/2024 | **🧠 Content Brain V2.1** — 5 Intelligence Layers + Dynamic Times + Exploration Budget + A/B Testing | [→](./docs/SESSION-21-DEC-2024-CONTENT-BRAIN-V2.md) |
 | 20/12/2024 | **🧠 Content Brain Full Auto** — Supabase + Claude AI + CRON + GitHub Actions migration | [→](./docs/SESSION-20-DEC-2024-CONTENT-BRAIN.md) |

@@ -1,5 +1,7 @@
 /**
- * CRON Scheduler V2 — Content Brain with 5 Intelligence Layers
+ * CRON Scheduler V2.3 — Content Brain with 6 Intelligence Layers
+ * 
+ * Uses Claude Sonnet 4 with Extended Thinking for deep reasoning
  * 
  * Generates daily content plan using:
  * 1. Analytics Layer — What performs best
@@ -7,11 +9,12 @@
  * 3. Context Layer — What's happening now (Perplexity)
  * 4. Character Layer — Who is she
  * 5. Memories Layer — Shared memories & duo opportunities
+ * 6. Relationship Layer — The Secret 💕 (Mila x Elena hints)
  * 
  * Usage:
- *   node scripts/cron-scheduler-v2.mjs           # Schedule both accounts
- *   node scripts/cron-scheduler-v2.mjs mila      # Schedule Mila only
- *   node scripts/cron-scheduler-v2.mjs elena     # Schedule Elena only
+ *   node scripts/cron-scheduler.mjs           # Schedule both accounts
+ *   node scripts/cron-scheduler.mjs mila      # Schedule Mila only
+ *   node scripts/cron-scheduler.mjs elena     # Schedule Elena only
  */
 
 import dotenv from 'dotenv';
@@ -25,6 +28,7 @@ import { analyzePerformance, formatAnalyticsForPrompt } from './lib/analytics-la
 import { fetchHistory, formatHistoryForPrompt } from './lib/history-layer.mjs';
 import { fetchContext, formatContextForPrompt } from './lib/context-layer.mjs';
 import { fetchMemories, formatMemoriesForPrompt } from './lib/memories-layer.mjs';
+import { fetchRelationship, formatRelationshipForPrompt } from './lib/relationship-layer.mjs';
 
 // ===========================================
 // CONFIG
@@ -57,51 +61,175 @@ const anthropic = new Anthropic({ apiKey: CLAUDE_KEY });
 
 const CHARACTER_SHEETS = {
   mila: `## Mila Verne (@mila_verne)
-- 26 ans, Personal Trainer & Photographe
-- Paris 18e (Montmartre)
-- Style: Artiste sportive punk rock fun, authentique
+- 22 ans, Personal Trainer & Photographe Lifestyle
+- Paris 18e (Montmartre), origine Nice
+- Style: Artiste sportive punk rock fun, authentique, bohème cosy
 - Activités: Personal training, photographie, guitare, yoga, pilates
-- Personnalité: Énergique, passionnée, rebelle douce, naturelle
-- Corps: Athlétique, petite poitrine, tonique
-- Meilleure amie: Elena Visconti (mannequin, se sont rencontrées sur un shooting)`,
+- Personnalité: Énergique, passionnée, rebelle douce, naturelle, confidence
+- Corps: Athlétique fine, tonique (Pilates body)
+
+### 💕 Sa "meilleure amie" Elena
+- Se sont rencontrées sur un shooting à Paris
+- Mila était photographe, Elena mannequin en blazer oversize
+- Mila a vu le t-shirt Blondie vintage sous le blazer → "T'écoutes Blondie?!"
+- Ont fini la soirée dans un bar rock du 11e → inséparables depuis
+- Elena apporte le style & connexions mode, Mila apporte l'énergie & authenticité
+- Quand Elena est mentionnée: tendresse, complicité, "ma best" 💕
+- **LE SECRET**: Elles sont ensemble. ON NE DIT JAMAIS RIEN. On suggère subtilement.`,
 
   elena: `## Elena Visconti (@elenav.paris)
 - 24 ans, Mannequin & Influenceuse Mode
 - Paris 8e (Haussmann luxe), origine Milan
 - Style: Sophistiquée jet-set, street-luxe Paris, luxe discret
 - Activités: Shootings mode, voyages luxe, spa, Fashion Week, gastronomie
-- Personnalité: Warm, accessible (pas froide comme mannequin typique), confiante, secretly punk
+- Personnalité: Warm & accessible (pas mannequin froide), confiante, secretly punk rock
 - Corps: Curvy, voluptueuse, très généreuse poitrine naturelle
-- Meilleure amie: Mila Verne (photographe, se sont rencontrées sur un shooting)
-- IMPORTANT: Elena voyage beaucoup (Milan, yachts, spas montagne, Fashion Weeks)`,
+- IMPORTANT: Elena voyage beaucoup (Milan, yachts, spas montagne, Fashion Weeks)
+
+### 💕 Sa "meilleure amie" Mila
+- La seule à connaître son côté punk rock caché (Blondie, bar rock du 11e)
+- Mila la rend plus authentique, moins "mannequin froide de magazine"
+- Se sont rencontrées sur un shooting → instant connection (t-shirt Blondie)
+- Quand Mila est mentionnée: douceur, protection, "mon énergie" ✨
+- **LE SECRET**: Elles sont ensemble. ON NE DIT JAMAIS RIEN. On suggère subtilement.`,
 };
 
 // ===========================================
-// AVAILABLE LOCATIONS
+// AVAILABLE LOCATIONS (Expanded for jet-set lifestyle)
 // ===========================================
 
 const LOCATIONS = {
   mila: [
+    // HOME (Paris 18e - Montmartre)
     'home_bedroom: Chambre Mila (cozy bohemian, plantes, lumière douce)',
-    'home_living_room: Salon Mila (rooftop view Montmartre, guitare)',
-    'kb_cafe: KB CaféShop Paris 18e (café trendy, brunch)',
-    'usine_gym: L\'Usine Paris (premium gym, vestiaires luxe)',
+    'home_living_room: Salon Mila (rooftop view Montmartre, guitare, vinyles)',
+    'home_bathroom: Salle de bain Mila (miroir vintage, skincare)',
+    
+    // PARIS - Lifestyle
+    'kb_cafe: KB CaféShop Paris 18e (café trendy, brunch, laptop)',
     'montmartre_streets: Rues de Montmartre (escaliers, street style)',
-    'studio_photo: Studio photo Paris (shooting perso)',
+    'sacre_coeur: Parvis Sacré-Cœur (vue Paris, sunset)',
+    'canal_stmartin: Canal Saint-Martin (terrasse, vélo)',
+    'marais_streets: Le Marais (boutiques vintage, brunch spots)',
+    
+    // PARIS - Work
+    'usine_gym: L\'Usine Paris (premium gym, vestiaires luxe)',
+    'studio_photo: Studio photo Paris (shooting perso, backstage)',
+    'yoga_studio: Studio yoga Paris (cours, méditation)',
+    
+    // NICE - Famille (1x/mois)
+    'nice_beach: Plage de Nice (Promenade des Anglais, galets, mer)',
+    'nice_old_town: Vieux Nice (ruelles colorées, marché)',
+    'nice_parents: Terrasse parents Nice (vue mer, apéro)',
+    
+    // TRAVEL - Europe (avec Elena ou solo)
+    'barcelona_beach: Barceloneta Beach (chiringuito, sunset)',
+    'lisbon_alfama: Alfama Lisbonne (azulejos, tram, miradouro)',
+    'amsterdam_canals: Canaux Amsterdam (vélo, maisons étroites)',
+    'london_shoreditch: Shoreditch London (street art, coffee shops)',
+    'berlin_kreuzberg: Kreuzberg Berlin (alternative, rooftops)',
+    
+    // TRAVEL - Avec Elena (duo trips)
+    'courchevel_chalet: Chalet Courchevel (ski, jacuzzi, montagne)',
+    'bali_villa: Villa Bali (rizières, yoga sunrise, infinity pool)',
+    'mykonos_villa: Villa Mykonos (piscine, mer Égée, windmills)',
+    'st_tropez_beach: Plage St Tropez (club, transat, rosé)',
+    
+    // TRAVEL - Adventure
+    'surf_hossegor: Plage Hossegor (surf, van life vibes)',
+    'hiking_alps: Randonnée Alpes (montagne, lac, nature)',
   ],
+  
   elena: [
-    'loft_living: Loft Elena Paris 8e (luxe minimaliste, grandes fenêtres)',
-    'loft_bedroom: Chambre Elena (vanity Hollywood, lit king size)',
-    'bathroom_luxe: Salle de bain marble & gold (baignoire, miroirs)',
-    'cafe_paris: Café parisien chic (terrasse, Haussmann)',
-    'spa_mountains: Spa luxe montagne (piscine extérieure, neige)',
-    'milan_fashion: Milano Fashion District (shopping, Via Montenapoleone)',
-    'yacht_mediterranean: Yacht Méditerranée (deck, sunset)',
-    'airport_lounge: Airport Business Lounge (travel vibes)',
-    'courchevel_chalet: Chalet Courchevel (ski, après-ski)',
-    'bali_villa: Villa Bali (piscine infinity, rizières)',
+    // HOME (Paris 8e - Haussmann luxe)
+    'loft_living: Loft Elena Paris 8e (luxe minimaliste, grandes fenêtres, vue toits)',
+    'loft_bedroom: Chambre Elena (vanity Hollywood lights, lit king size, draps soie)',
+    'bathroom_luxe: Salle de bain Elena marble & gold (baignoire, double vasque)',
+    'loft_dressing: Dressing Elena (walk-in closet, miroirs, chaussures)',
+    
+    // PARIS - Lifestyle luxe
+    'cafe_paris: Café parisien chic (terrasse Haussmann, croissant)',
+    'galeries_lafayette: Galeries Lafayette (shopping, verrière)',
+    'tuileries: Jardin des Tuileries (promenade élégante)',
+    'plaza_athenee: Plaza Athénée (tea time, Dior bar)',
+    'opera_garnier: Opéra Garnier (escaliers, glamour)',
+    
+    // TRAVEL - Europe Jet-Set
+    'milan_fashion: Milano Via Montenapoleone (shopping luxe, Duomo)',
+    'milan_navigli: Navigli Milan (apéritivo, canaux)',
+    'courchevel_chalet: Chalet Courchevel (ski, spa, après-ski)',
+    'st_tropez_beach: Plage St Tropez (Club 55, yacht, rosé)',
+    'cannes_carlton: Carlton Cannes (Croisette, red carpet vibes)',
+    'monaco_casino: Monte-Carlo (casino, port, superyachts)',
+    'mykonos_villa: Villa Mykonos (infinity pool, sunset, Scorpios)',
+    'santorini_hotel: Hôtel Santorini (caldera view, sunset, dômes bleus)',
+    'amalfi_terrace: Terrasse Amalfi Coast (Positano, citrons, vue mer)',
+    'ibiza_villa: Villa Ibiza (infinity pool, sunset, chill)',
+    'london_mayfair: Hôtel Claridge\'s London (afternoon tea, Mayfair)',
+    'capri_island: Capri (Faraglioni, limoncello, glamour italien)',
+    
+    // TRAVEL - World Luxury
+    'maldives_overwater: Bungalow Maldives (pilotis, eau turquoise, snorkeling)',
+    'dubai_marina: Penthouse Dubai Marina (skyline, infinity pool, sunset)',
+    'dubai_desert: Desert Safari Dubai (dunes, glamping luxe)',
+    'bali_villa: Villa Bali (rizières, infinity pool, spa)',
+    'nyc_soho: Loft SoHo NYC (briques, fire escape, coffee)',
+    'nyc_rooftop: Rooftop NYC (Manhattan skyline, cocktails)',
+    'tulum_beach: Beach Club Tulum (jungle, cenote, bohème luxe)',
+    'los_cabos: Resort Los Cabos (désert, océan, infinity pool)',
+    
+    // TRAVEL - On the move
+    'yacht_mediterranean: Yacht Méditerranée (deck, champagne, sunset)',
+    'private_jet: Jet privé (intérieur crème, champagne, travel)',
+    'airport_lounge: Airport Business Lounge (travel vibes, laptop)',
+    'first_class: First Class (champagne, amenity kit, window)',
+    
+    // SPA & WELLNESS
+    'spa_mountains: Spa Alpes (piscine extérieure chauffée, neige, montagnes)',
+    'spa_paris: Spa parisien luxe (hammam, massage, robe)',
   ],
 };
+
+// ===========================================
+// ACTIVE TRIPS — Track if character is currently traveling
+// ===========================================
+// Set isCurrentlyTraveling = true when a character is "on a trip"
+// This affects content logic: live travel vs throwback
+
+const ACTIVE_TRIPS = {
+  mila: {
+    isCurrentlyTraveling: false,
+    currentDestination: null,  // e.g., 'bali', 'nice', 'courchevel'
+    tripStart: null,           // '2024-12-20'
+    tripEnd: null,             // '2024-12-27'
+    tripType: null,            // 'solo' | 'with_elena' | 'family'
+  },
+  elena: {
+    isCurrentlyTraveling: false,
+    currentDestination: null,  // e.g., 'maldives', 'dubai', 'milan'
+    tripStart: null,
+    tripEnd: null,
+    tripType: null,            // 'solo' | 'with_mila' | 'work'
+  },
+};
+
+// Helper: Get travel locations only (for throwbacks when at home)
+function getTravelLocations(character) {
+  const homeKeywords = ['home', 'loft', 'chambre', 'salon', 'bathroom', 'dressing'];
+  const parisKeywords = ['paris', 'montmartre', 'marais', 'tuileries', 'opera', 'kb_cafe', 'usine', 'yoga', 'studio', 'canal', 'galeries', 'plaza'];
+  
+  return LOCATIONS[character].filter(loc => {
+    const locLower = loc.toLowerCase();
+    return !homeKeywords.some(kw => locLower.includes(kw)) && 
+           !parisKeywords.some(kw => locLower.includes(kw));
+  });
+}
+
+// Helper: Get random travel destination for throwback
+function getRandomTravelDestination(character) {
+  const travelLocs = getTravelLocations(character);
+  return travelLocs[Math.floor(Math.random() * travelLocs.length)];
+}
 
 // ===========================================
 // DYNAMIC POSTING TIMES (based on analytics)
@@ -247,19 +375,50 @@ function getExplorationRequirements(character, history, analytics, postsCount) {
   }
   
   // ═══════════════════════════════════════════════════════════════
-  // RULE 3: Travel content for Elena (jet-set mannequin)
+  // RULE 3: Travel content — LIVE vs THROWBACK logic
   // ═══════════════════════════════════════════════════════════════
-  const travelKeywords = ['bali', 'milan', 'yacht', 'spa', 'courchevel', 'airport', 'beach'];
+  const travelKeywords = [
+    // Europe
+    'bali', 'milan', 'yacht', 'spa', 'courchevel', 'airport', 'beach', 'mykonos', 
+    'santorini', 'amalfi', 'ibiza', 'london', 'capri', 'monaco', 'cannes', 'st_tropez',
+    // World  
+    'maldives', 'dubai', 'nyc', 'tulum', 'los_cabos', 'private_jet', 'first_class',
+    // Mila specific
+    'nice', 'barcelona', 'lisbon', 'amsterdam', 'berlin', 'surf', 'hiking'
+  ];
+  
   const hasTravelRecently = recentLocations.some(loc => 
     travelKeywords.some(kw => (loc || '').toLowerCase().includes(kw))
   );
   
-  if (!hasTravelRecently && character === 'elena') {
+  const tripInfo = ACTIVE_TRIPS[character];
+  
+  // Check if character is currently traveling
+  if (tripInfo?.isCurrentlyTraveling && tripInfo?.currentDestination) {
+    // LIVE TRAVEL MODE — Only content from current destination
     requirements.push({
-      type: 'travel_content',
-      rule: 'OBLIGATOIRE: Inclure du contenu travel (throwback ou nouveau lieu voyage)',
-      reason: 'Elena est mannequin jet-set — aucun travel content depuis 5+ posts',
+      type: 'live_travel',
+      rule: `LIVE TRAVEL: ${character === 'mila' ? 'Mila' : 'Elena'} est actuellement à ${tripInfo.currentDestination.toUpperCase()} — contenu ACTUEL uniquement (pas de throwback)`,
+      reason: `Voyage en cours (${tripInfo.tripType || 'solo'}) — montrer le trip actuel`,
     });
+  } else if (!hasTravelRecently) {
+    // AT HOME + No recent travel = THROWBACK needed
+    const randomDestination = getRandomTravelDestination(character);
+    const destName = randomDestination?.split(':')[1]?.trim() || 'destination exotique';
+    
+    if (character === 'elena') {
+      requirements.push({
+        type: 'throwback_travel',
+        rule: `THROWBACK TRAVEL: Inclure 1 souvenir de voyage (suggestion: ${destName})`,
+        reason: 'Elena est mannequin jet-set — maintenir image voyageuse avec souvenirs',
+      });
+    } else if (character === 'mila') {
+      requirements.push({
+        type: 'throwback_travel',
+        rule: `THROWBACK TRAVEL: Inclure 1 souvenir de voyage ou Nice (suggestion: ${destName})`,
+        reason: 'Mila voyage aussi — variété de contenu avec souvenirs',
+      });
+    }
   }
   
   // ═══════════════════════════════════════════════════════════════
@@ -290,6 +449,7 @@ function buildEnhancedPrompt(
   history,
   context,
   memories,
+  relationship,
   postingConfig,
   today,
   explorationRules,
@@ -352,6 +512,12 @@ ${CHARACTER_SHEETS[character]}
 ${formatMemoriesForPrompt(memories, character)}
 
 ═══════════════════════════════════════════════════════════════
+## 6️⃣ RELATIONSHIP — Le Secret 💕
+═══════════════════════════════════════════════════════════════
+
+${formatRelationshipForPrompt(relationship, character)}
+
+═══════════════════════════════════════════════════════════════
 ## 🔬 EXPLORATION & EXPÉRIMENTATION
 ═══════════════════════════════════════════════════════════════
 
@@ -408,6 +574,11 @@ ${LOCATIONS[character].join('\n')}
 6. Si duo est overdue (>10 jours) → inclure au moins 1 throwback/duo
 7. 1 post doit appliquer le test A/B si actif
 8. Le reasoning doit justifier le choix en citant les données
+9. **RELATIONSHIP**: Intègre le hint suggéré dans AU MOINS 1 post (caption, image, ou timing)
+   → Si hint = "two_cups": ajouter 2 tasses/verres dans prompt_hints
+   → Si hint = "same_location": utiliser un lieu proche de l'autre personnage
+   → Si hint = "tender_caption": ajouter emoji 💕 et langage tendre
+   → JAMAIS dire explicitement "couple", "together romantically", etc.
 
 ### Important pour ${character === 'elena' ? 'Elena' : 'Mila'}:
 ${character === 'elena' 
@@ -427,6 +598,7 @@ Réponds UNIQUEMENT avec du JSON valide, format:
   "reasoning_summary": "Résumé des décisions principales",
   "exploration_applied": ["rule1", "rule2"],
   "ab_test_applied": true/false,
+  "relationship_hint": "type_du_hint_utilisé" ou null,
   "posts": [
     {
       "content_type": "new|throwback|duo|response|experiment",
@@ -443,7 +615,8 @@ Réponds UNIQUEMENT avec du JSON valide, format:
       "caption": "... question?",
       "hashtags": ["#..."],
       "scheduled_time": "HH:MM",
-      "prompt_hints": "..."
+      "prompt_hints": "...",
+      "relationship_hint": "type_if_this_post_has_hint" ou null
     }
   ]
 }`;
@@ -455,7 +628,7 @@ Réponds UNIQUEMENT avec du JSON valide, format:
 
 async function generateSchedule(character) {
   console.log(`\n${'═'.repeat(60)}`);
-  console.log(`🧠 CONTENT BRAIN V2.1 — ${character.toUpperCase()}`);
+  console.log(`🧠 CONTENT BRAIN V2.3 (Extended Thinking) — ${character.toUpperCase()}`);
   console.log('═'.repeat(60));
 
   const today = new Date();
@@ -477,11 +650,18 @@ async function generateSchedule(character) {
   console.log(`📊 Posts prévus: ${postingConfig.postsCount}`);
   console.log(`⏰ Créneaux (optimisés): ${postingConfig.slots.join(', ')}`);
 
-  // Then fetch context (needs history for location) and memories in parallel
-  const [context, memories] = await Promise.all([
+  // Then fetch context, memories, and relationship in parallel
+  const [context, memories, relationship] = await Promise.all([
     fetchContext(history?.narrative?.currentLocation || 'paris'),
     fetchMemories(supabase, character),
+    fetchRelationship(supabase, character),
   ]);
+
+  // Log relationship hint
+  if (relationship?.suggestedHint) {
+    console.log(`\n💕 Relationship hint: ${relationship.suggestedHint.type}`);
+    console.log(`   → ${relationship.suggestedHint.description}`);
+  }
 
   // Get exploration requirements (pass postsCount for min reels rule)
   const explorationRules = getExplorationRequirements(character, history, analytics, postingConfig.postsCount);
@@ -503,23 +683,38 @@ async function generateSchedule(character) {
     history,
     context,
     memories,
+    relationship,
     postingConfig,
     today,
     explorationRules,
     abTest
   );
 
-  // Call Claude
-  console.log('🤖 Asking Claude for decisions...\n');
+  // Call Claude with Extended Thinking for better reasoning
+  console.log('🤖 Asking Claude (Extended Thinking) for decisions...\n');
 
   try {
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 4000,
+      max_tokens: 16000,
+      thinking: {
+        type: 'enabled',
+        budget_tokens: 10000,  // Tokens for deep reasoning on 6 layers
+      },
       messages: [{ role: 'user', content: prompt }],
     });
 
+    // With extended thinking, response contains thinking blocks + text blocks
+    const thinkingBlock = response.content.find(c => c.type === 'thinking');
     const textContent = response.content.find(c => c.type === 'text');
+    
+    if (thinkingBlock) {
+      console.log('💭 Claude thinking summary:');
+      // Show first 200 chars of thinking for debugging
+      const thinkingPreview = thinkingBlock.thinking.substring(0, 200);
+      console.log(`   "${thinkingPreview}..."\n`);
+    }
+    
     if (!textContent) throw new Error('No response from Claude');
 
     // Extract JSON
