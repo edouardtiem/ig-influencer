@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 21 décembre 2024 (Content Brain V2.1 ✅)
+**Dernière mise à jour** : 21 décembre 2024 (Reels Overhaul ✅)
 
 ---
 
@@ -48,6 +48,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-023 | **Reels Overhaul** — Photo vs Video reels + Minimum 2 reels/jour + Kling real-time speed | 21/12/2024 | v2.14.0 | [→](./docs/SESSION-21-DEC-2024-REELS-OVERHAUL.md) |
 | DONE-022 | **Content Brain V2.1** — 5 Intelligence Layers + Dynamic Times + Exploration Budget + A/B Testing | 21/12/2024 | v2.13.0 | [→](./docs/SESSION-21-DEC-2024-CONTENT-BRAIN-V2.md) |
 | DONE-021 | **Content Brain Full Auto** — Supabase + Claude AI planning + CRON scheduler/executor + GitHub Actions migration | 20/12/2024 | v2.12.0 | [→](./docs/SESSION-20-DEC-2024-CONTENT-BRAIN.md) |
 | DONE-020 | **Content Brain Phase 1-2** — Supabase schema + Claude API planning + Timeline lore | 20/12/2024 | v2.11.0 | [→](./docs/SESSION-20-DEC-2024-CONTENT-BRAIN.md) |
@@ -101,7 +102,7 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 23
+├── ✅ Done        : 24
 ├── 🚧 In Progress : 0
 ├── 📋 Todo        : 5
 ├── 🐛 Bugs        : 2 (1 fixed)
@@ -114,6 +115,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 21/12/2024 | **🎬 Reels Overhaul** — Photo vs Video reels + Minimum 2 reels/jour + Kling real-time | [→](./docs/SESSION-21-DEC-2024-REELS-OVERHAUL.md) |
 | 21/12/2024 | **🧠 Content Brain V2.1** — 5 Intelligence Layers + Dynamic Times + Exploration Budget + A/B Testing | [→](./docs/SESSION-21-DEC-2024-CONTENT-BRAIN-V2.md) |
 | 20/12/2024 | **🧠 Content Brain Full Auto** — Supabase + Claude AI + CRON + GitHub Actions migration | [→](./docs/SESSION-20-DEC-2024-CONTENT-BRAIN.md) |
 | 20/12/2024 | **📊 Analytics & Growth + TODO-011** — Analyse comptes + implémentation captions, hashtags, lieux, duo-post | [→](./docs/SESSION-20-DEC-2024-ANALYTICS-GROWTH.md) |
