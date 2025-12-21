@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 20 décembre 2024 (Content Brain Full Auto ✅)
+**Dernière mise à jour** : 21 décembre 2024 (Content Brain V2.1 ✅)
 
 ---
 
@@ -48,6 +48,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-022 | **Content Brain V2.1** — 5 Intelligence Layers + Dynamic Times + Exploration Budget + A/B Testing | 21/12/2024 | v2.13.0 | [→](./docs/SESSION-21-DEC-2024-CONTENT-BRAIN-V2.md) |
 | DONE-021 | **Content Brain Full Auto** — Supabase + Claude AI planning + CRON scheduler/executor + GitHub Actions migration | 20/12/2024 | v2.12.0 | [→](./docs/SESSION-20-DEC-2024-CONTENT-BRAIN.md) |
 | DONE-020 | **Content Brain Phase 1-2** — Supabase schema + Claude API planning + Timeline lore | 20/12/2024 | v2.11.0 | [→](./docs/SESSION-20-DEC-2024-CONTENT-BRAIN.md) |
 | DONE-019 | **Growth Improvements** — Captions engageants + hashtags.ts + 7 lieux Elena + duo-post.mjs | 20/12/2024 | v2.10.0 | [→](./roadmap/done/TODO-011-growth-improvements.md) |
@@ -100,7 +101,7 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 22
+├── ✅ Done        : 23
 ├── 🚧 In Progress : 0
 ├── 📋 Todo        : 5
 ├── 🐛 Bugs        : 2 (1 fixed)
@@ -113,6 +114,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 21/12/2024 | **🧠 Content Brain V2.1** — 5 Intelligence Layers + Dynamic Times + Exploration Budget + A/B Testing | [→](./docs/SESSION-21-DEC-2024-CONTENT-BRAIN-V2.md) |
 | 20/12/2024 | **🧠 Content Brain Full Auto** — Supabase + Claude AI + CRON + GitHub Actions migration | [→](./docs/SESSION-20-DEC-2024-CONTENT-BRAIN.md) |
 | 20/12/2024 | **📊 Analytics & Growth + TODO-011** — Analyse comptes + implémentation captions, hashtags, lieux, duo-post | [→](./docs/SESSION-20-DEC-2024-ANALYTICS-GROWTH.md) |
 | 18/12/2024 | **🤖 AI Label Workaround** — Recherche API + solution caption/hashtags | [→](./docs/SESSION-18-DEC-2024-AI-LABEL.md) |
