@@ -104,160 +104,35 @@ const LOCATIONS = {
 };
 
 // ===========================================
-// DYNAMIC POSTING TIMES (based on analytics)
+// OPTIMAL POSTING TIMES
 // ===========================================
 
-function getOptimalPostingTimes(dayOfWeek, analytics = null) {
+function getOptimalPostingTimes(dayOfWeek) {
   const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
   
-  // Base configuration per day type
-  let baseConfig;
   if (isWeekend) {
-    baseConfig = {
+    return {
       slots: ['10:00', '14:00', '20:00'],
       reelSlot: '14:00',
       postsCount: 3,
     };
-  } else if (dayOfWeek === 5) { // Friday
-    baseConfig = {
+  } else if (dayOfWeek === 5) {
+    return {
       slots: ['08:30', '12:30', '18:00', '21:00'],
       reelSlot: '18:00',
       postsCount: 4,
     };
   } else {
-    baseConfig = {
+    return {
       slots: ['08:00', '12:30', '19:00'],
       reelSlot: '12:30',
       postsCount: 3,
     };
   }
-
-  // Adjust based on analytics if available
-  if (analytics?.patterns?.bestTimeSlot) {
-    const bestSlot = analytics.patterns.bestTimeSlot;
-    
-    // Shift slots based on best performing time
-    if (bestSlot === 'evening' && !isWeekend) {
-      // Shift towards evening: remove early morning, add late evening
-      baseConfig.slots = baseConfig.slots.map(slot => {
-        const hour = parseInt(slot.split(':')[0]);
-        if (hour < 10) return `${hour + 2}:00`; // 08:00 → 10:00
-        if (hour < 15) return `${hour + 1}:30`; // 12:30 → 13:30
-        return slot;
-      });
-      baseConfig.reelSlot = '19:00';
-    } else if (bestSlot === 'morning' && !isWeekend) {
-      // Shift towards morning
-      baseConfig.slots = baseConfig.slots.map(slot => {
-        const hour = parseInt(slot.split(':')[0]);
-        if (hour > 18) return `${hour - 1}:00`; // 19:00 → 18:00
-        return slot;
-      });
-      baseConfig.reelSlot = '12:30';
-    }
-  }
-
-  return baseConfig;
 }
 
 // ===========================================
-// A/B TESTING SYSTEM
-// ===========================================
-
-const AB_EXPERIMENTS = [
-  {
-    id: 'reel_timing',
-    hypothesis: 'Les reels à 21h ont plus de reach que ceux de 14h',
-    variable: 'reel_time',
-    variants: ['14:00', '21:00'],
-  },
-  {
-    id: 'travel_vs_home',
-    hypothesis: 'Le contenu travel a plus d\'engagement même si home récent performe',
-    variable: 'location_type',
-    variants: ['travel', 'home'],
-  },
-  {
-    id: 'carousel_length',
-    hypothesis: 'Les carousels de 5+ images performent mieux que 3',
-    variable: 'carousel_count',
-    variants: ['3-4', '5-7'],
-  },
-  {
-    id: 'caption_style',
-    hypothesis: 'Les captions avec emoji en premier ont plus d\'engagement',
-    variable: 'caption_format',
-    variants: ['emoji_first', 'text_first'],
-  },
-];
-
-function getWeeklyExperiment() {
-  // Rotate experiments weekly based on week number
-  const weekNumber = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
-  const experiment = AB_EXPERIMENTS[weekNumber % AB_EXPERIMENTS.length];
-  
-  // Pick a random variant for this run
-  const variant = experiment.variants[Math.floor(Math.random() * experiment.variants.length)];
-  
-  return {
-    ...experiment,
-    activeVariant: variant,
-  };
-}
-
-// ===========================================
-// EXPLORATION BUDGET
-// ===========================================
-
-function getExplorationRequirements(character, history, analytics) {
-  const requirements = [];
-  
-  // Check if stuck in home content
-  const recentLocations = history?.recentPosts?.slice(0, 5).map(p => p.location) || [];
-  const homeKeywords = ['loft', 'home', 'bedroom', 'living', 'bathroom'];
-  const homeCount = recentLocations.filter(loc => 
-    homeKeywords.some(kw => (loc || '').toLowerCase().includes(kw))
-  ).length;
-  
-  if (homeCount >= 4) {
-    requirements.push({
-      type: 'location_change',
-      rule: 'OBLIGATOIRE: Au moins 1 post HORS de chez elle (café, extérieur, voyage)',
-      reason: `${homeCount}/5 derniers posts sont à la maison — besoin de variété`,
-    });
-  }
-  
-  // Check if no travel content recently (especially for Elena)
-  const travelKeywords = ['bali', 'milan', 'yacht', 'spa', 'courchevel', 'airport', 'beach'];
-  const hasTravelRecently = recentLocations.some(loc => 
-    travelKeywords.some(kw => (loc || '').toLowerCase().includes(kw))
-  );
-  
-  if (!hasTravelRecently && character === 'elena') {
-    requirements.push({
-      type: 'travel_content',
-      rule: 'RECOMMANDÉ: Inclure du contenu travel (throwback ou teasing futur voyage)',
-      reason: 'Elena est mannequin jet-set — aucun travel content depuis 5+ posts',
-    });
-  }
-  
-  // Check format variety
-  const recentTypes = history?.recentPosts?.slice(0, 7).map(p => p.type) || [];
-  const reelCount = recentTypes.filter(t => t === 'reel').length;
-  
-  if (reelCount < 2) {
-    requirements.push({
-      type: 'format_variety',
-      rule: 'RECOMMANDÉ: Privilégier les REELS (seulement 1-2 dans les 7 derniers posts)',
-      reason: 'Les reels ont généralement plus de reach — en manque actuellement',
-    });
-  }
-  
-  return requirements;
-}
-
-// ===========================================
-// BUILD ENHANCED PROMPT (5 LAYERS + EXPLORATION + A/B)
+// BUILD ENHANCED PROMPT (5 LAYERS)
 // ===========================================
 
 function buildEnhancedPrompt(
@@ -267,9 +142,7 @@ function buildEnhancedPrompt(
   context,
   memories,
   postingConfig,
-  today,
-  explorationRules,
-  abTest
+  today
 ) {
   const otherCharacter = character === 'mila' ? 'Elena' : 'Mila';
   const dayName = today.toLocaleDateString('fr-FR', { weekday: 'long' });
@@ -278,19 +151,6 @@ function buildEnhancedPrompt(
     month: 'long', 
     year: 'numeric' 
   });
-
-  // Format exploration rules
-  const explorationSection = explorationRules.length > 0 
-    ? explorationRules.map(r => `⚠️ ${r.rule}\n   (Raison: ${r.reason})`).join('\n\n')
-    : 'Aucune contrainte d\'exploration spécifique.';
-
-  // Format A/B test
-  const abTestSection = abTest 
-    ? `🧪 **TEST EN COURS**: ${abTest.hypothesis}
-   Variable testée: ${abTest.variable}
-   Variant actif: **${abTest.activeVariant}**
-   → Pour 1 post, applique ce variant et marque-le avec "is_experiment": true`
-    : 'Pas de test A/B cette semaine.';
 
   return `Tu es le Content Brain de ${character === 'mila' ? 'Mila Verne' : 'Elena Visconti'}.
 Ta mission: créer un planning de posts intelligent, cohérent et engageant.
@@ -328,22 +188,12 @@ ${CHARACTER_SHEETS[character]}
 ${formatMemoriesForPrompt(memories, character)}
 
 ═══════════════════════════════════════════════════════════════
-## 🔬 EXPLORATION & EXPÉRIMENTATION
-═══════════════════════════════════════════════════════════════
-
-### Règles d'exploration (PRIORITAIRES):
-${explorationSection}
-
-### A/B Test de la semaine:
-${abTestSection}
-
-═══════════════════════════════════════════════════════════════
 ## 🎯 MISSION
 ═══════════════════════════════════════════════════════════════
 
 Génère ${postingConfig.postsCount} posts pour aujourd'hui.
 
-### Horaires optimisés (basés sur analytics):
+### Horaires disponibles:
 ${postingConfig.slots.join(', ')}
 (Reel idéalement à ${postingConfig.reelSlot})
 
@@ -355,12 +205,10 @@ ${LOCATIONS[character].join('\n')}
 2. **THROWBACK** — Rappel d'un arc passé (#throwback, souvenir)
 3. **DUO** — Contenu avec/sur ${otherCharacter} (si opportunité)
 4. **RÉPONSE** — Réaction au post récent de ${otherCharacter}
-5. **EXPERIMENT** — Post expérimental pour tester une hypothèse
 
 ### Pour chaque post, fournis:
-- **content_type**: "new" | "throwback" | "duo" | "response" | "experiment"
-- **is_experiment**: true/false (true si c'est le post A/B test)
-- **reasoning**: POURQUOI ce choix (1-2 phrases, cite les données)
+- **content_type**: "new" | "throwback" | "duo" | "response"
+- **reasoning**: POURQUOI ce choix (1-2 phrases, basé sur les layers ci-dessus)
 - **location_key**: ID du lieu
 - **location_name**: Nom complet du lieu
 - **post_type**: "carousel" | "reel"
@@ -372,24 +220,13 @@ ${LOCATIONS[character].join('\n')}
 - **scheduled_time**: Horaire parmi les slots disponibles
 - **prompt_hints**: Indices pour génération image
 
-### Règles STRICTES (dans cet ordre de priorité):
-1. **EXPLORATION D'ABORD**: Respecte les règles d'exploration ci-dessus
-2. Au moins 1 REEL obligatoire
-3. NE PAS répéter les lieux de l'historique récent (sauf throwback)
-4. Chaque caption DOIT avoir une question pour l'engagement
+### Règles STRICTES:
+1. Au moins 1 REEL obligatoire
+2. NE PAS répéter les lieux de l'historique récent
+3. Chaque caption DOIT avoir une question pour l'engagement
+4. Si analytics montrent que travel performe bien → privilégier travel
 5. Si duo est overdue (>10 jours) → inclure au moins 1 throwback/duo
-6. 1 post doit appliquer le test A/B si actif
-7. Le reasoning doit justifier le choix en citant les données
-
-### Important pour ${character === 'elena' ? 'Elena' : 'Mila'}:
-${character === 'elena' 
-  ? `Elena est MANNEQUIN JET-SET. Elle DOIT voyager régulièrement!
-   Si elle n'a pas eu de contenu travel/voyage depuis 4+ posts:
-   → OBLIGATOIRE: au moins 1 post travel (même throwback)`
-  : `Mila est personal trainer & photographe. Variété entre:
-   → Fitness (gym, yoga)
-   → Lifestyle (café, Montmartre)
-   → Créatif (photo, musique)`}
+6. Le reasoning doit justifier le choix en citant les données
 
 ═══════════════════════════════════════════════════════════════
 
@@ -397,12 +234,9 @@ Réponds UNIQUEMENT avec du JSON valide, format:
 {
   "daily_theme": "Thème du jour en 1 phrase",
   "reasoning_summary": "Résumé des décisions principales",
-  "exploration_applied": ["rule1", "rule2"],
-  "ab_test_applied": true/false,
   "posts": [
     {
-      "content_type": "new|throwback|duo|response|experiment",
-      "is_experiment": false,
+      "content_type": "new|throwback|duo|response",
       "reasoning": "Pourquoi ce post...",
       "location_key": "...",
       "location_name": "...",
@@ -425,13 +259,18 @@ Réponds UNIQUEMENT avec du JSON valide, format:
 
 async function generateSchedule(character) {
   console.log(`\n${'═'.repeat(60)}`);
-  console.log(`🧠 CONTENT BRAIN V2.1 — ${character.toUpperCase()}`);
+  console.log(`🧠 CONTENT BRAIN V2 — ${character.toUpperCase()}`);
   console.log('═'.repeat(60));
 
   const today = new Date();
   const dayOfWeek = today.getDay();
+  const postingConfig = getOptimalPostingTimes(dayOfWeek);
 
-  // Gather all layers first (need analytics for dynamic times)
+  console.log(`📅 ${today.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}`);
+  console.log(`📊 Posts prévus: ${postingConfig.postsCount}`);
+  console.log(`⏰ Créneaux: ${postingConfig.slots.join(', ')}\n`);
+
+  // Gather all layers
   console.log('🔄 Gathering intelligence layers...\n');
 
   // First fetch analytics and history (no dependencies)
@@ -440,30 +279,11 @@ async function generateSchedule(character) {
     fetchHistory(supabase, character),
   ]);
 
-  // Get dynamic posting times based on analytics
-  const postingConfig = getOptimalPostingTimes(dayOfWeek, analytics);
-
-  console.log(`📅 ${today.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}`);
-  console.log(`📊 Posts prévus: ${postingConfig.postsCount}`);
-  console.log(`⏰ Créneaux (optimisés): ${postingConfig.slots.join(', ')}`);
-
   // Then fetch context (needs history for location) and memories in parallel
   const [context, memories] = await Promise.all([
     fetchContext(history?.narrative?.currentLocation || 'paris'),
     fetchMemories(supabase, character),
   ]);
-
-  // Get exploration requirements
-  const explorationRules = getExplorationRequirements(character, history, analytics);
-  if (explorationRules.length > 0) {
-    console.log(`\n🔬 Exploration rules detected:`);
-    explorationRules.forEach(r => console.log(`   → ${r.type}: ${r.reason}`));
-  }
-
-  // Get weekly A/B test
-  const abTest = getWeeklyExperiment();
-  console.log(`\n🧪 A/B Test: "${abTest.hypothesis}"`);
-  console.log(`   Variant: ${abTest.activeVariant}`);
 
   // Build enhanced prompt
   console.log('\n📝 Building enhanced prompt...');
@@ -474,9 +294,7 @@ async function generateSchedule(character) {
     context,
     memories,
     postingConfig,
-    today,
-    explorationRules,
-    abTest
+    today
   );
 
   // Call Claude
@@ -512,25 +330,16 @@ async function generateSchedule(character) {
 
     // Display results
     console.log(`✅ Theme: "${plan.daily_theme}"`);
-    console.log(`📋 Reasoning: ${plan.reasoning_summary || 'N/A'}`);
-    
-    if (plan.exploration_applied?.length > 0) {
-      console.log(`🔬 Exploration applied: ${plan.exploration_applied.join(', ')}`);
-    }
-    if (plan.ab_test_applied) {
-      console.log(`🧪 A/B Test applied: ${abTest.hypothesis}`);
-    }
+    console.log(`📋 Reasoning: ${plan.reasoning_summary || 'N/A'}\n`);
 
-    console.log('\n📅 Planning généré:');
+    console.log('📅 Planning généré:');
     console.log('─'.repeat(60));
     plan.posts.forEach((p, i) => {
       const typeIcon = p.content_type === 'throwback' ? '📸' : 
                        p.content_type === 'duo' ? '👯' : 
-                       p.content_type === 'response' ? '💬' :
-                       p.content_type === 'experiment' ? '🧪' : '✨';
-      const expBadge = p.is_experiment ? ' [A/B TEST]' : '';
-      console.log(`${p.scheduled_time} │ ${p.post_type.toUpperCase().padEnd(8)} │ ${typeIcon} ${p.location_name}${expBadge}`);
-      console.log(`         │ ${p.content_type.toUpperCase().padEnd(10)} │ "${p.caption?.substring(0, 40)}..."`);
+                       p.content_type === 'response' ? '💬' : '✨';
+      console.log(`${p.scheduled_time} │ ${p.post_type.toUpperCase().padEnd(8)} │ ${typeIcon} ${p.location_name}`);
+      console.log(`         │ ${p.content_type.toUpperCase()} │ "${p.caption?.substring(0, 45)}..."`);
       console.log(`         └─ Reasoning: ${p.reasoning?.substring(0, 50)}...`);
     });
     console.log('─'.repeat(60));
@@ -547,7 +356,6 @@ async function generateSchedule(character) {
         time: p.scheduled_time,
         type: p.post_type,
         content_type: p.content_type,
-        is_experiment: p.is_experiment || false,
         reasoning: p.reasoning,
         location_key: p.location_key,
         location_name: p.location_name,
@@ -562,16 +370,8 @@ async function generateSchedule(character) {
       status: 'pending',
       posts_completed: 0,
       posts_total: plan.posts.length,
-      generated_by: 'content_brain_v2.1',
-      generation_reasoning: JSON.stringify({
-        summary: plan.reasoning_summary || `Analytics: ${analytics.patterns?.bestLocationType}, Context: ${context.seasonalContext}`,
-        exploration_rules: explorationRules.map(r => r.type),
-        ab_test: plan.ab_test_applied ? {
-          experiment_id: abTest.id,
-          hypothesis: abTest.hypothesis,
-          variant: abTest.activeVariant,
-        } : null,
-      }),
+      generated_by: 'content_brain_v2',
+      generation_reasoning: plan.reasoning_summary || `Analytics: ${analytics.patterns?.bestLocationType}, Context: ${context.seasonalContext}`,
     };
 
     const { data, error } = await supabase
@@ -603,11 +403,10 @@ async function generateSchedule(character) {
 
 async function main() {
   console.log('\n' + '═'.repeat(60));
-  console.log('   🧠 CONTENT BRAIN V2.1 — Intelligent Content Planning');
+  console.log('   🧠 CONTENT BRAIN V2 — Intelligent Content Planning');
   console.log('═'.repeat(60));
   console.log(`   Time: ${new Date().toISOString()}`);
   console.log('   Layers: Analytics + History + Context + Character + Memories');
-  console.log('   + Dynamic Times + Exploration Budget + A/B Testing');
   console.log('═'.repeat(60));
 
   const args = process.argv.slice(2);
