@@ -1,179 +1,128 @@
-# 📝 SESSION — 21 Décembre 2024 (Partie 3)
+# 📝 SESSION — 21 Décembre 2024
 
-## 💕 Relationship Layer — The Secret
+## 💕 Content Brain V2.3 — Relationship Layer + Extended Thinking + Travel Expansion
 
-**Date** : 21 décembre 2024  
-**Durée** : ~45min
+**Date** : 21 décembre 2024 (samedi)  
+**Durée** : ~2h
 
 ---
 
 ### ✅ Ce qui a été fait cette session :
 
-1. **Nouveau Layer 6 : Relationship Layer**
-   - Créé `app/scripts/lib/relationship-layer.mjs`
-   - Système de hints subtils pour suggérer la relation Mila x Elena
-   - 5 niveaux de teasing progressifs
-   - Catalogue de 15+ types de hints
+1. **Relationship Layer (Layer 6)** — "The Secret" 💕
+   - Créé `relationship-layer.mjs` avec système de hints subtils
+   - Mila & Elena sont ensemble mais ON NE DIT JAMAIS RIEN
+   - 5 niveaux de teasing (1: parallel_lives → 5: undeniable)
+   - 15+ types de hints (two_cups, same_location, tender_caption, shared_item...)
+   - Intégré dans le prompt Claude avec règle #9
 
-2. **Intégration dans Content Brain V2.2**
-   - Import du relationship layer
-   - Ajout au prompt Claude (section 6️⃣)
-   - Nouveau champ `relationship_hint` dans le JSON output
-   - Règle STRICTE #9 : intégrer le hint suggéré
+2. **Extended Thinking activé**
+   - Claude Sonnet 4 avec `thinking.budget_tokens: 10000`
+   - Meilleur raisonnement sur les 6 layers d'intelligence
+   - Coût estimé: ~$4.30/mois (vs $2.50 sans)
 
-3. **Update CHARACTER_SHEETS**
-   - Ajout de la section "Sa meilleure amie"
-   - Backstory enrichie (t-shirt Blondie, bar rock du 11e)
-   - **LE SECRET** clairement indiqué (mais jamais dit publiquement)
+3. **Travel Expansion — Destinations diversifiées**
+   - **Mila** : 6 → 32 lieux (Nice, Barcelona, Lisbon, Amsterdam, Mykonos...)
+   - **Elena** : 10 → 38 lieux (Maldives, Dubai, Cannes, Monaco, Santorini...)
+   - Logique **Live vs Throwback** selon `ACTIVE_TRIPS`
 
-4. **Schema Supabase mis à jour**
-   - Nouvelle table `relationship_hints` pour tracker l'usage
-   - Mise à jour des données `relationships` avec backstory enrichie
-   - Version 1.1.0
+4. **Timeline Events enrichis**
+   - 12 → 35+ événements dans Supabase
+   - Trips variés 2024-2025 (Mykonos, Maldives, NYC, Cannes, Amalfi...)
+   - Solo trips pour chaque personnage
+
+5. **Bug fix**
+   - BUG-002 marqué comme fixé (GitHub Actions poste bien)
 
 ---
 
 ### 📁 Fichiers créés/modifiés :
 
 **Créés :**
-- `app/scripts/lib/relationship-layer.mjs` — Le layer complet
+- `app/scripts/lib/relationship-layer.mjs` — Hint system complet
 
 **Modifiés :**
-- `app/scripts/cron-scheduler.mjs` — V2.2 avec 6 layers
-- `app/supabase/schema.sql` — Table relationship_hints
+- `app/scripts/cron-scheduler.mjs` — V2.3 (6 layers + Extended Thinking + ACTIVE_TRIPS)
+- `app/supabase/schema.sql` — Table `relationship_hints` + 35 timeline events
+- `ROADMAP.md` — DONE-024, BUG-002 fixed
 
 ---
 
-### 💕 LE SECRET
+### 🚧 En cours (non terminé) :
 
-> **Mila et Elena sont ensemble, mais on ne le dit JAMAIS.**
-> 
-> On suggère subtilement à travers :
-> - Captions tendres ("ma personne" 💕)
-> - Éléments visuels (2 tasses, main dans le frame)
-> - Timing parallèle (même lieu, même jour)
-> - Items partagés (Elena porte le collier de Mila)
-
-**Règles d'or :**
-1. JAMAIS confirmer explicitement
-2. Laisser les fans spéculer (engagement!)
-3. Si question directe → "C'est ma best friend 💕"
-4. Subtext > text — show, don't tell
+- Rien — Session complète ✅
 
 ---
 
-### 🎭 Niveaux de Teasing
+### 📋 À faire prochaine session :
 
-| Level | Nom | Description | Exemples |
-|-------|-----|-------------|----------|
-| 1 | parallel_lives | Même lieu, même jour (non dit) | Les deux à Montmartre |
-| 2 | best_friends | Ensemble, tags, amitié visible | Brunch à deux |
-| 3 | intimate_hints | 2 tasses, main presque visible | "Cozy morning 💕" |
-| 4 | couple_energy | Valentine's "solo", items partagés | Elena avec collier étoile |
-| 5 | undeniable | Même chambre d'hôtel (angles différents) | Fans reconstituent |
-
-**Niveau actuel : 3** (intimate_hints)
+- [ ] Analyser analytics après 1 semaine (28 déc)
+- [ ] Décider si Auto-Reply comments est prioritaire
+- [ ] Créer `video-reel-post-elena.mjs`
+- [ ] Tester un video-reel en production
+- [ ] Tracker engagement posts avec hints vs sans
 
 ---
 
-### 📊 Hint Catalog (extrait)
+### 🐛 Bugs découverts :
 
-| Type | Level | Fréquence | Note |
-|------|-------|-----------|------|
-| `tag_each_other` | 2 | 2x/week | Tag dans caption |
-| `duo_content` | 2 | 1x/week | Ensemble visible |
-| `matching_outfits` | 3 | 2x/month | Jamais même jour |
-| `same_location_same_day` | 3 | 1x/week | Jamais même frame |
-| `two_cups` | 4 | 2x/month | Ne pas dire pour qui |
-| `shared_item` | 4 | 1x/month | Bijou de l'autre |
-| `caption_slip` | 5 | 2x/year | "We" → "I*" |
+- Aucun bug découvert cette session
 
 ---
 
 ### 💡 Idées notées :
 
-- Tracker les comments qui mentionnent "couple", "dating", "together"
-- A/B test : posts avec hint vs sans hint → engagement
-- Progression naturelle du teasing level avec growth du compte
-- Event spécial Valentine's Day 2025 (double teasing)
+- Script `set-trip.mjs` pour activer/désactiver voyages facilement
+- Auto-Reply comments system (3 options: notification, full auto, batch)
+- Tracker comments mentionnant "couple", "together", "dating"
+- A/B test: posts avec hint relationship vs sans
+- Valentine's Day 2025 special content (double teasing)
 
 ---
 
 ### 📝 Notes importantes :
 
-**Comment ça marche dans le scheduler :**
+**Le Secret 💕**
+```
+Mila & Elena sont ensemble romantiquement.
+ON NE DIT JAMAIS RIEN. On suggère subtilement.
+Les fans qui "comprennent" = engagement gold.
+```
 
+**Logique Travel**
 ```javascript
-// Le scheduler reçoit le hint suggéré
-const relationship = await fetchRelationship(supabase, character);
-// → { suggestedHint: { type: 'two_cups', level: 4, ... } }
+// Si Elena voyage (ex: Dubai)
+ACTIVE_TRIPS.elena = { isCurrentlyTraveling: true, currentDestination: 'dubai' }
+// → Contenu LIVE Dubai uniquement
 
-// Claude l'intègre dans le planning
-// Post généré avec relationship_hint: 'two_cups'
-// → prompt_hints: "morning coffee, two cups visible on table"
-// → caption: "Morning ritual ☕ You prefer tea or coffee?"
+// Si Elena est à Paris
+ACTIVE_TRIPS.elena = { isCurrentlyTraveling: false }
+// → THROWBACK random (Maldives, Mykonos, Bali, Cannes...)
 ```
 
-**Exemple output enrichi :**
+**Plan semaine prochaine**
+- 21-27 déc: Laisser tourner Content Brain V2.3
+- Prendre notes sur feedbacks (qualité, captions, timing)
+- 28 déc: Analyser analytics + décider next steps
 
-```
-════════════════════════════════════════════════════════════
-🧠 CONTENT BRAIN V2.2 — ELENA
-════════════════════════════════════════════════════════════
-
-💕 Relationship hint: same_location_same_day
-   → Mila a posté depuis Montmartre hier
-
-📅 Planning généré:
-────────────────────────────────────────────────────────────
-10:00 │ CAROUSEL │ ✨ Café Montmartre
-       Caption: "Exploring new neighborhoods 🤍 Any recommendations?"
-       [HINT: same location as Mila yesterday]
-────────────────────────────────────────────────────────────
-```
+**Coûts mensuels estimés**
+- Content Brain (scheduler): ~$4.30/mois
+- Smart Comments: variable (usage manuel)
+- Image generation: ~$15-30/mois (Replicate)
 
 ---
 
-### 🚀 Prochaines étapes :
+### 📊 Versions
 
-- [ ] Tester le scheduler V2.3 en local
-- [ ] Créer `video-reel-post-elena.mjs`
-- [ ] Tracker l'engagement des posts avec hints vs sans
-- [ ] Préparer contenu Valentine's Day 2025
-
----
-
-### ⚡ Update: Extended Thinking activé
-
-**V2.3** utilise maintenant Claude Sonnet 4 avec Extended Thinking :
-
-```javascript
-const response = await anthropic.messages.create({
-  model: 'claude-sonnet-4-20250514',
-  max_tokens: 16000,
-  thinking: {
-    type: 'enabled',
-    budget_tokens: 10000,  // Deep reasoning sur 6 layers
-  },
-  messages: [{ role: 'user', content: prompt }],
-});
-```
-
-**Coût estimé** : ~$4.30/mois (vs $2.50 sans thinking)
-
-**Avantages** :
-- Meilleure analyse des 6 layers d'intelligence
-- Hints relationship plus subtils et contextuels
-- Décisions narratives plus cohérentes
+| Composant | Version |
+|-----------|---------|
+| Content Brain | V2.3 |
+| Relationship Layer | V1.0 |
+| Project | v2.16.0 |
 
 ---
 
-**Commits de cette session :**
+**Commit** : `273c53d`
 ```
-feat: Add Relationship Layer (V2.3) - The Secret 💕
-- New relationship-layer.mjs with hint system
-- Updated cron-scheduler with 6 layers + Extended Thinking
-- Enhanced CHARACTER_SHEETS with secret backstory
-- New relationship_hints table in Supabase
+feat: Content Brain V2.3 - Relationship Layer + Extended Thinking + Travel Expansion
 ```
-
