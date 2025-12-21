@@ -1,13 +1,17 @@
 /**
- * CRON Scheduler — Generate daily content plan
+ * CRON Scheduler V2 — Content Brain with 5 Intelligence Layers
  * 
- * Run daily at 6:00 UTC (7:00 Paris)
- * Generates the day's posting schedule using Content Brain
+ * Generates daily content plan using:
+ * 1. Analytics Layer — What performs best
+ * 2. History Layer — Where we are in the story
+ * 3. Context Layer — What's happening now (Perplexity)
+ * 4. Character Layer — Who is she
+ * 5. Memories Layer — Shared memories & duo opportunities
  * 
  * Usage:
- *   node scripts/cron-scheduler.mjs           # Schedule both accounts
- *   node scripts/cron-scheduler.mjs mila      # Schedule Mila only
- *   node scripts/cron-scheduler.mjs elena     # Schedule Elena only
+ *   node scripts/cron-scheduler-v2.mjs           # Schedule both accounts
+ *   node scripts/cron-scheduler-v2.mjs mila      # Schedule Mila only
+ *   node scripts/cron-scheduler-v2.mjs elena     # Schedule Elena only
  */
 
 import dotenv from 'dotenv';
@@ -15,6 +19,12 @@ dotenv.config({ path: '.env.local' });
 
 import Anthropic from '@anthropic-ai/sdk';
 import { createClient } from '@supabase/supabase-js';
+
+// Import layers
+import { analyzePerformance, formatAnalyticsForPrompt } from './lib/analytics-layer.mjs';
+import { fetchHistory, formatHistoryForPrompt } from './lib/history-layer.mjs';
+import { fetchContext, formatContextForPrompt } from './lib/context-layer.mjs';
+import { fetchMemories, formatMemoriesForPrompt } from './lib/memories-layer.mjs';
 
 // ===========================================
 // CONFIG
@@ -30,7 +40,6 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
   if (!SUPABASE_URL) console.error('   - SUPABASE_URL');
   if (!SUPABASE_SERVICE_KEY) console.error('   - SUPABASE_SERVICE_KEY');
   console.error('\n💡 Add these secrets in GitHub: Settings → Secrets → Actions');
-  console.error('   Or in .env.local for local development');
   process.exit(1);
 }
 
@@ -40,189 +49,207 @@ if (!CLAUDE_KEY) {
 }
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
-
-const anthropic = new Anthropic({
-  apiKey: CLAUDE_KEY,
-});
+const anthropic = new Anthropic({ apiKey: CLAUDE_KEY });
 
 // ===========================================
-// OPTIMAL POSTING TIMES (Paris timezone)
-// ===========================================
-
-function getOptimalPostingTimes(dayOfWeek) {
-  // Based on Instagram best practices + our analytics
-  // dayOfWeek: 0 = Sunday, 6 = Saturday
-  
-  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-  
-  if (isWeekend) {
-    // Weekend: people wake up later, more active evening
-    return {
-      slots: ['10:00', '14:00', '20:00'],
-      reelSlot: '14:00', // Best for weekend reels
-      postsCount: 3,
-    };
-  } else if (dayOfWeek === 5) {
-    // Friday: anticipation for weekend
-    return {
-      slots: ['08:30', '12:30', '18:00', '21:00'],
-      reelSlot: '18:00', // Friday evening reels perform well
-      postsCount: 4,
-    };
-  } else {
-    // Weekdays (Mon-Thu)
-    return {
-      slots: ['08:00', '12:30', '19:00'],
-      reelSlot: '12:30', // Lunch break reels
-      postsCount: 3,
-    };
-  }
-}
-
-// ===========================================
-// CHARACTER CONFIG
+// CHARACTER SHEETS
 // ===========================================
 
 const CHARACTER_SHEETS = {
   mila: `## Mila Verne (@mila_verne)
 - 26 ans, Personal Trainer & Photographe
 - Paris 18e (Montmartre)
-- Style: Artiste sportive punk rock fun
-- Activités: PT, photo, guitare, yoga/pilates`,
+- Style: Artiste sportive punk rock fun, authentique
+- Activités: Personal training, photographie, guitare, yoga, pilates
+- Personnalité: Énergique, passionnée, rebelle douce, naturelle
+- Corps: Athlétique, petite poitrine, tonique
+- Meilleure amie: Elena Visconti (mannequin, se sont rencontrées sur un shooting)`,
 
   elena: `## Elena Visconti (@elenav.paris)
 - 24 ans, Mannequin & Influenceuse Mode
-- Paris 8e (Haussmann luxe)
-- Style: Sophistiquée jet-set, luxe discret
-- Activités: Shootings, voyages, spa, Fashion Week`,
+- Paris 8e (Haussmann luxe), origine Milan
+- Style: Sophistiquée jet-set, street-luxe Paris, luxe discret
+- Activités: Shootings mode, voyages luxe, spa, Fashion Week, gastronomie
+- Personnalité: Warm, accessible (pas froide comme mannequin typique), confiante, secretly punk
+- Corps: Curvy, voluptueuse, très généreuse poitrine naturelle
+- Meilleure amie: Mila Verne (photographe, se sont rencontrées sur un shooting)
+- IMPORTANT: Elena voyage beaucoup (Milan, yachts, spas montagne, Fashion Weeks)`,
 };
+
+// ===========================================
+// AVAILABLE LOCATIONS
+// ===========================================
 
 const LOCATIONS = {
   mila: [
-    'home_bedroom: Chambre Mila (cozy bohemian)',
-    'home_living_room: Salon Mila (rooftop view)',
-    'nice_old_town_cafe: KB CaféShop Paris 18e',
-    'nice_gym: L\'Usine Paris (premium gym)',
+    'home_bedroom: Chambre Mila (cozy bohemian, plantes, lumière douce)',
+    'home_living_room: Salon Mila (rooftop view Montmartre, guitare)',
+    'kb_cafe: KB CaféShop Paris 18e (café trendy, brunch)',
+    'usine_gym: L\'Usine Paris (premium gym, vestiaires luxe)',
+    'montmartre_streets: Rues de Montmartre (escaliers, street style)',
+    'studio_photo: Studio photo Paris (shooting perso)',
   ],
   elena: [
-    'loft_living: Loft Elena Paris 8e',
-    'loft_bedroom: Chambre Elena (vanity)',
-    'bathroom_luxe: Salle de bain marble & gold',
-    'cafe_paris: Café parisien chic',
-    'spa_luxe: Spa luxe (mountains)',
-    'milan_fashion: Milano Fashion District',
-    'yacht_mediterranean: Yacht Méditerranée',
-    'airport_lounge: Airport Business Lounge',
+    'loft_living: Loft Elena Paris 8e (luxe minimaliste, grandes fenêtres)',
+    'loft_bedroom: Chambre Elena (vanity Hollywood, lit king size)',
+    'bathroom_luxe: Salle de bain marble & gold (baignoire, miroirs)',
+    'cafe_paris: Café parisien chic (terrasse, Haussmann)',
+    'spa_mountains: Spa luxe montagne (piscine extérieure, neige)',
+    'milan_fashion: Milano Fashion District (shopping, Via Montenapoleone)',
+    'yacht_mediterranean: Yacht Méditerranée (deck, sunset)',
+    'airport_lounge: Airport Business Lounge (travel vibes)',
+    'courchevel_chalet: Chalet Courchevel (ski, après-ski)',
+    'bali_villa: Villa Bali (piscine infinity, rizières)',
   ],
 };
 
 // ===========================================
-// FETCH CONTEXT FROM SUPABASE
+// OPTIMAL POSTING TIMES
 // ===========================================
 
-async function fetchContext(character) {
-  // Get recent posts (avoid repetition)
-  const { data: recentPosts } = await supabase
-    .from('posts')
-    .select('location_key, mood, post_type, posted_at')
-    .eq('character_name', character)
-    .order('posted_at', { ascending: false })
-    .limit(5);
-
-  // Get analytics insights
-  const { data: topPosts } = await supabase
-    .from('posts')
-    .select('location_key, mood, post_type, likes_count')
-    .eq('character_name', character)
-    .order('likes_count', { ascending: false })
-    .limit(10);
-
-  // Get timeline events
-  const { data: timeline } = await supabase
-    .from('timeline_events')
-    .select('title, description, event_date, emotional_tone')
-    .contains('characters', [character])
-    .order('event_date', { ascending: false })
-    .limit(5);
-
-  // Calculate best performers
-  const locationCounts = {};
-  const moodCounts = {};
-  topPosts?.forEach(p => {
-    if (p.location_key) locationCounts[p.location_key] = (locationCounts[p.location_key] || 0) + 1;
-    if (p.mood) moodCounts[p.mood] = (moodCounts[p.mood] || 0) + 1;
-  });
-
-  const bestLocation = Object.entries(locationCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
-  const bestMood = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
-
-  // Recent locations to avoid
-  const recentLocations = [...new Set(recentPosts?.map(p => p.location_key).filter(Boolean))];
-
-  return {
-    recentPosts: recentPosts || [],
-    recentLocations,
-    bestLocation,
-    bestMood,
-    timeline: timeline || [],
-  };
+function getOptimalPostingTimes(dayOfWeek) {
+  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+  
+  if (isWeekend) {
+    return {
+      slots: ['10:00', '14:00', '20:00'],
+      reelSlot: '14:00',
+      postsCount: 3,
+    };
+  } else if (dayOfWeek === 5) {
+    return {
+      slots: ['08:30', '12:30', '18:00', '21:00'],
+      reelSlot: '18:00',
+      postsCount: 4,
+    };
+  } else {
+    return {
+      slots: ['08:00', '12:30', '19:00'],
+      reelSlot: '12:30',
+      postsCount: 3,
+    };
+  }
 }
 
 // ===========================================
-// BUILD CLAUDE PROMPT
+// BUILD ENHANCED PROMPT (5 LAYERS)
 // ===========================================
 
-function buildPrompt(character, context, postingConfig, today) {
-  const other = character === 'mila' ? 'elena' : 'mila';
+function buildEnhancedPrompt(
+  character,
+  analytics,
+  history,
+  context,
+  memories,
+  postingConfig,
+  today
+) {
+  const otherCharacter = character === 'mila' ? 'Elena' : 'Mila';
   const dayName = today.toLocaleDateString('fr-FR', { weekday: 'long' });
-  const dateStr = today.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const dateStr = today.toLocaleDateString('fr-FR', { 
+    day: 'numeric', 
+    month: 'long', 
+    year: 'numeric' 
+  });
 
   return `Tu es le Content Brain de ${character === 'mila' ? 'Mila Verne' : 'Elena Visconti'}.
+Ta mission: créer un planning de posts intelligent, cohérent et engageant.
+
+═══════════════════════════════════════════════════════════════
+## 1️⃣ ANALYTICS — Ce qui FONCTIONNE
+═══════════════════════════════════════════════════════════════
+
+${formatAnalyticsForPrompt(analytics)}
+
+═══════════════════════════════════════════════════════════════
+## 2️⃣ HISTORIQUE — Où en est-on dans l'histoire ?
+═══════════════════════════════════════════════════════════════
+
+${formatHistoryForPrompt(history)}
+
+═══════════════════════════════════════════════════════════════
+## 3️⃣ CONTEXTE TEMPS RÉEL — Que se passe-t-il ?
+═══════════════════════════════════════════════════════════════
+
+Date: ${dayName} ${dateStr}
+
+${formatContextForPrompt(context)}
+
+═══════════════════════════════════════════════════════════════
+## 4️⃣ PERSONNAGE
+═══════════════════════════════════════════════════════════════
 
 ${CHARACTER_SHEETS[character]}
 
-## Date: ${dayName} ${dateStr}
-## Posts à générer: ${postingConfig.postsCount}
-## Horaires optimaux: ${postingConfig.slots.join(', ')}
-## Slot idéal pour Reel: ${postingConfig.reelSlot}
+═══════════════════════════════════════════════════════════════
+## 5️⃣ SOUVENIRS PARTAGÉS — Opportunités avec ${otherCharacter}
+═══════════════════════════════════════════════════════════════
 
-## Historique récent (éviter ces lieux)
-${context.recentLocations.join(', ') || 'Aucun'}
+${formatMemoriesForPrompt(memories, character)}
 
-## Analytics Insights
-- Meilleur lieu: ${context.bestLocation || 'Pas assez de données'}
-- Meilleur mood: ${context.bestMood || 'Pas assez de données'}
+═══════════════════════════════════════════════════════════════
+## 🎯 MISSION
+═══════════════════════════════════════════════════════════════
 
-## Timeline récente (souvenirs avec ${other})
-${context.timeline.map(e => `- ${e.event_date}: ${e.title}`).join('\n') || 'Aucun'}
+Génère ${postingConfig.postsCount} posts pour aujourd'hui.
 
-## Lieux disponibles
+### Horaires disponibles:
+${postingConfig.slots.join(', ')}
+(Reel idéalement à ${postingConfig.reelSlot})
+
+### Lieux disponibles:
 ${LOCATIONS[character].join('\n')}
 
-## Mission
-Génère ${postingConfig.postsCount} posts pour aujourd'hui. Au moins 1 REEL obligatoire.
+### Types de contenu possibles:
+1. **NOUVEAU** — Contenu du jour (le plus courant)
+2. **THROWBACK** — Rappel d'un arc passé (#throwback, souvenir)
+3. **DUO** — Contenu avec/sur ${otherCharacter} (si opportunité)
+4. **RÉPONSE** — Réaction au post récent de ${otherCharacter}
 
-Pour chaque post:
-- location_key: ID du lieu
-- location_name: Nom du lieu  
-- post_type: "carousel" ou "reel"
-- mood: cozy|adventure|work|fitness|travel|fashion|relax
-- outfit: Description tenue
-- action: Ce qu'elle fait
-- caption: Caption avec question (max 150 chars)
-- hashtags: 15 hashtags (QUOTED strings like "#fitness")
-- scheduled_time: Horaire parmi ${postingConfig.slots.join(', ')}
-- prompt_hints: Indices pour génération image
+### Pour chaque post, fournis:
+- **content_type**: "new" | "throwback" | "duo" | "response"
+- **reasoning**: POURQUOI ce choix (1-2 phrases, basé sur les layers ci-dessus)
+- **location_key**: ID du lieu
+- **location_name**: Nom complet du lieu
+- **post_type**: "carousel" | "reel"
+- **mood**: cozy | adventure | work | fitness | travel | fashion | relax | nostalgic
+- **outfit**: Description tenue détaillée
+- **action**: Ce qu'elle fait (pour le prompt image)
+- **caption**: Caption engageante AVEC question (max 150 chars)
+- **hashtags**: 12-15 hashtags (format ["#tag1", "#tag2"])
+- **scheduled_time**: Horaire parmi les slots disponibles
+- **prompt_hints**: Indices pour génération image
 
-Règles:
-1. Ne PAS répéter les lieux récents
-2. Le Reel DOIT être à ${postingConfig.reelSlot}
-3. Chaque caption DOIT avoir une question
+### Règles STRICTES:
+1. Au moins 1 REEL obligatoire
+2. NE PAS répéter les lieux de l'historique récent
+3. Chaque caption DOIT avoir une question pour l'engagement
+4. Si analytics montrent que travel performe bien → privilégier travel
+5. Si duo est overdue (>10 jours) → inclure au moins 1 throwback/duo
+6. Le reasoning doit justifier le choix en citant les données
 
-JSON uniquement, format:
+═══════════════════════════════════════════════════════════════
+
+Réponds UNIQUEMENT avec du JSON valide, format:
 {
-  "daily_theme": "...",
-  "posts": [{ ... }]
+  "daily_theme": "Thème du jour en 1 phrase",
+  "reasoning_summary": "Résumé des décisions principales",
+  "posts": [
+    {
+      "content_type": "new|throwback|duo|response",
+      "reasoning": "Pourquoi ce post...",
+      "location_key": "...",
+      "location_name": "...",
+      "post_type": "carousel|reel",
+      "mood": "...",
+      "outfit": "...",
+      "action": "...",
+      "caption": "... question?",
+      "hashtags": ["#..."],
+      "scheduled_time": "HH:MM",
+      "prompt_hints": "..."
+    }
+  ]
 }`;
 }
 
@@ -231,19 +258,47 @@ JSON uniquement, format:
 // ===========================================
 
 async function generateSchedule(character) {
-  console.log(`\n🧠 Generating schedule for ${character.toUpperCase()}...`);
+  console.log(`\n${'═'.repeat(60)}`);
+  console.log(`🧠 CONTENT BRAIN V2 — ${character.toUpperCase()}`);
+  console.log('═'.repeat(60));
 
   const today = new Date();
   const dayOfWeek = today.getDay();
   const postingConfig = getOptimalPostingTimes(dayOfWeek);
-  const context = await fetchContext(character);
 
-  console.log(`   Day: ${today.toLocaleDateString('fr-FR', { weekday: 'long' })}`);
-  console.log(`   Posts: ${postingConfig.postsCount}`);
-  console.log(`   Slots: ${postingConfig.slots.join(', ')}`);
-  console.log(`   Locations to avoid: ${context.recentLocations.join(', ') || 'none'}`);
+  console.log(`📅 ${today.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}`);
+  console.log(`📊 Posts prévus: ${postingConfig.postsCount}`);
+  console.log(`⏰ Créneaux: ${postingConfig.slots.join(', ')}\n`);
 
-  const prompt = buildPrompt(character, context, postingConfig, today);
+  // Gather all layers
+  console.log('🔄 Gathering intelligence layers...\n');
+
+  // First fetch analytics and history (no dependencies)
+  const [analytics, history] = await Promise.all([
+    analyzePerformance(supabase, character),
+    fetchHistory(supabase, character),
+  ]);
+
+  // Then fetch context (needs history for location) and memories in parallel
+  const [context, memories] = await Promise.all([
+    fetchContext(history?.narrative?.currentLocation || 'paris'),
+    fetchMemories(supabase, character),
+  ]);
+
+  // Build enhanced prompt
+  console.log('\n📝 Building enhanced prompt...');
+  const prompt = buildEnhancedPrompt(
+    character,
+    analytics,
+    history,
+    context,
+    memories,
+    postingConfig,
+    today
+  );
+
+  // Call Claude
+  console.log('🤖 Asking Claude for decisions...\n');
 
   try {
     const response = await anthropic.messages.create({
@@ -253,18 +308,19 @@ async function generateSchedule(character) {
     });
 
     const textContent = response.content.find(c => c.type === 'text');
-    if (!textContent) throw new Error('No response');
+    if (!textContent) throw new Error('No response from Claude');
 
     // Extract JSON
     let jsonStr = textContent.text;
     const codeBlockMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
-    if (codeBlockMatch) jsonStr = codeBlockMatch[1];
-    else {
+    if (codeBlockMatch) {
+      jsonStr = codeBlockMatch[1];
+    } else {
       const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
       if (jsonMatch) jsonStr = jsonMatch[0];
     }
 
-    // Fix hashtags
+    // Fix common JSON issues
     jsonStr = jsonStr.replace(/"hashtags"\s*:\s*\[([\s\S]*?)\]/g, (match, content) => {
       const hashtags = content.match(/"#[\w]+"/g) || [];
       return `"hashtags": [${hashtags.join(', ')}]`;
@@ -272,7 +328,21 @@ async function generateSchedule(character) {
 
     const plan = JSON.parse(jsonStr);
 
-    console.log(`   ✅ Generated: "${plan.daily_theme}"`);
+    // Display results
+    console.log(`✅ Theme: "${plan.daily_theme}"`);
+    console.log(`📋 Reasoning: ${plan.reasoning_summary || 'N/A'}\n`);
+
+    console.log('📅 Planning généré:');
+    console.log('─'.repeat(60));
+    plan.posts.forEach((p, i) => {
+      const typeIcon = p.content_type === 'throwback' ? '📸' : 
+                       p.content_type === 'duo' ? '👯' : 
+                       p.content_type === 'response' ? '💬' : '✨';
+      console.log(`${p.scheduled_time} │ ${p.post_type.toUpperCase().padEnd(8)} │ ${typeIcon} ${p.location_name}`);
+      console.log(`         │ ${p.content_type.toUpperCase()} │ "${p.caption?.substring(0, 45)}..."`);
+      console.log(`         └─ Reasoning: ${p.reasoning?.substring(0, 50)}...`);
+    });
+    console.log('─'.repeat(60));
 
     // Save to Supabase
     const scheduleDate = today.toISOString().split('T')[0];
@@ -285,6 +355,8 @@ async function generateSchedule(character) {
       scheduled_posts: plan.posts.map(p => ({
         time: p.scheduled_time,
         type: p.post_type,
+        content_type: p.content_type,
+        reasoning: p.reasoning,
         location_key: p.location_key,
         location_name: p.location_name,
         mood: p.mood,
@@ -298,8 +370,8 @@ async function generateSchedule(character) {
       status: 'pending',
       posts_completed: 0,
       posts_total: plan.posts.length,
-      generated_by: 'cron_scheduler',
-      generation_reasoning: `Day: ${today.toLocaleDateString('fr-FR', { weekday: 'long' })}, Best location: ${context.bestLocation}, Avoided: ${context.recentLocations.join(', ')}`,
+      generated_by: 'content_brain_v2',
+      generation_reasoning: plan.reasoning_summary || `Analytics: ${analytics.patterns?.bestLocationType}, Context: ${context.seasonalContext}`,
     };
 
     const { data, error } = await supabase
@@ -309,22 +381,18 @@ async function generateSchedule(character) {
       .single();
 
     if (error) {
-      console.log(`   ❌ Save error: ${error.message}`);
+      console.log(`\n❌ Save error: ${error.message}`);
       return null;
     }
 
-    console.log(`   📅 Saved schedule ID: ${data.id}`);
-
-    // Display schedule
-    console.log(`\n   📋 Today's Schedule:`);
-    plan.posts.forEach((p, i) => {
-      console.log(`      ${p.scheduled_time} │ ${p.post_type.toUpperCase().padEnd(8)} │ ${p.location_name}`);
-    });
-
+    console.log(`\n💾 Saved to Supabase: ${data.id}`);
     return data;
 
   } catch (error) {
-    console.log(`   ❌ Error: ${error.message}`);
+    console.log(`\n❌ Error: ${error.message}`);
+    if (error.message.includes('JSON')) {
+      console.log('   JSON parsing failed — check Claude response format');
+    }
     return null;
   }
 }
@@ -334,10 +402,12 @@ async function generateSchedule(character) {
 // ===========================================
 
 async function main() {
-  console.log('\n⏰ ═══════════════════════════════════════════════════════');
-  console.log('   CRON SCHEDULER — Daily Content Planning');
-  console.log('═══════════════════════════════════════════════════════════');
+  console.log('\n' + '═'.repeat(60));
+  console.log('   🧠 CONTENT BRAIN V2 — Intelligent Content Planning');
+  console.log('═'.repeat(60));
   console.log(`   Time: ${new Date().toISOString()}`);
+  console.log('   Layers: Analytics + History + Context + Character + Memories');
+  console.log('═'.repeat(60));
 
   const args = process.argv.slice(2);
   const target = args[0]?.toLowerCase();
@@ -351,7 +421,7 @@ async function main() {
     await generateSchedule('elena');
   }
 
-  console.log('\n✅ Scheduling complete!\n');
+  console.log('\n✅ Content Brain V2 complete!\n');
 }
 
 main().catch(console.error);
