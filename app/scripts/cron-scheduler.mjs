@@ -209,10 +209,29 @@ function getWeeklyExperiment() {
 // EXPLORATION BUDGET
 // ===========================================
 
-function getExplorationRequirements(character, history, analytics) {
+function getExplorationRequirements(character, history, analytics, postsCount) {
   const requirements = [];
   
-  // Check if stuck in home content
+  // ═══════════════════════════════════════════════════════════════
+  // RULE 1: MINIMUM 2 REELS PER DAY (Option B)
+  // ═══════════════════════════════════════════════════════════════
+  if (postsCount >= 3) {
+    requirements.push({
+      type: 'minimum_reels',
+      rule: 'OBLIGATOIRE: Minimum 2 REELS par jour (1 photo-reel + 1 video-reel idéalement)',
+      reason: 'Les reels ont 4x plus de reach — stratégie de croissance',
+    });
+  } else {
+    requirements.push({
+      type: 'minimum_reels',
+      rule: 'OBLIGATOIRE: Minimum 1 REEL par jour',
+      reason: 'Les reels ont 4x plus de reach — stratégie de croissance',
+    });
+  }
+  
+  // ═══════════════════════════════════════════════════════════════
+  // RULE 2: Check if stuck in home content
+  // ═══════════════════════════════════════════════════════════════
   const recentLocations = history?.recentPosts?.slice(0, 5).map(p => p.location) || [];
   const homeKeywords = ['loft', 'home', 'bedroom', 'living', 'bathroom'];
   const homeCount = recentLocations.filter(loc => 
@@ -227,7 +246,9 @@ function getExplorationRequirements(character, history, analytics) {
     });
   }
   
-  // Check if no travel content recently (especially for Elena)
+  // ═══════════════════════════════════════════════════════════════
+  // RULE 3: Travel content for Elena (jet-set mannequin)
+  // ═══════════════════════════════════════════════════════════════
   const travelKeywords = ['bali', 'milan', 'yacht', 'spa', 'courchevel', 'airport', 'beach'];
   const hasTravelRecently = recentLocations.some(loc => 
     travelKeywords.some(kw => (loc || '').toLowerCase().includes(kw))
@@ -236,20 +257,23 @@ function getExplorationRequirements(character, history, analytics) {
   if (!hasTravelRecently && character === 'elena') {
     requirements.push({
       type: 'travel_content',
-      rule: 'RECOMMANDÉ: Inclure du contenu travel (throwback ou teasing futur voyage)',
+      rule: 'OBLIGATOIRE: Inclure du contenu travel (throwback ou nouveau lieu voyage)',
       reason: 'Elena est mannequin jet-set — aucun travel content depuis 5+ posts',
     });
   }
   
-  // Check format variety
-  const recentTypes = history?.recentPosts?.slice(0, 7).map(p => p.type) || [];
-  const reelCount = recentTypes.filter(t => t === 'reel').length;
+  // ═══════════════════════════════════════════════════════════════
+  // RULE 4: Video reel variety (at least 1 animated reel per week)
+  // ═══════════════════════════════════════════════════════════════
+  // Check day of week - suggest video reel on specific days
+  const dayOfWeek = new Date().getDay();
+  const videoReelDays = [2, 4, 6]; // Tuesday, Thursday, Saturday
   
-  if (reelCount < 2) {
+  if (videoReelDays.includes(dayOfWeek)) {
     requirements.push({
-      type: 'format_variety',
-      rule: 'RECOMMANDÉ: Privilégier les REELS (seulement 1-2 dans les 7 derniers posts)',
-      reason: 'Les reels ont généralement plus de reach — en manque actuellement',
+      type: 'video_reel',
+      rule: 'RECOMMANDÉ: Inclure 1 video-reel animé (Kling) pour plus d\'engagement',
+      reason: 'Les video-reels animés ont +30% d\'engagement vs photo-reels',
     });
   }
   
@@ -364,6 +388,9 @@ ${LOCATIONS[character].join('\n')}
 - **location_key**: ID du lieu
 - **location_name**: Nom complet du lieu
 - **post_type**: "carousel" | "reel"
+- **reel_type**: "photo" | "video" (SEULEMENT si post_type = "reel")
+  • "photo" = slideshow de 3 photos (rapide, ~2min génération)
+  • "video" = 3 clips animés Kling (premium, ~10min génération, plus engageant)
 - **mood**: cozy | adventure | work | fitness | travel | fashion | relax | nostalgic
 - **outfit**: Description tenue détaillée
 - **action**: Ce qu'elle fait (pour le prompt image)
@@ -374,12 +401,13 @@ ${LOCATIONS[character].join('\n')}
 
 ### Règles STRICTES (dans cet ordre de priorité):
 1. **EXPLORATION D'ABORD**: Respecte les règles d'exploration ci-dessus
-2. Au moins 1 REEL obligatoire
-3. NE PAS répéter les lieux de l'historique récent (sauf throwback)
-4. Chaque caption DOIT avoir une question pour l'engagement
-5. Si duo est overdue (>10 jours) → inclure au moins 1 throwback/duo
-6. 1 post doit appliquer le test A/B si actif
-7. Le reasoning doit justifier le choix en citant les données
+2. **MINIMUM 2 REELS** par jour si 3+ posts
+3. Au moins 1 reel devrait être "video" (animé) si recommandé dans exploration
+4. NE PAS répéter les lieux de l'historique récent (sauf throwback)
+5. Chaque caption DOIT avoir une question pour l'engagement
+6. Si duo est overdue (>10 jours) → inclure au moins 1 throwback/duo
+7. 1 post doit appliquer le test A/B si actif
+8. Le reasoning doit justifier le choix en citant les données
 
 ### Important pour ${character === 'elena' ? 'Elena' : 'Mila'}:
 ${character === 'elena' 
@@ -407,6 +435,8 @@ Réponds UNIQUEMENT avec du JSON valide, format:
       "location_key": "...",
       "location_name": "...",
       "post_type": "carousel|reel",
+      "reel_type": "photo|video",
+      "reel_theme": "fitness|spa|lifestyle|travel",
       "mood": "...",
       "outfit": "...",
       "action": "...",
@@ -453,8 +483,8 @@ async function generateSchedule(character) {
     fetchMemories(supabase, character),
   ]);
 
-  // Get exploration requirements
-  const explorationRules = getExplorationRequirements(character, history, analytics);
+  // Get exploration requirements (pass postsCount for min reels rule)
+  const explorationRules = getExplorationRequirements(character, history, analytics, postingConfig.postsCount);
   if (explorationRules.length > 0) {
     console.log(`\n🔬 Exploration rules detected:`);
     explorationRules.forEach(r => console.log(`   → ${r.type}: ${r.reason}`));
@@ -529,7 +559,8 @@ async function generateSchedule(character) {
                        p.content_type === 'response' ? '💬' :
                        p.content_type === 'experiment' ? '🧪' : '✨';
       const expBadge = p.is_experiment ? ' [A/B TEST]' : '';
-      console.log(`${p.scheduled_time} │ ${p.post_type.toUpperCase().padEnd(8)} │ ${typeIcon} ${p.location_name}${expBadge}`);
+      const reelInfo = p.post_type === 'reel' ? ` (${p.reel_type || 'photo'})` : '';
+      console.log(`${p.scheduled_time} │ ${p.post_type.toUpperCase()}${reelInfo.padEnd(6)} │ ${typeIcon} ${p.location_name}${expBadge}`);
       console.log(`         │ ${p.content_type.toUpperCase().padEnd(10)} │ "${p.caption?.substring(0, 40)}..."`);
       console.log(`         └─ Reasoning: ${p.reasoning?.substring(0, 50)}...`);
     });
@@ -546,6 +577,8 @@ async function generateSchedule(character) {
       scheduled_posts: plan.posts.map(p => ({
         time: p.scheduled_time,
         type: p.post_type,
+        reel_type: p.post_type === 'reel' ? (p.reel_type || 'photo') : null,
+        reel_theme: p.post_type === 'reel' ? (p.reel_theme || 'lifestyle') : null,
         content_type: p.content_type,
         is_experiment: p.is_experiment || false,
         reasoning: p.reasoning,

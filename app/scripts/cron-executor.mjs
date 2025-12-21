@@ -86,12 +86,13 @@ async function getPendingPosts(character) {
 // ===========================================
 
 async function executePost(character, post, scheduleId, dryRun = false) {
-  console.log(`\n   🎬 Executing ${post.type.toUpperCase()} for ${character}...`);
+  const reelInfo = post.type === 'reel' ? ` (${post.reel_type || 'photo'})` : '';
+  console.log(`\n   🎬 Executing ${post.type.toUpperCase()}${reelInfo} for ${character}...`);
   console.log(`      📍 ${post.location_name}`);
   console.log(`      💬 "${post.caption?.substring(0, 50)}..."`);
 
   if (dryRun) {
-    console.log(`      ⏭️  DRY RUN - would execute ${post.type}`);
+    console.log(`      ⏭️  DRY RUN - would execute ${post.type}${reelInfo}`);
     return true;
   }
 
@@ -100,10 +101,24 @@ async function executePost(character, post, scheduleId, dryRun = false) {
   let args = [];
 
   if (post.type === 'reel') {
-    scriptName = character === 'mila' 
-      ? 'vacation-reel-post.mjs' 
-      : 'vacation-reel-post-elena.mjs';
+    // Check reel_type: "photo" = slideshow, "video" = Kling animated
+    const reelType = post.reel_type || 'photo';
+    
+    if (reelType === 'video') {
+      // Animated reel with Kling
+      scriptName = 'video-reel-post.mjs';
+      // Pass the theme if specified
+      if (post.reel_theme) {
+        args.push(post.reel_theme);
+      }
+    } else {
+      // Photo slideshow reel
+      scriptName = character === 'mila' 
+        ? 'photo-reel-post.mjs' 
+        : 'photo-reel-post-elena.mjs';
+    }
   } else {
+    // Carousel
     scriptName = character === 'mila' 
       ? 'carousel-post.mjs' 
       : 'carousel-post-elena.mjs';
@@ -111,7 +126,7 @@ async function executePost(character, post, scheduleId, dryRun = false) {
 
   const scriptPath = path.join(__dirname, scriptName);
 
-  console.log(`      📜 Running: ${scriptName}`);
+  console.log(`      📜 Running: ${scriptName} ${args.join(' ')}`);
 
   return new Promise((resolve) => {
     const child = spawn('node', [scriptPath, ...args], {
