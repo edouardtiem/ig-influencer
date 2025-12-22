@@ -1,6 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase, CharacterName } from '@/lib/supabase';
 
+interface Post {
+  id: string;
+  posted_at: string | null;
+  impressions: number | null;
+  reach: number | null;
+  likes_count: number | null;
+  comments_count: number | null;
+  saves_count: number | null;
+  character_name: string;
+  location_name: string | null;
+  engagement_rate: number | null;
+  caption: string | null;
+}
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const character = searchParams.get('character') as CharacterName | 'all' | null;
@@ -60,7 +74,7 @@ export async function GET(request: NextRequest) {
       posts: number;
     }> = {};
 
-    posts?.forEach((post) => {
+    (posts as Post[] | null)?.forEach((post) => {
       if (!post.posted_at) return;
       const date = post.posted_at.split('T')[0];
       if (!dailyData[date]) {
