@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 22 décembre 2024 (Content Brain V3 Ideas 💡)
+**Dernière mise à jour** : 22 décembre 2024 (Cloudinary Fix 🔧)
 
 ---
 
@@ -84,6 +84,7 @@ roadmap/
 
 | ID | Bug | Sévérité | Status | Lien |
 |----|-----|----------|--------|------|
+| BUG-004 | **Cloudinary Unsigned Upload Blocked** — upload_preset: 'ml_default' rejeté, fix signed uploads | 🔴 High | ✅ Fixed | [→](./docs/SESSION-22-DEC-2024-CLOUDINARY-FIX.md) |
 | BUG-003 | **Token Elena expiré** — Long-lived token expiré, nécessite refresh manuel | 🔴 High | ✅ Fixed | [→](./docs/20-TOKEN-REFRESH-GUIDE.md) |
 | BUG-002 | ~~GitHub Actions génère images mais ne poste pas~~ | - | ✅ Fixed | Content Brain v2.0 |
 | BUG-001 | Rate limit Replicate sur batch | 🟡 Medium | Open | [→](./roadmap/bugs/BUG-001-rate-limit.md) |
@@ -112,7 +113,7 @@ Total Features:
 ├── ✅ Done        : 26
 ├── 🚧 In Progress : 1 (Model Evolution)
 ├── 📋 Todo        : 5
-├── 🐛 Bugs        : 2 (2 fixed)
+├── 🐛 Bugs        : 3 (3 fixed)
 └── 💡 Ideas       : 7 (+3 Content Brain V3)
 ```
 
@@ -122,6 +123,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 22/12/2024 | **🔧 Cloudinary Fix** — Signed uploads pour Content Brain auto-post | [→](./docs/SESSION-22-DEC-2024-CLOUDINARY-FIX.md) |
 | 22/12/2024 | **💡 Content Brain V3 Ideas** — Ideas Backlog + Trends Layer + Long-form Captions + Character Voice | [→](./docs/SESSION-22-DEC-2024-CONTENT-BRAIN-V3.md) |
 | 22/12/2024 | **🔴 Model Evolution Strategy** — Mila Tesla Cherry Wine Red + Elena blonde + bi/open + découverte base64 | [→](./docs/SESSION-22-DEC-2024-MODEL-EVOLUTION.md) |
 | 22/12/2024 | **🎯 Explicit Reference Prompts** — IMAGE 1=face, IMAGE 2=body pour meilleure ressemblance | [→](./docs/SESSION-22-DEC-2024-EXPLICIT-PROMPTS.md) |
