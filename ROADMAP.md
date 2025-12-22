@@ -85,6 +85,7 @@ roadmap/
 
 | ID | Bug | Sévérité | Status | Lien |
 |----|-----|----------|--------|------|
+| BUG-005 | **TypeScript Strict Mode Errors** — Recharts formatter + Supabase callback types | 🟡 Medium | ✅ Fixed | [→](./docs/SESSION-22-DEC-2024-CLOUDINARY-FIX.md) |
 | BUG-004 | **Cloudinary Unsigned Upload Blocked** — upload_preset: 'ml_default' rejeté, fix signed uploads | 🔴 High | ✅ Fixed | [→](./docs/SESSION-22-DEC-2024-CLOUDINARY-FIX.md) |
 | BUG-003 | **Token Elena expiré** — Long-lived token expiré, nécessite refresh manuel | 🔴 High | ✅ Fixed | [→](./docs/20-TOKEN-REFRESH-GUIDE.md) |
 | BUG-002 | ~~GitHub Actions génère images mais ne poste pas~~ | - | ✅ Fixed | Content Brain v2.0 |
@@ -114,7 +115,7 @@ Total Features:
 ├── ✅ Done        : 27 (+1 Analytics Page)
 ├── 🚧 In Progress : 1 (Model Evolution)
 ├── 📋 Todo        : 4
-├── 🐛 Bugs        : 3 (3 fixed)
+├── 🐛 Bugs        : 4 (4 fixed)
 └── 💡 Ideas       : 7 (+3 Content Brain V3)
 ```
 
@@ -125,7 +126,7 @@ Total Features:
 | Date | Focus | Lien |
 |------|-------|------|
 | 22/12/2024 | **📊 Analytics Page** — Dashboard complet + Sync Instagram API v22 + Scripts → Supabase | [→](./docs/SESSION-22-DEC-2024-ANALYTICS-PAGE.md) |
-| 22/12/2024 | **🔧 Cloudinary Fix** — Signed uploads pour Content Brain auto-post | [→](./docs/SESSION-22-DEC-2024-CLOUDINARY-FIX.md) |
+| 22/12/2024 | **🔧 Cloudinary Fix + TypeScript** — Signed uploads + fix TS strict mode errors | [→](./docs/SESSION-22-DEC-2024-CLOUDINARY-FIX.md) |
 | 22/12/2024 | **💡 Content Brain V3 Ideas** — Ideas Backlog + Trends Layer + Long-form Captions + Character Voice | [→](./docs/SESSION-22-DEC-2024-CONTENT-BRAIN-V3.md) |
 | 22/12/2024 | **🔴 Model Evolution Strategy** — Mila Tesla Cherry Wine Red + Elena blonde + bi/open + découverte base64 | [→](./docs/SESSION-22-DEC-2024-MODEL-EVOLUTION.md) |
 | 22/12/2024 | **🎯 Explicit Reference Prompts** — IMAGE 1=face, IMAGE 2=body pour meilleure ressemblance | [→](./docs/SESSION-22-DEC-2024-EXPLICIT-PROMPTS.md) |

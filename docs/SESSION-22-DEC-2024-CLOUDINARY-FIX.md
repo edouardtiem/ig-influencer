@@ -1,74 +1,92 @@
-# Session 22 Décembre 2024 — Fix Cloudinary Auto-Post
+# Session 22 Décembre 2024 — Fix Cloudinary + TypeScript Errors
 
 ## 📝 FIN DE SESSION — À SAUVEGARDER
 
 **Date** : 22 Décembre 2024
-**Durée** : ~30min
+**Durée** : ~1h
 
 ### ✅ Ce qui a été fait cette session :
 
-1. **Diagnostic du problème** : Les posts automatiques de Mila n'étaient pas publiés ce matin
-2. **Identification de la cause** : Cloudinary a changé sa configuration pour rejeter les "unsigned uploads" avec `upload_preset: 'ml_default'`
-3. **Fix appliqué** : Conversion vers des **signed uploads** avec signature SHA1 dans `scheduled-post.mjs`
-4. **Vérification** : Post de Mila 08:00 publié avec succès après le fix
+1. **Fix Content Brain Auto-Post** : Les posts automatiques de Mila ne fonctionnaient pas ce matin
+   - Diagnostic : Cloudinary rejette maintenant les "unsigned uploads" avec `upload_preset: 'ml_default'`
+   - Fix : Conversion vers des **signed uploads** avec signature SHA1
+   - Vérification : Post de Mila 08:00 publié avec succès
+
+2. **Fix TypeScript Analytics Page** : Erreurs de build Vercel
+   - `analytics/page.tsx` : Formatter Tooltip avec `value: number | undefined`
+   - `analytics/route.ts` : Interfaces Post et Snapshot + types explicites pour callbacks
+   - `sync-analytics/route.ts` : Type pour callback `some()`
+
+3. **Documentation** : Session documentée + ROADMAP mis à jour
 
 ### 📁 Fichiers modifiés :
 
-- `app/scripts/scheduled-post.mjs` — Ajout de `crypto` import et signatures SHA1 pour les uploads images et vidéos
-- `app/scripts/cron-executor.mjs` — Nettoyage des logs de debug
-- `app/scripts/check-schedules.mjs` — Nettoyage des logs de debug
+- `app/scripts/scheduled-post.mjs` — Signed uploads Cloudinary (images + vidéos)
+- `app/src/app/analytics/page.tsx` — Fix Recharts Tooltip formatter types
+- `app/src/app/api/analytics/route.ts` — Interfaces Post/Snapshot + types callbacks
+- `app/src/app/api/sync-analytics/route.ts` — Type callback some()
 
 ### 🚧 En cours (non terminé) :
 
-- Rien, le fix est complet et vérifié
+- Rien, tous les fixes sont complets et vérifiés
 
 ### 📋 À faire prochaine session :
 
-- [ ] Vérifier que les posts automatiques fonctionnent correctement dans les prochaines heures
-- [ ] Surveiller les logs GitHub Actions pour le Content Brain
+- [ ] Vérifier que les posts automatiques Content Brain continuent de fonctionner
+- [ ] Tester la page Analytics en production
 
-### 🐛 Bugs découverts :
+### 🐛 Bugs découverts et fixés :
 
-- **Cloudinary Unsigned Upload Blocked** : Le preset `ml_default` n'accepte plus les uploads non signés. Le message d'erreur était : `"Upload preset must be whitelisted for unsigned uploads"`. Fix : utiliser des signed uploads avec signature SHA1.
+1. **BUG-004: Cloudinary Unsigned Upload Blocked**
+   - Erreur : `"Upload preset must be whitelisted for unsigned uploads"`
+   - Cause : Changement de configuration Cloudinary
+   - Fix : Signed uploads avec SHA1 signature
+
+2. **TypeScript Strict Mode Errors**
+   - Recharts `formatter` attend `number | undefined`
+   - Supabase query results need explicit typing for callbacks
 
 ### 💡 Idées notées :
 
-- Les scripts legacy (`carousel-post.mjs`, `photo-reel-post.mjs`, etc.) utilisaient déjà des signed uploads, donc ils fonctionnent. Seul `scheduled-post.mjs` (utilisé par Content Brain) avait le bug.
+- Les scripts legacy utilisaient déjà des signed uploads → seul `scheduled-post.mjs` avait le bug
+- Utiliser `npx tsc --noEmit` avant de push pour catch toutes les erreurs TS
 
 ### 📝 Notes importantes :
 
-#### Flux Content Brain
-```
-1. cron-scheduler.mjs (7h Paris)
-   └── Génère le plan du jour dans Supabase
-
-2. cron-executor.mjs (toutes les 30 min)
-   └── Vérifie les posts à publier
-       └── Appelle scheduled-post.mjs
-
-3. scheduled-post.mjs
-   └── Génère images (Replicate Nano Banana Pro)
-   └── Upload vers Cloudinary (SIGNED UPLOAD)
-   └── Publie sur Instagram
-```
-
-#### Signed Upload Cloudinary
+#### Signed Upload Cloudinary (Pattern à réutiliser)
 ```javascript
-// Générer la signature
+import crypto from 'crypto';
+
+const timestamp = Math.floor(Date.now() / 1000);
+const publicId = `folder/filename-${timestamp}`;
 const paramsToSign = `public_id=${publicId}&timestamp=${timestamp}`;
 const signature = crypto
   .createHash('sha1')
   .update(paramsToSign + process.env.CLOUDINARY_API_SECRET)
   .digest('hex');
 
-// FormData avec signature
+const formData = new FormData();
+formData.append('file', imageUrl);
 formData.append('public_id', publicId);
 formData.append('timestamp', timestamp.toString());
 formData.append('api_key', process.env.CLOUDINARY_API_KEY);
 formData.append('signature', signature);
 ```
 
+#### TypeScript Supabase Pattern
+```typescript
+// Always type Supabase query results before using callbacks
+interface MyType { field: string | null; }
+const typedData = data as MyType[] | null;
+typedData?.forEach((item: MyType) => { ... });
+```
+
 ---
 
-**Commit** : `fix(cloudinary): use signed uploads to fix 'Upload preset must be whitelisted' error`
+**Commits** :
+- `fix(cloudinary): use signed uploads to fix 'Upload preset must be whitelisted' error`
+- `fix(analytics): handle undefined value in Recharts Tooltip formatter`
+- `fix(analytics): add Post interface type for Supabase query result`
+- `fix(analytics): add explicit types for reduce callbacks`
+- `fix(typescript): add explicit types to all untyped callbacks in API routes`
 
