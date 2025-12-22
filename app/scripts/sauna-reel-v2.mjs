@@ -49,8 +49,26 @@ const FACE_REFS = [
   'https://res.cloudinary.com/dily60mr0/image/upload/v1764767098/Photo_3_nopedx.png',
 ];
 
-// Instruction to match reference images (MUST be at start of prompt)
-const REFERENCE_INSTRUCTION = `BASED ON THE PROVIDED REFERENCE IMAGES, generate the EXACT SAME PERSON with identical face features, body proportions, and distinctive marks.`;
+// Instruction to match reference images - EXPLICIT IMAGE MAPPING
+const REFERENCE_INSTRUCTION = `You are provided with reference images in order:
+
+**IMAGE 1 (FACE REFERENCE)**: This is Mila's face. Copy this EXACTLY:
+- Same oval elongated face shape with high cheekbones
+- Same soft feminine jawline (not angular), slightly pointed chin
+- Same copper auburn hair with type 3A loose curls, shoulder-length
+- Same almond-shaped hazel-green eyes with golden flecks
+- Same straight nose with slightly upturned tip
+- Same naturally full lips with subtle asymmetry
+- Same small dark brown beauty mark 2mm above left lip corner (SIGNATURE)
+- Same beauty mark on center of right cheekbone
+- Same golden-brown freckles on nose and cheekbones
+
+**IMAGE 2+ (ADDITIONAL REFERENCES)**: More angles of Mila for consistency.
+
+CRITICAL RULES:
+- Face MUST be identical to Image 1 - same person, same features
+- Hair MUST be copper auburn with curls (NOT straight, NOT dark brown)
+- ALWAYS include the beauty mark above left lip and freckles`;
 
 // Detailed face description (critical for consistency)
 const MILA_FACE = `oval elongated face shape with high naturally defined cheekbones,
@@ -72,6 +90,14 @@ natural full feminine curves with defined waist`;
 
 // Combined base
 const MILA_BASE = `${MILA_FACE}, ${MILA_MARKS}, ${MILA_BODY}`;
+
+// Final check to reinforce reference matching
+const MILA_FINAL_CHECK = `FINAL CHECK - MUST MATCH REFERENCES:
+- Face: IDENTICAL to Image 1 (oval face, copper auburn curly hair)
+- Body: slim athletic, toned with feminine curves
+- Beauty mark: above left lip corner MUST be visible (SIGNATURE)
+- Freckles: on nose and cheekbones
+- Jewelry: thin gold necklace with star pendant`;
 
 const NEGATIVE = `cartoon, anime, illustration, 3D render, CGI, deformed face, deformed body, blurry, bad anatomy, extra limbs, watermark, text, logo, plastic skin, wrong hair color, straight hair, tattoos, glasses, heavy makeup, steam, smoke, fog, mist, vapor, snow on hair, wet hair`;
 
@@ -96,7 +122,7 @@ ${MILA_BASE},
 
 [QUALITY] ultra realistic, 8k, professional photography, sharp focus, natural skin texture,
 
-CRITICAL: Face must match reference images exactly - same jawline, same cheekbones, same distinctive marks,
+${MILA_FINAL_CHECK},
 
 NEGATIVE: ${NEGATIVE}`,
 
@@ -132,7 +158,7 @@ ${MILA_BASE},
 
 [QUALITY] ultra realistic, 8k, professional photography, sharp focus, natural skin texture,
 
-CRITICAL: Face must match reference images exactly - same jawline, same cheekbones, same distinctive marks,
+${MILA_FINAL_CHECK},
 
 NEGATIVE: ${NEGATIVE}`,
 
@@ -168,7 +194,7 @@ ${MILA_BASE},
 
 [QUALITY] ultra realistic, 8k, professional photography, sharp focus, natural skin texture,
 
-CRITICAL: Face must match reference images exactly - same jawline, same cheekbones, same distinctive marks,
+${MILA_FINAL_CHECK},
 
 NEGATIVE: ${NEGATIVE}`,
 

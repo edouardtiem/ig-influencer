@@ -76,6 +76,18 @@ export default function Home() {
           
           <div className="grid gap-4 md:grid-cols-2">
             <Link 
+              href="/analytics"
+              className="block p-6 bg-gradient-to-br from-violet-50 to-indigo-50 rounded-xl border border-violet-200 hover:border-violet-300 transition-colors group"
+            >
+              <span className="text-2xl mb-3 block">📊</span>
+              <h3 className="font-medium text-gray-900 group-hover:text-violet-600 transition-colors">
+                Analytics
+              </h3>
+              <p className="text-sm text-gray-500 mt-1">
+                Performance et évolution des comptes
+              </p>
+            </Link>
+            <Link 
               href="/smart-comment"
               className="block p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 hover:border-purple-300 transition-colors group"
             >

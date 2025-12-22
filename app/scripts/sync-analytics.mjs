@@ -70,14 +70,12 @@ async function fetchRecentMedia(account) {
 
 // ===========================================
 // FETCH INSIGHTS FOR A POST
+// API v22: 'impressions' and 'plays' deprecated, use 'views' instead
 // ===========================================
 
 async function fetchPostInsights(mediaId, accessToken, mediaType) {
-  // Different metrics for different media types
-  let metrics = 'impressions,reach';
-  if (mediaType === 'VIDEO' || mediaType === 'REELS') {
-    metrics = 'impressions,reach,plays';
-  }
+  // New API v22 metrics - works for all media types
+  const metrics = 'views,reach,saved,shares,total_interactions';
   
   const url = `https://graph.facebook.com/v21.0/${mediaId}/insights`;
   const params = {
@@ -94,7 +92,13 @@ async function fetchPostInsights(mediaId, accessToken, mediaType) {
       insights[metric.name] = metric.values?.[0]?.value || 0;
     });
     
-    return insights;
+    // Map 'views' to 'impressions' for backward compatibility
+    return {
+      impressions: insights.views || 0,
+      reach: insights.reach || 0,
+      saved: insights.saved || 0,
+      shares: insights.shares || 0,
+    };
   } catch (error) {
     // Insights may not be available for all posts
     return { impressions: 0, reach: 0 };

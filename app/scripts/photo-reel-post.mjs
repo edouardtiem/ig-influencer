@@ -13,6 +13,7 @@
 import Replicate from 'replicate';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { savePostToSupabase } from './lib/supabase-helper.mjs';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -52,8 +53,26 @@ const FACE_REFS = [
 // CRITICAL: Must match provided reference images exactly
 // ═══════════════════════════════════════════════════════════════
 
-// Instruction to match reference images (MUST be at start of prompt)
-const REFERENCE_INSTRUCTION = `BASED ON THE PROVIDED REFERENCE IMAGES, generate the EXACT SAME PERSON with identical face features, body proportions, and distinctive marks. The reference images are the source of truth for appearance.`;
+// Instruction to match reference images - EXPLICIT IMAGE MAPPING
+const REFERENCE_INSTRUCTION = `You are provided with reference images in order:
+
+**IMAGE 1 (FACE REFERENCE)**: This is Mila's face. Copy this EXACTLY:
+- Same oval elongated face shape with high cheekbones
+- Same soft feminine jawline (not angular), slightly pointed chin
+- Same copper auburn hair with type 3A loose curls, shoulder-length, messy texture
+- Same almond-shaped hazel-green eyes with golden flecks
+- Same straight nose with slightly upturned tip
+- Same naturally full lips with subtle asymmetry
+- Same small dark brown beauty mark 2mm above left lip corner (SIGNATURE)
+- Same beauty mark on center of right cheekbone
+- Same 20-25 light golden-brown freckles on nose and cheekbones
+
+**IMAGE 2+ (ADDITIONAL REFERENCES)**: More angles of Mila for consistency.
+
+CRITICAL RULES:
+- Face MUST be identical to Image 1 - same person, same features
+- Hair MUST be copper auburn with curls (NOT straight, NOT dark brown)
+- ALWAYS include the beauty mark above left lip and freckles`;
 
 // Detailed face description (critical for consistency)
 const MILA_FACE = `oval elongated face shape with high naturally defined cheekbones,
@@ -78,6 +97,14 @@ toned but not muscular, Pilates-sculpted shoulders`;
 const MILA_BASE = `${MILA_FACE},
 ${MILA_MARKS},
 ${MILA_BODY}`;
+
+// Final check to reinforce reference matching
+const MILA_FINAL_CHECK = `FINAL CHECK - MUST MATCH REFERENCES:
+- Face: IDENTICAL to Image 1 (oval face, copper auburn curly hair)
+- Body: slim athletic, toned with feminine curves
+- Beauty mark: above left lip corner MUST be visible (SIGNATURE)
+- Freckles: on nose and cheekbones
+- Jewelry: thin gold necklace with star pendant`;
 
 // ═══════════════════════════════════════════════════════════════
 // VACATION THEMES - Sexy but filter-safe
@@ -560,7 +587,7 @@ STYLE: ultra realistic vacation photography, authentic travel moment,
 8k resolution, professional photography, soft focus background,
 Instagram aesthetic, travel influencer style, golden hour lighting,
 
-CRITICAL: Face must match reference images exactly - same jawline, same cheekbones, same distinctive marks`;
+${MILA_FINAL_CHECK}`;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -705,6 +732,19 @@ async function main() {
     } else {
       const postId = await publishReel(videoUrl, caption);
       log(`\n✅ PUBLISHED! Reel ID: ${postId}`);
+      
+      // Save to Supabase
+      log('💾 Saving to Supabase...');
+      await savePostToSupabase({
+        character: 'mila',
+        instagramPostId: postId,
+        postType: 'reel',
+        imageUrls: cloudinaryUrls,
+        caption,
+        locationName: theme,
+        mood: 'adventure',
+      });
+      
       console.log(JSON.stringify({
         success: true,
         postId,

@@ -215,5 +215,61 @@ home_bathroom: {
 
 ---
 
-*Dernière mise à jour : 18 décembre 2024*
+---
+
+## ⚠️ IMPORTANT : Format des Références pour Nano Banana Pro
+
+> **Découverte du 22 décembre 2024** — Le format de passage des références est CRITIQUE.
+
+### ❌ Méthode qui NE FONCTIONNE PAS
+
+```javascript
+// URLs directes dans reference_images
+const output = await replicate.run('google/nano-banana-pro', {
+  input: {
+    prompt: "...",
+    reference_images: [url1, url2, url3], // ❌ WRONG
+  },
+});
+```
+
+**Résultat** : Le modèle ne respecte pas bien les références, génère des visages différents.
+
+### ✅ Méthode CORRECTE
+
+```javascript
+// 1. Convertir URLs en base64
+async function urlToBase64(url) {
+  const response = await fetch(url);
+  const arrayBuffer = await response.arrayBuffer();
+  const base64 = Buffer.from(arrayBuffer).toString('base64');
+  const contentType = response.headers.get('content-type') || 'image/png';
+  return `data:${contentType};base64,${base64}`;
+}
+
+// 2. Passer dans image_input (PAS reference_images)
+const base64Images = await Promise.all(urls.map(url => urlToBase64(url)));
+
+const output = await replicate.run('google/nano-banana-pro', {
+  input: {
+    prompt: "...",
+    image_input: base64Images, // ✅ CORRECT
+  },
+});
+```
+
+**Résultat** : Le modèle respecte parfaitement les références, le visage reste identique.
+
+### Pourquoi ?
+
+| Paramètre | Format | Comportement |
+|-----------|--------|--------------|
+| `reference_images` | URLs | Traitement "inspiration" légère |
+| `image_input` | Base64 | Traitement prioritaire, pixels directs |
+
+> Voir `carousel-post.mjs` pour l'implémentation de production qui utilise déjà cette méthode.
+
+---
+
+*Dernière mise à jour : 22 décembre 2024*
 

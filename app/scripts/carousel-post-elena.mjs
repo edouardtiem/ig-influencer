@@ -8,6 +8,7 @@
  */
 
 import Replicate from 'replicate';
+import { savePostToSupabase } from './lib/supabase-helper.mjs';
 
 // ═══════════════════════════════════════════════════════════════
 // CONFIG
@@ -36,8 +37,34 @@ const LOCATION_REFS = {
 // CRITICAL: Must match provided reference images exactly
 // ═══════════════════════════════════════════════════════════════
 
-// Instruction to match reference images (MUST be at start of prompt)
-const REFERENCE_INSTRUCTION = `BASED ON THE PROVIDED REFERENCE IMAGES, generate the EXACT SAME PERSON with identical face features, body proportions, and distinctive marks. The reference images are the source of truth for appearance.`;
+// Instruction to match reference images - EXPLICIT IMAGE MAPPING
+const REFERENCE_INSTRUCTION = `You are provided with reference images in order:
+
+**IMAGE 1 (FACE REFERENCE)**: This is Elena's face. Copy this EXACTLY:
+- Same soft round pleasant face shape (NOT angular, NOT sharp jawline)
+- Same smooth feminine jawline and rounded chin
+- Same honey brown warm almond-shaped eyes
+- Same naturally full lips nude-pink color
+- Same small beauty mark on right cheekbone (SIGNATURE MARK)
+- Same bronde hair with VISIBLE golden blonde balayage highlights (NOT solid dark brown)
+- Same naturally thick well-groomed eyebrows
+
+**IMAGE 2 (BODY REFERENCE)**: This is Elena's body. Match these proportions EXACTLY:
+- Same curvy voluptuous figure (NOT skinny, NOT thin)
+- Same very large natural F-cup breasts (prominent, NOT reduced)
+- Same narrow defined waist
+- Same wide feminine hips
+- Same thick thighs
+- Same healthy curvy Italian body type
+
+**IMAGE 3+ (LOCATION REFERENCE if provided)**: This is the setting. Place the subject in this exact room/location.
+
+CRITICAL RULES:
+- Face MUST be identical to Image 1 - same person, same features
+- Body proportions MUST match Image 2 - same curves, same large bust size
+- Do NOT change face to look more "model-like" or angular
+- Do NOT reduce bust size or body curves
+- Hair MUST show visible golden blonde balayage highlights, NOT solid dark brown`;
 
 // Detailed face description (critical for consistency)
 const ELENA_FACE = `soft round pleasant face NOT angular, warm approachable features,
@@ -62,6 +89,14 @@ healthy curvy Italian body, confident posture`;
 const ELENA_BASE = `${ELENA_FACE},
 ${ELENA_MARKS},
 ${ELENA_BODY}`;
+
+// Final check to reinforce reference matching
+const ELENA_FINAL_CHECK = `FINAL CHECK - MUST MATCH REFERENCES:
+- Face: IDENTICAL to Image 1 (soft round face, NOT angular, warm features)
+- Body: IDENTICAL to Image 2 (curvy with very large bust visible)
+- Hair: bronde with VISIBLE golden blonde balayage highlights (NOT solid dark brown)
+- Beauty mark: on right cheekbone MUST be visible
+- Jewelry: gold chunky bracelet on wrist, layered gold necklaces`;
 
 // Elena's signature phone
 const ELENA_PHONE = 'iPhone 17 Pro in blue color, sleek modern design';
@@ -758,7 +793,7 @@ MOOD: ${slot.mood},
 STYLE: ultra realistic Instagram photo, lifestyle content, high fashion model aesthetic,
 shot on iPhone, natural photography, 8k quality, detailed skin texture, realistic lighting,
 
-CRITICAL: Face must match reference images exactly - same soft round face shape, same jawline, same distinctive marks`;
+${ELENA_FINAL_CHECK}`;
 
     log(`  Prompt preview: ${prompt.substring(0, 100)}...`);
 
@@ -843,6 +878,20 @@ CRITICAL: Face must match reference images exactly - same soft round face shape,
     try {
       const postId = await publishCarousel(imageUrls, caption, location.instagramLocationId);
       log(`\n🎉 Published! Post ID: ${postId}`);
+      
+      // Save to Supabase
+      log('💾 Saving to Supabase...');
+      await savePostToSupabase({
+        character: 'elena',
+        instagramPostId: postId,
+        postType: 'carousel',
+        imageUrls: imageUrls,
+        caption,
+        locationName: location.name,
+        locationKey: locationId,
+        outfit,
+        mood: slotConfig.mood,
+      });
     } catch (error) {
       log(`\n❌ Publish failed: ${error.message}`);
       throw error;

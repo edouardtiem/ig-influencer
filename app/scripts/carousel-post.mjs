@@ -8,6 +8,7 @@
  */
 
 import Replicate from 'replicate';
+import { savePostToSupabase } from './lib/supabase-helper.mjs';
 
 // ═══════════════════════════════════════════════════════════════
 // CONFIG
@@ -35,8 +36,33 @@ const LOCATION_REFS = {
 // CRITICAL: Must match provided reference images exactly
 // ═══════════════════════════════════════════════════════════════
 
-// Instruction to match reference images (MUST be at start of prompt)
-const REFERENCE_INSTRUCTION = `BASED ON THE PROVIDED REFERENCE IMAGES, generate the EXACT SAME PERSON with identical face features, body proportions, and distinctive marks. The reference images are the source of truth for appearance.`;
+// Instruction to match reference images - EXPLICIT IMAGE MAPPING
+const REFERENCE_INSTRUCTION = `You are provided with reference images in order:
+
+**IMAGE 1 (FACE REFERENCE)**: This is Mila's face. Copy this EXACTLY:
+- Same oval elongated face shape with high cheekbones
+- Same soft feminine jawline (not angular), slightly pointed chin
+- Same copper auburn hair with type 3A loose curls, shoulder-length, messy texture
+- Same almond-shaped hazel-green eyes with golden flecks
+- Same straight nose with slightly upturned tip
+- Same naturally full lips with subtle asymmetry
+- Same small dark brown beauty mark 2mm above left lip corner (SIGNATURE)
+- Same beauty mark on center of right cheekbone
+- Same 20-25 light golden-brown freckles on nose and cheekbones
+
+**IMAGE 2 (BODY REFERENCE)**: This is Mila's body. Match these proportions:
+- Same slim athletic physique 168cm
+- Same natural full feminine curves with defined waist
+- Same toned but not muscular Pilates-sculpted shoulders
+- Same Mediterranean light tan skin
+
+**IMAGE 3+ (LOCATION REFERENCE if provided)**: This is the setting. Place the subject in this exact room/location.
+
+CRITICAL RULES:
+- Face MUST be identical to Image 1 - same person, same features
+- Body proportions MUST match Image 2
+- Hair MUST be copper auburn with curls (NOT straight, NOT dark brown)
+- ALWAYS include the beauty mark above left lip and freckles`;
 
 // Detailed face description (critical for consistency)
 const MILA_FACE = `oval elongated face shape with high naturally defined cheekbones,
@@ -61,6 +87,14 @@ toned but not muscular, Pilates-sculpted shoulders`;
 const MILA_BASE = `${MILA_FACE},
 ${MILA_MARKS},
 ${MILA_BODY}`;
+
+// Final check to reinforce reference matching
+const MILA_FINAL_CHECK = `FINAL CHECK - MUST MATCH REFERENCES:
+- Face: IDENTICAL to Image 1 (oval face, copper auburn curly hair)
+- Body: IDENTICAL to Image 2 (slim athletic, toned)
+- Beauty mark: above left lip corner MUST be visible (SIGNATURE)
+- Freckles: on nose and cheekbones
+- Jewelry: thin gold necklace with star pendant`;
 
 // Mila's signature phone - always the same for consistency
 const MILA_PHONE = 'iPhone Air in cream white color, ultra-thin minimalist design, matte finish';
@@ -709,7 +743,7 @@ MOOD: ${mood},
 STYLE: ultra realistic Instagram photo, lifestyle editorial photography, natural feminine beauty,
 8k resolution, professional photography, soft focus background, candid authentic moment,
 
-CRITICAL: Face must match reference images exactly - same jawline, same cheekbones, same distinctive marks`;
+${MILA_FINAL_CHECK}`;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -851,6 +885,21 @@ async function main() {
         location.instagramLocationId
       );
       log(`\n✅ PUBLISHED! Post ID: ${postId}`);
+      
+      // Step 5: Save to Supabase
+      log('💾 Saving to Supabase...');
+      await savePostToSupabase({
+        character: 'mila',
+        instagramPostId: postId,
+        postType: 'carousel',
+        imageUrls: cloudinaryUrls,
+        caption,
+        locationName: location.name,
+        locationKey: locationId,
+        outfit,
+        mood: slotConfig.mood,
+      });
+      
       console.log(JSON.stringify({
         success: true,
         postId,

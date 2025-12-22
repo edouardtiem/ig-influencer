@@ -41,7 +41,11 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
 // Time window: execute posts scheduled within this many minutes
-const TIME_WINDOW_MINUTES = 30;
+// Increased to 60 minutes for more reliability with GitHub Actions cron
+const TIME_WINDOW_MINUTES = 60;
+
+// Catchup window: also execute posts that were missed up to this many hours ago
+const CATCHUP_HOURS = 3;
 
 // ===========================================
 // GET PENDING POSTS
@@ -73,9 +77,24 @@ async function getPendingPosts(character) {
     const [hours, minutes] = post.time.split(':').map(Number);
     const postMinutes = hours * 60 + minutes;
     
-    // Execute if the post time is within the window (past or upcoming 30 min)
+    // Calculate time difference
     const diff = postMinutes - currentMinutes;
-    return diff >= -15 && diff <= TIME_WINDOW_MINUTES;
+    
+    // Execute if:
+    // 1. Post time is upcoming within TIME_WINDOW_MINUTES, OR
+    // 2. Post was missed but within CATCHUP_HOURS (catchup mode)
+    const catchupMinutes = CATCHUP_HOURS * 60;
+    const isUpcoming = diff >= 0 && diff <= TIME_WINDOW_MINUTES;
+    const isCatchup = diff < 0 && diff >= -catchupMinutes;
+    
+    return isUpcoming || isCatchup;
+  });
+
+  // Sort: prioritize older missed posts first (catchup), then upcoming
+  pendingPosts.sort((a, b) => {
+    const [aH, aM] = a.time.split(':').map(Number);
+    const [bH, bM] = b.time.split(':').map(Number);
+    return (aH * 60 + aM) - (bH * 60 + bM);
   });
 
   return { schedule, pendingPosts };
@@ -89,6 +108,7 @@ async function executePost(character, post, scheduleId, dryRun = false) {
   const reelInfo = post.type === 'reel' ? ` (${post.reel_type || 'photo'})` : '';
   console.log(`\n   🎬 Executing ${post.type.toUpperCase()}${reelInfo} for ${character}...`);
   console.log(`      📍 ${post.location_name}`);
+  console.log(`      👗 ${post.outfit?.substring(0, 40)}...`);
   console.log(`      💬 "${post.caption?.substring(0, 50)}..."`);
 
   if (dryRun) {
@@ -96,42 +116,35 @@ async function executePost(character, post, scheduleId, dryRun = false) {
     return true;
   }
 
-  // Determine which script to run
-  let scriptName;
-  let args = [];
-
-  if (post.type === 'reel') {
-    // Check reel_type: "photo" = slideshow, "video" = Kling animated
-    const reelType = post.reel_type || 'photo';
-    
-    if (reelType === 'video') {
-      // Animated reel with Kling
-      scriptName = 'video-reel-post.mjs';
-      // Pass the theme if specified
-      if (post.reel_theme) {
-        args.push(post.reel_theme);
-      }
-    } else {
-      // Photo slideshow reel
-      scriptName = character === 'mila' 
-        ? 'photo-reel-post.mjs' 
-        : 'photo-reel-post-elena.mjs';
-    }
-  } else {
-    // Carousel
-    scriptName = character === 'mila' 
-      ? 'carousel-post.mjs' 
-      : 'carousel-post-elena.mjs';
-  }
-
+  // Use the unified scheduled-post.mjs script
+  // Pass schedule params via SCHEDULED_POST env var
+  const scriptName = 'scheduled-post.mjs';
   const scriptPath = path.join(__dirname, scriptName);
 
-  console.log(`      📜 Running: ${scriptName} ${args.join(' ')}`);
+  // Prepare post data with character included
+  const postData = {
+    character,
+    type: post.type,
+    reel_type: post.reel_type,
+    location_key: post.location_key,
+    location_name: post.location_name,
+    mood: post.mood,
+    outfit: post.outfit,
+    action: post.action,
+    caption: post.caption,
+    hashtags: post.hashtags,
+    prompt_hints: post.prompt_hints,
+  };
+
+  console.log(`      📜 Running: ${scriptName} with schedule params`);
 
   return new Promise((resolve) => {
-    const child = spawn('node', [scriptPath, ...args], {
+    const child = spawn('node', [scriptPath], {
       cwd: path.join(__dirname, '..'),
-      env: { ...process.env },
+      env: { 
+        ...process.env,
+        SCHEDULED_POST: JSON.stringify(postData),
+      },
       stdio: 'inherit',
     });
 

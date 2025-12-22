@@ -13,6 +13,7 @@
 import Replicate from 'replicate';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { savePostToSupabase } from './lib/supabase-helper.mjs';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -49,8 +50,32 @@ const ELENA_BODY_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v17659
 // CRITICAL: Must match provided reference images exactly
 // ═══════════════════════════════════════════════════════════════
 
-// Instruction to match reference images (MUST be at start of prompt)
-const REFERENCE_INSTRUCTION = `BASED ON THE PROVIDED REFERENCE IMAGES, generate the EXACT SAME PERSON with identical face features, body proportions, and distinctive marks. The reference images are the source of truth for appearance.`;
+// Instruction to match reference images - EXPLICIT IMAGE MAPPING
+const REFERENCE_INSTRUCTION = `You are provided with reference images in order:
+
+**IMAGE 1 (FACE REFERENCE)**: This is Elena's face. Copy this EXACTLY:
+- Same soft round pleasant face shape (NOT angular, NOT sharp jawline)
+- Same smooth feminine jawline and rounded chin
+- Same honey brown warm almond-shaped eyes
+- Same naturally full lips nude-pink color
+- Same small beauty mark on right cheekbone (SIGNATURE MARK)
+- Same bronde hair with VISIBLE golden blonde balayage highlights (NOT solid dark brown)
+- Same naturally thick well-groomed eyebrows
+
+**IMAGE 2 (BODY REFERENCE)**: This is Elena's body. Match these proportions EXACTLY:
+- Same curvy voluptuous figure (NOT skinny, NOT thin)
+- Same very large natural F-cup breasts (prominent, NOT reduced)
+- Same narrow defined waist
+- Same wide feminine hips
+- Same thick thighs
+- Same healthy curvy Italian body type
+
+CRITICAL RULES:
+- Face MUST be identical to Image 1 - same person, same features
+- Body proportions MUST match Image 2 - same curves, same large bust size
+- Do NOT change face to look more "model-like" or angular
+- Do NOT reduce bust size or body curves
+- Hair MUST show visible golden blonde balayage highlights, NOT solid dark brown`;
 
 // Detailed face description (critical for consistency)
 const ELENA_FACE = `soft round pleasant face NOT angular, warm approachable features,
@@ -75,6 +100,14 @@ healthy curvy Italian body, confident posture`;
 const ELENA_BASE = `${ELENA_FACE},
 ${ELENA_MARKS},
 ${ELENA_BODY}`;
+
+// Final check to reinforce reference matching
+const ELENA_FINAL_CHECK = `FINAL CHECK - MUST MATCH REFERENCES:
+- Face: IDENTICAL to Image 1 (soft round face, NOT angular, warm features)
+- Body: IDENTICAL to Image 2 (curvy with very large bust visible)
+- Hair: bronde with VISIBLE golden blonde balayage highlights (NOT solid dark brown)
+- Beauty mark: on right cheekbone MUST be visible
+- Jewelry: gold chunky bracelet on wrist, layered gold necklaces`;
 
 // ═══════════════════════════════════════════════════════════════
 // VACATION THEMES - Luxury vibes
@@ -558,7 +591,7 @@ STYLE: ultra realistic luxury vacation photography, authentic travel moment,
 8k resolution, professional photography, soft focus background,
 Instagram model aesthetic 2025, street-luxe European style, golden hour lighting,
 
-CRITICAL: Face must match reference images exactly - same soft round face shape, same jawline, same distinctive marks`;
+${ELENA_FINAL_CHECK}`;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -704,6 +737,19 @@ async function main() {
     } else {
       const postId = await publishReel(videoUrl, caption);
       log(`\n✅ PUBLISHED! Elena Reel ID: ${postId}`);
+      
+      // Save to Supabase
+      log('💾 Saving to Supabase...');
+      await savePostToSupabase({
+        character: 'elena',
+        instagramPostId: postId,
+        postType: 'reel',
+        imageUrls: cloudinaryUrls,
+        caption,
+        locationName: theme,
+        mood: 'glamorous',
+      });
+      
       console.log(JSON.stringify({
         success: true,
         postId,

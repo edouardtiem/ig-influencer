@@ -13,6 +13,8 @@
  * Scenarios: shooting, brunch, workout, shopping (or random)
  */
 
+import { savePostToSupabase } from './lib/supabase-helper.mjs';
+
 import Replicate from 'replicate';
 import fs from 'fs';
 import path from 'path';
@@ -463,15 +465,29 @@ async function publishCarousel(imageUrls, caption, accessToken, accountId) {
 // ═══════════════════════════════════════════════════════════════
 
 function buildDuoPrompt(scenario, action, scenarioConfig) {
-  return `BASED ON THE PROVIDED REFERENCE IMAGES, generate a scene with TWO DIFFERENT WOMEN together.
+  return `You are provided with reference images in order:
+
+**IMAGES 1-2 (MILA REFERENCES)**: Face and body references for Mila
+- Oval elongated face with high cheekbones
+- Copper auburn curly hair (NOT straight, NOT dark brown)
+- Beauty mark above left lip corner (SIGNATURE)
+- Slim athletic physique
+
+**IMAGES 3-4 (ELENA REFERENCES)**: Face and body references for Elena  
+- Soft round pleasant face (NOT angular)
+- Bronde hair with golden blonde balayage highlights (NOT solid dark brown)
+- Beauty mark on right cheekbone
+- Curvy voluptuous figure with large bust
+
+Generate a scene with TWO DIFFERENT WOMEN together.
 
 SCENE: ${action}
 
-FIRST PERSON (LEFT SIDE):
+FIRST PERSON (LEFT SIDE - MILA):
 ${MILA_DESCRIPTION}
 wearing ${scenarioConfig.outfits.mila}
 
-SECOND PERSON (RIGHT SIDE):
+SECOND PERSON (RIGHT SIDE - ELENA):
 ${ELENA_DESCRIPTION}
 wearing ${scenarioConfig.outfits.elena}
 
@@ -482,9 +498,10 @@ INTERACTION: Both women are clearly interacting as close friends, genuine warmth
 STYLE: ultra realistic Instagram photo, lifestyle content, friendship goals aesthetic,
 8k resolution, professional photography, natural lighting, candid authentic moment,
 
-CRITICAL: 
-- TWO distinct women with DIFFERENT faces - one with auburn curly hair (Mila), one with blonde wavy hair (Elena)
-- Both faces must match their respective reference images exactly
+FINAL CHECK - MUST MATCH REFERENCES:
+- MILA (left): oval face, copper auburn CURLY hair, beauty mark above left lip
+- ELENA (right): soft round face, bronde hair with BLONDE BALAYAGE, beauty mark on right cheekbone, curvy body
+- TWO distinct women - do NOT merge their features
 - Natural interaction between friends, not posed mannequins`;
 }
 
@@ -622,6 +639,29 @@ async function main() {
         process.env.INSTAGRAM_ACCOUNT_ID_ELENA
       );
       log(`  ✅ Elena Post ID: ${elenaPostId}`);
+
+      // Save both posts to Supabase
+      log('\n💾 Saving to Supabase...');
+      await savePostToSupabase({
+        character: 'mila',
+        instagramPostId: milaPostId,
+        postType: 'carousel',
+        imageUrls: cloudinaryUrls,
+        caption: captionMila,
+        locationName: scenario.setting.name,
+        mood: 'playful',
+        withCharacter: 'elena',
+      });
+      await savePostToSupabase({
+        character: 'elena',
+        instagramPostId: elenaPostId,
+        postType: 'carousel',
+        imageUrls: cloudinaryUrls,
+        caption: captionElena,
+        locationName: scenario.setting.name,
+        mood: 'playful',
+        withCharacter: 'mila',
+      });
 
       log('\n✅ PUBLISHED TO BOTH ACCOUNTS!');
       console.log(JSON.stringify({

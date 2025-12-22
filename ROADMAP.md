@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 21 décembre 2024 (Relationship Layer 💕)
+**Dernière mise à jour** : 22 décembre 2024 (Content Brain V3 Ideas 💡)
 
 ---
 
@@ -23,10 +23,12 @@ roadmap/
 
 | ID | Feature | Priorité | Branche | Lien |
 |----|---------|----------|---------|------|
-| - | *Aucun en cours* | - | - | - |
+| IP-002 | **🔴 Model Evolution** — Mila Tesla Red + Elena blonde + bi/open relationship | 🔴 High | main | [→](./roadmap/in-progress/IP-002-model-evolution.md) |
 
-> **Elena Phase 1 terminée** — Compte lancé avec 9 posts le 17/12/2024  
-> **Merge done** — `feature/elena-character` → `main` (28 files, +4919 lines)
+> **Mila Tesla Cherry Wine Red** : ✅ Couleur validée + Cloudinary  
+> **Elena Blonde** : À tester  
+> **Bi/Open Relationship** : Stratégie définie, à implémenter  
+> **Découverte technique** : `image_input` + base64 obligatoire pour Nano Banana Pro
 
 ---
 
@@ -48,6 +50,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-025 | **Explicit Reference Prompts 🎯** — IMAGE 1=face, IMAGE 2=body mapping pour Nano Banana Pro | 22/12/2024 | v2.17.0 | [→](./docs/SESSION-22-DEC-2024-EXPLICIT-PROMPTS.md) |
 | DONE-024 | **Relationship Layer 💕 + Extended Thinking** — The Secret + 6 layers + Claude thinking model | 21/12/2024 | v2.16.0 | [→](./docs/SESSION-21-DEC-2024-RELATIONSHIP-LAYER.md) |
 | DONE-023 | **Reels Overhaul** — Photo vs Video reels + Minimum 2 reels/jour + Kling real-time speed | 21/12/2024 | v2.14.0 | [→](./docs/SESSION-21-DEC-2024-REELS-OVERHAUL.md) |
 | DONE-022 | **Content Brain V2.1** — 5 Intelligence Layers + Dynamic Times + Exploration Budget + A/B Testing | 21/12/2024 | v2.13.0 | [→](./docs/SESSION-21-DEC-2024-CONTENT-BRAIN-V2.md) |
@@ -91,6 +94,9 @@ roadmap/
 
 | ID | Idée | Impact | Effort | Status | Lien |
 |----|------|--------|--------|--------|------|
+| **IDEA-008** | **Long-form Captions + Character Voice** — Hooks FR + textes longs + annonce bi/open | 🔴 High | 🟡 Medium | 💡 Idea | [→](./roadmap/ideas/IDEA-008-longform-captions.md) |
+| **IDEA-007** | **Trends Layer** — Perplexity daily search US→FR→EU pour viralité | 🔴 High | 🟡 Medium | 💡 Idea | [→](./roadmap/ideas/IDEA-007-trends-layer.md) |
+| **IDEA-006** | **Ideas Backlog** — Inspirations curated → Content Brain auto-scheduling | 🟡 Medium | 🟡 Medium | 💡 Idea | [→](./roadmap/ideas/IDEA-006-ideas-backlog.md) |
 | ~~IDEA-005~~ | ~~Content Brain~~ — Full auto + Timeline + Arcs narratifs | 🔴 High | 🔴 High | ✅ Done | [→](./roadmap/done/DONE-021-content-brain.md) |
 | IDEA-001 | Univers multi-personnages (Elena) | 🔴 High | 🔴 High | ✅ Phase 1 Done | [→](./roadmap/ideas/IDEA-001-multi-characters.md) |
 | IDEA-002 | Chatbot Mila payant | 🔴 High | 🟡 Medium | 💡 Idea | [→](./roadmap/ideas/IDEA-002-chatbot.md) |
@@ -103,11 +109,11 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 25
-├── 🚧 In Progress : 0
+├── ✅ Done        : 26
+├── 🚧 In Progress : 1 (Model Evolution)
 ├── 📋 Todo        : 5
 ├── 🐛 Bugs        : 2 (2 fixed)
-└── 💡 Ideas       : 4
+└── 💡 Ideas       : 7 (+3 Content Brain V3)
 ```
 
 ---
@@ -116,6 +122,9 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 22/12/2024 | **💡 Content Brain V3 Ideas** — Ideas Backlog + Trends Layer + Long-form Captions + Character Voice | [→](./docs/SESSION-22-DEC-2024-CONTENT-BRAIN-V3.md) |
+| 22/12/2024 | **🔴 Model Evolution Strategy** — Mila Tesla Cherry Wine Red + Elena blonde + bi/open + découverte base64 | [→](./docs/SESSION-22-DEC-2024-MODEL-EVOLUTION.md) |
+| 22/12/2024 | **🎯 Explicit Reference Prompts** — IMAGE 1=face, IMAGE 2=body pour meilleure ressemblance | [→](./docs/SESSION-22-DEC-2024-EXPLICIT-PROMPTS.md) |
 | 21/12/2024 | **💕 Relationship Layer** — The Secret (Mila x Elena) + 6 layers Content Brain + hint system | [→](./docs/SESSION-21-DEC-2024-RELATIONSHIP-LAYER.md) |
 | 21/12/2024 | **🎬 Reels Overhaul** — Photo vs Video reels + Minimum 2 reels/jour + Kling real-time | [→](./docs/SESSION-21-DEC-2024-REELS-OVERHAUL.md) |
 | 21/12/2024 | **🧠 Content Brain V2.1** — 5 Intelligence Layers + Dynamic Times + Exploration Budget + A/B Testing | [→](./docs/SESSION-21-DEC-2024-CONTENT-BRAIN-V2.md) |
