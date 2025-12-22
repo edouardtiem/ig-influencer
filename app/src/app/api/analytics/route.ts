@@ -104,23 +104,26 @@ export async function GET(request: NextRequest) {
     const { data: snapshots } = await snapshotsQuery;
 
     // Calculate totals
+    const typedPosts = posts as Post[] | null;
     const totals = {
-      impressions: posts?.reduce((sum, p) => sum + (p.impressions || 0), 0) || 0,
-      reach: posts?.reduce((sum, p) => sum + (p.reach || 0), 0) || 0,
-      likes: posts?.reduce((sum, p) => sum + (p.likes_count || 0), 0) || 0,
-      comments: posts?.reduce((sum, p) => sum + (p.comments_count || 0), 0) || 0,
-      saves: posts?.reduce((sum, p) => sum + (p.saves_count || 0), 0) || 0,
-      posts: posts?.length || 0,
+      impressions: typedPosts?.reduce((sum: number, p: Post) => sum + (p.impressions || 0), 0) || 0,
+      reach: typedPosts?.reduce((sum: number, p: Post) => sum + (p.reach || 0), 0) || 0,
+      likes: typedPosts?.reduce((sum: number, p: Post) => sum + (p.likes_count || 0), 0) || 0,
+      comments: typedPosts?.reduce((sum: number, p: Post) => sum + (p.comments_count || 0), 0) || 0,
+      saves: typedPosts?.reduce((sum: number, p: Post) => sum + (p.saves_count || 0), 0) || 0,
+      posts: typedPosts?.length || 0,
     };
 
     // Calculate previous period totals for comparison
+    type PrevPost = { impressions: number | null; reach: number | null; likes_count: number | null; comments_count: number | null; saves_count: number | null };
+    const typedPrevPosts = prevPosts as PrevPost[] | null;
     const prevTotals = {
-      impressions: prevPosts?.reduce((sum, p) => sum + (p.impressions || 0), 0) || 0,
-      reach: prevPosts?.reduce((sum, p) => sum + (p.reach || 0), 0) || 0,
-      likes: prevPosts?.reduce((sum, p) => sum + (p.likes_count || 0), 0) || 0,
-      comments: prevPosts?.reduce((sum, p) => sum + (p.comments_count || 0), 0) || 0,
-      saves: prevPosts?.reduce((sum, p) => sum + (p.saves_count || 0), 0) || 0,
-      posts: prevPosts?.length || 0,
+      impressions: typedPrevPosts?.reduce((sum: number, p: PrevPost) => sum + (p.impressions || 0), 0) || 0,
+      reach: typedPrevPosts?.reduce((sum: number, p: PrevPost) => sum + (p.reach || 0), 0) || 0,
+      likes: typedPrevPosts?.reduce((sum: number, p: PrevPost) => sum + (p.likes_count || 0), 0) || 0,
+      comments: typedPrevPosts?.reduce((sum: number, p: PrevPost) => sum + (p.comments_count || 0), 0) || 0,
+      saves: typedPrevPosts?.reduce((sum: number, p: PrevPost) => sum + (p.saves_count || 0), 0) || 0,
+      posts: typedPrevPosts?.length || 0,
     };
 
     // Calculate percentage changes
