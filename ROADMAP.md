@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 22 décembre 2024 (Cloudinary Fix 🔧)
+**Dernière mise à jour** : 22 décembre 2024 (Analytics Page 📊)
 
 ---
 
@@ -42,7 +42,7 @@ roadmap/
 | TODO-006 | Elena Stories Highlights (Travel, Home, BTS) | 🟡 Medium | 2h | - |
 | ~~TODO-007~~ | ~~Premier Reel Elena~~ — Scripts existants | - | - | - |
 | ~~TODO-008~~ | ~~Crossover Mila x Elena NYC~~ — ✅ Done | - | - | [→](./docs/SESSION-18-DEC-2024-DUAL-TOKENS.md) |
-| TODO-003 | Dashboard analytics | 🟢 Low | 6h | [→](./roadmap/todo/TODO-003-dashboard.md) |
+| ~~TODO-003~~ | ~~Dashboard analytics~~ — ✅ Done | - | - | [→](./docs/SESSION-22-DEC-2024-ANALYTICS-PAGE.md) |
 
 ---
 
@@ -50,6 +50,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-026 | **Analytics Page 📊** — Dashboard complet + Sync Instagram API v22 + Sauvegarde Supabase auto | 22/12/2024 | v2.18.0 | [→](./docs/SESSION-22-DEC-2024-ANALYTICS-PAGE.md) |
 | DONE-025 | **Explicit Reference Prompts 🎯** — IMAGE 1=face, IMAGE 2=body mapping pour Nano Banana Pro | 22/12/2024 | v2.17.0 | [→](./docs/SESSION-22-DEC-2024-EXPLICIT-PROMPTS.md) |
 | DONE-024 | **Relationship Layer 💕 + Extended Thinking** — The Secret + 6 layers + Claude thinking model | 21/12/2024 | v2.16.0 | [→](./docs/SESSION-21-DEC-2024-RELATIONSHIP-LAYER.md) |
 | DONE-023 | **Reels Overhaul** — Photo vs Video reels + Minimum 2 reels/jour + Kling real-time speed | 21/12/2024 | v2.14.0 | [→](./docs/SESSION-21-DEC-2024-REELS-OVERHAUL.md) |
@@ -110,9 +111,9 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 26
+├── ✅ Done        : 27 (+1 Analytics Page)
 ├── 🚧 In Progress : 1 (Model Evolution)
-├── 📋 Todo        : 5
+├── 📋 Todo        : 4
 ├── 🐛 Bugs        : 3 (3 fixed)
 └── 💡 Ideas       : 7 (+3 Content Brain V3)
 ```
@@ -123,6 +124,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 22/12/2024 | **📊 Analytics Page** — Dashboard complet + Sync Instagram API v22 + Scripts → Supabase | [→](./docs/SESSION-22-DEC-2024-ANALYTICS-PAGE.md) |
 | 22/12/2024 | **🔧 Cloudinary Fix** — Signed uploads pour Content Brain auto-post | [→](./docs/SESSION-22-DEC-2024-CLOUDINARY-FIX.md) |
 | 22/12/2024 | **💡 Content Brain V3 Ideas** — Ideas Backlog + Trends Layer + Long-form Captions + Character Voice | [→](./docs/SESSION-22-DEC-2024-CONTENT-BRAIN-V3.md) |
 | 22/12/2024 | **🔴 Model Evolution Strategy** — Mila Tesla Cherry Wine Red + Elena blonde + bi/open + découverte base64 | [→](./docs/SESSION-22-DEC-2024-MODEL-EVOLUTION.md) |

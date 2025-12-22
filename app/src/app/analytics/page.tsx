@@ -290,7 +290,7 @@ export default function AnalyticsPage() {
                       <Tooltip
                         contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: '12px' }}
                         labelStyle={{ color: '#f8fafc' }}
-                        formatter={(value: number) => [formatNumber(value), 'Impressions']}
+                        formatter={(value: number | undefined) => [formatNumber(value ?? 0), 'Impressions']}
                         labelFormatter={formatDate}
                       />
                       <Area type="monotone" dataKey="impressions" stroke="#8b5cf6" strokeWidth={2} fill="url(#impressionsGradient)" />
@@ -352,7 +352,7 @@ export default function AnalyticsPage() {
                       <Tooltip
                         contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: '12px' }}
                         labelStyle={{ color: '#f8fafc' }}
-                        formatter={(value: number) => [value, 'Followers']}
+                        formatter={(value: number | undefined) => [value ?? 0, 'Followers']}
                         labelFormatter={formatDate}
                       />
                       <Area type="monotone" dataKey="followers" stroke="#10b981" strokeWidth={2} fill="url(#followersGradient)" />
