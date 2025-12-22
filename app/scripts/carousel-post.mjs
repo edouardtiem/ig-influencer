@@ -100,20 +100,20 @@ const MILA_FINAL_CHECK = `FINAL CHECK - MUST MATCH REFERENCES:
 const MILA_PHONE = 'iPhone Air in cream white color, ultra-thin minimalist design, matte finish';
 
 // ═══════════════════════════════════════════════════════════════
-// EXPRESSIONS - Sensual but tasteful
+// EXPRESSIONS - Safe sexy vocabulary per docs/19-QUALITY-SEXY-STRATEGY.md
 // ═══════════════════════════════════════════════════════════════
 
 const HERO_EXPRESSIONS = [
-  'confident sensual gaze at camera, slight knowing smile, eyes sparkling',
-  'soft inviting expression, lips slightly parted, warm feminine energy',
-  'playful smirk, direct eye contact, effortless allure',
-  'serene confident look, natural beauty radiating, approachable warmth',
+  'captivating magnetic gaze at camera, slight knowing smile, eyes sparkling',
+  'soft warm gaze with feminine allure, lips slightly parted, enchanting presence',
+  'playful smirk, direct eye contact, effortless charm',
+  'striking confident look, natural beauty radiating, approachable warmth',
 ];
 
 const SECONDARY_EXPRESSIONS = [
-  'soft sensual expression, eyes slightly hooded, natural allure',
-  'pensive look gazing away, mysterious charm, caught in thought',
-  'genuine relaxed smile, eyes crinkled, authentic moment',
+  'alluring soft expression, eyes slightly hooded, natural charm',
+  'pensive look gazing away, mysterious allure, caught in thought',
+  'genuine relaxed smile, radiant expression, authentic moment',
   'dreamy expression, looking through window, contemplative',
   'candid laugh, hand near face, spontaneous joy',
   'sleepy soft smile, just woke up authenticity',
@@ -740,8 +740,8 @@ SETTING: ${setting},
 LIGHTING: ${lighting},
 MOOD: ${mood},
 
-STYLE: ultra realistic Instagram photo, lifestyle editorial photography, natural feminine beauty,
-8k resolution, professional photography, soft focus background, candid authentic moment,
+STYLE: 2026 instagram style picture, ultra realistic Instagram photo, lifestyle editorial photography, 
+natural feminine beauty, 8k resolution, professional photography, soft focus background, candid authentic moment,
 
 ${MILA_FINAL_CHECK}`;
 }

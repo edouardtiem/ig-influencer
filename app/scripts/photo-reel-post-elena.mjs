@@ -210,7 +210,7 @@ const EXPRESSIONS = [
   'warm confident gaze at camera, genuine soft smile, vacation glow',
   'serene peaceful expression, eyes gently closed, enjoying luxury moment',
   'playful inviting look, subtle knowing smile, Italian warmth',
-  'soft sensual expression, lips slightly parted, dreamy atmosphere',
+  'soft alluring expression, lips slightly parted, dreamy atmosphere',
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -587,9 +587,9 @@ OUTFIT: wearing ${outfit},
 
 SETTING: ${setting},
 
-STYLE: ultra realistic luxury vacation photography, authentic travel moment,
+STYLE: 2026 instagram style picture, ultra realistic luxury vacation photography, authentic travel moment,
 8k resolution, professional photography, soft focus background,
-Instagram model aesthetic 2025, street-luxe European style, golden hour lighting,
+Instagram model aesthetic, street-luxe European style, golden hour lighting,
 
 ${ELENA_FINAL_CHECK}`;
 }

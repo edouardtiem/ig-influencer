@@ -159,16 +159,185 @@ healthy curvy Italian body, confident posture`,
 
 // ===========================================
 // EXPRESSIONS (varied for carousel/reel)
+// Safe sexy vocabulary per docs/19-QUALITY-SEXY-STRATEGY.md
 // ===========================================
 
-const EXPRESSIONS = [
-  'confident sensual gaze at camera, slight knowing smile, eyes sparkling',
-  'soft inviting expression, lips slightly parted, warm feminine energy',
-  'playful smirk, direct eye contact, effortless allure',
-  'serene confident look, natural beauty radiating, approachable warmth',
-  'pensive look gazing away, mysterious charm, caught in thought',
-  'genuine relaxed smile, eyes crinkled, authentic moment',
-];
+const EXPRESSIONS = {
+  mila: [
+    'captivating magnetic gaze at camera, slight knowing smile, eyes sparkling',
+    'soft warm gaze with feminine allure, lips slightly parted, enchanting presence',
+    'playful smirk, direct eye contact, effortless charm',
+    'striking confident look, natural beauty radiating, approachable warmth',
+    'pensive look gazing away, alluring charm, caught in thought',
+    'genuine relaxed smile, radiant expression, authentic moment',
+  ],
+  elena: [
+    'intense captivating gaze at camera, lips slightly parted, smoldering confidence',
+    'enchanting knowing smile, direct eye contact, magnetic allure, curves visible',
+    'soft alluring expression, warm inviting eyes, effortless glamour',
+    'looking over shoulder with captivating glance, mysterious and inviting',
+    'confident smile, head tilted, curves accentuated, body language open',
+    'playful charming smirk, inviting look, confident femininity',
+  ],
+};
+
+// ===========================================
+// SEXY OUTFIT ENHANCERS FOR ELENA
+// Based on docs/characters/elena/AUDIENCE.md - "très sexy" positioning
+// ===========================================
+
+// Safe sexy vocabulary that passes Google filters while staying alluring
+const ELENA_SEXY_OUTFIT_DETAILS = {
+  bedroom: [
+    'silk slip dress with delicate straps, fabric draping elegantly over curves, intimate elegance',
+    'elegant lace loungewear set, confident feminine energy, silhouette emphasized',
+    'silk camisole and matching shorts set champagne color, fabric following curves',
+    'oversized cream sweater worn as dress off-shoulder, legs visible, cozy intimate morning',
+    'delicate lace top visible under unbuttoned white oversized shirt, fitted shorts',
+  ],
+  living: [
+    'fitted crop top showing midriff, high-waisted leggings hugging curves tightly',
+    'cream oversized knit sweater falling off one shoulder, fitted black shorts',
+    'fitted white ribbed tank top emphasizing silhouette, high-waisted black leggings',
+    'silk robe elegantly tied at waist, loungewear underneath',
+    'oversized mens white shirt partially unbuttoned, cycling shorts',
+  ],
+  bathroom: [
+    'luxurious white towel wrapped elegantly around body, hair wet, skin glowing',
+    'silk robe tied loosely, getting ready moment, feminine',
+    'matching cream loungewear set, showing midriff and silhouette',
+  ],
+  default: [
+    'form-fitting dress emphasizing elegant silhouette',
+    'elegant top with feminine neckline, fitted bottom',
+    'bodycon outfit accentuating feminine curves',
+  ],
+};
+
+const ELENA_SEXY_ACTION_DETAILS = {
+  bedroom: [
+    'lying on bed propped on elbow, relaxed elegant pose, looking at camera with warm gaze',
+    'sitting on bed edge, leaning back on hands, legs extended elegantly',
+    'stretching on bed just woke up, natural morning moment',
+    'standing by window in morning light, elegant silhouette',
+  ],
+  living: [
+    'lounging on sofa elegantly, legs tucked, relaxed confident pose',
+    'leaning against doorframe, hip slightly cocked, confident feminine pose',
+    'sitting with legs crossed, leaning forward slightly, engaging camera warmly',
+  ],
+  bathroom: [
+    'standing in front of mirror, glowing skin, elegant reflection',
+    'applying skincare, natural beauty moment, mirror reflection',
+  ],
+  default: [
+    'confident elegant pose',
+    'relaxed feminine body language',
+  ],
+};
+
+// ===========================================
+// SEXY OUTFIT ENHANCERS FOR MILA
+// Based on docs/characters/mila/PERSONNAGE.md - "Sexy Light-Medium (30%)"
+// ===========================================
+
+const MILA_SEXY_OUTFIT_DETAILS = {
+  bedroom: [
+    'silk champagne camisole with thin delicate straps, matching shorts, intimate elegance',
+    'oversized white cotton t-shirt slipping off one shoulder, bare legs, just woke up authentic',
+    'fitted ribbed gray bodysuit with thin spaghetti straps, fabric hugging curves elegantly',
+    'delicate lace bralette visible under loose tank top, cozy morning',
+    'oversized cream knit sweater falling off shoulder, cotton boyshort underneath',
+  ],
+  living: [
+    'fitted ribbed bodysuit heather gray, thin straps, barefoot on sofa, relaxed allure',
+    'oversized cream sweater slipping off one shoulder revealing skin, bare legs tucked',
+    'matching loungewear set cropped top and high-waisted leggings, showing midriff',
+    'fitted tank top natural silhouette, cotton shorts casual home',
+    'yoga set fitted crop top and high-waisted leggings showing toned midriff',
+  ],
+  gym: [
+    'matching sports bra and high-waisted leggings, form-fitting, showing toned midriff',
+    'fitted sports bra and bike shorts, athletic but feminine, showing curves',
+    'seamless workout set, cropped top showing waist, sculpting leggings',
+    'sports bra with mesh details, high-waisted leggings, athletic allure',
+  ],
+  outdoor: [
+    'fitted ribbed top, high-waisted jeans, effortless Parisian chic',
+    'crop top showing midriff, high-waisted vintage jeans, casual confidence',
+    'mini dress flowing fabric, natural silhouette, feminine energy',
+  ],
+  default: [
+    'form-fitting outfit emphasizing athletic silhouette',
+    'casual chic showing natural curves tastefully',
+    'fitted athleisure highlighting toned body',
+  ],
+};
+
+const MILA_SEXY_ACTION_DETAILS = {
+  bedroom: [
+    'stretching on bed, natural morning moment, relaxed and confident',
+    'sitting on bed edge, legs tucked, warm inviting pose',
+    'standing by window in morning light, natural silhouette',
+  ],
+  living: [
+    'lounging on sofa elegantly, legs tucked, relaxed confident pose',
+    'sitting with guitar, creative intimate moment',
+    'relaxed on floor with coffee, casual authentic vibe',
+  ],
+  gym: [
+    'mid-workout pose, confident and focused',
+    'stretching, athletic flexibility visible',
+    'casual gym selfie, natural confidence',
+  ],
+  outdoor: [
+    'walking with natural confidence, hair moving',
+    'leaning against wall, casual cool pose',
+    'candid moment, authentic street style',
+  ],
+  default: [
+    'confident natural pose',
+    'relaxed authentic body language',
+  ],
+};
+
+function getLocationCategory(locationName) {
+  const name = locationName.toLowerCase();
+  if (name.includes('bedroom') || name.includes('chambre') || name.includes('lit')) return 'bedroom';
+  if (name.includes('living') || name.includes('salon') || name.includes('loft')) return 'living';
+  if (name.includes('bathroom') || name.includes('salle de bain') || name.includes('bath')) return 'bathroom';
+  if (name.includes('gym') || name.includes('fitness') || name.includes('sport')) return 'gym';
+  if (name.includes('street') || name.includes('cafe') || name.includes('outdoor') || name.includes('paris')) return 'outdoor';
+  return 'default';
+}
+
+function enhanceElenaOutfit(originalOutfit, locationName) {
+  const category = getLocationCategory(locationName);
+  const sexyOptions = ELENA_SEXY_OUTFIT_DETAILS[category] || ELENA_SEXY_OUTFIT_DETAILS.default;
+  const sexyOutfit = sexyOptions[Math.floor(Math.random() * sexyOptions.length)];
+  return `${sexyOutfit}, ${originalOutfit}`;
+}
+
+function enhanceElenaAction(originalAction, locationName) {
+  const category = getLocationCategory(locationName);
+  const sexyOptions = ELENA_SEXY_ACTION_DETAILS[category] || ELENA_SEXY_ACTION_DETAILS.default;
+  const sexyAction = sexyOptions[Math.floor(Math.random() * sexyOptions.length)];
+  return `${sexyAction}, ${originalAction}`;
+}
+
+function enhanceMilaOutfit(originalOutfit, locationName) {
+  const category = getLocationCategory(locationName);
+  const sexyOptions = MILA_SEXY_OUTFIT_DETAILS[category] || MILA_SEXY_OUTFIT_DETAILS.default;
+  const sexyOutfit = sexyOptions[Math.floor(Math.random() * sexyOptions.length)];
+  return `${sexyOutfit}, ${originalOutfit}`;
+}
+
+function enhanceMilaAction(originalAction, locationName) {
+  const category = getLocationCategory(locationName);
+  const sexyOptions = MILA_SEXY_ACTION_DETAILS[category] || MILA_SEXY_ACTION_DETAILS.default;
+  const sexyAction = sexyOptions[Math.floor(Math.random() * sexyOptions.length)];
+  return `${sexyAction}, ${originalAction}`;
+}
 
 // ===========================================
 // HELPER FUNCTIONS
@@ -192,11 +361,26 @@ function pick(arr) {
 // GENERATE IMAGE
 // ===========================================
 
-async function generateImage(character, setting, outfit, action, promptHints, index) {
+async function generateImage(character, setting, outfit, action, promptHints, index, locationName, sceneReferenceBase64 = null) {
   const config = CHARACTERS[character];
   const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
 
-  const expression = EXPRESSIONS[index % EXPRESSIONS.length];
+  // Get character-specific expressions
+  const charExpressions = EXPRESSIONS[character] || EXPRESSIONS.mila;
+  const expression = charExpressions[index % charExpressions.length];
+
+  // Enhance outfit and action for sexy positioning (both characters)
+  let finalOutfit = outfit;
+  let finalAction = action;
+  if (character === 'elena') {
+    finalOutfit = enhanceElenaOutfit(outfit, locationName || setting);
+    finalAction = enhanceElenaAction(action, locationName || setting);
+    log(`  🔥 Elena sexy enhancement applied`);
+  } else if (character === 'mila') {
+    finalOutfit = enhanceMilaOutfit(outfit, locationName || setting);
+    finalAction = enhanceMilaAction(action, locationName || setting);
+    log(`  🔥 Mila sexy enhancement applied`);
+  }
 
   // Build the prompt using schedule params with explicit reference mapping
   const prompt = `${config.reference_instruction}
@@ -207,17 +391,17 @@ ${config.body_description}
 
 SETTING: ${setting}
 
-OUTFIT: ${outfit}
+OUTFIT: ${finalOutfit}
 
-ACTION: ${action}
+ACTION: ${finalAction}
 
 EXPRESSION: ${expression}
 
 ${promptHints ? `ADDITIONAL HINTS: ${promptHints}` : ''}
 
-STYLE: professional Instagram photography, natural lighting, shallow depth of field, 
-high-end fashion editorial quality, authentic lifestyle moment, not posed or artificial.
-Shot on Sony A7III with 85mm f/1.4 lens.
+STYLE: 2026 instagram style picture, professional Instagram photography, natural lighting, 
+shallow depth of field, high-end fashion editorial quality, authentic lifestyle moment, 
+not posed or artificial. Shot on Sony A7III with 85mm f/1.4 lens.
 
 ${config.final_check}`;
 
@@ -225,22 +409,27 @@ ${config.final_check}`;
   log(`  Setting: ${setting.substring(0, 60)}...`);
   log(`  Outfit: ${outfit.substring(0, 60)}...`);
 
-  // Prepare references
+  // Prepare references - add scene reference first for outfit/scene consistency
   const refs = [config.face_ref, config.body_ref, ...config.extra_refs].filter(Boolean);
   log(`  Converting ${refs.length} references to base64...`);
   const refBase64 = await Promise.all(refs.map(urlToBase64));
+  
+  // Add scene reference at the beginning for stronger consistency (images 2 and 3)
+  if (sceneReferenceBase64) {
+    refBase64.unshift(sceneReferenceBase64);
+    log(`  👗 Added first image as scene reference for consistency`);
+  }
 
   try {
     const output = await replicate.run(NANO_BANANA_MODEL, {
       input: {
         prompt,
         negative_prompt: 'ugly, deformed, noisy, blurry, low quality, cartoon, anime, illustration, painting, drawing, watermark, text, logo, bad anatomy, extra limbs, missing limbs, floating limbs, disconnected limbs, mutation, mutated, disfigured, poorly drawn face, cloned face, gross proportions, malformed limbs, missing arms, missing legs, extra arms, extra legs, fused fingers, too many fingers, long neck, username, signature, words, letters',
-        width: 1024,
-        height: 1440,
-        num_outputs: 1,
-        guidance_scale: 7.5,
-        num_inference_steps: 30,
-        subject_images: refBase64,
+        aspect_ratio: '4:5',
+        resolution: '2K',
+        output_format: 'jpg',
+        safety_filter_level: 'block_only_high',
+        image_input: refBase64,
       },
     });
 
@@ -261,12 +450,11 @@ ${config.final_check}`;
         input: {
           prompt: saferPrompt,
           negative_prompt: 'ugly, deformed, noisy, blurry, low quality, cartoon, anime',
-          width: 1024,
-          height: 1440,
-          num_outputs: 1,
-          guidance_scale: 7.5,
-          num_inference_steps: 30,
-          subject_images: refBase64,
+          aspect_ratio: '4:5',
+          resolution: '2K',
+          output_format: 'jpg',
+          safety_filter_level: 'block_only_high',
+          image_input: refBase64,
         },
       });
 
@@ -521,8 +709,10 @@ async function main() {
   // Build setting from location
   const setting = post.prompt_hints || post.location_name;
 
-  // Generate images
+  // Generate images with scene consistency (first image used as reference for subsequent)
   const imageUrls = [];
+  let firstImageBase64 = null; // Store first image for outfit/scene consistency
+  
   for (let i = 0; i < contentCount; i++) {
     log(`\n🎨 Generating image ${i + 1}/${contentCount}...`);
     
@@ -540,12 +730,20 @@ async function main() {
       post.outfit || 'stylish casual outfit appropriate for the setting',
       action,
       post.prompt_hints,
-      i
+      i,
+      post.location_name,
+      i > 0 ? firstImageBase64 : null // Pass first image as reference for images 2 and 3
     );
 
     // Upload to Cloudinary
     const cloudinaryUrl = await uploadToCloudinary(imageUrl, character, post.type, i);
     imageUrls.push(cloudinaryUrl);
+    
+    // Store first image as base64 for scene consistency
+    if (i === 0) {
+      firstImageBase64 = await urlToBase64(cloudinaryUrl);
+      log(`  📌 Stored first image as reference for scene consistency`);
+    }
   }
 
   log(`\n📸 ${contentCount} images ready`);

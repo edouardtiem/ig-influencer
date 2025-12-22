@@ -102,21 +102,21 @@ const ELENA_FINAL_CHECK = `FINAL CHECK - MUST MATCH REFERENCES:
 const ELENA_PHONE = 'iPhone 17 Pro in blue color, sleek modern design';
 
 // ═══════════════════════════════════════════════════════════════
-// EXPRESSIONS - Très sexy focus
+// EXPRESSIONS - Safe sexy vocabulary per docs/19-QUALITY-SEXY-STRATEGY.md
 // ═══════════════════════════════════════════════════════════════
 
 const HERO_EXPRESSIONS = [
-  'intense sultry gaze at camera, lips slightly parted, smoldering confidence',
-  'seductive knowing smile, direct eye contact, magnetic allure',
-  'soft sensual expression, bedroom eyes, effortless glamour',
-  'playful sexy smirk, inviting look, confident femininity',
+  'intense captivating gaze at camera, lips slightly parted, smoldering confidence',
+  'enchanting knowing smile, direct eye contact, magnetic allure',
+  'soft alluring expression, warm inviting eyes, effortless glamour',
+  'playful charming smirk, inviting look, confident femininity',
 ];
 
 const SECONDARY_EXPRESSIONS = [
-  'looking over shoulder with sultry glance, mysterious and inviting',
-  'eyes half-closed sensual, caught in intimate moment',
+  'looking over shoulder with captivating glance, mysterious and inviting',
+  'eyes half-closed alluring, caught in intimate moment',
   'confident smile, head tilted, curves accentuated',
-  'dreamy soft expression, natural sensuality radiating',
+  'dreamy soft expression, natural radiance',
   'biting lip subtly, playful teasing energy',
   'looking up through lashes, innocent but knowing',
 ];
@@ -790,8 +790,8 @@ SETTING: ${location.setting},
 LIGHTING: ${slot.lighting},
 MOOD: ${slot.mood},
 
-STYLE: ultra realistic Instagram photo, lifestyle content, high fashion model aesthetic,
-shot on iPhone, natural photography, 8k quality, detailed skin texture, realistic lighting,
+STYLE: 2026 instagram style picture, ultra realistic Instagram photo, lifestyle content, 
+high fashion model aesthetic, shot on iPhone, natural photography, 8k quality, detailed skin texture, realistic lighting,
 
 ${ELENA_FINAL_CHECK}`;
 

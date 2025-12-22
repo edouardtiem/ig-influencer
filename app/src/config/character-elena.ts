@@ -65,7 +65,7 @@ export const CHARACTER_ELENA = {
   // ═══════════════════════════════════════════════════════════════
   
   style: {
-    aesthetic: 'Instagram model aesthetic 2025, street-luxe Paris, revealing but tasteful',
+    aesthetic: '2026 instagram style picture, Instagram model aesthetic, street-luxe Paris, revealing but tasteful',
     colors: ['beige', 'cream', 'nude', 'white', 'black', 'plaid'],
     jewelry: 'gold only, chunky chain bracelet, layered necklaces',
     

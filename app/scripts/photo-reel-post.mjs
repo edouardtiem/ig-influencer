@@ -207,7 +207,7 @@ const EXPRESSIONS = [
   'confident relaxed gaze at camera, soft knowing smile, vacation glow',
   'serene peaceful expression, eyes slightly closed, enjoying the moment',
   'playful inviting look over shoulder, subtle smile, carefree energy',
-  'soft sensual expression, lips slightly parted, dreamy atmosphere',
+  'soft alluring expression, lips slightly parted, dreamy atmosphere',
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -583,7 +583,7 @@ OUTFIT: wearing ${outfit},
 
 SETTING: ${setting},
 
-STYLE: ultra realistic vacation photography, authentic travel moment,
+STYLE: 2026 instagram style picture, ultra realistic vacation photography, authentic travel moment,
 8k resolution, professional photography, soft focus background,
 Instagram aesthetic, travel influencer style, golden hour lighting,
 

@@ -74,7 +74,7 @@ function buildPromptFromTemplate(template: PromptsTemplate): string {
   const characterPrompt = buildCharacterPrompt();
   const stylePrompt = buildStylePrompt();
   
-  return `[STYLE] Photorealistic Instagram photo, natural lighting, professional photography quality, authentic candid feel,
+  return `[STYLE] 2026 instagram style picture, Photorealistic Instagram photo, natural lighting, professional photography quality, authentic candid feel,
 
 ${characterPrompt}
 
@@ -158,7 +158,7 @@ function buildContextualPrompt(
     ? `\n[ENVIRONMENT DETAILS] ${brief.props.join(', ')}`
     : '';
   
-  return `[STYLE] Photorealistic Instagram photo, professional photography quality, authentic candid moment captured mid-action,
+  return `[STYLE] 2026 instagram style picture, Photorealistic Instagram photo, professional photography quality, authentic candid moment captured mid-action,
 
 ${characterPrompt}
 
@@ -201,7 +201,7 @@ export function buildSimplePrompt(instruction: string): string {
   const characterPrompt = buildCharacterPrompt();
   const stylePrompt = buildStylePrompt();
   
-  return `[STYLE] Photorealistic Instagram photo, natural lighting, professional photography quality,
+  return `[STYLE] 2026 instagram style picture, Photorealistic Instagram photo, natural lighting, professional photography quality,
 
 ${characterPrompt}
 

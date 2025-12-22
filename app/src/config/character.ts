@@ -53,8 +53,8 @@ export const CHARACTER = {
     necklace: 'thin gold necklace with minimalist star pendant (always visible)',
   },
   
-  // Style keywords — Sexy but tasteful
-  style: 'athleisure chic, Parisian elegant, naturally sensual, alluring confidence, subtle sex appeal, Instagram aesthetic, effortless French girl vibe, feminine power',
+  // Style keywords — Safe sexy vocabulary per docs/19-QUALITY-SEXY-STRATEGY.md
+  style: '2026 instagram style picture, athleisure chic, Parisian elegant, captivating allure, magnetic confidence, Instagram aesthetic, effortless French girl vibe, feminine power',
   
   // Quality settings
   quality: {
