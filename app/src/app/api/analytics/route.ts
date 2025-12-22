@@ -15,6 +15,12 @@ interface Post {
   caption: string | null;
 }
 
+interface Snapshot {
+  snapshot_date: string;
+  character: string;
+  followers_count: number | null;
+}
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const character = searchParams.get('character') as CharacterName | 'all' | null;
@@ -153,8 +159,8 @@ export async function GET(request: NextRequest) {
       : 0;
 
     // Find best performers
-    const sortedByImpressions = [...(posts || [])].sort((a, b) => (b.impressions || 0) - (a.impressions || 0));
-    const topPosts = sortedByImpressions.slice(0, 5).map(p => ({
+    const sortedByImpressions = [...(typedPosts || [])].sort((a: Post, b: Post) => (b.impressions || 0) - (a.impressions || 0));
+    const topPosts = sortedByImpressions.slice(0, 5).map((p: Post) => ({
       id: p.id,
       date: p.posted_at,
       impressions: p.impressions || 0,
@@ -165,7 +171,7 @@ export async function GET(request: NextRequest) {
 
     // Best performing location
     const locationStats: Record<string, { count: number; impressions: number; likes: number }> = {};
-    posts?.forEach(p => {
+    typedPosts?.forEach((p: Post) => {
       const loc = p.location_name || 'Unknown';
       if (!locationStats[loc]) locationStats[loc] = { count: 0, impressions: 0, likes: 0 };
       locationStats[loc].count++;
@@ -179,7 +185,7 @@ export async function GET(request: NextRequest) {
 
     // Best posting hour
     const hourStats: Record<number, { count: number; impressions: number }> = {};
-    posts?.forEach(p => {
+    typedPosts?.forEach((p: Post) => {
       if (!p.posted_at) return;
       const hour = new Date(p.posted_at).getHours();
       if (!hourStats[hour]) hourStats[hour] = { count: 0, impressions: 0 };
@@ -192,14 +198,15 @@ export async function GET(request: NextRequest) {
       .sort((a, b) => b.avgImpressions - a.avgImpressions)[0];
 
     // Followers growth
-    const firstSnapshot = snapshots?.[0];
-    const lastSnapshot = snapshots?.[snapshots.length - 1];
+    const typedSnapshots = snapshots as Snapshot[] | null;
+    const firstSnapshot = typedSnapshots?.[0];
+    const lastSnapshot = typedSnapshots?.[typedSnapshots.length - 1];
     const followersGrowth = lastSnapshot && firstSnapshot
       ? (lastSnapshot.followers_count || 0) - (firstSnapshot.followers_count || 0)
       : null;
 
     // Followers timeline for graph
-    const followersTimeline = snapshots?.map(s => ({
+    const followersTimeline = typedSnapshots?.map((s: Snapshot) => ({
       date: s.snapshot_date,
       followers: s.followers_count || 0,
       character: s.character,

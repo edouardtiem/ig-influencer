@@ -291,7 +291,7 @@ async function syncAccount(character: CharacterName): Promise<{
     
     for (const post of recentMedia) {
       // Check if post already exists
-      const exists = dbPosts?.some(p => p.instagram_post_id === post.id);
+      const exists = dbPosts?.some((p: { instagram_post_id: string | null }) => p.instagram_post_id === post.id);
       if (exists) continue;
       
       // New post - insert it
