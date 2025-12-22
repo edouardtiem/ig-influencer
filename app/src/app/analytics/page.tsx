@@ -76,10 +76,22 @@ export default function AnalyticsPage() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const days = period === 'all' ? 365 : parseInt(period);
-    const res = await fetch(`/api/analytics?days=${days}&character=${character}`);
-    const json = await res.json();
-    setData(json);
+    try {
+      const days = period === 'all' ? 365 : parseInt(period);
+      const res = await fetch(`/api/analytics?days=${days}&character=${character}`);
+      const json = await res.json();
+      
+      // Check if response is an error
+      if (json.error || !json.totals) {
+        console.error('Analytics API error:', json.error || 'Invalid response');
+        setData(null);
+      } else {
+        setData(json);
+      }
+    } catch (error) {
+      console.error('Failed to fetch analytics:', error);
+      setData(null);
+    }
     setLoading(false);
   }, [period, character]);
 

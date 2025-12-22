@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase, CharacterName } from '@/lib/supabase';
+import { supabase, CharacterName, isSupabaseConfigured } from '@/lib/supabase';
 
 interface Post {
   id: string;
@@ -22,6 +22,14 @@ interface Snapshot {
 }
 
 export async function GET(request: NextRequest) {
+  // Check if Supabase is properly configured
+  if (!isSupabaseConfigured()) {
+    return NextResponse.json(
+      { error: 'Database not configured. Please set SUPABASE_URL and SUPABASE_SERVICE_KEY.' },
+      { status: 503 }
+    );
+  }
+
   const searchParams = request.nextUrl.searchParams;
   const character = searchParams.get('character') as CharacterName | 'all' | null;
   const days = parseInt(searchParams.get('days') || '30');
