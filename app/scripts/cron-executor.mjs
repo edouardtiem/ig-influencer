@@ -45,7 +45,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 const TIME_WINDOW_MINUTES = 60;
 
 // Catchup window: also execute posts that were missed up to this many hours ago
-const CATCHUP_HOURS = 3;
+// Increased to 18h to ensure all daily posts get executed even if GH Actions skips runs
+const CATCHUP_HOURS = 18;
 
 // ===========================================
 // GET PENDING POSTS
