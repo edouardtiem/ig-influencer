@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 22 décembre 2024 (Prompt Improvements 📸)
+**Dernière mise à jour** : 23 décembre 2024 (Status Tracking + Calendar 📅)
 
 ---
 
@@ -50,6 +50,8 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-029 | **Calendar Dashboard 📅** — Page /calendar avec vue semaine + status badges + auto-refresh 30s | 23/12/2024 | v2.21.0 | [→](./docs/SESSION-23-DEC-2024-STATUS-TRACKING.md) |
+| DONE-028 | **Post Status Tracking 🔄** — Table scheduled_posts + 6 statuts + step-based executor + retry 3x | 23/12/2024 | v2.20.0 | [→](./docs/SESSION-23-DEC-2024-STATUS-TRACKING.md) |
 | DONE-027 | **Prompt Improvements 📸** — 2026 style + safe sexy vocabulary + scene consistency + sexy enhancers Mila/Elena + format 4:5 | 22/12/2024 | v2.19.0 | [→](./docs/SESSION-22-DEC-2024-PROMPT-IMPROVEMENTS.md) |
 | DONE-026 | **Analytics Page 📊** — Dashboard complet + Sync Instagram API v22 + Sauvegarde Supabase auto | 22/12/2024 | v2.18.0 | [→](./docs/SESSION-22-DEC-2024-ANALYTICS-PAGE.md) |
 | DONE-025 | **Explicit Reference Prompts 🎯** — IMAGE 1=face, IMAGE 2=body mapping pour Nano Banana Pro | 22/12/2024 | v2.17.0 | [→](./docs/SESSION-22-DEC-2024-EXPLICIT-PROMPTS.md) |
@@ -86,6 +88,7 @@ roadmap/
 
 | ID | Bug | Sévérité | Status | Lien |
 |----|-----|----------|--------|------|
+| BUG-007 | **Catchup 3h trop court** — Posts manqués quand GitHub Actions skip runs, augmenté à 18h | 🔴 High | ✅ Fixed | [→](./docs/SESSION-23-DEC-2024-STATUS-TRACKING.md) |
 | BUG-006 | **subject_images vs image_input** — scheduled-post.mjs utilisait le mauvais param, références non envoyées | 🔴 High | ✅ Fixed | [→](./docs/SESSION-22-DEC-2024-PROMPT-IMPROVEMENTS.md) |
 | BUG-005 | **TypeScript Strict Mode Errors** — Recharts formatter + Supabase callback types | 🟡 Medium | ✅ Fixed | [→](./docs/SESSION-22-DEC-2024-CLOUDINARY-FIX.md) |
 | BUG-004 | **Cloudinary Unsigned Upload Blocked** — upload_preset: 'ml_default' rejeté, fix signed uploads | 🔴 High | ✅ Fixed | [→](./docs/SESSION-22-DEC-2024-CLOUDINARY-FIX.md) |
@@ -114,10 +117,10 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 28 (+1 Prompt Improvements)
+├── ✅ Done        : 30 (+2 Status Tracking + Calendar)
 ├── 🚧 In Progress : 1 (Model Evolution)
 ├── 📋 Todo        : 4
-├── 🐛 Bugs        : 5 (5 fixed)
+├── 🐛 Bugs        : 6 (6 fixed)
 └── 💡 Ideas       : 7 (+3 Content Brain V3)
 ```
 
@@ -127,6 +130,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 23/12/2024 | **📅 Status Tracking + Calendar** — Table scheduled_posts + 6 statuts + page /calendar + catchup 18h | [→](./docs/SESSION-23-DEC-2024-STATUS-TRACKING.md) |
 | 22/12/2024 | **📸 Prompt Improvements** — 2026 style + safe sexy + scene consistency + sexy enhancers | [→](./docs/SESSION-22-DEC-2024-PROMPT-IMPROVEMENTS.md) |
 | 22/12/2024 | **📊 Analytics Page** — Dashboard complet + Sync Instagram API v22 + Scripts → Supabase | [→](./docs/SESSION-22-DEC-2024-ANALYTICS-PAGE.md) |
 | 22/12/2024 | **🔧 Cloudinary Fix + TypeScript** — Signed uploads + fix TS strict mode errors | [→](./docs/SESSION-22-DEC-2024-CLOUDINARY-FIX.md) |

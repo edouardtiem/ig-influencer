@@ -373,7 +373,7 @@ async function processNextPost(character, dryRun) {
     return null;
   }
 
-  const reelInfo = post.post_type === 'reel' ? ` (${post.reel_type || 'photo'})` : '';
+  const reelInfo = post.post_type === 'reel' ? ' (video)' : '';
   console.log(`\n   🎬 Processing ${post.post_type.toUpperCase()}${reelInfo}`);
   console.log(`      📍 ${post.location_name}`);
   console.log(`      ⏰ Scheduled: ${post.scheduled_time}`);

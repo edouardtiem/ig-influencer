@@ -554,9 +554,9 @@ ${LOCATIONS[character].join('\n')}
 - **location_key**: ID du lieu
 - **location_name**: Nom complet du lieu
 - **post_type**: "carousel" | "reel"
-- **reel_type**: "photo" | "video" (SEULEMENT si post_type = "reel")
-  • "photo" = slideshow de 3 photos (rapide, ~2min génération)
-  • "video" = 3 clips animés Kling (premium, ~10min génération, plus engageant)
+- **reel_type**: "video" (automatique pour tous les reels)
+  • Tous les reels utilisent Kling v2.5 pour animation (~5-7min génération)
+  • Style Instagram 2026, real-time speed, pas de slow motion
 - **mood**: cozy | adventure | work | fitness | travel | fashion | relax | nostalgic
 - **outfit**: Description tenue détaillée
 - **action**: Ce qu'elle fait (pour le prompt image)
@@ -607,7 +607,7 @@ Réponds UNIQUEMENT avec du JSON valide, format:
       "location_key": "...",
       "location_name": "...",
       "post_type": "carousel|reel",
-      "reel_type": "photo|video",
+      "reel_type": "video",
       "reel_theme": "fitness|spa|lifestyle|travel",
       "mood": "...",
       "outfit": "...",
@@ -754,7 +754,7 @@ async function generateSchedule(character) {
                        p.content_type === 'response' ? '💬' :
                        p.content_type === 'experiment' ? '🧪' : '✨';
       const expBadge = p.is_experiment ? ' [A/B TEST]' : '';
-      const reelInfo = p.post_type === 'reel' ? ` (${p.reel_type || 'photo'})` : '';
+      const reelInfo = p.post_type === 'reel' ? ' (video)' : '';
       console.log(`${p.scheduled_time} │ ${p.post_type.toUpperCase()}${reelInfo.padEnd(6)} │ ${typeIcon} ${p.location_name}${expBadge}`);
       console.log(`         │ ${p.content_type.toUpperCase().padEnd(10)} │ "${p.caption?.substring(0, 40)}..."`);
       console.log(`         └─ Reasoning: ${p.reasoning?.substring(0, 50)}...`);
@@ -772,7 +772,7 @@ async function generateSchedule(character) {
       scheduled_posts: plan.posts.map(p => ({
         time: p.scheduled_time,
         type: p.post_type,
-        reel_type: p.post_type === 'reel' ? (p.reel_type || 'photo') : null,
+        reel_type: p.post_type === 'reel' ? 'video' : null,
         reel_theme: p.post_type === 'reel' ? (p.reel_theme || 'lifestyle') : null,
         content_type: p.content_type,
         is_experiment: p.is_experiment || false,
@@ -828,7 +828,7 @@ async function generateSchedule(character) {
           scheduled_time: post.scheduled_time,
           status: 'scheduled',
           post_type: post.post_type,
-          reel_type: post.post_type === 'reel' ? (post.reel_type || 'photo') : null,
+          reel_type: post.post_type === 'reel' ? 'video' : null,
           reel_theme: post.post_type === 'reel' ? (post.reel_theme || 'lifestyle') : null,
           content_type: post.content_type || 'new',
           location_key: post.location_key,

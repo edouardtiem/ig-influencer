@@ -361,9 +361,12 @@ function pick(arr) {
 // GENERATE IMAGE
 // ===========================================
 
-async function generateImage(character, setting, outfit, action, promptHints, index, locationName, sceneReferenceBase64 = null) {
+async function generateImage(character, setting, outfit, action, promptHints, index, locationName, sceneReferenceBase64 = null, isReel = false) {
   const config = CHARACTERS[character];
   const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
+  
+  // Use 9:16 for reels, 4:5 for carousels
+  const aspectRatio = isReel ? '9:16' : '4:5';
 
   // Get character-specific expressions
   const charExpressions = EXPRESSIONS[character] || EXPRESSIONS.mila;
@@ -399,9 +402,13 @@ EXPRESSION: ${expression}
 
 ${promptHints ? `ADDITIONAL HINTS: ${promptHints}` : ''}
 
-STYLE: 2026 instagram style picture, professional Instagram photography, natural lighting, 
-shallow depth of field, high-end fashion editorial quality, authentic lifestyle moment, 
-not posed or artificial. Shot on Sony A7III with 85mm f/1.4 lens.
+STYLE: 2026 Instagram content, iPhone 15 Pro quality
+- Natural lighting (golden hour, window light, soft diffused)
+- Authentic influencer aesthetic, casually perfect
+- Main character energy, effortlessly cool
+- The kind of post that gets organic viral engagement
+- Candid vibe like a friend took it, not overly posed
+AVOID: Professional studio, magazine editorial, stock photo look, overly retouched
 
 ${config.final_check}`;
 
@@ -424,8 +431,8 @@ ${config.final_check}`;
     const output = await replicate.run(NANO_BANANA_MODEL, {
       input: {
         prompt,
-        negative_prompt: 'ugly, deformed, noisy, blurry, low quality, cartoon, anime, illustration, painting, drawing, watermark, text, logo, bad anatomy, extra limbs, missing limbs, floating limbs, disconnected limbs, mutation, mutated, disfigured, poorly drawn face, cloned face, gross proportions, malformed limbs, missing arms, missing legs, extra arms, extra legs, fused fingers, too many fingers, long neck, username, signature, words, letters',
-        aspect_ratio: '4:5',
+        negative_prompt: 'ugly, deformed, noisy, blurry, low quality, cartoon, anime, illustration, painting, drawing, watermark, text, logo, bad anatomy, extra limbs, missing limbs, mutation, disfigured, poorly drawn face, cloned face, malformed limbs, fused fingers, too many fingers, username, signature, professional studio lighting, magazine cover, stock photo, overly retouched, artificial lighting',
+        aspect_ratio: aspectRatio,
         resolution: '2K',
         output_format: 'jpg',
         safety_filter_level: 'block_only_high',
@@ -450,7 +457,7 @@ ${config.final_check}`;
         input: {
           prompt: saferPrompt,
           negative_prompt: 'ugly, deformed, noisy, blurry, low quality, cartoon, anime',
-          aspect_ratio: '4:5',
+          aspect_ratio: aspectRatio,
           resolution: '2K',
           output_format: 'jpg',
           safety_filter_level: 'block_only_high',
@@ -507,51 +514,215 @@ async function uploadToCloudinary(imageUrl, character, postType, index) {
 }
 
 // ===========================================
-// CREATE REEL VIDEO (slideshow)
+// KLING VIDEO PROMPT — Instagram 2026 Style
 // ===========================================
 
-async function createReelVideo(imageUrls, character) {
+function buildKlingPrompt(action, setting, mood) {
+  return `SETTING: ${setting}
+
+ACTION: ${action}
+
+STYLE: Instagram Reel 2026 aesthetic
+- iPhone video quality, authentic content vibe
+- Natural casual movement (not choreographed)
+- "Caught on camera" authentic feel
+- The kind of reel that goes viral organically
+- Main character energy, effortless cool
+
+SPEED CRITICAL:
+- REAL-TIME SPEED only
+- NO slow motion whatsoever
+- Normal human movement pace
+- Instagram Reel pacing (quick, engaging)
+
+MOVEMENTS (subtle and natural):
+- Gentle breathing visible in shoulders
+- Hair moving slightly with natural air
+- Natural eye blinks
+- Micro-expressions (slight smile changes)
+- Fabric settling naturally
+
+CAMERA: Static or very subtle pan. No dramatic moves.
+
+MOOD: ${mood}
+
+AVOID: Slow motion, cinematic camera moves, CGI look, TikTok transitions, overly produced feel, artificial movements`;
+}
+
+// ===========================================
+// DOWNLOAD FILE HELPER
+// ===========================================
+
+async function downloadFile(url, destPath) {
+  const { default: https } = await import('https');
+  const { default: http } = await import('http');
+  
+  return new Promise((resolve, reject) => {
+    const proto = url.startsWith('https') ? https : http;
+    const file = fs.createWriteStream(destPath);
+    proto.get(url, (res) => {
+      if (res.statusCode === 302 || res.statusCode === 301) {
+        return downloadFile(res.headers.location, destPath).then(resolve).catch(reject);
+      }
+      res.pipe(file);
+      file.on('finish', () => { file.close(); resolve(destPath); });
+    }).on('error', (err) => {
+      fs.unlink(destPath, () => {});
+      reject(err);
+    });
+  });
+}
+
+// ===========================================
+// CREATE REEL VIDEO (Kling v2.5 Animation)
+// ===========================================
+
+async function createReelVideo(imageUrls, character, postParams = {}) {
   const config = CHARACTERS[character];
   const outputDir = path.join(__dirname, '..', 'generated', config.cloudinary_folder);
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
-  // Download images
-  const localPaths = [];
+  const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
+
+  // Download images locally first
+  log(`🎬 Preparing ${imageUrls.length} images for Kling animation...`);
+  const localImagePaths = [];
   for (let i = 0; i < imageUrls.length; i++) {
     const response = await fetch(imageUrls[i]);
     const buffer = Buffer.from(await response.arrayBuffer());
-    const localPath = path.join(outputDir, `temp-${i}.jpg`);
+    const localPath = path.join(outputDir, `temp-img-${i}.jpg`);
     fs.writeFileSync(localPath, buffer);
-    localPaths.push(localPath);
+    localImagePaths.push(localPath);
   }
 
-  // Create video with FFmpeg
-  const outputPath = path.join(outputDir, `reel-${Date.now()}.mp4`);
-  const inputList = localPaths.map(p => `file '${p}'`).join('\n');
-  const listPath = path.join(outputDir, 'input.txt');
+  // Kling action variations for narrative progression
+  const baseAction = postParams.action || 'natural movement, looking at camera';
+  const klingActions = [
+    `${baseAction}, subtle movement, holds position naturally`,
+    `${baseAction}, transitions smoothly, natural body adjustment`,
+    `${baseAction}, finishes movement, warm smile toward camera`,
+  ];
+
+  const setting = postParams.prompt_hints || postParams.location_name || 'aesthetic interior';
+  const mood = postParams.mood || 'authentic, natural';
+
+  // Generate Kling clips in parallel
+  log(`🎬 Generating ${localImagePaths.length} Kling clips (parallel)...`);
+  const startTime = Date.now();
+
+  const clipPromises = localImagePaths.map(async (imgPath, i) => {
+    log(`   Clip ${i + 1}/${localImagePaths.length}: Starting Kling...`);
+    const clipStart = Date.now();
+    
+    const imageBase64 = `data:image/jpeg;base64,${fs.readFileSync(imgPath).toString('base64')}`;
+    const prompt = buildKlingPrompt(klingActions[i] || klingActions[0], setting, mood);
+    
+    try {
+      const output = await replicate.run('kwaivgi/kling-v2.5-turbo-pro', {
+        input: {
+          prompt,
+          image: imageBase64,
+          duration: 5,
+          aspect_ratio: '9:16',
+        },
+      });
+      
+      // Extract URL from various Replicate output formats
+      let videoUrl = null;
+      
+      if (typeof output === 'string') {
+        videoUrl = output;
+      } else if (output && typeof output === 'object') {
+        // Check if it's a FileOutput with href() method
+        if (typeof output.url === 'function') {
+          const urlObj = output.url();
+          videoUrl = urlObj?.href || String(urlObj);
+        } else if (output.url) {
+          videoUrl = String(output.url);
+        } else if (output.href) {
+          videoUrl = String(output.href);
+        } else if (output.video) {
+          videoUrl = typeof output.video === 'string' ? output.video : output.video?.url;
+        }
+      }
+      
+      // Array output
+      if (!videoUrl && Array.isArray(output) && output[0]) {
+        const first = output[0];
+        if (typeof first === 'string') {
+          videoUrl = first;
+        } else if (first && typeof first === 'object') {
+          if (typeof first.url === 'function') {
+            const urlObj = first.url();
+            videoUrl = urlObj?.href || String(urlObj);
+          } else {
+            videoUrl = first.url || first.href || first.video;
+          }
+        }
+      }
+      
+      // Last resort: try to extract URL from stringified output
+      if (!videoUrl) {
+        const outputStr = JSON.stringify(output);
+        const urlMatch = outputStr.match(/https?:\/\/[^\s"]+\.mp4[^"']*/);
+        if (urlMatch) {
+          videoUrl = urlMatch[0];
+        }
+      }
+      
+      if (!videoUrl || typeof videoUrl !== 'string') {
+        log(`   ❌ Clip ${i + 1}: No valid URL in Kling output`);
+        return null;
+      }
+      
+      // Download clip
+      const clipPath = path.join(outputDir, `clip-${i + 1}-${Date.now()}.mp4`);
+      await downloadFile(videoUrl, clipPath);
+      
+      const duration = ((Date.now() - clipStart) / 1000).toFixed(1);
+      log(`   ✅ Clip ${i + 1} generated in ${duration}s`);
+      return clipPath;
+      
+    } catch (err) {
+      log(`   ❌ Clip ${i + 1} Kling error: ${err.message?.slice(0, 80) || err}`);
+      return null;
+    }
+  });
+
+  const clipPaths = await Promise.all(clipPromises);
+  const validClips = clipPaths.filter(Boolean);
   
-  // Each image shown for SECONDS_PER_PHOTO seconds
-  const ffmpegInput = localPaths.map(p => `-loop 1 -t ${SECONDS_PER_PHOTO} -i "${p}"`).join(' ');
-  const filterComplex = localPaths.map((_, i) => `[${i}:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1[v${i}]`).join(';');
-  const concat = localPaths.map((_, i) => `[v${i}]`).join('') + `concat=n=${localPaths.length}:v=1:a=0[outv]`;
+  const klingTime = ((Date.now() - startTime) / 1000).toFixed(1);
+  log(`   📊 ${validClips.length}/${localImagePaths.length} clips generated in ${klingTime}s`);
 
-  const ffmpegCmd = `ffmpeg -y ${ffmpegInput} -filter_complex "${filterComplex};${concat}" -map "[outv]" -c:v libx264 -pix_fmt yuv420p -r 30 "${outputPath}"`;
+  // Cleanup temp images
+  localImagePaths.forEach(p => { try { fs.unlinkSync(p); } catch {} });
 
-  log(`🎬 Creating slideshow video...`);
-  await execAsync(ffmpegCmd);
-  log(`  ✅ Video created: ${outputPath}`);
+  if (validClips.length === 0) {
+    throw new Error('No Kling clips generated - cannot create reel');
+  }
 
-  // Cleanup temp files
-  localPaths.forEach(p => fs.unlinkSync(p));
+  // Assemble clips with FFmpeg
+  log(`🎞️ Assembling ${validClips.length} clips with FFmpeg...`);
+  const listPath = path.join(outputDir, 'clips.txt');
+  fs.writeFileSync(listPath, validClips.map(p => `file '${p}'`).join('\n'));
+  
+  const outputPath = path.join(outputDir, `reel-${Date.now()}.mp4`);
+  await execAsync(`ffmpeg -y -f concat -safe 0 -i "${listPath}" -c copy "${outputPath}"`);
+  
+  // Cleanup clips and list
+  fs.unlinkSync(listPath);
+  validClips.forEach(p => { try { fs.unlinkSync(p); } catch {} });
 
-  // Upload video to Cloudinary with signed upload
+  log(`  ✅ Reel assembled: ${outputPath}`);
+
+  // Upload video to Cloudinary
   const timestamp = Math.floor(Date.now() / 1000);
   const videoPublicId = `${config.cloudinary_folder}/reel-${timestamp}`;
   const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/video/upload`;
 
-  // Generate signature for signed upload
   const paramsToSign = `public_id=${videoPublicId}&timestamp=${timestamp}`;
   const signature = crypto
     .createHash('sha1')
@@ -709,6 +880,7 @@ export async function generateImagesForPost(postParams) {
     ];
     const action = actionVariations[i % actionVariations.length];
 
+    const isReel = postParams.type === 'reel';
     const imageUrl = await generateImage(
       character,
       setting,
@@ -717,7 +889,8 @@ export async function generateImagesForPost(postParams) {
       postParams.prompt_hints,
       i,
       postParams.location_name,
-      i > 0 ? firstImageBase64 : null
+      i > 0 ? firstImageBase64 : null,
+      isReel
     );
 
     const cloudinaryUrl = await uploadToCloudinary(imageUrl, character, postParams.type, i);
@@ -731,11 +904,11 @@ export async function generateImagesForPost(postParams) {
 
   log(`\n📸 ${contentCount} images generated`);
 
-  // If reel video type, create the video
+  // All reels use Kling animation now (no more photo slideshows)
   let videoUrl = null;
-  if (postParams.type === 'reel' && postParams.reel_type === 'video') {
-    log(`\n🎬 Creating slideshow video...`);
-    videoUrl = await createReelVideo(imageUrls, character);
+  if (postParams.type === 'reel') {
+    log(`\n🎬 Creating Kling animated reel...`);
+    videoUrl = await createReelVideo(imageUrls, character, postParams);
   }
 
   return { imageUrls, videoUrl };
