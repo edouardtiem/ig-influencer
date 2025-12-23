@@ -88,6 +88,18 @@ export default function Home() {
               </p>
             </Link>
             <Link 
+              href="/calendar"
+              className="block p-6 bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 hover:border-violet-500 transition-colors group"
+            >
+              <span className="text-2xl mb-3 block">📅</span>
+              <h3 className="font-medium text-white group-hover:text-violet-400 transition-colors">
+                Calendar
+              </h3>
+              <p className="text-sm text-slate-400 mt-1">
+                Suivi des posts programmés en temps réel
+              </p>
+            </Link>
+            <Link 
               href="/smart-comment"
               className="block p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 hover:border-purple-300 transition-colors group"
             >
