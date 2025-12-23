@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 23 décembre 2024 (Kling Video Reels 🎬)
+**Dernière mise à jour** : 23 décembre 2024 (Analytics Fix 📊)
 
 ---
 
@@ -37,9 +37,10 @@ roadmap/
 | ID | Feature | Priorité | Estimation | Lien |
 |----|---------|----------|------------|------|
 | TODO-010 | **Targeting Actif** — 20 comments/jour/compte sur niches cibles | 🔴 High | ongoing | - |
+| TODO-012 | **Daily Account Insights** — Tracking vraies métriques journalières (reach, interactions par jour) | 🟡 Medium | 3-4h | [→](./roadmap/todo/TODO-012-daily-account-insights.md) |
+| TODO-006 | Elena Stories Highlights (Travel, Home, BTS) | 🟡 Medium | 2h | - |
 | ~~TODO-004~~ | ~~Intégration Supabase~~ — ✅ Fait via Content Brain | - | - | [→](./docs/SESSION-20-DEC-2024-CONTENT-BRAIN.md) |
 | ~~TODO-001~~ | ~~Multi-shot Reels (carousel → video)~~ — ✅ Done via DONE-030 | - | - | [→](./roadmap/done/DONE-030-kling-video-reels.md) |
-| TODO-006 | Elena Stories Highlights (Travel, Home, BTS) | 🟡 Medium | 2h | - |
 | ~~TODO-007~~ | ~~Premier Reel Elena~~ — Scripts existants | - | - | - |
 | ~~TODO-008~~ | ~~Crossover Mila x Elena NYC~~ — ✅ Done | - | - | [→](./docs/SESSION-18-DEC-2024-DUAL-TOKENS.md) |
 | ~~TODO-003~~ | ~~Dashboard analytics~~ — ✅ Done | - | - | [→](./docs/SESSION-22-DEC-2024-ANALYTICS-PAGE.md) |
@@ -50,6 +51,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-031 | **Analytics Fix 📊** — Sync likes/comments + inclusion données jour actuel + correction snapshots | 23/12/2024 | v2.23.0 | [→](./docs/SESSION-23-DEC-2024-ANALYTICS-FIX.md) |
 | DONE-030 | **Kling Video Reels 🎬** — Tous reels animés Kling v2.5 + style Instagram 2026 + format 9:16 + real-time speed | 23/12/2024 | v2.22.0 | [→](./docs/SESSION-23-DEC-2024-KLING-REELS.md) |
 | DONE-029 | **Calendar Dashboard 📅** — Page /calendar avec vue semaine + status badges + auto-refresh 30s | 23/12/2024 | v2.21.0 | [→](./docs/SESSION-23-DEC-2024-STATUS-TRACKING.md) |
 | DONE-028 | **Post Status Tracking 🔄** — Table scheduled_posts + 6 statuts + step-based executor + retry 3x | 23/12/2024 | v2.20.0 | [→](./docs/SESSION-23-DEC-2024-STATUS-TRACKING.md) |
@@ -89,6 +91,8 @@ roadmap/
 
 | ID | Bug | Sévérité | Status | Lien |
 |----|-----|----------|--------|------|
+| BUG-008 | **Sync ne met pas à jour likes/comments** — Seules impressions/reach mises à jour | 🔴 High | ✅ Fixed | [→](./docs/SESSION-23-DEC-2024-ANALYTICS-FIX.md) |
+| BUG-009 | **Données du jour exclues du graphique** — API excluait aujourd'hui | 🟡 Medium | ✅ Fixed | [→](./docs/SESSION-23-DEC-2024-ANALYTICS-FIX.md) |
 | BUG-007 | **Catchup 3h trop court** — Posts manqués quand GitHub Actions skip runs, augmenté à 18h | 🔴 High | ✅ Fixed | [→](./docs/SESSION-23-DEC-2024-STATUS-TRACKING.md) |
 | BUG-006 | **subject_images vs image_input** — scheduled-post.mjs utilisait le mauvais param, références non envoyées | 🔴 High | ✅ Fixed | [→](./docs/SESSION-22-DEC-2024-PROMPT-IMPROVEMENTS.md) |
 | BUG-005 | **TypeScript Strict Mode Errors** — Recharts formatter + Supabase callback types | 🟡 Medium | ✅ Fixed | [→](./docs/SESSION-22-DEC-2024-CLOUDINARY-FIX.md) |

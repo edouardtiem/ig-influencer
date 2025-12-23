@@ -51,14 +51,15 @@ async function fetchRecentMedia(accessToken: string, accountId: string) {
 }
 
 // ===========================================
-// FETCH POST INSIGHTS
+// FETCH POST INSIGHTS + ENGAGEMENT METRICS
 // Uses new API v22 metrics: views (replaces impressions), reach, saved, shares
+// Also fetches current like_count and comments_count
 // ===========================================
 async function fetchPostInsights(
   mediaId: string, 
   accessToken: string, 
   mediaType: string
-): Promise<{ impressions: number; reach: number; saved?: number; shares?: number }> {
+): Promise<{ impressions: number; reach: number; saved?: number; shares?: number; likes?: number; comments?: number }> {
   // API v22: 'impressions' and 'plays' are deprecated, use 'views' instead
   // Works for all media types: IMAGE, CAROUSEL_ALBUM, VIDEO, REELS
   const metrics = 'views,reach,saved,shares,total_interactions';
@@ -69,13 +70,9 @@ async function fetchPostInsights(
   });
 
   try {
+    // Fetch insights
     const response = await fetch(`${INSTAGRAM_GRAPH_API}/${mediaId}/insights?${params}`);
     const data = await response.json();
-    
-    if (data.error) {
-      console.log(`   ⚠️ Insights error for ${mediaType}: ${data.error.message}`);
-      return { impressions: 0, reach: 0 };
-    }
     
     const insights: Record<string, number> = {};
     if (data.data) {
@@ -84,12 +81,22 @@ async function fetchPostInsights(
       });
     }
     
+    // Also fetch current like_count and comments_count
+    const mediaParams = new URLSearchParams({
+      fields: 'like_count,comments_count',
+      access_token: accessToken,
+    });
+    const mediaResponse = await fetch(`${INSTAGRAM_GRAPH_API}/${mediaId}?${mediaParams}`);
+    const mediaData = await mediaResponse.json();
+    
     // Map 'views' to 'impressions' for backward compatibility in our DB
     return {
       impressions: insights.views || 0,  // views = new impressions
       reach: insights.reach || 0,
       saved: insights.saved || 0,
       shares: insights.shares || 0,
+      likes: mediaData.like_count || 0,
+      comments: mediaData.comments_count || 0,
     };
   } catch (error) {
     console.error(`   ❌ Fetch insights error:`, error);
@@ -256,7 +263,7 @@ async function syncAccount(character: CharacterName): Promise<{
           'IMAGE' // Media type doesn't matter for new API
         );
         
-        // Update the post in Supabase
+        // Update the post in Supabase (including likes/comments!)
         await supabase
           .from('posts')
           .update({
@@ -264,20 +271,22 @@ async function syncAccount(character: CharacterName): Promise<{
             reach: insights.reach,
             saves_count: insights.saved || 0,
             shares_count: insights.shares || 0,
+            likes_count: insights.likes || dbPost.likes_count || 0,
+            comments_count: insights.comments || dbPost.comments_count || 0,
             analytics_updated_at: new Date().toISOString(),
           })
           .eq('id', dbPost.id);
         
         updated++;
         
-        // Build igPosts for snapshot calculation
+        // Build igPosts for snapshot calculation with fresh data
         igPosts.push({
           id: dbPost.instagram_post_id,
           media_type: 'IMAGE',
           permalink: '',
           timestamp: new Date().toISOString(),
-          like_count: dbPost.likes_count || 0,
-          comments_count: dbPost.comments_count || 0,
+          like_count: insights.likes || dbPost.likes_count || 0,
+          comments_count: insights.comments || dbPost.comments_count || 0,
         });
         
         // Small delay to avoid rate limits

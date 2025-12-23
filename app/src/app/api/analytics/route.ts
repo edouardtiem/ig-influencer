@@ -37,9 +37,8 @@ export async function GET(request: NextRequest) {
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - days);
   
-  // End date = yesterday at 23:59:59 (exclude today's incomplete data)
+  // End date = today at 23:59:59 (include today's data)
   const endDate = new Date();
-  endDate.setDate(endDate.getDate() - 1);
   endDate.setHours(23, 59, 59, 999);
 
   // Previous period for comparison
@@ -102,13 +101,13 @@ export async function GET(request: NextRequest) {
       dailyData[date].posts += 1;
     });
 
-    // Get analytics snapshots for followers growth (excluding today)
-    const yesterdayStr = endDate.toISOString().split('T')[0];
+    // Get analytics snapshots for followers growth (including today)
+    const todayStr = endDate.toISOString().split('T')[0];
     let snapshotsQuery = supabase
       .from('analytics_snapshots')
       .select('*')
       .gte('snapshot_date', startDate.toISOString().split('T')[0])
-      .lte('snapshot_date', yesterdayStr)
+      .lte('snapshot_date', todayStr)
       .order('snapshot_date', { ascending: true });
 
     if (character && character !== 'all') {
