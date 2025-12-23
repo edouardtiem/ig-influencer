@@ -672,7 +672,99 @@ async function publishReel(character, videoUrl, caption) {
 }
 
 // ===========================================
-// MAIN
+// EXPORTED FUNCTIONS FOR CRON-EXECUTOR V2
+// ===========================================
+
+/**
+ * Generate images for a post (without publishing)
+ * @param {Object} postParams - Post parameters from scheduler
+ * @returns {Object} { imageUrls: string[], videoUrl?: string }
+ */
+export async function generateImagesForPost(postParams) {
+  const character = postParams.character;
+  const config = CHARACTERS[character];
+  if (!config) {
+    throw new Error(`Unknown character: ${character}`);
+  }
+
+  log('═'.repeat(60));
+  log(`🎨 GENERATING IMAGES — ${character.toUpperCase()}`);
+  log('═'.repeat(60));
+  log(`📍 Location: ${postParams.location_name}`);
+  log(`📸 Type: ${postParams.type} ${postParams.reel_type ? `(${postParams.reel_type})` : ''}`);
+
+  const contentCount = postParams.type === 'reel' ? REEL_SIZE : CAROUSEL_SIZE;
+  const setting = postParams.prompt_hints || postParams.location_name;
+
+  const imageUrls = [];
+  let firstImageBase64 = null;
+
+  for (let i = 0; i < contentCount; i++) {
+    log(`\n🎨 Generating image ${i + 1}/${contentCount}...`);
+
+    const actionVariations = [
+      postParams.action,
+      `${postParams.action}, different angle`,
+      `${postParams.action}, candid moment`,
+    ];
+    const action = actionVariations[i % actionVariations.length];
+
+    const imageUrl = await generateImage(
+      character,
+      setting,
+      postParams.outfit || 'stylish casual outfit appropriate for the setting',
+      action,
+      postParams.prompt_hints,
+      i,
+      postParams.location_name,
+      i > 0 ? firstImageBase64 : null
+    );
+
+    const cloudinaryUrl = await uploadToCloudinary(imageUrl, character, postParams.type, i);
+    imageUrls.push(cloudinaryUrl);
+
+    if (i === 0) {
+      firstImageBase64 = await urlToBase64(cloudinaryUrl);
+      log(`  📌 Stored first image as reference for scene consistency`);
+    }
+  }
+
+  log(`\n📸 ${contentCount} images generated`);
+
+  // If reel video type, create the video
+  let videoUrl = null;
+  if (postParams.type === 'reel' && postParams.reel_type === 'video') {
+    log(`\n🎬 Creating slideshow video...`);
+    videoUrl = await createReelVideo(imageUrls, character);
+  }
+
+  return { imageUrls, videoUrl };
+}
+
+/**
+ * Publish a carousel to Instagram
+ * @param {string} character - 'mila' or 'elena'
+ * @param {string[]} imageUrls - Cloudinary URLs
+ * @param {string} caption - Full caption with hashtags
+ * @returns {string} Instagram post ID
+ */
+export async function publishCarouselToInstagram(character, imageUrls, caption) {
+  return await publishCarousel(character, imageUrls, caption);
+}
+
+/**
+ * Publish a reel to Instagram
+ * @param {string} character - 'mila' or 'elena'
+ * @param {string} videoUrl - Cloudinary video URL
+ * @param {string} caption - Full caption with hashtags
+ * @returns {string} Instagram post ID
+ */
+export async function publishReelToInstagram(character, videoUrl, caption) {
+  return await publishReel(character, videoUrl, caption);
+}
+
+// ===========================================
+// MAIN (for direct execution)
 // ===========================================
 
 async function main() {
@@ -793,8 +885,12 @@ async function main() {
   };
 }
 
-main().catch(err => {
-  console.error('❌ ERROR:', err.message);
-  process.exit(1);
-});
+// Only run main() when executed directly (not when imported)
+const isMainModule = process.argv[1]?.includes('scheduled-post.mjs');
+if (isMainModule) {
+  main().catch(err => {
+    console.error('❌ ERROR:', err.message);
+    process.exit(1);
+  });
+}
 

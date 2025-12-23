@@ -814,6 +814,40 @@ async function generateSchedule(character) {
     }
 
     console.log(`\n💾 Saved to Supabase: ${data.id}`);
+
+    // Insert individual posts into scheduled_posts table for granular tracking
+    console.log('📝 Creating individual post entries...');
+    
+    for (const post of plan.posts) {
+      const { error: postError } = await supabase
+        .from('scheduled_posts')
+        .upsert({
+          schedule_id: data.id,
+          character,
+          scheduled_date: scheduleDate,
+          scheduled_time: post.scheduled_time,
+          status: 'scheduled',
+          post_type: post.post_type,
+          reel_type: post.post_type === 'reel' ? (post.reel_type || 'photo') : null,
+          reel_theme: post.post_type === 'reel' ? (post.reel_theme || 'lifestyle') : null,
+          content_type: post.content_type || 'new',
+          location_key: post.location_key,
+          location_name: post.location_name,
+          mood: post.mood,
+          outfit: post.outfit,
+          action: post.action,
+          caption: post.caption,
+          hashtags: post.hashtags,
+          prompt_hints: post.prompt_hints,
+        }, { onConflict: 'schedule_id,scheduled_time' });
+
+      if (postError) {
+        console.log(`   ⚠️ Failed to create post entry for ${post.scheduled_time}: ${postError.message}`);
+      } else {
+        console.log(`   ✅ ${post.scheduled_time} | ${post.post_type}`);
+      }
+    }
+
     return data;
 
   } catch (error) {

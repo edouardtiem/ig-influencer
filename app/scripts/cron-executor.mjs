@@ -1,21 +1,24 @@
 /**
- * CRON Executor — Execute scheduled posts
+ * CRON Executor V2 — Step-based post execution with granular status tracking
  * 
- * Run every 30 minutes
- * Checks if there's a post scheduled within the next 30 minutes and executes it
+ * Uses the scheduled_posts table for granular status tracking.
+ * Each run processes ONE step of ONE post:
+ *   - scheduled → generating (generate images)
+ *   - images_ready → posting (publish to Instagram)
+ *   - failed → retry (if retry_count < max_retries)
  * 
  * Usage:
- *   node scripts/cron-executor.mjs           # Check and execute for both accounts
+ *   node scripts/cron-executor.mjs           # Process next post for both accounts
  *   node scripts/cron-executor.mjs mila      # Mila only
  *   node scripts/cron-executor.mjs elena     # Elena only
  *   node scripts/cron-executor.mjs --dry-run # Check without executing
+ *   node scripts/cron-executor.mjs --status  # Show status only
  */
 
 import dotenv from 'dotenv';
 dotenv.config({ path: '.env.local' });
 
 import { createClient } from '@supabase/supabase-js';
-import { spawn } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -28,199 +31,440 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 
-// Check required env vars
 if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
   console.error('❌ Missing required environment variables:');
   if (!SUPABASE_URL) console.error('   - SUPABASE_URL');
   if (!SUPABASE_SERVICE_KEY) console.error('   - SUPABASE_SERVICE_KEY');
-  console.error('\n💡 Add these secrets in GitHub: Settings → Secrets → Actions');
-  console.error('   Or in .env.local for local development');
   process.exit(1);
 }
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
-// Time window: execute posts scheduled within this many minutes
-// Increased to 60 minutes for more reliability with GitHub Actions cron
-const TIME_WINDOW_MINUTES = 60;
-
-// Catchup window: also execute posts that were missed up to this many hours ago
-// Increased to 18h to ensure all daily posts get executed even if GH Actions skips runs
+// Time window for post execution (in hours)
+const LOOKAHEAD_HOURS = 1;
 const CATCHUP_HOURS = 18;
 
 // ===========================================
-// GET PENDING POSTS
+// IMPORT GENERATION & PUBLISHING FUNCTIONS
 // ===========================================
 
-async function getPendingPosts(character) {
+// Dynamic import to get the functions from scheduled-post.mjs
+let generateImagesForPost, publishCarouselToInstagram, publishReelToInstagram;
+
+async function loadPostFunctions() {
+  const module = await import('./scheduled-post.mjs');
+  generateImagesForPost = module.generateImagesForPost;
+  publishCarouselToInstagram = module.publishCarouselToInstagram;
+  publishReelToInstagram = module.publishReelToInstagram;
+}
+
+// ===========================================
+// GET NEXT POST TO PROCESS
+// ===========================================
+
+async function getNextPost(character = null) {
   const today = new Date().toISOString().split('T')[0];
   
-  const { data: schedule, error } = await supabase
-    .from('daily_schedules')
-    .select('*')
-    .eq('schedule_date', today)
-    .eq('character', character)
-    .single();
-
-  if (error || !schedule) {
-    return { schedule: null, pendingPosts: [] };
-  }
-
   // Get current time in Paris
   const now = new Date();
   const parisTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' }));
   const currentMinutes = parisTime.getHours() * 60 + parisTime.getMinutes();
+  
+  // Build query
+  let query = supabase
+    .from('scheduled_posts')
+    .select('*')
+    .eq('scheduled_date', today)
+    .in('status', ['scheduled', 'images_ready', 'failed']);
 
-  // Find posts that should be executed now
-  const pendingPosts = schedule.scheduled_posts.filter(post => {
-    if (post.executed) return false;
-    
-    const [hours, minutes] = post.time.split(':').map(Number);
+  if (character) {
+    query = query.eq('character', character);
+  }
+
+  const { data: posts, error } = await query.order('scheduled_time', { ascending: true });
+
+  if (error || !posts || posts.length === 0) {
+    return null;
+  }
+
+  // Filter posts within time window
+  const eligiblePosts = posts.filter(post => {
+    // Skip failed posts that have exceeded retries
+    if (post.status === 'failed' && post.retry_count >= post.max_retries) {
+      return false;
+    }
+
+    const [hours, minutes] = post.scheduled_time.split(':').map(Number);
     const postMinutes = hours * 60 + minutes;
-    
-    // Calculate time difference
     const diff = postMinutes - currentMinutes;
-    
-    // Execute if:
-    // 1. Post time is upcoming within TIME_WINDOW_MINUTES, OR
-    // 2. Post was missed but within CATCHUP_HOURS (catchup mode)
-    const catchupMinutes = CATCHUP_HOURS * 60;
-    const isUpcoming = diff >= 0 && diff <= TIME_WINDOW_MINUTES;
-    const isCatchup = diff < 0 && diff >= -catchupMinutes;
-    
+
+    // Execute if within window or catchup
+    const isUpcoming = diff >= 0 && diff <= LOOKAHEAD_HOURS * 60;
+    const isCatchup = diff < 0 && diff >= -CATCHUP_HOURS * 60;
+
     return isUpcoming || isCatchup;
   });
 
-  // Sort: prioritize older missed posts first (catchup), then upcoming
-  pendingPosts.sort((a, b) => {
-    const [aH, aM] = a.time.split(':').map(Number);
-    const [bH, bM] = b.time.split(':').map(Number);
+  if (eligiblePosts.length === 0) {
+    return null;
+  }
+
+  // Prioritize: images_ready first (ready to post), then scheduled, then failed (retry)
+  const priorityOrder = { 'images_ready': 0, 'scheduled': 1, 'failed': 2 };
+  eligiblePosts.sort((a, b) => {
+    const priorityDiff = priorityOrder[a.status] - priorityOrder[b.status];
+    if (priorityDiff !== 0) return priorityDiff;
+    
+    // Same priority: older posts first
+    const [aH, aM] = a.scheduled_time.split(':').map(Number);
+    const [bH, bM] = b.scheduled_time.split(':').map(Number);
     return (aH * 60 + aM) - (bH * 60 + bM);
   });
 
-  return { schedule, pendingPosts };
+  return eligiblePosts[0];
 }
 
 // ===========================================
-// EXECUTE POST
+// UPDATE POST STATUS
 // ===========================================
 
-async function executePost(character, post, scheduleId, dryRun = false) {
-  const reelInfo = post.type === 'reel' ? ` (${post.reel_type || 'photo'})` : '';
-  console.log(`\n   🎬 Executing ${post.type.toUpperCase()}${reelInfo} for ${character}...`);
-  console.log(`      📍 ${post.location_name}`);
-  console.log(`      👗 ${post.outfit?.substring(0, 40)}...`);
-  console.log(`      💬 "${post.caption?.substring(0, 50)}..."`);
+async function updatePostStatus(postId, updates) {
+  const { error } = await supabase
+    .from('scheduled_posts')
+    .update({
+      ...updates,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', postId);
 
-  if (dryRun) {
-    console.log(`      ⏭️  DRY RUN - would execute ${post.type}${reelInfo}`);
-    return true;
+  if (error) {
+    console.log(`   ⚠️ Failed to update status: ${error.message}`);
   }
+}
 
-  // Use the unified scheduled-post.mjs script
-  // Pass schedule params via SCHEDULED_POST env var
-  const scriptName = 'scheduled-post.mjs';
-  const scriptPath = path.join(__dirname, scriptName);
+async function markPostFailed(postId, errorMessage, errorStep) {
+  const { data: post } = await supabase
+    .from('scheduled_posts')
+    .select('retry_count')
+    .eq('id', postId)
+    .single();
 
-  // Prepare post data with character included
-  const postData = {
-    character,
-    type: post.type,
-    reel_type: post.reel_type,
-    location_key: post.location_key,
-    location_name: post.location_name,
-    mood: post.mood,
-    outfit: post.outfit,
-    action: post.action,
-    caption: post.caption,
-    hashtags: post.hashtags,
-    prompt_hints: post.prompt_hints,
-  };
-
-  console.log(`      📜 Running: ${scriptName} with schedule params`);
-
-  return new Promise((resolve) => {
-    const child = spawn('node', [scriptPath], {
-      cwd: path.join(__dirname, '..'),
-      env: { 
-        ...process.env,
-        SCHEDULED_POST: JSON.stringify(postData),
-      },
-      stdio: 'inherit',
-    });
-
-    child.on('close', async (code) => {
-      if (code === 0) {
-        console.log(`      ✅ Post executed successfully`);
-        
-        // Mark as executed in Supabase
-        await markPostExecuted(scheduleId, post.time);
-        resolve(true);
-      } else {
-        console.log(`      ❌ Script exited with code ${code}`);
-        resolve(false);
-      }
-    });
-
-    child.on('error', (err) => {
-      console.log(`      ❌ Error: ${err.message}`);
-      resolve(false);
-    });
+  await updatePostStatus(postId, {
+    status: 'failed',
+    error_message: errorMessage,
+    error_step: errorStep,
+    retry_count: (post?.retry_count || 0) + 1,
   });
 }
 
 // ===========================================
-// MARK POST AS EXECUTED
+// SYNC DAILY_SCHEDULES (keep legacy table updated)
 // ===========================================
 
-async function markPostExecuted(scheduleId, postTime) {
+async function syncDailySchedule(scheduleId) {
+  // Get all posts for this schedule
+  const { data: posts } = await supabase
+    .from('scheduled_posts')
+    .select('scheduled_time, status')
+    .eq('schedule_id', scheduleId);
+
+  if (!posts) return;
+
+  const completedCount = posts.filter(p => p.status === 'posted').length;
+  const totalCount = posts.length;
+  const newStatus = completedCount >= totalCount ? 'completed' : 
+                    completedCount > 0 ? 'in_progress' : 'pending';
+
+  // Update daily_schedules for backward compatibility
   const { data: schedule } = await supabase
     .from('daily_schedules')
-    .select('scheduled_posts, posts_completed, posts_total')
+    .select('scheduled_posts')
     .eq('id', scheduleId)
     .single();
 
-  if (!schedule) return;
+  if (schedule) {
+    const updatedLegacyPosts = schedule.scheduled_posts.map(p => {
+      const matchingPost = posts.find(sp => sp.scheduled_time === p.time);
+      return matchingPost 
+        ? { ...p, executed: matchingPost.status === 'posted' }
+        : p;
+    });
 
-  const updatedPosts = schedule.scheduled_posts.map(p => 
-    p.time === postTime ? { ...p, executed: true } : p
-  );
-
-  const completedCount = updatedPosts.filter(p => p.executed).length;
-  const newStatus = completedCount >= schedule.posts_total ? 'completed' : 'in_progress';
-
-  await supabase
-    .from('daily_schedules')
-    .update({
-      scheduled_posts: updatedPosts,
-      posts_completed: completedCount,
-      status: newStatus,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', scheduleId);
+    await supabase
+      .from('daily_schedules')
+      .update({
+        scheduled_posts: updatedLegacyPosts,
+        posts_completed: completedCount,
+        status: newStatus,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', scheduleId);
+  }
 }
 
 // ===========================================
-// CHECK AND EXECUTE FOR CHARACTER
+// PROCESS POST: GENERATE IMAGES
 // ===========================================
 
-async function checkAndExecute(character, dryRun) {
-  console.log(`\n📋 Checking schedule for ${character.toUpperCase()}...`);
+async function processGenerating(post, dryRun) {
+  console.log(`\n   🎨 STEP 1: Generating images...`);
+  console.log(`      📍 ${post.location_name}`);
+  console.log(`      👗 ${post.outfit?.substring(0, 50)}...`);
 
-  const { schedule, pendingPosts } = await getPendingPosts(character);
+  if (dryRun) {
+    console.log(`      ⏭️ DRY RUN - would generate images`);
+    return true;
+  }
 
-  if (!schedule) {
-    console.log(`   ⚠️  No schedule found for today`);
-    console.log(`   💡 Run: node scripts/cron-scheduler.mjs ${character}`);
+  try {
+    // Update status to generating
+    await updatePostStatus(post.id, {
+      status: 'generating',
+      generation_started_at: new Date().toISOString(),
+    });
+
+    // Generate images
+    const postParams = {
+      character: post.character,
+      type: post.post_type,
+      reel_type: post.reel_type,
+      location_key: post.location_key,
+      location_name: post.location_name,
+      mood: post.mood,
+      outfit: post.outfit,
+      action: post.action,
+      caption: post.caption,
+      hashtags: post.hashtags,
+      prompt_hints: post.prompt_hints,
+    };
+
+    const result = await generateImagesForPost(postParams);
+
+    if (!result || !result.imageUrls || result.imageUrls.length === 0) {
+      throw new Error('No images generated');
+    }
+
+    // Update with generated images
+    await updatePostStatus(post.id, {
+      status: 'images_ready',
+      image_urls: result.imageUrls,
+      video_url: result.videoUrl || null,
+      generation_completed_at: new Date().toISOString(),
+    });
+
+    console.log(`      ✅ Generated ${result.imageUrls.length} images`);
+    return true;
+
+  } catch (error) {
+    console.log(`      ❌ Generation failed: ${error.message}`);
+    await markPostFailed(post.id, error.message, 'generating');
+    return false;
+  }
+}
+
+// ===========================================
+// PROCESS POST: PUBLISH TO INSTAGRAM
+// ===========================================
+
+async function processPosting(post, dryRun) {
+  console.log(`\n   📤 STEP 2: Publishing to Instagram...`);
+  console.log(`      💬 "${post.caption?.substring(0, 50)}..."`);
+
+  if (dryRun) {
+    console.log(`      ⏭️ DRY RUN - would publish ${post.post_type}`);
+    return true;
+  }
+
+  try {
+    // Update status to posting
+    await updatePostStatus(post.id, {
+      status: 'posting',
+      posting_started_at: new Date().toISOString(),
+    });
+
+    // Build caption with hashtags
+    const hashtagStr = Array.isArray(post.hashtags) 
+      ? post.hashtags.join(' ')
+      : (post.hashtags || '');
+    const fullCaption = `${post.caption}\n\n${hashtagStr}`;
+
+    let instagramPostId;
+
+    if (post.post_type === 'reel' && post.video_url) {
+      // Publish as reel
+      instagramPostId = await publishReelToInstagram(
+        post.character,
+        post.video_url,
+        fullCaption
+      );
+    } else {
+      // Publish as carousel
+      instagramPostId = await publishCarouselToInstagram(
+        post.character,
+        post.image_urls,
+        fullCaption
+      );
+    }
+
+    // Update as posted
+    await updatePostStatus(post.id, {
+      status: 'posted',
+      instagram_post_id: instagramPostId,
+      posted_at: new Date().toISOString(),
+    });
+
+    // Sync legacy table
+    if (post.schedule_id) {
+      await syncDailySchedule(post.schedule_id);
+    }
+
+    console.log(`      ✅ Published! ID: ${instagramPostId}`);
+    return true;
+
+  } catch (error) {
+    console.log(`      ❌ Publishing failed: ${error.message}`);
+    await markPostFailed(post.id, error.message, 'posting');
+    return false;
+  }
+}
+
+// ===========================================
+// PROCESS POST: RETRY FAILED
+// ===========================================
+
+async function processRetry(post, dryRun) {
+  console.log(`\n   🔄 RETRY (attempt ${post.retry_count + 1}/${post.max_retries})...`);
+  console.log(`      Previous error: ${post.error_message}`);
+
+  if (dryRun) {
+    console.log(`      ⏭️ DRY RUN - would retry from ${post.error_step}`);
+    return true;
+  }
+
+  // Reset status based on where it failed
+  if (post.error_step === 'generating' || !post.image_urls || post.image_urls.length === 0) {
+    // Retry from generation
+    await updatePostStatus(post.id, {
+      status: 'scheduled',
+      error_message: null,
+      error_step: null,
+    });
+    return await processGenerating(post, dryRun);
+  } else {
+    // Retry from posting
+    await updatePostStatus(post.id, {
+      status: 'images_ready',
+      error_message: null,
+      error_step: null,
+    });
+    return await processPosting(post, dryRun);
+  }
+}
+
+// ===========================================
+// PROCESS NEXT POST
+// ===========================================
+
+async function processNextPost(character, dryRun) {
+  const post = await getNextPost(character);
+
+  if (!post) {
+    console.log(`   😴 No posts to process right now`);
+    return null;
+  }
+
+  const reelInfo = post.post_type === 'reel' ? ` (${post.reel_type || 'photo'})` : '';
+  console.log(`\n   🎬 Processing ${post.post_type.toUpperCase()}${reelInfo}`);
+  console.log(`      📍 ${post.location_name}`);
+  console.log(`      ⏰ Scheduled: ${post.scheduled_time}`);
+  console.log(`      📊 Status: ${post.status}`);
+
+  switch (post.status) {
+    case 'scheduled':
+      return await processGenerating(post, dryRun);
+    case 'images_ready':
+      return await processPosting(post, dryRun);
+    case 'failed':
+      return await processRetry(post, dryRun);
+    default:
+      console.log(`   ⚠️ Unknown status: ${post.status}`);
+      return false;
+  }
+}
+
+// ===========================================
+// SHOW STATUS
+// ===========================================
+
+async function showStatus(character = null) {
+  const today = new Date().toISOString().split('T')[0];
+
+  let query = supabase
+    .from('scheduled_posts')
+    .select('*')
+    .eq('scheduled_date', today)
+    .order('scheduled_time', { ascending: true });
+
+  if (character) {
+    query = query.eq('character', character);
+  }
+
+  const { data: posts, error } = await query;
+
+  if (error || !posts || posts.length === 0) {
+    console.log(`   📭 No posts scheduled for today`);
     return;
   }
 
-  console.log(`   📅 Theme: "${schedule.daily_theme}"`);
-  console.log(`   📊 Progress: ${schedule.posts_completed}/${schedule.posts_total} posts`);
+  // Group by character
+  const byCharacter = posts.reduce((acc, post) => {
+    if (!acc[post.character]) acc[post.character] = [];
+    acc[post.character].push(post);
+    return acc;
+  }, {});
+
+  for (const [char, charPosts] of Object.entries(byCharacter)) {
+    console.log(`\n   📅 ${char.toUpperCase()}`);
+    console.log('   ' + '─'.repeat(55));
+
+    for (const post of charPosts) {
+      const statusIcon = {
+        scheduled: '⏳',
+        generating: '🎨',
+        images_ready: '📦',
+        posting: '📤',
+        posted: '✅',
+        failed: '❌',
+      }[post.status] || '❓';
+
+      const retryInfo = post.status === 'failed' 
+        ? ` (retry ${post.retry_count}/${post.max_retries})`
+        : '';
+
+      console.log(`   ${statusIcon} ${post.scheduled_time} │ ${post.post_type.padEnd(8)} │ ${post.status}${retryInfo}`);
+      console.log(`      └─ ${post.location_name}`);
+
+      if (post.status === 'failed' && post.error_message) {
+        console.log(`         ⚠️ ${post.error_message.substring(0, 50)}...`);
+      }
+    }
+
+    const posted = charPosts.filter(p => p.status === 'posted').length;
+    console.log(`   ─────────────────────────────────────────────────────`);
+    console.log(`   Progress: ${posted}/${charPosts.length} posted`);
+  }
+}
+
+// ===========================================
+// CHECK FOR CHARACTER
+// ===========================================
+
+async function checkAndExecute(character, dryRun, showStatusOnly) {
+  console.log(`\n📋 Checking ${character ? character.toUpperCase() : 'ALL ACCOUNTS'}...`);
 
   // Get current Paris time
   const now = new Date();
-  const parisTime = now.toLocaleString('en-US', { 
+  const parisTime = now.toLocaleString('en-US', {
     timeZone: 'Europe/Paris',
     hour: '2-digit',
     minute: '2-digit',
@@ -228,25 +472,16 @@ async function checkAndExecute(character, dryRun) {
   });
   console.log(`   🕐 Current time (Paris): ${parisTime}`);
 
-  // Show all scheduled posts with status
-  console.log(`\n   📋 Today's posts:`);
-  schedule.scheduled_posts.forEach(p => {
-    const status = p.executed ? '✅' : '⏳';
-    const isPending = pendingPosts.some(pp => pp.time === p.time);
-    const marker = isPending ? ' ← NOW' : '';
-    console.log(`      ${status} ${p.time} │ ${p.type.padEnd(8)} │ ${p.location_name}${marker}`);
-  });
-
-  if (pendingPosts.length === 0) {
-    console.log(`\n   😴 No posts to execute right now`);
+  if (showStatusOnly) {
+    await showStatus(character);
     return;
   }
 
-  console.log(`\n   🚀 ${pendingPosts.length} post(s) to execute:`);
+  // Show status first
+  await showStatus(character);
 
-  for (const post of pendingPosts) {
-    await executePost(character, post, schedule.id, dryRun);
-  }
+  // Process next post
+  await processNextPost(character, dryRun);
 }
 
 // ===========================================
@@ -255,29 +490,43 @@ async function checkAndExecute(character, dryRun) {
 
 async function main() {
   console.log('\n⏰ ═══════════════════════════════════════════════════════');
-  console.log('   CRON EXECUTOR — Post Execution Check');
+  console.log('   CRON EXECUTOR V2 — Step-based Processing');
   console.log('═══════════════════════════════════════════════════════════');
   console.log(`   Time: ${new Date().toISOString()}`);
 
   const args = process.argv.slice(2);
   const dryRun = args.includes('--dry-run');
+  const showStatusOnly = args.includes('--status');
   const target = args.find(a => !a.startsWith('--'))?.toLowerCase();
 
   if (dryRun) {
-    console.log('   Mode: DRY RUN (no actual posts)');
+    console.log('   Mode: DRY RUN (no actual execution)');
+  }
+  if (showStatusOnly) {
+    console.log('   Mode: STATUS ONLY');
+  }
+
+  // Load generation/publishing functions
+  if (!dryRun && !showStatusOnly) {
+    try {
+      await loadPostFunctions();
+    } catch (err) {
+      console.log(`\n❌ Failed to load post functions: ${err.message}`);
+      console.log('   Make sure scheduled-post.mjs exports the required functions');
+      process.exit(1);
+    }
   }
 
   if (target === 'mila') {
-    await checkAndExecute('mila', dryRun);
+    await checkAndExecute('mila', dryRun, showStatusOnly);
   } else if (target === 'elena') {
-    await checkAndExecute('elena', dryRun);
+    await checkAndExecute('elena', dryRun, showStatusOnly);
   } else {
-    await checkAndExecute('mila', dryRun);
-    await checkAndExecute('elena', dryRun);
+    await checkAndExecute('mila', dryRun, showStatusOnly);
+    await checkAndExecute('elena', dryRun, showStatusOnly);
   }
 
   console.log('\n✅ Execution check complete!\n');
 }
 
 main().catch(console.error);
-
