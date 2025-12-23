@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 23 décembre 2024 (Status Tracking + Calendar 📅)
+**Dernière mise à jour** : 23 décembre 2024 (Kling Video Reels 🎬)
 
 ---
 
@@ -38,7 +38,7 @@ roadmap/
 |----|---------|----------|------------|------|
 | TODO-010 | **Targeting Actif** — 20 comments/jour/compte sur niches cibles | 🔴 High | ongoing | - |
 | ~~TODO-004~~ | ~~Intégration Supabase~~ — ✅ Fait via Content Brain | - | - | [→](./docs/SESSION-20-DEC-2024-CONTENT-BRAIN.md) |
-| TODO-001 | Multi-shot Reels (carousel → video) | 🟡 Medium | 4h | [→](./roadmap/todo/TODO-001-multi-shot-reels.md) |
+| ~~TODO-001~~ | ~~Multi-shot Reels (carousel → video)~~ — ✅ Done via DONE-030 | - | - | [→](./roadmap/done/DONE-030-kling-video-reels.md) |
 | TODO-006 | Elena Stories Highlights (Travel, Home, BTS) | 🟡 Medium | 2h | - |
 | ~~TODO-007~~ | ~~Premier Reel Elena~~ — Scripts existants | - | - | - |
 | ~~TODO-008~~ | ~~Crossover Mila x Elena NYC~~ — ✅ Done | - | - | [→](./docs/SESSION-18-DEC-2024-DUAL-TOKENS.md) |
@@ -50,6 +50,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-030 | **Kling Video Reels 🎬** — Tous reels animés Kling v2.5 + style Instagram 2026 + format 9:16 + real-time speed | 23/12/2024 | v2.22.0 | [→](./docs/SESSION-23-DEC-2024-KLING-REELS.md) |
 | DONE-029 | **Calendar Dashboard 📅** — Page /calendar avec vue semaine + status badges + auto-refresh 30s | 23/12/2024 | v2.21.0 | [→](./docs/SESSION-23-DEC-2024-STATUS-TRACKING.md) |
 | DONE-028 | **Post Status Tracking 🔄** — Table scheduled_posts + 6 statuts + step-based executor + retry 3x | 23/12/2024 | v2.20.0 | [→](./docs/SESSION-23-DEC-2024-STATUS-TRACKING.md) |
 | DONE-027 | **Prompt Improvements 📸** — 2026 style + safe sexy vocabulary + scene consistency + sexy enhancers Mila/Elena + format 4:5 | 22/12/2024 | v2.19.0 | [→](./docs/SESSION-22-DEC-2024-PROMPT-IMPROVEMENTS.md) |
@@ -117,9 +118,9 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 30 (+2 Status Tracking + Calendar)
+├── ✅ Done        : 31 (+1 Kling Video Reels)
 ├── 🚧 In Progress : 1 (Model Evolution)
-├── 📋 Todo        : 4
+├── 📋 Todo        : 3
 ├── 🐛 Bugs        : 6 (6 fixed)
 └── 💡 Ideas       : 7 (+3 Content Brain V3)
 ```
@@ -130,6 +131,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 23/12/2024 | **🎬 Kling Video Reels** — Tous reels animés Kling v2.5 + style Instagram 2026 + format 9:16 | [→](./docs/SESSION-23-DEC-2024-KLING-REELS.md) |
 | 23/12/2024 | **📅 Status Tracking + Calendar** — Table scheduled_posts + 6 statuts + page /calendar + catchup 18h | [→](./docs/SESSION-23-DEC-2024-STATUS-TRACKING.md) |
 | 22/12/2024 | **📸 Prompt Improvements** — 2026 style + safe sexy + scene consistency + sexy enhancers | [→](./docs/SESSION-22-DEC-2024-PROMPT-IMPROVEMENTS.md) |
 | 22/12/2024 | **📊 Analytics Page** — Dashboard complet + Sync Instagram API v22 + Scripts → Supabase | [→](./docs/SESSION-22-DEC-2024-ANALYTICS-PAGE.md) |
