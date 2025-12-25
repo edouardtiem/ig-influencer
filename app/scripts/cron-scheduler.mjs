@@ -341,21 +341,13 @@ function getExplorationRequirements(character, history, analytics, postsCount) {
   const requirements = [];
   
   // ═══════════════════════════════════════════════════════════════
-  // RULE 1: MINIMUM 2 REELS PER DAY (Option B)
+  // RULE 1: ALL CAROUSELS (no reels for now)
   // ═══════════════════════════════════════════════════════════════
-  if (postsCount >= 3) {
-    requirements.push({
-      type: 'minimum_reels',
-      rule: 'OBLIGATOIRE: Minimum 2 REELS par jour (1 photo-reel + 1 video-reel idéalement)',
-      reason: 'Les reels ont 4x plus de reach — stratégie de croissance',
-    });
-  } else {
-    requirements.push({
-      type: 'minimum_reels',
-      rule: 'OBLIGATOIRE: Minimum 1 REEL par jour',
-      reason: 'Les reels ont 4x plus de reach — stratégie de croissance',
-    });
-  }
+  requirements.push({
+    type: 'carousel_only',
+    rule: 'TOUS LES POSTS sont des CAROUSELS (3 images). Pas de reels.',
+    reason: 'Stratégie actuelle: uniquement des carrousels pour cohérence',
+  });
   
   // ═══════════════════════════════════════════════════════════════
   // RULE 2: Check if stuck in home content
@@ -419,21 +411,6 @@ function getExplorationRequirements(character, history, analytics, postsCount) {
         reason: 'Mila voyage aussi — variété de contenu avec souvenirs',
       });
     }
-  }
-  
-  // ═══════════════════════════════════════════════════════════════
-  // RULE 4: Video reel variety (at least 1 animated reel per week)
-  // ═══════════════════════════════════════════════════════════════
-  // Check day of week - suggest video reel on specific days
-  const dayOfWeek = new Date().getDay();
-  const videoReelDays = [2, 4, 6]; // Tuesday, Thursday, Saturday
-  
-  if (videoReelDays.includes(dayOfWeek)) {
-    requirements.push({
-      type: 'video_reel',
-      rule: 'RECOMMANDÉ: Inclure 1 video-reel animé (Kling) pour plus d\'engagement',
-      reason: 'Les video-reels animés ont +30% d\'engagement vs photo-reels',
-    });
   }
   
   return requirements;
@@ -553,10 +530,7 @@ ${LOCATIONS[character].join('\n')}
 - **reasoning**: POURQUOI ce choix (1-2 phrases, cite les données)
 - **location_key**: ID du lieu
 - **location_name**: Nom complet du lieu
-- **post_type**: "carousel" | "reel"
-- **reel_type**: "video" (automatique pour tous les reels)
-  • Tous les reels utilisent Kling v2.5 pour animation (~5-7min génération)
-  • Style Instagram 2026, real-time speed, pas de slow motion
+- **post_type**: "carousel" (TOUJOURS carousel, pas de reel)
 - **mood**: cozy | adventure | work | fitness | travel | fashion | relax | nostalgic
 - **outfit**: Description tenue détaillée
 - **action**: Ce qu'elle fait (pour le prompt image)
@@ -566,15 +540,14 @@ ${LOCATIONS[character].join('\n')}
 - **prompt_hints**: Indices pour génération image
 
 ### Règles STRICTES (dans cet ordre de priorité):
-1. **EXPLORATION D'ABORD**: Respecte les règles d'exploration ci-dessus
-2. **MINIMUM 2 REELS** par jour si 3+ posts
-3. Au moins 1 reel devrait être "video" (animé) si recommandé dans exploration
-4. NE PAS répéter les lieux de l'historique récent (sauf throwback)
-5. Chaque caption DOIT avoir une question pour l'engagement
-6. Si duo est overdue (>10 jours) → inclure au moins 1 throwback/duo
-7. 1 post doit appliquer le test A/B si actif
-8. Le reasoning doit justifier le choix en citant les données
-9. **RELATIONSHIP**: Intègre le hint suggéré dans AU MOINS 1 post (caption, image, ou timing)
+1. **TOUS CAROUSELS**: Chaque post est un carousel de 3 images. Pas de reel.
+2. **EXPLORATION D'ABORD**: Respecte les règles d'exploration ci-dessus
+3. NE PAS répéter les lieux de l'historique récent (sauf throwback)
+4. Chaque caption DOIT avoir une question pour l'engagement
+5. Si duo est overdue (>10 jours) → inclure au moins 1 throwback/duo
+6. 1 post doit appliquer le test A/B si actif
+7. Le reasoning doit justifier le choix en citant les données
+8. **RELATIONSHIP**: Intègre le hint suggéré dans AU MOINS 1 post (caption, image, ou timing)
    → Si hint = "two_cups": ajouter 2 tasses/verres dans prompt_hints
    → Si hint = "same_location": utiliser un lieu proche de l'autre personnage
    → Si hint = "tender_caption": ajouter emoji 💕 et langage tendre
@@ -606,9 +579,7 @@ Réponds UNIQUEMENT avec du JSON valide, format:
       "reasoning": "Pourquoi ce post...",
       "location_key": "...",
       "location_name": "...",
-      "post_type": "carousel|reel",
-      "reel_type": "video",
-      "reel_theme": "fitness|spa|lifestyle|travel",
+      "post_type": "carousel",
       "mood": "...",
       "outfit": "...",
       "action": "...",
@@ -754,8 +725,7 @@ async function generateSchedule(character) {
                        p.content_type === 'response' ? '💬' :
                        p.content_type === 'experiment' ? '🧪' : '✨';
       const expBadge = p.is_experiment ? ' [A/B TEST]' : '';
-      const reelInfo = p.post_type === 'reel' ? ' (video)' : '';
-      console.log(`${p.scheduled_time} │ ${p.post_type.toUpperCase()}${reelInfo.padEnd(6)} │ ${typeIcon} ${p.location_name}${expBadge}`);
+      console.log(`${p.scheduled_time} │ CAROUSEL │ ${typeIcon} ${p.location_name}${expBadge}`);
       console.log(`         │ ${p.content_type.toUpperCase().padEnd(10)} │ "${p.caption?.substring(0, 40)}..."`);
       console.log(`         └─ Reasoning: ${p.reasoning?.substring(0, 50)}...`);
     });
@@ -771,9 +741,9 @@ async function generateSchedule(character) {
       mood: plan.posts[0]?.mood || 'cozy',
       scheduled_posts: plan.posts.map(p => ({
         time: p.scheduled_time,
-        type: p.post_type,
-        reel_type: p.post_type === 'reel' ? 'video' : null,
-        reel_theme: p.post_type === 'reel' ? (p.reel_theme || 'lifestyle') : null,
+        type: 'carousel',  // Force carousel for all posts
+        reel_type: null,
+        reel_theme: null,
         content_type: p.content_type,
         is_experiment: p.is_experiment || false,
         reasoning: p.reasoning,
@@ -827,9 +797,9 @@ async function generateSchedule(character) {
           scheduled_date: scheduleDate,
           scheduled_time: post.scheduled_time,
           status: 'scheduled',
-          post_type: post.post_type,
-          reel_type: post.post_type === 'reel' ? 'video' : null,
-          reel_theme: post.post_type === 'reel' ? (post.reel_theme || 'lifestyle') : null,
+          post_type: 'carousel',  // Force carousel for all posts
+          reel_type: null,
+          reel_theme: null,
           content_type: post.content_type || 'new',
           location_key: post.location_key,
           location_name: post.location_name,
@@ -844,7 +814,7 @@ async function generateSchedule(character) {
       if (postError) {
         console.log(`   ⚠️ Failed to create post entry for ${post.scheduled_time}: ${postError.message}`);
       } else {
-        console.log(`   ✅ ${post.scheduled_time} | ${post.post_type}`);
+        console.log(`   ✅ ${post.scheduled_time} | carousel`);
       }
     }
 
