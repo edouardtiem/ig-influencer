@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 24 décembre 2024 (Carousel-Only Strategy 📸)
+**Dernière mise à jour** : 26 décembre 2024 (ManyChat Setup + AI Agent Strategy 🤖)
 
 ---
 
@@ -23,12 +23,14 @@ roadmap/
 
 | ID | Feature | Priorité | Branche | Lien |
 |----|---------|----------|---------|------|
-| IP-002 | **🔴 Model Evolution** — Mila Tesla Red + Elena blonde + bi/open relationship | 🔴 High | main | [→](./roadmap/in-progress/IP-002-model-evolution.md) |
+| IP-003 | **💰 Fanvue Monetization** — Packs photos Elena + ManyChat DM automation | 🔴 High | main | [→](./docs/sessions/2024-12-25-fanvue-pack-elena.md) |
+| IP-002 | **🔴 Model Evolution** — Mila Tesla Red + Elena blonde + bi/open relationship | 🟡 Medium | main | [→](./roadmap/in-progress/IP-002-model-evolution.md) |
 
-> **Mila Tesla Cherry Wine Red** : ✅ Couleur validée + Cloudinary  
-> **Elena Blonde** : À tester  
-> **Bi/Open Relationship** : Stratégie définie, à implémenter  
-> **Découverte technique** : `image_input` + base64 obligatoire pour Nano Banana Pro
+> **Fanvue Pack 1** : ✅ 14 photos générées (2 shootings) dans `elena-fanvue-pack1`  
+> **ManyChat** : ✅ 2 automations LIVE (Auto-DM comments + Welcome followers)  
+> **AI Agent** : 💡 Architecture définie, à implémenter  
+> **Objectif** : 500€/mois via Fanvue  
+> **Next** : Implémenter AI Agent conversationnel avec auto-learning
 
 ---
 
@@ -36,7 +38,11 @@ roadmap/
 
 | ID | Feature | Priorité | Estimation | Lien |
 |----|---------|----------|------------|------|
-| TODO-010 | **Targeting Actif** — 20 comments/jour/compte sur niches cibles | 🔴 High | ongoing | - |
+| TODO-016 | **Elena AI Agent** — Agent conversationnel flirty + auto-learning + Supabase tracking | 🔴 High | 8h | [→](./roadmap/ideas/IDEA-009-elena-ai-agent.md) |
+| ~~TODO-013~~ | ~~ManyChat Setup~~ — ✅ 2 automations LIVE | - | - | [→](./docs/sessions/2024-12-26-manychat-ai-agent.md) |
+| TODO-014 | **Fanvue Pack Final** — Sélection 10-12 photos + Upload Fanvue + Prix 3€ | 🔴 High | 30min | [→](./docs/sessions/2024-12-25-fanvue-pack-elena.md) |
+| TODO-015 | **IG Teaser Post** — Photo pack + Caption CTA "Link in bio" / "DM PACK" | 🔴 High | 15min | - |
+| TODO-010 | **Targeting Actif** — 20 comments/jour/compte sur niches cibles | 🟡 Medium | ongoing | - |
 | TODO-012 | **Daily Account Insights** — Tracking vraies métriques journalières (reach, interactions par jour) | 🟡 Medium | 3-4h | [→](./roadmap/todo/TODO-012-daily-account-insights.md) |
 | TODO-006 | Elena Stories Highlights (Travel, Home, BTS) | 🟡 Medium | 2h | - |
 | ~~TODO-004~~ | ~~Intégration Supabase~~ — ✅ Fait via Content Brain | - | - | [→](./docs/SESSION-20-DEC-2024-CONTENT-BRAIN.md) |
@@ -51,6 +57,8 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-034 | **🤖 ManyChat Setup + AI Agent Strategy** — Guide ManyChat complet + Architecture AI Agent avec auto-learning | 26/12/2024 | v2.26.0 | [→](./docs/sessions/2024-12-26-manychat-ai-agent.md) |
+| DONE-033 | **📸 Fanvue Pack Elena** — Script génération + 14 photos 2 shootings + Prompts safe-sexy validés | 25/12/2024 | v2.25.0 | [→](./docs/sessions/2024-12-25-fanvue-pack-elena.md) |
 | DONE-032 | **Carousel-Only Strategy 📸** — Migration complète vers carrousels uniquement + Fix tokens GitHub | 24/12/2024 | v2.24.0 | [→](./docs/SESSION-24-DEC-2024-CAROUSEL-ONLY.md) |
 | DONE-031 | **Analytics Fix 📊** — Sync likes/comments + inclusion données jour actuel + correction snapshots | 23/12/2024 | v2.23.0 | [→](./docs/SESSION-23-DEC-2024-ANALYTICS-FIX.md) |
 | DONE-030 | **Kling Video Reels 🎬** — Tous reels animés Kling v2.5 + style Instagram 2026 + format 9:16 + real-time speed | 23/12/2024 | v2.22.0 | [→](./docs/SESSION-23-DEC-2024-KLING-REELS.md) |
@@ -109,6 +117,7 @@ roadmap/
 
 | ID | Idée | Impact | Effort | Status | Lien |
 |----|------|--------|--------|--------|------|
+| **IDEA-009** | **Elena AI Agent** — Agent conversationnel flirty + auto-learning + Supabase tracking | 🔴 High | 🔴 High | 💡 Idea | [→](./roadmap/ideas/IDEA-009-elena-ai-agent.md) |
 | **IDEA-008** | **Long-form Captions + Character Voice** — Hooks FR + textes longs + annonce bi/open | 🔴 High | 🟡 Medium | 💡 Idea | [→](./roadmap/ideas/IDEA-008-longform-captions.md) |
 | **IDEA-007** | **Trends Layer** — Perplexity daily search US→FR→EU pour viralité | 🔴 High | 🟡 Medium | 💡 Idea | [→](./roadmap/ideas/IDEA-007-trends-layer.md) |
 | **IDEA-006** | **Ideas Backlog** — Inspirations curated → Content Brain auto-scheduling | 🟡 Medium | 🟡 Medium | 💡 Idea | [→](./roadmap/ideas/IDEA-006-ideas-backlog.md) |
@@ -124,11 +133,11 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 31 (+1 Kling Video Reels)
-├── 🚧 In Progress : 1 (Model Evolution)
-├── 📋 Todo        : 3
+├── ✅ Done        : 34 (+1 ManyChat Setup + Guide)
+├── 🚧 In Progress : 2 (Fanvue Monetization + Model Evolution)
+├── 📋 Todo        : 6 (+1 AI Agent)
 ├── 🐛 Bugs        : 6 (6 fixed)
-└── 💡 Ideas       : 7 (+3 Content Brain V3)
+└── 💡 Ideas       : 8 (+1 AI Agent)
 ```
 
 ---
@@ -137,6 +146,8 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 26/12/2024 | **🤖 ManyChat Setup + AI Agent** — Guide ManyChat + Architecture AI Agent conversationnel avec auto-learning | [→](./docs/sessions/2024-12-26-manychat-ai-agent.md) |
+| 25/12/2024 | **💰 Fanvue Pack Elena + ManyChat** — 14 photos générées + Stratégie conversion DM→Fanvue | [→](./docs/sessions/2024-12-25-fanvue-pack-elena.md) |
 | 23/12/2024 | **🎬 Kling Video Reels** — Tous reels animés Kling v2.5 + style Instagram 2026 + format 9:16 | [→](./docs/SESSION-23-DEC-2024-KLING-REELS.md) |
 | 23/12/2024 | **📅 Status Tracking + Calendar** — Table scheduled_posts + 6 statuts + page /calendar + catchup 18h | [→](./docs/SESSION-23-DEC-2024-STATUS-TRACKING.md) |
 | 22/12/2024 | **📸 Prompt Improvements** — 2026 style + safe sexy + scene consistency + sexy enhancers | [→](./docs/SESSION-22-DEC-2024-PROMPT-IMPROVEMENTS.md) |
