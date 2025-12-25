@@ -78,7 +78,7 @@ const PACK_STARTER_PHOTOS = [
 
 Luxurious bright Parisian loft apartment 8th arrondissement with high Haussmannian ceilings, ornate white crown moldings. Large French windows with natural daylight flooding in, Paris zinc rooftops view. Herringbone chevron parquet floor in light oak honey color. Statement vintage dusty rose mauve velvet sofa with curved armrests 1970s Italian design. Minimalist black metal and glass side table. Large indoor palm tree in terracotta pot, fiddle leaf fig plant, smaller potted plants. Fashion magazines on coffee table, gold candle holders, soft cream throw blanket on sofa. White walls, dusty rose mauve velvet, cream and beige tones, gold accents. Expensive but lived-in, Italian-Parisian luxury aesthetic.`,
     },
-    outfit: 'oversized white button-down shirt worn open and unbuttoned, underneath wearing fitted black sports bra covering chest only showing toned midriff, black bikini bottoms, barefoot, casual sporty home look',
+    outfit: 'fitted black sports bra covering chest only showing toned midriff and curves, black bikini bottoms, barefoot, casual sporty home look',
     pose: 'lounging on velvet sofa elegantly positioned in left third of frame, legs extended along sofa, body curved gracefully showcasing feminine silhouette, one hand running through hair, confident relaxed pose, full body visible in wide shot with room environment',
     expression: 'magnetic captivating gaze directly at camera, soft natural smile, eyes sparkling with warmth, relaxed confident expression',
   },
@@ -104,7 +104,7 @@ Luxurious bright Parisian loft apartment 8th arrondissement with high Haussmanni
 
 Luxurious bright Parisian loft apartment 8th arrondissement with high Haussmannian ceilings, ornate white crown moldings. Large French windows with natural daylight flooding in, Paris zinc rooftops view. Herringbone chevron parquet floor in light oak honey color. Statement vintage dusty rose mauve velvet sofa with curved armrests 1970s Italian design.`,
     },
-    outfit: 'fitted black sports bra covering chest only showing toned midriff and curves, black bikini bottoms, barefoot, casual sporty home look',
+    outfit: 'fitted black sports bra covering chest only showing toned midriff and curves, black bikini bottoms, barefoot, hair slightly tousled',
     pose: 'CLOSE UP PORTRAIT from chest up, standing near French window with soft natural backlight, one hand gently touching hair, head slightly tilted, intimate close framing showing face and upper body, shallow depth of field background blurred',
     expression: 'soft intimate gaze directly at camera, natural warm smile, eyes sparkling with genuine warmth, relaxed confident expression',
   },
@@ -130,8 +130,8 @@ Luxurious Parisian apartment bathroom with high ceiling, spacious and elegant. L
 
 Luxurious bright Parisian loft apartment 8th arrondissement with high Haussmannian ceilings, ornate white crown moldings. Large French windows with natural daylight flooding in, Paris zinc rooftops view. Herringbone chevron parquet floor in light oak honey color. Statement vintage dusty rose mauve velvet sofa with curved armrests 1970s Italian design.`,
     },
-    outfit: 'oversized white button-down shirt worn loosely, fitted black athletic crop top underneath showing midriff, black high-waisted athletic shorts, barefoot, cozy morning athleisure',
-    pose: 'standing by French window holding coffee cup in both hands, looking out at Paris view, soft morning light on face, relaxed contemplative moment, three-quarter view showing face and silhouette',
+    outfit: 'fitted black sports bra, black athletic shorts, barefoot, cozy morning',
+    pose: 'standing by French window holding coffee cup, looking out at Paris view, soft morning light on face, relaxed contemplative moment, three-quarter profile view',
     expression: 'peaceful serene expression, soft natural smile, eyes looking out window dreamily, quiet morning moment',
   },
   {
@@ -143,7 +143,7 @@ Luxurious bright Parisian loft apartment 8th arrondissement with high Haussmanni
 
 Elegant Parisian apartment bedroom in the 8th arrondissement with high Haussmannian ceiling, ornate white crown moldings, herringbone chevron parquet floor light oak. Two tall French windows with sheer white linen curtains gently flowing, view of Paris rooftops. King size bed with cream linen upholstered headboard button-tufted, luxurious white and beige layered bedding with linen duvet, multiple pillows in cream white and dusty rose, cashmere throw blanket in camel color draped at foot of bed.`,
     },
-    outfit: 'fitted black athletic crop top showing toned midriff, black high-waisted athletic shorts, comfortable loungewear, lying on luxurious white bedding',
+    outfit: 'fitted black sports bra, black athletic shorts, lying on luxurious white bedding, lazy morning',
     pose: 'lying on bed on side, propped up on elbow facing camera, hair flowing on white pillows, one hand supporting head, relaxed lazy morning pose, soft natural light from window, full body visible on white sheets',
     expression: 'soft warm smile, dreamy relaxed eyes, peaceful morning gaze at camera, genuine warmth and comfort',
   },
@@ -156,7 +156,7 @@ Elegant Parisian apartment bedroom in the 8th arrondissement with high Haussmann
 
 Luxurious bright Parisian loft apartment 8th arrondissement with high Haussmannian ceilings, ornate white crown moldings. Large French windows with natural daylight flooding in, Paris zinc rooftops view. Herringbone chevron parquet floor in light oak honey color. Statement vintage dusty rose mauve velvet sofa with curved armrests 1970s Italian design.`,
     },
-    outfit: 'fitted black athletic crop top showing toned midriff, black high-waisted athletic shorts, barefoot, morning workout athleisure',
+    outfit: 'fitted black sports bra, black athletic shorts, barefoot, morning stretch athleisure',
     pose: 'standing in living room doing gentle morning stretch, arms raised above head stretching, body elongated gracefully, natural movement captured mid-stretch, soft morning light, full body visible with apartment in background',
     expression: 'eyes closed peacefully enjoying stretch, serene relaxed expression, natural moment of wellness, soft gentle smile',
   },

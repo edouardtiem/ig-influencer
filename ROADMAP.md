@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 23 décembre 2024 (Analytics Fix 📊)
+**Dernière mise à jour** : 24 décembre 2024 (Carousel-Only Strategy 📸)
 
 ---
 
@@ -51,6 +51,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-032 | **Carousel-Only Strategy 📸** — Migration complète vers carrousels uniquement + Fix tokens GitHub | 24/12/2024 | v2.24.0 | [→](./docs/SESSION-24-DEC-2024-CAROUSEL-ONLY.md) |
 | DONE-031 | **Analytics Fix 📊** — Sync likes/comments + inclusion données jour actuel + correction snapshots | 23/12/2024 | v2.23.0 | [→](./docs/SESSION-23-DEC-2024-ANALYTICS-FIX.md) |
 | DONE-030 | **Kling Video Reels 🎬** — Tous reels animés Kling v2.5 + style Instagram 2026 + format 9:16 + real-time speed | 23/12/2024 | v2.22.0 | [→](./docs/SESSION-23-DEC-2024-KLING-REELS.md) |
 | DONE-029 | **Calendar Dashboard 📅** — Page /calendar avec vue semaine + status badges + auto-refresh 30s | 23/12/2024 | v2.21.0 | [→](./docs/SESSION-23-DEC-2024-STATUS-TRACKING.md) |
@@ -91,6 +92,7 @@ roadmap/
 
 | ID | Bug | Sévérité | Status | Lien |
 |----|-----|----------|--------|------|
+| BUG-010 | **Pas de gestion d'erreurs API** — Code marque "posted" même si `instagram_post_id` est null | 🔴 High | 🔍 Identifié | [→](./docs/SESSION-24-DEC-2024-CAROUSEL-ONLY.md) |
 | BUG-008 | **Sync ne met pas à jour likes/comments** — Seules impressions/reach mises à jour | 🔴 High | ✅ Fixed | [→](./docs/SESSION-23-DEC-2024-ANALYTICS-FIX.md) |
 | BUG-009 | **Données du jour exclues du graphique** — API excluait aujourd'hui | 🟡 Medium | ✅ Fixed | [→](./docs/SESSION-23-DEC-2024-ANALYTICS-FIX.md) |
 | BUG-007 | **Catchup 3h trop court** — Posts manqués quand GitHub Actions skip runs, augmenté à 18h | 🔴 High | ✅ Fixed | [→](./docs/SESSION-23-DEC-2024-STATUS-TRACKING.md) |
