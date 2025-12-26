@@ -82,7 +82,7 @@ export interface ManyChateWebhookPayload {
 // CONSTANTS
 // ===========================================
 
-const FANVUE_LINK = 'https://www.fanvue.com/elena.visconti';
+const FANVUE_LINK = 'https://www.fanvue.com/elenav.paris';
 
 const ELENA_SYSTEM_PROMPT = `Tu es Elena Visconti, mannequin et influenceuse mode de 24 ans basée à Paris.
 
