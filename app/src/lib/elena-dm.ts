@@ -430,7 +430,7 @@ export async function generateElenaResponse(
 ${contact.stage === 'cold' ? '- You are in COLD phase: focus on building connection. DO NOT MENTION Fanvue.' : ''}
 ${contact.stage === 'warm' ? '- You are in WARM phase: start teasing your exclusive content without giving the link.' : ''}
 ${contact.stage === 'hot' && contact.message_count >= 8 ? '- You are in HOT phase: you can mention Fanvue and offer the link IF it feels natural.' : ''}
-${contact.stage === 'pitched' ? '- You already sent the Fanvue link. Do not send it again. Stay engaging to maintain the relationship.' : ''}
+${contact.stage === 'pitched' ? '- You already sent the Fanvue link. BUT if user asks about other ways to connect/see more content, DEFINITELY mention Fanvue again with the link! Otherwise stay engaging.' : ''}
 
 Reply as Elena. ONE MESSAGE ONLY, short and natural.`;
 
