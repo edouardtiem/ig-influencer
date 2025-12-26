@@ -1,7 +1,7 @@
 # 📝 SESSION — DM Automation + Fanvue Content Strategy
 
 **Date** : 26 décembre 2024  
-**Durée** : ~7h
+**Durée** : ~8h
 
 ---
 
@@ -52,6 +52,18 @@
    - Solution : Changé le webhook pour retourner format simple `{response: "..."}` au lieu du format v2
    - Response Mapping : `$.response` → `elena_response`
 
+### 8. **🎯 Fix Prompt - Re-pitch Fanvue si demandé**
+   - Problème : Elena ne proposait pas Fanvue si déjà pitché, même si user demande explicitement
+   - Solution : Ajouté exception dans prompt : "BUT if user asks about other ways to connect, DEFINITELY mention Fanvue again"
+
+### 9. **✂️ Fix Prompt - Réponses trop longues et robotic**
+   - Problème : Elena écrivait des paragraphes longs, pas naturels
+   - Solution : 
+     - Règle stricte : MAX 2-3 phrases par message
+     - Exemples GOOD vs BAD dans le prompt
+     - max_tokens réduit : 300 → 150
+     - Style "texting, not email"
+
 ---
 
 ## 📁 Fichiers créés/modifiés :
@@ -62,8 +74,8 @@
 
 ### DM Automation
 - `app/supabase/dm-automation-schema.sql` — 3 tables + fonctions SQL
-- `app/src/lib/elena-dm.ts` — Core logic (Claude + Supabase + Lead scoring) **+ English default**
-- `app/src/app/api/dm/webhook/route.ts` — ManyChat webhook
+- `app/src/lib/elena-dm.ts` — Core logic (Claude + Supabase + Lead scoring) **+ English default + Shorter responses (max 2-3 sentences) + Re-pitch Fanvue exception**
+- `app/src/app/api/dm/webhook/route.ts` — ManyChat webhook **+ Format simple (pas v2 auto-send)**
 - `app/src/app/api/dm/contacts/route.ts` — Contacts API
 
 ### Documentation
@@ -81,12 +93,12 @@
 
 ## 📋 À faire prochaine session :
 
-- [ ] Monitorer les premières conversations réelles (24-48h)
-- [ ] Ajuster le prompt Elena si nécessaire (tone, pitch timing)
+- [ ] Monitorer les premières conversations réelles (24-48h) - vérifier que réponses sont courtes
 - [ ] Tracker les conversions Fanvue (stage → converted → paid)
 - [ ] Programmer les photos Fanvue restantes
 - [ ] Stories IG avec tease Fanvue
 - [ ] Dashboard temps réel des conversations
+- [ ] Ajuster prompt si nécessaire après monitoring (tone, timing pitch)
 
 ---
 
@@ -100,6 +112,8 @@
 | Automation pausée | Edouard avait pausé l'automation sur certains contacts | Cliquer "Resume automation" par contact |
 | Send Message vide | Le bloc Send Message n'avait pas la variable | Créer Custom Field + mapper response |
 | **Double message** | Elena envoyait le même message 2 fois | Format v2 auto-envoie → changé en format simple `$.response` |
+| **Pas de re-pitch Fanvue** | Elena ne proposait pas Fanvue si déjà pitché même si user demande | Exception ajoutée dans prompt pour cas "other ways to connect" |
+| **Réponses trop longues** | Elena écrivait des paragraphes robotic | max_tokens 150 + règle stricte 2-3 phrases + exemples GOOD/BAD |
 
 ---
 
@@ -161,6 +175,13 @@ Fanvue:  https://www.fanvue.com/elenav.paris
 | "❤️🔥" (emojis only) | 🇬🇧 English (default) |
 | "Salut tu es trop belle" | 🇫🇷 French |
 | "Hola guapa" | 🇪🇸 Spanish |
+
+### Message Length Rules
+- **MAX 2-3 sentences** per message
+- **max_tokens: 150** (forcé par code)
+- Style "texting, not email"
+- Exemples GOOD/BAD dans le prompt système
+- Re-pitch Fanvue autorisé si user demande "other ways to connect"
 
 ### Coûts Estimés
 - ManyChat Pro : ~15$/mois
