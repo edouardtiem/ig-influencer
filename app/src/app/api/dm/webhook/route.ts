@@ -62,6 +62,16 @@ export async function POST(request: NextRequest) {
     console.log(`Response: "${result.response.substring(0, 100)}..."`);
     console.log(`${'='.repeat(50)}\n`);
 
+    // Add natural delay (4-5 seconds total) to make responses feel more human
+    const TARGET_DELAY_MS = 4500; // 4.5 seconds
+    const elapsed = Date.now() - startTime;
+    const remainingDelay = Math.max(0, TARGET_DELAY_MS - elapsed);
+    
+    if (remainingDelay > 0) {
+      console.log(`⏳ Adding ${remainingDelay}ms delay for natural response timing...`);
+      await new Promise(resolve => setTimeout(resolve, remainingDelay));
+    }
+
     // Return response in simple format for Response Mapping
     // The Send Message block will use {{elena_response}} from mapping
     // DO NOT use v2 format with messages[] as it auto-sends!
