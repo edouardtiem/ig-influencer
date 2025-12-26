@@ -53,6 +53,7 @@ feminine shapely figure 172cm, very large natural F-cup breasts,
 narrow defined waist, wide feminine hips`;
 
 const ELENA_FINAL_CHECK = `FINAL CHECK - MUST MATCH REFERENCES:
+- SINGLE IMAGE ONLY - NO collages, NO grids, NO patchwork, NO multiple photos combined
 - Face: IDENTICAL to Image 1 (soft round face, NOT angular)
 - Body: IDENTICAL to Image 2 (shapely with large bust visible)
 - Hair: bronde with VISIBLE golden blonde balayage

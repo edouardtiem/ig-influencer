@@ -1,7 +1,7 @@
 # 📝 SESSION — DM Automation + Fanvue Content Strategy
 
 **Date** : 26 décembre 2024  
-**Durée** : ~3h
+**Durée** : ~4h
 
 ---
 
@@ -33,6 +33,13 @@
    - Caption pour photo marble bathroom (pack payant)
    - Options captions pour photo vanity
 
+### 6. **🚀 DM Automation System IMPLÉMENTÉ**
+   - ✅ Schema SQL créé (`dm-automation-schema.sql`)
+   - ✅ Lib `elena-dm.ts` — Claude AI + Supabase
+   - ✅ API `/api/dm/webhook` — ManyChat webhook
+   - ✅ API `/api/dm/contacts` — Stats + management
+   - ✅ Test local réussi (endpoint fonctionnel)
+
 ---
 
 ## 📁 Fichiers créés/modifiés :
@@ -40,6 +47,12 @@
 ### Scripts
 - `app/scripts/elena-fanvue-free.mjs` — Génère 6 photos lifestyle Fanvue
 - `app/scripts/elena-vanity-photo.mjs` — Génère photo vanity sexy
+
+### DM Automation (NOUVEAU)
+- `app/supabase/dm-automation-schema.sql` — Tables + fonctions SQL
+- `app/src/lib/elena-dm.ts` — Core logic (Claude + Supabase)
+- `app/src/app/api/dm/webhook/route.ts` — ManyChat webhook
+- `app/src/app/api/dm/contacts/route.ts` — Contacts API
 
 ### Documentation
 - `docs/24-DM-AUTOMATION-SYSTEM.md` — Spec complète système DM
@@ -61,10 +74,12 @@ elena-fanvue-free/
 ## 🚧 En cours (non terminé) :
 
 ### DM Automation System
-- [ ] Tables Supabase à créer
-- [ ] API `/api/dm/webhook` à implémenter
-- [ ] Intégration ManyChat webhook
-- [ ] Test flow complet
+- [x] Schema SQL créé
+- [x] API `/api/dm/webhook` implémenté
+- [x] API `/api/dm/contacts` implémenté
+- [ ] **Exécuter SQL dans Supabase** ⬅️ À FAIRE
+- [ ] Configurer ManyChat → webhook Vercel
+- [ ] Test flow complet avec DM réel
 
 ### Fanvue
 - [ ] Programmer remaining photos
@@ -73,13 +88,32 @@ elena-fanvue-free/
 
 ---
 
-## 📋 À faire prochaine session :
+## 📋 À faire maintenant :
 
-### Priorité 1 : DM Automation
-- [ ] Créer tables Supabase (`elena_dm_contacts`, `elena_dm_messages`)
-- [ ] Implémenter `/api/dm/webhook`
-- [ ] Configurer ManyChat → webhook
-- [ ] Tester avec quelques DMs réels
+### 1. Exécuter le SQL dans Supabase
+```
+Fichier: app/supabase/dm-automation-schema.sql
+→ Copier/coller dans Supabase SQL Editor
+→ Exécuter
+```
+
+### 2. Deploy sur Vercel
+```bash
+git add -A
+git commit -m "feat: DM automation system with Claude AI"
+git push
+```
+
+### 3. Configurer ManyChat
+- Créer Custom Action → URL: `https://your-domain.vercel.app/api/dm/webhook`
+- Mapper `subscriber.*` et `last_input_text`
+
+### 4. Test
+```bash
+curl -X POST https://your-domain.vercel.app/api/dm/webhook \
+  -H "Content-Type: application/json" \
+  -d '{"subscriber":{"id":"test","name":"Test"},"last_input_text":"Hey!"}'
+```
 
 ### Priorité 2 : Content
 - [ ] Continuer Content Brain posts (IG normal)

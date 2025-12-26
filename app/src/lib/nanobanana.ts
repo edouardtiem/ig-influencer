@@ -89,6 +89,8 @@ The woman in the reference images is the subject - maintain her EXACT face, feat
 ${stylePrompt}
 
 [REQUIREMENTS]
+- SINGLE IMAGE ONLY - absolutely NO collages, NO grids, NO patchwork, NO multiple photos combined in one frame
+- Generate exactly ONE photograph, not a montage or split-screen composition
 - Photorealistic quality like iPhone 15 Pro camera
 - Natural skin texture with visible pores (not airbrushed)
 - The thin gold star necklace MUST be visible
@@ -182,6 +184,8 @@ ${lightingInstructions}
 ${stylePrompt}
 
 [REQUIREMENTS]
+- SINGLE IMAGE ONLY - absolutely NO collages, NO grids, NO patchwork, NO multiple photos combined in one frame
+- Generate exactly ONE photograph, not a montage or split-screen composition
 - Photorealistic quality like iPhone 15 Pro camera
 - DYNAMIC ACTION shot - she is doing something, not just posing
 - Natural movement, authentic candid moment
@@ -212,6 +216,7 @@ ${instruction}
 ${stylePrompt}
 
 [REQUIREMENTS]
+- SINGLE IMAGE ONLY - absolutely NO collages, NO grids, NO patchwork, NO multiple photos combined
 - Photorealistic quality, iPhone 15 Pro camera aesthetic
 - Natural skin texture (not airbrushed)
 - Gold star necklace MUST be visible

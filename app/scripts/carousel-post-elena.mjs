@@ -91,6 +91,7 @@ ${ELENA_BODY}`;
 
 // Final check to reinforce reference matching
 const ELENA_FINAL_CHECK = `FINAL CHECK - MUST MATCH REFERENCES:
+- SINGLE IMAGE ONLY - NO collages, NO grids, NO patchwork, NO multiple photos combined
 - Face: IDENTICAL to Image 1 (soft round face, NOT angular, warm features)
 - Body: IDENTICAL to Image 2 (shapely with very large bust visible)
 - Hair: bronde with VISIBLE golden blonde balayage highlights (NOT solid dark brown)

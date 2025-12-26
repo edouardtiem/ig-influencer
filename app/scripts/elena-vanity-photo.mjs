@@ -31,6 +31,7 @@ gold chunky chain bracelet on left wrist,
 feminine athletic figure, toned silhouette`;
 
 const ELENA_FINAL_CHECK = `FINAL CHECK - MUST MATCH REFERENCES:
+- SINGLE IMAGE ONLY - NO collages, NO grids, NO patchwork, NO multiple photos combined
 - Face: IDENTICAL to Image 1 (soft round face, visible in mirror)
 - Body: IDENTICAL to Image 2 (feminine figure)
 - Hair: bronde with golden blonde balayage in updo

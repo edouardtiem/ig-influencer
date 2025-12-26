@@ -100,6 +100,7 @@ ${MILA_BODY}`;
 
 // Final check to reinforce reference matching
 const MILA_FINAL_CHECK = `FINAL CHECK - MUST MATCH REFERENCES:
+- SINGLE IMAGE ONLY - NO collages, NO grids, NO patchwork, NO multiple photos combined
 - Face: IDENTICAL to Image 1 (oval face, copper auburn curly hair)
 - Body: slim athletic, toned with feminine curves
 - Beauty mark: above left lip corner MUST be visible (SIGNATURE)
