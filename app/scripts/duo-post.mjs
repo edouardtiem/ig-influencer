@@ -64,7 +64,7 @@ soft round pleasant face, warm approachable features,
 bronde hair dark roots with golden blonde balayage, long beach waves,
 honey brown warm almond-shaped eyes, naturally thick eyebrows,
 small beauty mark on right cheekbone,
-curvy voluptuous figure 172cm, sun-kissed Italian skin,
+feminine shapely figure 172cm with very large F-cup breasts, sun-kissed Italian skin,
 gold chunky chain bracelet, layered gold necklaces with medallion`;
 
 // ═══════════════════════════════════════════════════════════════

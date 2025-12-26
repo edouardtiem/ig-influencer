@@ -1,8 +1,9 @@
 # BUG-010: Pas de gestion d'erreurs API Instagram
 
 **Date découverte** : 24 décembre 2024  
+**Date fixée** : 26 décembre 2024  
 **Sévérité** : 🔴 High  
-**Status** : 🔍 Identifié
+**Status** : ✅ Fixé dans `scheduled-post.mjs` | 🔧 À appliquer dans autres scripts
 
 ---
 
@@ -55,11 +56,29 @@ Le code `publishCarousel()` et `publishReel()` dans `scheduled-post.mjs` ne vér
 
 ---
 
-## 📋 À faire
+## ✅ Fix appliqué
 
-- [ ] Ajouter vérification `publishData.error` dans `publishCarousel()`
-- [ ] Ajouter vérification `publishData.error` dans `publishReel()`
-- [ ] Vérifier que `publishData.id` existe avant de marquer "posted"
-- [ ] Logger les erreurs API correctement
-- [ ] Tester avec token invalide pour vérifier que l'erreur est bien catchée
+**Date** : 26 décembre 2024  
+**Fichier** : `app/scripts/scheduled-post.mjs`
+
+### Changements
+
+- ✅ Ajout vérification `publishData.error` dans `publishCarousel()`
+- ✅ Ajout vérification `publishData.error` dans `publishReel()`
+- ✅ Vérification que `publishData.id` existe avant de retourner
+- ✅ Vérification erreurs à chaque étape (containers, carousel container, publication)
+- ✅ Messages d'erreur descriptifs avec code d'erreur API
+
+### Documentation
+
+- ✅ Guide de migration créé : `docs/BUG-010-FIX-GUIDE.md`
+- ✅ Template de code fourni pour les autres scripts
+
+## 📋 À faire (autres scripts)
+
+- [ ] Appliquer le fix dans `carousel-post.mjs` (Mila auto-post)
+- [ ] Appliquer le fix dans `carousel-post-elena.mjs` (Elena auto-post)
+- [ ] Appliquer le fix dans `duo-post.mjs` (Duo posts)
+- [ ] Tester tous les scripts avec token invalide
+- [ ] Corriger les 9 posts existants marqués "posted" mais non publiés
 

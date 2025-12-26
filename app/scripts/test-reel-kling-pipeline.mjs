@@ -101,7 +101,7 @@ bronde hair with golden blonde balayage, long beach waves,
 honey brown eyes, naturally full lips nude-pink,
 small beauty mark on right cheekbone (SIGNATURE)`,
     
-    bodyDescription: `curvy voluptuous figure 172cm, very large natural bust,
+    bodyDescription: `feminine shapely figure 172cm, very large natural F-cup bust,
 narrow defined waist, wide feminine hips, Italian sun-kissed skin`,
     
     testScene: {

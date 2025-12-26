@@ -37,13 +37,13 @@ const CHARACTER_SHEETS = {
 
   elena: `## Elena Visconti (@elenav.paris)
 - 24 ans, Mannequin & Influenceuse Mode
-- Paris 8e (Haussmann luxe) - origines italiennes
-- Aesthetic: Sophistiquée jet-set — Luxe discret mais assumé, French-Italian elegance
-- Physique: Long dark brown hair, olive skin, striking features, elegant posture
-- Style: Designer pieces, minimalist luxe, French girl chic
-- Personnalité: Sophistiquée, mystérieuse, jet-set, aspirational mais accessible
-- Activités: Shootings mannequin, fittings, voyages travail, Fashion Week, spa/wellness
-- Tone: Élégant, inspirational, lifestyle luxe, captions courtes et impactantes`,
+- Paris 8e (Haussmann luxe) - origines italiennes (Milan)
+- Aesthetic: Paris Street-Luxe Mannequin 2025 — Osé mais stylé, près du corps, tendance
+- Physique: Bronde hair (dark roots + golden blonde balayage), beach waves volumineuses. Visage doux et rond (PAS anguleux), honey brown warm eyes. Corps féminin shapely (NOT skinny), F-cup, taille marquée, hanches larges. Grain de beauté pommette droite.
+- Style: Street-luxe, beige/cream/nude/noir, gold chunky bracelet + layered gold necklaces, looks osés près du corps
+- Personnalité: Warm & accessible (pas cold model), confident, fun, secretly punk rock (amie de Mila)
+- Activités: Shootings mannequin, getting ready, cozy home, café Paris, spa luxe
+- Tone: Casual luxe, confident, playful, French touch, captions courtes et impactantes`,
 };
 
 // Available locations

@@ -63,12 +63,11 @@ const REFERENCE_INSTRUCTION = `You are provided with reference images in order:
 - Same naturally thick well-groomed eyebrows
 
 **IMAGE 2 (BODY REFERENCE)**: This is Elena's body. Match these proportions EXACTLY:
-- Same curvy voluptuous figure (NOT skinny, NOT thin)
+- Same feminine shapely figure (NOT skinny, NOT thin)
 - Same very large natural F-cup breasts (prominent, NOT reduced)
 - Same narrow defined waist
 - Same wide feminine hips
-- Same thick thighs
-- Same healthy curvy Italian body type
+- Same healthy fit Italian body type
 
 CRITICAL RULES:
 - Face MUST be identical to Image 1 - same person, same features
@@ -91,10 +90,10 @@ gold chunky chain bracelet on left wrist ALWAYS visible,
 layered gold necklaces with medallion pendant ALWAYS visible`;
 
 // Body description
-const ELENA_BODY = `curvy voluptuous figure 172cm tall,
+const ELENA_BODY = `feminine shapely figure 172cm tall,
 very large natural F-cup breasts prominent and natural shape,
-narrow defined waist, wide feminine hips, thick thighs,
-healthy curvy Italian body, confident posture`;
+narrow defined waist, wide feminine hips,
+healthy fit Italian body, confident posture`;
 
 // Combined base (used in prompts)
 const ELENA_BASE = `${ELENA_FACE},
@@ -104,7 +103,7 @@ ${ELENA_BODY}`;
 // Final check to reinforce reference matching
 const ELENA_FINAL_CHECK = `FINAL CHECK - MUST MATCH REFERENCES:
 - Face: IDENTICAL to Image 1 (soft round face, NOT angular, warm features)
-- Body: IDENTICAL to Image 2 (curvy with very large bust visible)
+- Body: IDENTICAL to Image 2 (shapely with very large bust visible)
 - Hair: bronde with VISIBLE golden blonde balayage highlights (NOT solid dark brown)
 - Beauty mark: on right cheekbone MUST be visible
 - Jewelry: gold chunky bracelet on wrist, layered gold necklaces`;

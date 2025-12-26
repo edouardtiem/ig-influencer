@@ -46,8 +46,8 @@ export const CHARACTER_ELENA = {
     // Hair — Critical for consistency
     hair: 'bronde hair (dark roots with golden blonde balayage) long voluminous beach waves',
     
-    // Body Proportions - CURVY with large bust
-    body: 'curvy voluptuous figure not skinny, very large natural F-cup breasts prominent emphasized visible cleavage, soft feminine curves, narrow waist, wide hips, thick thighs, healthy curvy body',
+    // Body Proportions - Shapely with large bust
+    body: 'feminine shapely figure not skinny, very large natural F-cup breasts prominent emphasized visible cleavage, soft feminine curves, narrow waist, wide hips, healthy fit body',
   },
   
   // ═══════════════════════════════════════════════════════════════

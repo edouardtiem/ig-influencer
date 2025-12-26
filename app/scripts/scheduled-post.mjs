@@ -119,12 +119,11 @@ toned but not muscular, Pilates-sculpted shoulders`,
 - Same naturally thick well-groomed eyebrows
 
 **IMAGE 2 (BODY REFERENCE)**: This is Elena's body. Match these proportions EXACTLY:
-- Same curvy voluptuous figure (NOT skinny, NOT thin)
+- Same feminine shapely figure (NOT skinny, NOT thin)
 - Same very large natural F-cup breasts (prominent, NOT reduced)
 - Same narrow defined waist
 - Same wide feminine hips
-- Same thick thighs
-- Same healthy curvy Italian body type
+- Same healthy fit Italian body type
 
 CRITICAL RULES:
 - Face MUST be identical to Image 1 - same person, same features
@@ -141,13 +140,13 @@ small straight nose, naturally full lips nude-pink color`,
 glowing sun-kissed Italian skin tone,
 gold chunky chain bracelet on left wrist ALWAYS visible,
 layered gold necklaces with medallion pendant ALWAYS visible`,
-    body_description: `curvy voluptuous figure 172cm tall,
+    body_description: `feminine shapely figure 172cm tall,
 very large natural F-cup breasts prominent and natural shape,
-narrow defined waist, wide feminine hips, thick thighs,
-healthy curvy Italian body, confident posture`,
+narrow defined waist, wide feminine hips,
+healthy fit Italian body, confident posture`,
     final_check: `FINAL CHECK - MUST MATCH REFERENCES:
 - Face: IDENTICAL to Image 1 (soft round face, NOT angular)
-- Body: IDENTICAL to Image 2 (curvy with very large bust visible)
+- Body: IDENTICAL to Image 2 (shapely with very large bust visible)
 - Hair: bronde with VISIBLE golden blonde balayage (NOT solid dark brown)
 - Beauty mark: on right cheekbone MUST be visible
 - Jewelry: gold chunky bracelet + layered gold necklaces`,
@@ -766,15 +765,35 @@ async function publishCarousel(character, imageUrls, caption) {
 
   log(`📤 Publishing carousel to Instagram (${config.name})...`);
 
+  // Validate inputs
+  if (!Array.isArray(imageUrls) || imageUrls.length === 0) {
+    throw new Error('Invalid imageUrls: must be a non-empty array');
+  }
+
   // Create media containers for each image
   const containerIds = [];
-  for (const url of imageUrls) {
+  for (let i = 0; i < imageUrls.length; i++) {
+    const url = imageUrls[i];
     const response = await fetch(
       `https://graph.facebook.com/v21.0/${accountId}/media?image_url=${encodeURIComponent(url)}&is_carousel_item=true&access_token=${accessToken}`,
       { method: 'POST' }
     );
     const data = await response.json();
-    if (data.id) containerIds.push(data.id);
+    
+    // Check for API errors
+    if (data.error) {
+      throw new Error(`Failed to create media container ${i + 1}/${imageUrls.length}: ${data.error.message} (code: ${data.error.code})`);
+    }
+    
+    if (!data.id) {
+      throw new Error(`Media container ${i + 1}/${imageUrls.length} creation failed: no ID returned`);
+    }
+    
+    containerIds.push(data.id);
+  }
+
+  if (containerIds.length === 0) {
+    throw new Error('No media containers created');
   }
 
   // Create carousel container
@@ -784,12 +803,30 @@ async function publishCarousel(character, imageUrls, caption) {
   );
   const carouselData = await carouselResponse.json();
 
+  // Check for API errors
+  if (carouselData.error) {
+    throw new Error(`Failed to create carousel container: ${carouselData.error.message} (code: ${carouselData.error.code})`);
+  }
+
+  if (!carouselData.id) {
+    throw new Error('Carousel container creation failed: no ID returned');
+  }
+
   // Publish
   const publishResponse = await fetch(
     `https://graph.facebook.com/v21.0/${accountId}/media_publish?creation_id=${carouselData.id}&access_token=${accessToken}`,
     { method: 'POST' }
   );
   const publishData = await publishResponse.json();
+
+  // Check for API errors
+  if (publishData.error) {
+    throw new Error(`Failed to publish carousel: ${publishData.error.message} (code: ${publishData.error.code})`);
+  }
+
+  if (!publishData.id) {
+    throw new Error('Carousel publication failed: Instagram API returned no post ID');
+  }
 
   log(`✅ Carousel published! ID: ${publishData.id}`);
   return publishData.id;
@@ -802,12 +839,27 @@ async function publishReel(character, videoUrl, caption) {
 
   log(`📤 Publishing reel to Instagram (${config.name})...`);
 
+  // Validate inputs
+  if (!videoUrl) {
+    throw new Error('Invalid videoUrl: must be provided');
+  }
+
   // Create reel container
   const containerResponse = await fetch(
     `https://graph.facebook.com/v21.0/${accountId}/media?media_type=REELS&video_url=${encodeURIComponent(videoUrl)}&caption=${encodeURIComponent(caption)}&access_token=${accessToken}`,
     { method: 'POST' }
   );
   const containerData = await containerResponse.json();
+
+  // Check for API errors
+  if (containerData.error) {
+    throw new Error(`Failed to create reel container: ${containerData.error.message} (code: ${containerData.error.code})`);
+  }
+
+  if (!containerData.id) {
+    throw new Error('Reel container creation failed: no ID returned');
+  }
+
   log(`  Container created: ${containerData.id}`);
 
   // Wait for video processing
@@ -820,6 +872,12 @@ async function publishReel(character, videoUrl, caption) {
       `https://graph.facebook.com/v21.0/${containerData.id}?fields=status_code&access_token=${accessToken}`
     );
     const statusData = await statusResponse.json();
+    
+    // Check for API errors when checking status
+    if (statusData.error) {
+      throw new Error(`Failed to check video processing status: ${statusData.error.message} (code: ${statusData.error.code})`);
+    }
+    
     status = statusData.status_code;
     process.stdout.write('.');
     attempts++;
@@ -837,6 +895,15 @@ async function publishReel(character, videoUrl, caption) {
     { method: 'POST' }
   );
   const publishData = await publishResponse.json();
+
+  // Check for API errors
+  if (publishData.error) {
+    throw new Error(`Failed to publish reel: ${publishData.error.message} (code: ${publishData.error.code})`);
+  }
+
+  if (!publishData.id) {
+    throw new Error('Reel publication failed: Instagram API returned no post ID');
+  }
 
   log(`✅ Reel published! ID: ${publishData.id}`);
   return publishData.id;

@@ -248,12 +248,11 @@ function buildPrompt(photoSpec) {
 - FACE MUST BE RECOGNIZABLE AS THE SAME PERSON IN IMAGE 1
 
 **IMAGE 2 (BODY REFERENCE)**: This is Elena's body. Match these proportions EXACTLY:
-- Same curvy voluptuous figure (NOT skinny, NOT thin)
+- Same feminine shapely figure (NOT skinny, NOT thin)
 - Same very large natural F-cup breasts (prominent, NOT reduced)
 - Same narrow defined waist
 - Same wide feminine hips
-- Same thick thighs
-- Match the overall body type and proportions shown
+- Same healthy fit Italian body type
 
 **IMAGE 3 (LOCATION REFERENCE)**: Based on the provided location reference image, place the subject in this exact room/location.
 
