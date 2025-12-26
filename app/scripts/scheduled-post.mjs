@@ -93,6 +93,7 @@ thin gold necklace with minimalist star pendant always visible`,
 natural full feminine curves with defined waist,
 toned but not muscular, Pilates-sculpted shoulders`,
     final_check: `FINAL CHECK - MUST MATCH REFERENCES:
+- SINGLE IMAGE ONLY - NO collages, NO grids, NO patchwork, NO multiple photos combined
 - Face: IDENTICAL to Image 1 (oval face, copper auburn curly hair)
 - Body: IDENTICAL to Image 2 (slim athletic, toned)
 - Beauty mark: above left lip corner MUST be visible (SIGNATURE)
@@ -145,6 +146,7 @@ very large natural F-cup breasts prominent and natural shape,
 narrow defined waist, wide feminine hips,
 healthy fit Italian body, confident posture`,
     final_check: `FINAL CHECK - MUST MATCH REFERENCES:
+- SINGLE IMAGE ONLY - NO collages, NO grids, NO patchwork, NO multiple photos combined
 - Face: IDENTICAL to Image 1 (soft round face, NOT angular)
 - Body: IDENTICAL to Image 2 (shapely with very large bust visible)
 - Hair: bronde with VISIBLE golden blonde balayage (NOT solid dark brown)

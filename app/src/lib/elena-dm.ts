@@ -147,7 +147,7 @@ On se retrouve là-bas? 🖤"`;
 // ===========================================
 
 const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY,
+  apiKey: process.env.Claude_key || process.env.ANTHROPIC_API_KEY,
 });
 
 // ===========================================

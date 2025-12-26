@@ -290,7 +290,9 @@ luxury Parisian apartment atmosphere fully visible, tasteful and sophisticated, 
 
 FACE CHECK: The face in this image MUST be identical to Image 1 reference - same person, same features, same beauty mark on right cheekbone
 
-NEGATIVE: different face, different person, angular face, sharp jawline, square face, 
+CRITICAL: Generate exactly ONE single photograph. NO collages, NO grids, NO patchwork, NO multiple photos combined in one frame.
+
+NEGATIVE: collage, grid, patchwork, multiple images, split screen, montage, different face, different person, angular face, sharp jawline, square face, 
 classic model face, skinny thin body, flat chest, small breasts, medium breasts, 
 A-cup, B-cup, C-cup, D-cup, average bust, conservative outfit, covered up, 
 modest clothing, dark room, cheap decor, stiff pose, cold expression, 

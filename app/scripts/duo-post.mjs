@@ -527,6 +527,7 @@ STYLE: ultra realistic Instagram photo, lifestyle content, friendship goals aest
 8k resolution, professional photography, natural lighting, candid authentic moment,
 
 FINAL CHECK - MUST MATCH REFERENCES:
+- SINGLE IMAGE ONLY - NO collages, NO grids, NO patchwork, NO multiple photos combined
 - MILA (left): oval face, copper auburn CURLY hair, beauty mark above left lip
 - ELENA (right): soft round face, bronde hair with BLONDE BALAYAGE, beauty mark on right cheekbone, curvy body
 - TWO distinct women - do NOT merge their features
