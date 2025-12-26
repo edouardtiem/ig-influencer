@@ -1,7 +1,7 @@
 # 📝 SESSION — DM Automation + Fanvue Content Strategy
 
 **Date** : 26 décembre 2024  
-**Durée** : ~6h
+**Durée** : ~7h
 
 ---
 
@@ -45,6 +45,12 @@
    - Prompt système mis à jour : English first
    - Switch vers autre langue SEULEMENT si l'user écrit dans cette langue
    - Fallback response aussi en anglais
+
+### 7. **🐛 Fix Bug Double Message**
+   - Problème : Elena envoyait le même message 2 fois
+   - Cause : Format v2 ManyChat auto-envoie + bloc Send Message = double envoi
+   - Solution : Changé le webhook pour retourner format simple `{response: "..."}` au lieu du format v2
+   - Response Mapping : `$.response` → `elena_response`
 
 ---
 
@@ -93,6 +99,7 @@
 | ManyChat AI override | L'IA ManyChat répondait à la place du webhook | Désactiver ManyChat AI dans Settings |
 | Automation pausée | Edouard avait pausé l'automation sur certains contacts | Cliquer "Resume automation" par contact |
 | Send Message vide | Le bloc Send Message n'avait pas la variable | Créer Custom Field + mapper response |
+| **Double message** | Elena envoyait le même message 2 fois | Format v2 auto-envoie → changé en format simple `$.response` |
 
 ---
 
@@ -123,9 +130,20 @@ Fanvue:  https://www.fanvue.com/elenav.paris
 [External Request → webhook]
    - POST to https://ig-influencer.vercel.app/api/dm/webhook
    - Body: { subscriber, last_input_text }
-   - Response mapping: $.content.messages[0].text → elena_response
+   - Response mapping: $.response → elena_response
          ↓
 [Send Message: {{elena_response}}]
+```
+
+### Format réponse webhook (simple, pas v2)
+```json
+{
+  "success": true,
+  "response": "Hey! 🖤 What's on your mind?",
+  "lead_stage": "warm",
+  "message_count": 5,
+  "strategy": "nurture"
+}
 ```
 
 ### Lead Scoring

@@ -57,7 +57,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
-| DONE-037 | **🤖 DM Automation LIVE** — Claude AI + ManyChat webhook + Lead scoring + Fanvue pitch + English default | 26/12/2024 | v2.28.1 | [→](./docs/sessions/2024-12-26-dm-automation.md) |
+| DONE-037 | **🤖 DM Automation LIVE** — Claude AI + ManyChat + Lead scoring + English default + Fix double message | 26/12/2024 | v2.28.2 | [→](./docs/sessions/2024-12-26-dm-automation.md) |
 | DONE-036 | **🔗 Fanvue OAuth 2.0 + PKCE** — Intégration API Fanvue complète avec OAuth sécurisé | 26/12/2024 | v2.27.0 | [→](./docs/sessions/2024-12-26-fanvue-oauth.md) |
 | DONE-035 | **🔧 BUG-010 Fix** — Gestion d'erreurs API Instagram dans tous les scripts + Audit posts | 26/12/2024 | v2.25.0 | [→](./docs/SESSION-26-DEC-2024-BUG-010-FIX.md) |
 | DONE-034 | **🤖 ManyChat Setup + AI Agent Strategy** — Guide ManyChat complet + Architecture AI Agent avec auto-learning | 26/12/2024 | v2.26.0 | [→](./docs/sessions/2024-12-26-manychat-ai-agent.md) |
