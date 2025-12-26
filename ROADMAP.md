@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 26 décembre 2024 (Fanvue OAuth ✅)
+**Dernière mise à jour** : 26 décembre 2024 (DM Automation LIVE ✅)
 
 ---
 
@@ -38,7 +38,7 @@ roadmap/
 
 | ID | Feature | Priorité | Estimation | Lien |
 |----|---------|----------|------------|------|
-| TODO-016 | **Elena AI Agent** — Agent conversationnel flirty + auto-learning + Supabase tracking | 🔴 High | 8h | [→](./roadmap/ideas/IDEA-009-elena-ai-agent.md) |
+| ~~TODO-016~~ | ~~Elena AI Agent~~ — ✅ DONE via DONE-037 | - | - | [→](./docs/sessions/2024-12-26-dm-automation.md) |
 | ~~TODO-013~~ | ~~ManyChat Setup~~ — ✅ 2 automations LIVE | - | - | [→](./docs/sessions/2024-12-26-manychat-ai-agent.md) |
 | TODO-014 | **Fanvue Pack Final** — Sélection 10-12 photos + Upload Fanvue + Prix 3€ | 🔴 High | 30min | [→](./docs/sessions/2024-12-25-fanvue-pack-elena.md) |
 | TODO-015 | **IG Teaser Post** — Photo pack + Caption CTA "Link in bio" / "DM PACK" | 🔴 High | 15min | - |
@@ -57,6 +57,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-037 | **🤖 DM Automation LIVE** — Claude AI + ManyChat webhook + Lead scoring + Fanvue pitch automatique | 26/12/2024 | v2.28.0 | [→](./docs/sessions/2024-12-26-dm-automation.md) |
 | DONE-036 | **🔗 Fanvue OAuth 2.0 + PKCE** — Intégration API Fanvue complète avec OAuth sécurisé | 26/12/2024 | v2.27.0 | [→](./docs/sessions/2024-12-26-fanvue-oauth.md) |
 | DONE-035 | **🔧 BUG-010 Fix** — Gestion d'erreurs API Instagram dans tous les scripts + Audit posts | 26/12/2024 | v2.25.0 | [→](./docs/SESSION-26-DEC-2024-BUG-010-FIX.md) |
 | DONE-034 | **🤖 ManyChat Setup + AI Agent Strategy** — Guide ManyChat complet + Architecture AI Agent avec auto-learning | 26/12/2024 | v2.26.0 | [→](./docs/sessions/2024-12-26-manychat-ai-agent.md) |
@@ -148,6 +149,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 26/12/2024 | **🤖 DM Automation LIVE** — Claude AI webhook + ManyChat intégré + Lead scoring + 100% DMs automatisés | [→](./docs/sessions/2024-12-26-dm-automation.md) |
 | 26/12/2024 | **🔗 Fanvue OAuth 2.0** — Intégration API complète avec PKCE + client_secret_basic | [→](./docs/sessions/2024-12-26-fanvue-oauth.md) |
 | 26/12/2024 | **🤖 ManyChat Setup + AI Agent** — Guide ManyChat + Architecture AI Agent conversationnel avec auto-learning | [→](./docs/sessions/2024-12-26-manychat-ai-agent.md) |
 | 25/12/2024 | **💰 Fanvue Pack Elena + ManyChat** — 14 photos générées + Stratégie conversion DM→Fanvue | [→](./docs/sessions/2024-12-25-fanvue-pack-elena.md) |
