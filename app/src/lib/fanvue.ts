@@ -144,17 +144,19 @@ export async function exchangeCodeForTokens(code: string, codeVerifier: string):
   
   console.log('[Fanvue] Exchanging authorization code for tokens...');
 
+  // Use client_secret_basic auth (credentials in Authorization header)
+  const basicAuth = Buffer.from(`${config.clientId}:${config.clientSecret}`).toString('base64');
+
   // Correct endpoint: /oauth2/token (not /oauth/token)
   const response = await fetch(`${AUTH_BASE_URL}/oauth2/token`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': `Basic ${basicAuth}`,
     },
     body: new URLSearchParams({
       grant_type: 'authorization_code',
       code,
-      client_id: config.clientId,
-      client_secret: config.clientSecret,
       redirect_uri: config.redirectUri,
       code_verifier: codeVerifier, // PKCE required
     }),
@@ -188,16 +190,18 @@ export async function refreshAccessToken(refreshToken: string): Promise<FanvueTo
   
   console.log('[Fanvue] Refreshing access token...');
 
+  // Use client_secret_basic auth (credentials in Authorization header)
+  const basicAuth = Buffer.from(`${config.clientId}:${config.clientSecret}`).toString('base64');
+
   const response = await fetch(`${AUTH_BASE_URL}/oauth2/token`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': `Basic ${basicAuth}`,
     },
     body: new URLSearchParams({
       grant_type: 'refresh_token',
       refresh_token: refreshToken,
-      client_id: config.clientId,
-      client_secret: config.clientSecret,
     }),
   });
 
