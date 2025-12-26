@@ -62,44 +62,26 @@ export async function POST(request: NextRequest) {
     console.log(`Response: "${result.response.substring(0, 100)}..."`);
     console.log(`${'='.repeat(50)}\n`);
 
-    // Return response in ManyChat format
-    // ManyChat expects a specific format for Custom Actions
+    // Return response in simple format for Response Mapping
+    // The Send Message block will use {{elena_response}} from mapping
+    // DO NOT use v2 format with messages[] as it auto-sends!
     return NextResponse.json({
-      version: 'v2',
-      content: {
-        messages: [
-          {
-            type: 'text',
-            text: result.response,
-          },
-        ],
-        // Optional: Set custom fields in ManyChat
-        set_field_value: [
-          {
-            field_name: 'elena_lead_stage',
-            value: result.contact.stage,
-          },
-          {
-            field_name: 'elena_message_count',
-            value: result.contact.message_count,
-          },
-        ],
-      },
+      success: true,
+      response: result.response,
+      lead_stage: result.contact.stage,
+      message_count: result.contact.message_count,
+      strategy: result.strategy,
     });
   } catch (error) {
     console.error('❌ Webhook error:', error);
     
-    // Return error but still provide a response for ManyChat
+    // Return fallback response for mapping
     return NextResponse.json({
-      version: 'v2',
-      content: {
-        messages: [
-          {
-            type: 'text',
-            text: "Hey 🖤 Donne-moi une seconde, je reviens...",
-          },
-        ],
-      },
+      success: false,
+      response: "Hey 🖤 Sorry, got distracted. What were you saying?",
+      lead_stage: 'cold',
+      message_count: 0,
+      strategy: 'engage',
     });
   }
 }
