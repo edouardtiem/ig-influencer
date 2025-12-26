@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { checkApiStatus } from '@/lib/replicate';
+import { isFanvueConfigured, getTokens } from '@/lib/fanvue';
 
 interface StatusResponse {
   status: 'ok' | 'error';
@@ -12,11 +13,16 @@ interface StatusResponse {
     claude: {
       configured: boolean;
     };
+    fanvue: {
+      configured: boolean;
+      connected: boolean;
+    };
   };
   config: {
     replicateConfigured: boolean;
     claudeConfigured: boolean;
     cronSecretConfigured: boolean;
+    fanvueConfigured: boolean;
   };
 }
 
@@ -29,10 +35,14 @@ export async function GET(): Promise<NextResponse<StatusResponse>> {
   const timestamp = new Date().toISOString();
   
   // Check config
+  const fanvueConfigured = isFanvueConfigured();
+  const fanvueTokens = getTokens();
+  
   const config = {
     replicateConfigured: !!process.env.REPLICATE_API_TOKEN,
     claudeConfigured: !!process.env.Claude_key,
     cronSecretConfigured: !!process.env.CRON_SECRET,
+    fanvueConfigured,
   };
   
   // Check Replicate
@@ -48,6 +58,10 @@ export async function GET(): Promise<NextResponse<StatusResponse>> {
       },
       claude: {
         configured: config.claudeConfigured,
+      },
+      fanvue: {
+        configured: fanvueConfigured,
+        connected: !!fanvueTokens,
       },
     },
     config,
