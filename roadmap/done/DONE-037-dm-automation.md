@@ -1,9 +1,9 @@
 # ✅ DONE-037 — DM Automation LIVE
 
 **Date** : 26 décembre 2024  
-**Version** : v2.28.0  
+**Version** : v2.28.1  
 **Impact** : 🔴 High  
-**Effort** : ~5h
+**Effort** : ~6h
 
 ---
 
@@ -73,6 +73,7 @@ ManyChat envoie la réponse
 - **Voix** : Sophistiquée, sexy mais classe
 - **Objectif** : Convertir vers Fanvue gratuit
 - **AI Disclosure** : Honnête si on demande directement
+- **Langue** : 🇬🇧 **English par défaut**, switch si user parle autre langue
 
 ---
 
@@ -94,12 +95,24 @@ ManyChat envoie la réponse
 
 ---
 
+## 🌍 Language Rules
+
+| User écrit | Elena répond en |
+|------------|-----------------|
+| "Hey beautiful" | 🇬🇧 English (default) |
+| "❤️🔥" (emojis) | 🇬🇧 English (default) |
+| "Salut tu es belle" | 🇫🇷 French |
+| "Hola guapa" | 🇪🇸 Spanish |
+
+---
+
 ## 📝 Notes
 
 - ManyChat "Default Reply" trigger capture tous les DMs
 - Le webhook retourne le format ManyChat v2 natif
 - Lead scoring basé sur message_count (1-3=cold, 4-7=warm, 8+=hot)
 - Fanvue pitch uniquement quand stage=hot
+- **English default** depuis v2.28.1
 
 ---
 

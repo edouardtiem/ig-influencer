@@ -1,7 +1,7 @@
 # 📝 SESSION — DM Automation + Fanvue Content Strategy
 
 **Date** : 26 décembre 2024  
-**Durée** : ~5h
+**Durée** : ~6h
 
 ---
 
@@ -32,11 +32,19 @@
    - ✅ ManyChat configuré et testé
    - ✅ **AUTOMATION LIVE** 🎉
 
-### 5. **Configuration ManyChat**
-   - Flow "Default Reply" créé
-   - Dynamic Content block configuré
-   - Webhook testé avec succès (réponse Claude reçue)
+### 5. **Configuration ManyChat COMPLÈTE**
+   - Flow "Instagram Default Reply" créé
+   - **External Request** configuré vers webhook
+   - **Custom User Field** `elena_response` créé
+   - **Response Mapping** : `$.content.messages[0].text` → `elena_response`
+   - **Send Message** block avec `{{elena_response}}`
+   - Trigger : "User sends a Direct Message" (Default Reply)
    - Lien Fanvue corrigé : `https://www.fanvue.com/elenav.paris`
+
+### 6. **Elena parle ANGLAIS par défaut**
+   - Prompt système mis à jour : English first
+   - Switch vers autre langue SEULEMENT si l'user écrit dans cette langue
+   - Fallback response aussi en anglais
 
 ---
 
@@ -48,12 +56,13 @@
 
 ### DM Automation
 - `app/supabase/dm-automation-schema.sql` — 3 tables + fonctions SQL
-- `app/src/lib/elena-dm.ts` — Core logic (Claude + Supabase + Lead scoring)
+- `app/src/lib/elena-dm.ts` — Core logic (Claude + Supabase + Lead scoring) **+ English default**
 - `app/src/app/api/dm/webhook/route.ts` — ManyChat webhook
 - `app/src/app/api/dm/contacts/route.ts` — Contacts API
 
 ### Documentation
 - `docs/24-DM-AUTOMATION-SYSTEM.md` — Spec complète système DM
+- `docs/sessions/2024-12-26-dm-automation.md` — Ce fichier (session log)
 - `roadmap/done/DONE-037-dm-automation.md` — Feature terminée
 
 ---
@@ -66,20 +75,24 @@
 
 ## 📋 À faire prochaine session :
 
-- [ ] Monitorer les premières conversations réelles
-- [ ] Ajuster le prompt Elena si nécessaire
-- [ ] Tracker les conversions Fanvue
+- [ ] Monitorer les premières conversations réelles (24-48h)
+- [ ] Ajuster le prompt Elena si nécessaire (tone, pitch timing)
+- [ ] Tracker les conversions Fanvue (stage → converted → paid)
 - [ ] Programmer les photos Fanvue restantes
 - [ ] Stories IG avec tease Fanvue
+- [ ] Dashboard temps réel des conversations
 
 ---
 
 ## 🐛 Bugs découverts :
 
-- **Header ManyChat** — "Content-Type→" invalide (caractère spécial)
-  - Fix : Supprimer et recréer le header proprement
-- **Fanvue link incorrect** — `elena.visconti` au lieu de `elenav.paris`
-  - Fix : Corrigé et redéployé
+| Bug | Description | Fix |
+|-----|-------------|-----|
+| Header ManyChat | "Content-Type→" invalide (caractère spécial) | Supprimer et recréer header proprement |
+| Fanvue link | `elena.visconti` au lieu de `elenav.paris` | Corrigé dans elena-dm.ts + redéployé |
+| ManyChat AI override | L'IA ManyChat répondait à la place du webhook | Désactiver ManyChat AI dans Settings |
+| Automation pausée | Edouard avait pausé l'automation sur certains contacts | Cliquer "Resume automation" par contact |
+| Send Message vide | Le bloc Send Message n'avait pas la variable | Créer Custom Field + mapper response |
 
 ---
 
@@ -90,6 +103,7 @@
 - Alertes quand quelqu'un atteint stage "hot"
 - A/B testing des messages de pitch
 - Auto-learning basé sur les conversions réussies
+- Détection automatique du sentiment pour escalade
 
 ---
 
@@ -102,18 +116,38 @@ Stats:   https://ig-influencer.vercel.app/api/dm/contacts?stats=true
 Fanvue:  https://www.fanvue.com/elenav.paris
 ```
 
+### Architecture ManyChat Flow
+```
+[Trigger: User sends DM - Default Reply]
+         ↓
+[External Request → webhook]
+   - POST to https://ig-influencer.vercel.app/api/dm/webhook
+   - Body: { subscriber, last_input_text }
+   - Response mapping: $.content.messages[0].text → elena_response
+         ↓
+[Send Message: {{elena_response}}]
+```
+
 ### Lead Scoring
 | Stage | Messages | Action Elena |
 |-------|----------|--------------|
-| cold | 1-3 | Engage, pose des questions |
-| warm | 4-7 | Tease contenu exclusif |
-| hot | 8+ | Pitch Fanvue |
-| pitched | - | Follow-up |
+| cold | 1-3 | Engage, ask questions |
+| warm | 4-7 | Tease exclusive content |
+| hot | 8+ | Pitch Fanvue (free follow) |
+| pitched | - | Follow-up, maintain relationship |
+
+### Language Rules
+| User écrit | Elena répond en |
+|------------|-----------------|
+| "Hey beautiful" | 🇬🇧 English (default) |
+| "❤️🔥" (emojis only) | 🇬🇧 English (default) |
+| "Salut tu es trop belle" | 🇫🇷 French |
+| "Hola guapa" | 🇪🇸 Spanish |
 
 ### Coûts Estimés
 - ManyChat Pro : ~15$/mois
-- Claude API : ~5-10$/mois
-- Supabase : Gratuit
+- Claude API : ~5-10$/mois (claude-sonnet-4-20250514)
+- Supabase : Gratuit (free tier)
 - **Total : ~20-25$/mois**
 
 ---
@@ -122,17 +156,29 @@ Fanvue:  https://www.fanvue.com/elenav.paris
 
 | Élément | Status |
 |---------|--------|
-| Tables Supabase | ✅ Créées |
-| API Webhook | ✅ Live |
-| Claude AI | ✅ Fonctionne |
-| ManyChat | ✅ Configuré |
+| Tables Supabase | ✅ Créées (3 tables) |
+| API Webhook | ✅ Live sur Vercel |
+| Claude AI | ✅ claude-sonnet-4-20250514 |
+| ManyChat Flow | ✅ External Request + Send Message |
+| Custom Field | ✅ `elena_response` |
+| Trigger | ✅ Default Reply (all DMs) |
+| Language | ✅ English default |
 | Test | ✅ Réussi |
 | **100% DMs automatisés** | ✅ **LIVE** |
 
 ---
 
-**Elena AI répond maintenant à tous les DMs automatiquement !** 🚀
+## 🎉 VICTOIRE
+
+**Elena AI répond maintenant à tous les DMs automatiquement !**
+
+- ✅ En anglais par défaut
+- ✅ Switch si l'user parle une autre langue
+- ✅ Lead scoring automatique (cold → warm → hot)
+- ✅ Pitch Fanvue au bon moment
+- ✅ Historique sauvegardé dans Supabase
+- ✅ Honnête sur son statut d'IA si on demande
 
 ---
 
-*Next : Monitorer les conversions et optimiser le funnel*
+*Next : Monitorer 24-48h + optimiser le prompt si nécessaire*
