@@ -1,12 +1,17 @@
 /**
  * Fanvue API Client
- * OAuth 2.0 authentication and API integration for premium content monetization
+ * OAuth 2.0 + PKCE authentication for premium content monetization
  * 
- * Documentation: https://api.fanvue.com/docs
+ * Documentation: https://api.fanvue.com/docs/authentication/implementation-guide
  */
+
+import { randomBytes, createHash } from 'crypto';
 
 const AUTH_BASE_URL = 'https://auth.fanvue.com';
 const API_BASE_URL = 'https://api.fanvue.com';
+
+// Required scopes per Fanvue docs
+const REQUIRED_SCOPES = 'openid offline_access offline';
 
 interface FanvueConfig {
   clientId: string;
@@ -18,6 +23,7 @@ interface FanvueConfig {
 interface TokenResponse {
   access_token: string;
   refresh_token: string;
+  id_token?: string;
   token_type: string;
   expires_in: number;
   scope: string;
@@ -29,19 +35,64 @@ interface FanvueTokens {
   expiresAt: number;
 }
 
-// In-memory token storage (should be persisted in production)
+// In-memory storage (should be persisted in production)
 let cachedTokens: FanvueTokens | null = null;
+let cachedCodeVerifier: string | null = null;
+
+// ===========================================
+// PKCE HELPERS
+// ===========================================
+
+function base64URLEncode(buffer: Buffer): string {
+  return buffer
+    .toString('base64')
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
+}
 
 /**
- * Get Fanvue configuration from environment variables
+ * Generate PKCE code verifier (43-128 characters)
  */
+export function generateCodeVerifier(): string {
+  return base64URLEncode(randomBytes(32));
+}
+
+/**
+ * Generate PKCE code challenge from verifier
+ */
+export function generateCodeChallenge(verifier: string): string {
+  return base64URLEncode(
+    createHash('sha256').update(verifier).digest()
+  );
+}
+
+/**
+ * Store code verifier for later use in token exchange
+ */
+export function setCodeVerifier(verifier: string): void {
+  cachedCodeVerifier = verifier;
+}
+
+/**
+ * Get stored code verifier
+ */
+export function getCodeVerifier(): string | null {
+  return cachedCodeVerifier;
+}
+
+// ===========================================
+// CONFIG
+// ===========================================
+
 function getConfig(): FanvueConfig {
   const clientId = process.env.FANVUE_CLIENT_ID;
   const clientSecret = process.env.FANVUE_CLIENT_SECRET;
-  
-  // Default to production URL, can be overridden for local dev
   const redirectUri = process.env.FANVUE_REDIRECT_URI || 'https://ig-influencer.vercel.app/api/oauth/callback';
-  const scopes = process.env.FANVUE_SCOPES || 'read:chat read:creator read:fan read:insights read:media read:post read:self write:chat write:creator write:media write:post';
+  
+  // User scopes + required system scopes
+  const userScopes = process.env.FANVUE_SCOPES || 'read:chat read:creator read:fan read:insights read:media read:post read:self write:chat write:creator write:media write:post';
+  const scopes = `${REQUIRED_SCOPES} ${userScopes}`;
 
   if (!clientId || !clientSecret) {
     throw new Error('Fanvue credentials not configured. Set FANVUE_CLIENT_ID and FANVUE_CLIENT_SECRET');
@@ -50,39 +101,51 @@ function getConfig(): FanvueConfig {
   return { clientId, clientSecret, redirectUri, scopes };
 }
 
-/**
- * Check if Fanvue is configured
- */
 export function isFanvueConfigured(): boolean {
   return !!(process.env.FANVUE_CLIENT_ID && process.env.FANVUE_CLIENT_SECRET);
 }
 
+// ===========================================
+// OAUTH 2.0 + PKCE FLOW
+// ===========================================
+
 /**
- * Generate OAuth authorization URL
- * Redirect user here to start OAuth flow
+ * Generate OAuth authorization URL with PKCE
+ * Returns { url, codeVerifier } - store codeVerifier for token exchange
  */
-export function getAuthorizationUrl(state?: string): string {
+export function getAuthorizationUrl(state?: string): { url: string; codeVerifier: string } {
   const config = getConfig();
+  
+  // Generate PKCE values
+  const codeVerifier = generateCodeVerifier();
+  const codeChallenge = generateCodeChallenge(codeVerifier);
+  
   const params = new URLSearchParams({
     response_type: 'code',
     client_id: config.clientId,
     redirect_uri: config.redirectUri,
     scope: config.scopes,
+    code_challenge: codeChallenge,
+    code_challenge_method: 'S256',
     ...(state && { state }),
   });
 
-  return `${AUTH_BASE_URL}/oauth/authorize?${params.toString()}`;
+  // Correct endpoint: /oauth2/auth (not /oauth/authorize)
+  const url = `${AUTH_BASE_URL}/oauth2/auth?${params.toString()}`;
+  
+  return { url, codeVerifier };
 }
 
 /**
- * Exchange authorization code for access tokens
+ * Exchange authorization code for access tokens (with PKCE)
  */
-export async function exchangeCodeForTokens(code: string): Promise<FanvueTokens> {
+export async function exchangeCodeForTokens(code: string, codeVerifier: string): Promise<FanvueTokens> {
   const config = getConfig();
   
   console.log('[Fanvue] Exchanging authorization code for tokens...');
 
-  const response = await fetch(`${AUTH_BASE_URL}/oauth/token`, {
+  // Correct endpoint: /oauth2/token (not /oauth/token)
+  const response = await fetch(`${AUTH_BASE_URL}/oauth2/token`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -93,6 +156,7 @@ export async function exchangeCodeForTokens(code: string): Promise<FanvueTokens>
       client_id: config.clientId,
       client_secret: config.clientSecret,
       redirect_uri: config.redirectUri,
+      code_verifier: codeVerifier, // PKCE required
     }),
   });
 
@@ -124,7 +188,7 @@ export async function refreshAccessToken(refreshToken: string): Promise<FanvueTo
   
   console.log('[Fanvue] Refreshing access token...');
 
-  const response = await fetch(`${AUTH_BASE_URL}/oauth/token`, {
+  const response = await fetch(`${AUTH_BASE_URL}/oauth2/token`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -173,16 +237,10 @@ export async function getValidAccessToken(): Promise<string> {
   return cachedTokens.accessToken;
 }
 
-/**
- * Set tokens manually (e.g., from database)
- */
 export function setTokens(tokens: FanvueTokens): void {
   cachedTokens = tokens;
 }
 
-/**
- * Get current tokens
- */
 export function getTokens(): FanvueTokens | null {
   return cachedTokens;
 }
@@ -196,9 +254,6 @@ interface FanvueApiOptions {
   body?: unknown;
 }
 
-/**
- * Make authenticated API call to Fanvue
- */
 async function fanvueApi<T>(endpoint: string, options: FanvueApiOptions = {}): Promise<T> {
   const accessToken = await getValidAccessToken();
   
@@ -224,16 +279,10 @@ async function fanvueApi<T>(endpoint: string, options: FanvueApiOptions = {}): P
   return response.json();
 }
 
-/**
- * Get creator profile information
- */
 export async function getProfile(): Promise<unknown> {
   return fanvueApi('/v1/me');
 }
 
-/**
- * Get creator analytics
- */
 export async function getAnalytics(): Promise<unknown> {
   return fanvueApi('/v1/analytics');
 }
@@ -246,9 +295,6 @@ interface CreatePostParams {
   scheduled_at?: string;
 }
 
-/**
- * Create a new post on Fanvue
- */
 export async function createPost(params: CreatePostParams): Promise<unknown> {
   console.log('[Fanvue] Creating post...');
   return fanvueApi('/v1/posts', {
@@ -257,23 +303,17 @@ export async function createPost(params: CreatePostParams): Promise<unknown> {
   });
 }
 
-/**
- * Get list of posts
- */
 export async function getPosts(): Promise<unknown> {
   return fanvueApi('/v1/posts');
 }
 
-/**
- * Check Fanvue connection status
- */
 export async function checkStatus(): Promise<{ ok: boolean; error?: string; profile?: unknown }> {
   if (!isFanvueConfigured()) {
     return { ok: false, error: 'Fanvue credentials not configured' };
   }
 
   if (!cachedTokens) {
-    return { ok: false, error: 'OAuth not completed. Visit /api/fanvue/auth to authorize.' };
+    return { ok: false, error: 'OAuth not completed. Visit /api/oauth/auth to authorize.' };
   }
 
   try {
@@ -286,4 +326,3 @@ export async function checkStatus(): Promise<{ ok: boolean; error?: string; prof
     };
   }
 }
-
