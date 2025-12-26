@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 26 décembre 2024 (ManyChat Setup + AI Agent Strategy 🤖)
+**Dernière mise à jour** : 26 décembre 2024 (BUG-010 Fix 🔧)
 
 ---
 
@@ -57,6 +57,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-035 | **🔧 BUG-010 Fix** — Gestion d'erreurs API Instagram dans tous les scripts + Audit posts | 26/12/2024 | v2.25.0 | [→](./docs/SESSION-26-DEC-2024-BUG-010-FIX.md) |
 | DONE-034 | **🤖 ManyChat Setup + AI Agent Strategy** — Guide ManyChat complet + Architecture AI Agent avec auto-learning | 26/12/2024 | v2.26.0 | [→](./docs/sessions/2024-12-26-manychat-ai-agent.md) |
 | DONE-033 | **📸 Fanvue Pack Elena** — Script génération + 14 photos 2 shootings + Prompts safe-sexy validés | 25/12/2024 | v2.25.0 | [→](./docs/sessions/2024-12-25-fanvue-pack-elena.md) |
 | DONE-032 | **Carousel-Only Strategy 📸** — Migration complète vers carrousels uniquement + Fix tokens GitHub | 24/12/2024 | v2.24.0 | [→](./docs/SESSION-24-DEC-2024-CAROUSEL-ONLY.md) |
@@ -100,7 +101,7 @@ roadmap/
 
 | ID | Bug | Sévérité | Status | Lien |
 |----|-----|----------|--------|------|
-| BUG-010 | **Pas de gestion d'erreurs API** — Code marque "posted" même si `instagram_post_id` est null | 🔴 High | 🔍 Identifié | [→](./docs/SESSION-24-DEC-2024-CAROUSEL-ONLY.md) |
+| BUG-010 | **Pas de gestion d'erreurs API** — Code marque "posted" même si `instagram_post_id` est null | 🔴 High | ✅ Fixé | [→](./roadmap/bugs/BUG-010-api-error-handling.md) |
 | BUG-008 | **Sync ne met pas à jour likes/comments** — Seules impressions/reach mises à jour | 🔴 High | ✅ Fixed | [→](./docs/SESSION-23-DEC-2024-ANALYTICS-FIX.md) |
 | BUG-009 | **Données du jour exclues du graphique** — API excluait aujourd'hui | 🟡 Medium | ✅ Fixed | [→](./docs/SESSION-23-DEC-2024-ANALYTICS-FIX.md) |
 | BUG-007 | **Catchup 3h trop court** — Posts manqués quand GitHub Actions skip runs, augmenté à 18h | 🔴 High | ✅ Fixed | [→](./docs/SESSION-23-DEC-2024-STATUS-TRACKING.md) |

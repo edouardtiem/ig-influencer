@@ -397,6 +397,16 @@ async function publishCarousel(imageUrls, caption, accessToken, accountId) {
     }
 
     const result = await response.json();
+    
+    // Check for API errors
+    if (result.error) {
+      throw new Error(`Failed to create media container ${i + 1}/${imageUrls.length}: ${result.error.message} (code: ${result.error.code})`);
+    }
+    
+    if (!result.id) {
+      throw new Error(`Media container ${i + 1}/${imageUrls.length} creation failed: no ID returned`);
+    }
+    
     containerIds.push(result.id);
   }
 
@@ -419,6 +429,16 @@ async function publishCarousel(imageUrls, caption, accessToken, accountId) {
   }
 
   const carouselResult = await carouselResponse.json();
+  
+  // Check for API errors
+  if (carouselResult.error) {
+    throw new Error(`Failed to create carousel container: ${carouselResult.error.message} (code: ${carouselResult.error.code})`);
+  }
+  
+  if (!carouselResult.id) {
+    throw new Error('Carousel container creation failed: no ID returned');
+  }
+  
   const carouselId = carouselResult.id;
 
   log('  Waiting for media to be ready...');
@@ -443,21 +463,29 @@ async function publishCarousel(imageUrls, caption, accessToken, accountId) {
 
     const result = await publishResponse.json();
     
-    if (result.id) {
-      return result.id;
-    }
-    
-    if (result.error?.error_subcode === 2207027 && attempt < maxRetries) {
+    // Check for API errors (except "not ready" which we retry)
+    if (result.error) {
+      // Special case: media not ready yet (error_subcode 2207027) - retry
+      if (result.error.error_subcode === 2207027 && attempt < maxRetries) {
       const delay = baseDelay * attempt;
       log(`  ⏳ Media not ready, waiting ${delay/1000}s...`);
       await new Promise(resolve => setTimeout(resolve, delay));
       continue;
+      }
+      // Other error or max retries reached
+      throw new Error(`Failed to publish carousel: ${result.error.message} (code: ${result.error.code})`);
     }
     
-    throw new Error(`Failed to publish: ${JSON.stringify(result)}`);
+    // Success - verify ID exists
+    if (result.id) {
+      return result.id;
+    }
+    
+    // No error but no ID either - this shouldn't happen
+    throw new Error(`Carousel publication failed: Instagram API returned no post ID (response: ${JSON.stringify(result)})`);
   }
   
-  throw new Error('Max retries reached');
+  throw new Error('Max retries reached: Media never became ready');
 }
 
 // ═══════════════════════════════════════════════════════════════
