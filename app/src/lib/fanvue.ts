@@ -202,14 +202,19 @@ interface FanvueApiOptions {
 async function fanvueApi<T>(endpoint: string, options: FanvueApiOptions = {}): Promise<T> {
   const accessToken = await getValidAccessToken();
   
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const fetchOptions: RequestInit = {
     method: options.method || 'GET',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
     },
-    ...(options.body && { body: JSON.stringify(options.body) }),
-  });
+  };
+  
+  if (options.body) {
+    fetchOptions.body = JSON.stringify(options.body);
+  }
+  
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, fetchOptions);
 
   if (!response.ok) {
     const error = await response.text();
