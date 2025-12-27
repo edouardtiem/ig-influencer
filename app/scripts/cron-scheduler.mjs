@@ -235,7 +235,29 @@ function getRandomTravelDestination(character) {
 // DYNAMIC POSTING TIMES (based on analytics)
 // ===========================================
 
-function getOptimalPostingTimes(dayOfWeek, analytics = null) {
+function getOptimalPostingTimes(dayOfWeek, analytics = null, character = null) {
+  // ═══════════════════════════════════════════════════════════════
+  // ELENA SEXY MODE — 1 post/jour à 21h (safe mode après ban)
+  // ═══════════════════════════════════════════════════════════════
+  if (character === 'elena') {
+    return {
+      slots: ['21:00'],  // Un seul slot, heure de pointe sexy content
+      reelSlot: null,
+      postsCount: 1,
+    };
+  }
+  
+  // ═══════════════════════════════════════════════════════════════
+  // MILA — Désactivée pour le moment
+  // ═══════════════════════════════════════════════════════════════
+  if (character === 'mila') {
+    return {
+      slots: [],
+      reelSlot: null,
+      postsCount: 0,
+    };
+  }
+  
   const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
   
   // Base configuration per day type
@@ -287,6 +309,68 @@ function getOptimalPostingTimes(dayOfWeek, analytics = null) {
 
   return baseConfig;
 }
+
+// ===========================================
+// ELENA SEXY MODE — Locations & Outfits
+// ===========================================
+
+const ELENA_SEXY_LOCATIONS = [
+  // BEACH & POOL — Bikini content
+  'yacht_mediterranean: Yacht Méditerranée (deck, champagne, sunset)',
+  'st_tropez_beach: Plage St Tropez (Club 55, yacht, rosé)',
+  'mykonos_villa: Villa Mykonos (infinity pool, sunset, Scorpios)',
+  'maldives_overwater: Bungalow Maldives (pilotis, eau turquoise)',
+  'ibiza_villa: Villa Ibiza (infinity pool, sunset)',
+  'dubai_marina: Penthouse Dubai Marina (infinity pool, skyline)',
+  'bali_villa: Villa Bali (infinity pool, rizières)',
+  
+  // BEDROOM & BATHROOM — Lingerie content
+  'loft_bedroom: Chambre Elena (vanity Hollywood lights, lit king size, draps soie)',
+  'bathroom_luxe: Salle de bain Elena marble & gold (baignoire, miroir)',
+  
+  // SPA & WELLNESS — Swimwear/robe content
+  'spa_mountains: Spa Alpes (piscine extérieure chauffée, neige, montagnes)',
+  'spa_paris: Spa parisien luxe (hammam, piscine, robe)',
+  'courchevel_chalet: Chalet Courchevel (jacuzzi, montagne, après-ski)',
+  
+  // FITNESS — Sport moulant content
+  'loft_living: Loft Elena Paris 8e (yoga, pilates, morning workout)',
+];
+
+const ELENA_SEXY_OUTFIT_CATEGORIES = {
+  bikini: [
+    'designer bikini string noir avec détails dorés, silhouette mise en valeur',
+    'bikini blanc minimaliste triangles, bronzage visible, élégance naturelle',
+    'maillot une pièce plongeant noir très échancré, allure sophistiquée',
+    'bikini terracotta avec liens à nouer, style méditerranéen chic',
+  ],
+  lingerie: [
+    'ensemble lingerie dentelle noire délicate, élégance intimiste',
+    'nuisette soie champagne courte, tombé fluide sur les courbes',
+    'body dentelle noir transparent avec détails floraux',
+    'bralette + culotte haute assortie en dentelle bordeaux',
+  ],
+  sport: [
+    'brassière sport noire + legging taille haute sculptant, silhouette athlétique',
+    'ensemble yoga seamless gris chiné moulant, lignes épurées',
+    'crop top sport + bike shorts noirs, look fitness chic',
+    'brassière croisée + legging push-up, courbes accentuées',
+  ],
+  spa: [
+    'peignoir soie entrouvert révélant maillot underneath',
+    'serviette nouée élégamment, épaules et jambes visibles',
+    'robe de chambre satin courte, intimité suggérée',
+  ],
+};
+
+const ELENA_SEXY_POSES = [
+  'allongée sur le côté, appuyée sur le coude, regard captivant vers caméra',
+  'debout de dos regardant par-dessus l\'épaule, courbes mises en valeur',
+  'assise bord de piscine/lit, jambes croisées élégamment, posture confiante',
+  'stretching yoga, dos légèrement cambré, silhouette étirée',
+  'appuyée contre un mur/cadre de porte, hanche décalée, pose assurée',
+  'allongée sur le ventre, jambes relevées, regard joueur',
+];
 
 // ===========================================
 // A/B TESTING SYSTEM
@@ -515,7 +599,7 @@ ${postingConfig.slots.join(', ')}
 (Reel idéalement à ${postingConfig.reelSlot})
 
 ### Lieux disponibles:
-${LOCATIONS[character].join('\n')}
+${character === 'elena' ? ELENA_SEXY_LOCATIONS.join('\n') : LOCATIONS[character].join('\n')}
 
 ### Types de contenu possibles:
 1. **NOUVEAU** — Contenu du jour (le plus courant)
@@ -555,9 +639,43 @@ ${LOCATIONS[character].join('\n')}
 
 ### Important pour ${character === 'elena' ? 'Elena' : 'Mila'}:
 ${character === 'elena' 
-  ? `Elena est MANNEQUIN JET-SET. Elle DOIT voyager régulièrement!
-   Si elle n'a pas eu de contenu travel/voyage depuis 4+ posts:
-   → OBLIGATOIRE: au moins 1 post travel (même throwback)`
+  ? `
+═══════════════════════════════════════════════════════════════
+## 🔥 ELENA SEXY MODE — OBLIGATOIRE
+═══════════════════════════════════════════════════════════════
+
+**1 POST/JOUR, TOUJOURS SEXY (niveau 8/10)**
+
+### Catégories de tenues (rotation):
+- **👙 BIKINI**: yacht, plage, piscine, maldives → bikini string, maillot échancré
+- **🖤 LINGERIE**: chambre, salle de bain → dentelle, nuisette soie, body
+- **🏋️ SPORT MOULANT**: loft (yoga), spa → brassière + legging sculptant
+- **♨️ SPA**: spa, jacuzzi → peignoir entrouvert, serviette
+
+### Locations AUTORISÉES (sexy-friendly uniquement):
+${ELENA_SEXY_LOCATIONS.join('\n')}
+
+### Tenues par catégorie:
+**Bikini**: ${ELENA_SEXY_OUTFIT_CATEGORIES.bikini.join(' | ')}
+**Lingerie**: ${ELENA_SEXY_OUTFIT_CATEGORIES.lingerie.join(' | ')}
+**Sport**: ${ELENA_SEXY_OUTFIT_CATEGORIES.sport.join(' | ')}
+**Spa**: ${ELENA_SEXY_OUTFIT_CATEGORIES.spa.join(' | ')}
+
+### Poses sexy (niveau high):
+${ELENA_SEXY_POSES.join('\n')}
+
+### Vocabulaire "safe-sexy" (passe les filtres Google):
+- ❌ "sensual" → ✅ "captivating", "alluring", "magnetic"
+- ❌ "seductive" → ✅ "enchanting", "inviting", "confident"
+- ❌ "lingerie" → ✅ "intimate sleepwear", "delicate loungewear"
+- ❌ "sexy pose" → ✅ "confident feminine pose"
+
+### RÈGLES STRICTES:
+1. La tenue DOIT être dans une des catégories ci-dessus (bikini/lingerie/sport/spa)
+2. La pose DOIT mettre en valeur les courbes d'Elena
+3. Le lieu DOIT être dans la liste sexy-friendly
+4. CONTINUER l'histoire d'Elena (throwback voyage, soirée cozy, etc.)
+5. Caption avec question engageante`
   : `Mila est personal trainer & photographe. Variété entre:
    → Fitness (gym, yoga)
    → Lifestyle (café, Montmartre)
@@ -614,8 +732,14 @@ async function generateSchedule(character) {
     fetchHistory(supabase, character),
   ]);
 
-  // Get dynamic posting times based on analytics
-  const postingConfig = getOptimalPostingTimes(dayOfWeek, analytics);
+  // Get dynamic posting times based on analytics AND character
+  const postingConfig = getOptimalPostingTimes(dayOfWeek, analytics, character);
+  
+  // Skip if no posts configured (e.g., Mila disabled)
+  if (postingConfig.postsCount === 0) {
+    console.log(`⏸️ ${character.toUpperCase()} is currently disabled (0 posts configured)`);
+    return null;
+  }
 
   console.log(`📅 ${today.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}`);
   console.log(`📊 Posts prévus: ${postingConfig.postsCount}`);
