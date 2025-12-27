@@ -82,11 +82,11 @@ jobs:
           Claude_key: ${{ secrets.CLAUDE_KEY }}
         run: |
           CHARACTER="${{ github.event.inputs.character }}"
-          if [ -n "$CHARACTER" ]; then
-            node scripts/cron-scheduler.mjs $CHARACTER
-          else
-            node scripts/cron-scheduler.mjs
+          # Par défaut, ne générer que pour Elena (Mila désactivée)
+          if [ -z "$CHARACTER" ]; then
+            CHARACTER="elena"
           fi
+          node scripts/cron-scheduler.mjs $CHARACTER
 
   # ===========================================
   # POST EXECUTOR — Execute scheduled posts

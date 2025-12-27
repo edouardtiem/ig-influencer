@@ -969,12 +969,13 @@ async function main() {
   const args = process.argv.slice(2);
   const target = args[0]?.toLowerCase();
 
+  // Par défaut, ne générer que pour Elena (Mila désactivée)
   if (target === 'mila') {
     await generateSchedule('mila');
   } else if (target === 'elena') {
     await generateSchedule('elena');
   } else {
-    await generateSchedule('mila');
+    // Par défaut : Elena uniquement (Mila désactivée)
     await generateSchedule('elena');
   }
 
