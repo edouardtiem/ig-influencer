@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 26 décembre 2024 (DM Automation LIVE ✅ + English Default)
+**Dernière mise à jour** : 27 décembre 2024 (Elena Sexy Mode 🔥 + Mila PAUSE)
 
 ---
 
@@ -23,14 +23,17 @@ roadmap/
 
 | ID | Feature | Priorité | Branche | Lien |
 |----|---------|----------|---------|------|
+| IP-004 | **🔥 Elena Sexy Mode** — 1 post/jour à 21h, contenu suggestif (bikini/lingerie/sport) | 🔴 High | main | [→](./docs/sessions/2024-12-27-elena-sexy-mode.md) |
 | IP-003 | **💰 Fanvue Monetization** — Packs photos Elena + ManyChat DM automation | 🔴 High | main | [→](./docs/sessions/2024-12-25-fanvue-pack-elena.md) |
 | IP-002 | **🔴 Model Evolution** — Mila Tesla Red + Elena blonde + bi/open relationship | 🟡 Medium | main | [→](./roadmap/in-progress/IP-002-model-evolution.md) |
 
+> **Elena Sexy Mode** : ✅ Actif — 1 post/jour à 21h (bikini/lingerie/sport moulant)  
+> **Mila** : ⏸️ PAUSE temporaire (à réactiver après stabilisation Elena)  
 > **Fanvue Pack 1** : ✅ 14 photos générées (2 shootings) dans `elena-fanvue-pack1`  
 > **ManyChat** : ✅ 2 automations LIVE (Auto-DM comments + Welcome followers)  
 > **AI Agent** : 💡 Architecture définie, à implémenter  
 > **Objectif** : 500€/mois via Fanvue  
-> **Next** : Implémenter AI Agent conversationnel avec auto-learning
+> **Next** : Surveiller engagement posts sexy mode Elena
 
 ---
 
@@ -57,6 +60,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-038 | **🔥 Elena Sexy Mode** — 1 post/jour 21h + Prompts suggestifs (bikini/lingerie/sport) + Locations filtrées + Mila PAUSE | 27/12/2024 | v2.29.0 | [→](./docs/sessions/2024-12-27-elena-sexy-mode.md) |
 | DONE-037 | **🤖 DM Automation LIVE** — Claude AI + ManyChat + Lead scoring + English default + Fix double message + Shorter responses + Natural delay + Conversational auto-DM | 26/12/2024 | v2.28.4 | [→](./docs/sessions/2024-12-26-dm-automation.md) |
 | DONE-036 | **🔗 Fanvue OAuth 2.0 + PKCE** — Intégration API Fanvue complète avec OAuth sécurisé | 26/12/2024 | v2.27.0 | [→](./docs/sessions/2024-12-26-fanvue-oauth.md) |
 | DONE-035 | **🔧 BUG-010 Fix** — Gestion d'erreurs API Instagram dans tous les scripts + Audit posts | 26/12/2024 | v2.25.0 | [→](./docs/SESSION-26-DEC-2024-BUG-010-FIX.md) |
@@ -136,11 +140,11 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 34 (+1 ManyChat Setup + Guide)
-├── 🚧 In Progress : 2 (Fanvue Monetization + Model Evolution)
-├── 📋 Todo        : 6 (+1 AI Agent)
+├── ✅ Done        : 35 (+1 Elena Sexy Mode)
+├── 🚧 In Progress : 3 (Elena Sexy Mode + Fanvue + Model Evolution)
+├── 📋 Todo        : 6 
 ├── 🐛 Bugs        : 6 (6 fixed)
-└── 💡 Ideas       : 8 (+1 AI Agent)
+└── 💡 Ideas       : 8
 ```
 
 ---
@@ -149,6 +153,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 27/12/2024 | **🔥 Elena Sexy Mode** — 1 post/jour 21h + Diagnostic ban Instagram + Prompts suggestifs + Mila PAUSE | [→](./docs/sessions/2024-12-27-elena-sexy-mode.md) |
 | 26/12/2024 | **🤖 DM Automation LIVE** — Claude AI webhook + ManyChat intégré + Lead scoring + 100% DMs automatisés | [→](./docs/sessions/2024-12-26-dm-automation.md) |
 | 26/12/2024 | **🔗 Fanvue OAuth 2.0** — Intégration API complète avec PKCE + client_secret_basic | [→](./docs/sessions/2024-12-26-fanvue-oauth.md) |
 | 26/12/2024 | **🤖 ManyChat Setup + AI Agent** — Guide ManyChat + Architecture AI Agent conversationnel avec auto-learning | [→](./docs/sessions/2024-12-26-manychat-ai-agent.md) |
