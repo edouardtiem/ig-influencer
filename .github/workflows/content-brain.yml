@@ -3,18 +3,24 @@
 # Two workflows:
 # 1. Daily Scheduler: Runs at 6:00 UTC (7:00 Paris) to generate the day's plan
 # 2. Post Executor: Runs every 30 minutes to execute scheduled posts
+#
+# ⚠️ DÉSACTIVÉ LE 27/12/2024 — Compte Elena banni
+# Pour réactiver: décommenter les lignes schedule ci-dessous
 
-name: Content Brain
+name: Content Brain (PAUSED)
 
 on:
-  schedule:
-    # Scheduler: 6:00 UTC = 7:00 Paris (winter) / 8:00 Paris (summer)
-    - cron: '0 6 * * *'
-    
-    # Executor: Every 30 minutes
-    - cron: '0,30 * * * *'
+  # ═══════════════════════════════════════════════════════════════
+  # 🛑 CRONS DÉSACTIVÉS — Elena ban + pause générale
+  # ═══════════════════════════════════════════════════════════════
+  # schedule:
+  #   # Scheduler: 6:00 UTC = 7:00 Paris (winter) / 8:00 Paris (summer)
+  #   - cron: '0 6 * * *'
+  #   
+  #   # Executor: Every 30 minutes
+  #   - cron: '0,30 * * * *'
   
-  # Manual trigger for testing
+  # Manual trigger for testing (toujours disponible)
   workflow_dispatch:
     inputs:
       action:
