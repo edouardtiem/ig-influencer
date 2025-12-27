@@ -62,13 +62,17 @@ export async function POST(request: NextRequest) {
     console.log(`Response: "${result.response.substring(0, 100)}..."`);
     console.log(`${'='.repeat(50)}\n`);
 
-    // Add natural delay (4-5 seconds total) to make responses feel more human
-    const TARGET_DELAY_MS = 4500; // 4.5 seconds
+    // Smart delay based on response length (simulate typing)
+    const responseLength = result.response.length;
+    const typingDelay = Math.min(responseLength * 40, 6000); // ~40ms per char, cap 6s
+    const baseDelay = 1500 + Math.random() * 1500; // 1.5-3s base
+    const totalDelay = baseDelay + typingDelay;
+    
     const elapsed = Date.now() - startTime;
-    const remainingDelay = Math.max(0, TARGET_DELAY_MS - elapsed);
+    const remainingDelay = Math.max(0, totalDelay - elapsed);
     
     if (remainingDelay > 0) {
-      console.log(`⏳ Adding ${remainingDelay}ms delay for natural response timing...`);
+      console.log(`⏳ Smart delay: ${Math.round(remainingDelay)}ms (${responseLength} chars)`);
       await new Promise(resolve => setTimeout(resolve, remainingDelay));
     }
 
