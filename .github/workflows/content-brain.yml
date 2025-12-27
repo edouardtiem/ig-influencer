@@ -145,10 +145,13 @@ jobs:
           CHARACTER="${{ github.event.inputs.character }}"
           DRY_RUN="${{ github.event.inputs.dry_run }}"
           
-          ARGS=""
-          if [ -n "$CHARACTER" ]; then
-            ARGS="$CHARACTER"
+          # Par défaut, ne traiter que Elena (Mila désactivée)
+          # Mais permettre override via workflow_dispatch
+          if [ -z "$CHARACTER" ]; then
+            CHARACTER="elena"
           fi
+          
+          ARGS="$CHARACTER"
           if [ "$DRY_RUN" = "true" ]; then
             ARGS="$ARGS --dry-run"
           fi
