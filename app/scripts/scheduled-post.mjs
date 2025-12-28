@@ -798,7 +798,41 @@ async function publishCarousel(character, imageUrls, caption) {
     throw new Error('No media containers created');
   }
 
+  // Wait for all media containers to be ready
+  log(`⏳ Waiting for ${containerIds.length} media containers to process...`);
+  for (let i = 0; i < containerIds.length; i++) {
+    const containerId = containerIds[i];
+    let attempts = 0;
+    const maxAttempts = 60; // 2 minutes max
+    
+    while (attempts < maxAttempts) {
+      const statusResponse = await fetch(
+        `https://graph.facebook.com/v21.0/${containerId}?fields=status_code,status&access_token=${accessToken}`
+      );
+      const statusData = await statusResponse.json();
+      
+      if (statusData.status_code === 'FINISHED') {
+        log(`   ✅ Container ${i + 1}/${containerIds.length} ready`);
+        break;
+      }
+      
+      if (statusData.status_code === 'ERROR') {
+        throw new Error(`Media container ${i + 1} processing failed: ${statusData.status || 'Unknown error'}`);
+      }
+      
+      attempts++;
+      if (attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+      }
+    }
+    
+    if (attempts >= maxAttempts) {
+      throw new Error(`Media container ${i + 1} processing timeout`);
+    }
+  }
+
   // Create carousel container
+  log(`🎠 Creating carousel container...`);
   const carouselResponse = await fetch(
     `https://graph.facebook.com/v21.0/${accountId}/media?media_type=CAROUSEL&children=${containerIds.join(',')}&caption=${encodeURIComponent(caption)}&access_token=${accessToken}`,
     { method: 'POST' }
@@ -814,7 +848,38 @@ async function publishCarousel(character, imageUrls, caption) {
     throw new Error('Carousel container creation failed: no ID returned');
   }
 
+  // Wait for carousel container to be ready
+  log(`⏳ Waiting for carousel container to process...`);
+  let carouselAttempts = 0;
+  const maxCarouselAttempts = 60;
+  
+  while (carouselAttempts < maxCarouselAttempts) {
+    const carouselStatusResponse = await fetch(
+      `https://graph.facebook.com/v21.0/${carouselData.id}?fields=status_code,status&access_token=${accessToken}`
+    );
+    const carouselStatusData = await carouselStatusResponse.json();
+    
+    if (carouselStatusData.status_code === 'FINISHED') {
+      log(`   ✅ Carousel container ready`);
+      break;
+    }
+    
+    if (carouselStatusData.status_code === 'ERROR') {
+      throw new Error(`Carousel container processing failed: ${carouselStatusData.status || 'Unknown error'}`);
+    }
+    
+    carouselAttempts++;
+    if (carouselAttempts < maxCarouselAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+  }
+  
+  if (carouselAttempts >= maxCarouselAttempts) {
+    throw new Error('Carousel container processing timeout');
+  }
+
   // Publish
+  log(`🚀 Publishing carousel...`);
   const publishResponse = await fetch(
     `https://graph.facebook.com/v21.0/${accountId}/media_publish?creation_id=${carouselData.id}&access_token=${accessToken}`,
     { method: 'POST' }

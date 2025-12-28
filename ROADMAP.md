@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 27 décembre 2024 (Elena Sexy Mode 🔥 + Mila PAUSE)
+**Dernière mise à jour** : 28 décembre 2024 (Stratégie X Twitter 🐦)
 
 ---
 
@@ -124,6 +124,7 @@ roadmap/
 
 | ID | Idée | Impact | Effort | Status | Lien |
 |----|------|--------|--------|--------|------|
+| **IDEA-010** | **Stratégie X (Twitter)** — Compte X automatisé + posts + réponses commentaires + funnel DM Fanvue | 🔴 High | 🔴 High | 💡 Idea | [→](./roadmap/ideas/IDEA-010-x-twitter-strategy.md) |
 | **IDEA-009** | **Elena AI Agent** — Agent conversationnel flirty + auto-learning + Supabase tracking | 🔴 High | 🔴 High | 💡 Idea | [→](./roadmap/ideas/IDEA-009-elena-ai-agent.md) |
 | **IDEA-008** | **Long-form Captions + Character Voice** — Hooks FR + textes longs + annonce bi/open | 🔴 High | 🟡 Medium | 💡 Idea | [→](./roadmap/ideas/IDEA-008-longform-captions.md) |
 | **IDEA-007** | **Trends Layer** — Perplexity daily search US→FR→EU pour viralité | 🔴 High | 🟡 Medium | 💡 Idea | [→](./roadmap/ideas/IDEA-007-trends-layer.md) |
@@ -144,7 +145,7 @@ Total Features:
 ├── 🚧 In Progress : 3 (Elena Sexy Mode + Fanvue + Model Evolution)
 ├── 📋 Todo        : 6 
 ├── 🐛 Bugs        : 6 (6 fixed)
-└── 💡 Ideas       : 8
+└── 💡 Ideas       : 9 (+1 Stratégie X Twitter)
 ```
 
 ---
@@ -153,6 +154,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 28/12/2024 | **🐦 Stratégie X (Twitter)** — Documentation complète automation compte X + posts + réponses commentaires + funnel DM Fanvue | [→](./docs/sessions/2024-12-28-x-twitter-strategy.md) |
 | 27/12/2024 | **🔥 Elena Sexy Mode** — 1 post/jour 21h + Diagnostic ban Instagram + Prompts suggestifs + Mila PAUSE | [→](./docs/sessions/2024-12-27-elena-sexy-mode.md) |
 | 26/12/2024 | **🤖 DM Automation LIVE** — Claude AI webhook + ManyChat intégré + Lead scoring + 100% DMs automatisés | [→](./docs/sessions/2024-12-26-dm-automation.md) |
 | 26/12/2024 | **🔗 Fanvue OAuth 2.0** — Intégration API complète avec PKCE + client_secret_basic | [→](./docs/sessions/2024-12-26-fanvue-oauth.md) |

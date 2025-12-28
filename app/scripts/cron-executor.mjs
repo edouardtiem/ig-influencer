@@ -63,18 +63,32 @@ async function loadPostFunctions() {
 // ===========================================
 
 async function getNextPost(character = null) {
-  const today = new Date().toISOString().split('T')[0];
-  
-  // Get current time in Paris
+  // Get current time in Paris (important for date calculation)
   const now = new Date();
-  const parisTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' }));
+  const parisTimeStr = now.toLocaleString('en-US', { timeZone: 'Europe/Paris' });
+  const parisTime = new Date(parisTimeStr);
   const currentMinutes = parisTime.getHours() * 60 + parisTime.getMinutes();
   
-  // Build query
+  // Get today's date in Paris timezone (not UTC!)
+  // Format: YYYY-MM-DD from Paris date components
+  const year = parisTime.getFullYear();
+  const month = String(parisTime.getMonth() + 1).padStart(2, '0');
+  const day = String(parisTime.getDate()).padStart(2, '0');
+  const today = `${year}-${month}-${day}`;
+  
+  // Also check yesterday's posts (for catchup after midnight)
+  const yesterday = new Date(parisTime);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayYear = yesterday.getFullYear();
+  const yesterdayMonth = String(yesterday.getMonth() + 1).padStart(2, '0');
+  const yesterdayDay = String(yesterday.getDate()).padStart(2, '0');
+  const yesterdayStr = `${yesterdayYear}-${yesterdayMonth}-${yesterdayDay}`;
+  
+  // Build query - check both today and yesterday
   let query = supabase
     .from('scheduled_posts')
     .select('*')
-    .eq('scheduled_date', today)
+    .in('scheduled_date', [today, yesterdayStr])
     .in('status', ['scheduled', 'images_ready', 'failed']);
 
   if (character) {
@@ -96,7 +110,21 @@ async function getNextPost(character = null) {
 
     const [hours, minutes] = post.scheduled_time.split(':').map(Number);
     const postMinutes = hours * 60 + minutes;
-    const diff = postMinutes - currentMinutes;
+    
+    // Calculate diff: handle midnight crossing
+    const isYesterday = post.scheduled_date === yesterdayStr;
+    let diff;
+    
+    if (isYesterday) {
+      // Post was yesterday: calculate how many minutes ago it was
+      // If post was at 21:00 yesterday and we're at 00:25 today, that's 3h25 ago = -205 minutes
+      const minutesSinceMidnight = currentMinutes; // 25 minutes
+      const minutesUntilPostYesterday = (24 * 60) - postMinutes; // minutes from midnight to post time
+      diff = -(minutesSinceMidnight + minutesUntilPostYesterday); // negative = in the past
+    } else {
+      // Post is today: normal calculation
+      diff = postMinutes - currentMinutes;
+    }
 
     // Execute if within window or catchup
     const isUpcoming = diff >= 0 && diff <= LOOKAHEAD_HOURS * 60;
