@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 28 décembre 2024 (Stratégie X Twitter 🐦)
+**Dernière mise à jour** : 28 décembre 2024 (DM Audit + Pitch Optimization 🔥)
 
 ---
 
@@ -124,6 +124,7 @@ roadmap/
 
 | ID | Idée | Impact | Effort | Status | Lien |
 |----|------|--------|--------|--------|------|
+| **IDEA-011** | **🔥 Fanvue Bot Uncensored** — Bot conversationnel Fanvue avec Venice Uncensored (contenu explicite/sexy) + Prompt Elena "Hot Mode" prêt | 🔴 High | 🟡 Medium | 🚀 Ready | [→](./roadmap/ideas/IDEA-011-fanvue-bot-uncensored.md) |
 | **IDEA-010** | **Stratégie X (Twitter)** — Compte X automatisé + posts + réponses commentaires + funnel DM Fanvue | 🔴 High | 🔴 High | 💡 Idea | [→](./roadmap/ideas/IDEA-010-x-twitter-strategy.md) |
 | **IDEA-009** | **Elena AI Agent** — Agent conversationnel flirty + auto-learning + Supabase tracking | 🔴 High | 🔴 High | 💡 Idea | [→](./roadmap/ideas/IDEA-009-elena-ai-agent.md) |
 | **IDEA-008** | **Long-form Captions + Character Voice** — Hooks FR + textes longs + annonce bi/open | 🔴 High | 🟡 Medium | 💡 Idea | [→](./roadmap/ideas/IDEA-008-longform-captions.md) |
@@ -141,11 +142,11 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 35 (+1 Elena Sexy Mode)
+├── ✅ Done        : 35 
 ├── 🚧 In Progress : 3 (Elena Sexy Mode + Fanvue + Model Evolution)
 ├── 📋 Todo        : 6 
 ├── 🐛 Bugs        : 6 (6 fixed)
-└── 💡 Ideas       : 9 (+1 Stratégie X Twitter)
+└── 💡 Ideas       : 10 (Fanvue Bot Uncensored prêt à implémenter 🔥)
 ```
 
 ---
@@ -154,6 +155,8 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 28/12/2024 | **📊 DM Audit + Pitch Optimization** — Audit 122 convos DM + Validation perso bratty (81% progression) + Fix pitch en 2 temps (tease → lien si demandé) + Prompt Elena "Hot Mode" Fanvue | [→](./docs/sessions/2024-12-28-dm-audit-pitch-optimization.md) |
+| 28/12/2024 | **🔥 Fanvue Bot Uncensored Research** — Recherche modèles uncensored (Replicate/OpenRouter/Venice) + Choix Venice Direct + Architecture bot Fanvue avec contenu explicite | [→](./docs/sessions/2024-12-28-fanvue-bot-uncensored-research.md) |
 | 28/12/2024 | **🐦 Stratégie X (Twitter)** — Documentation complète automation compte X + posts + réponses commentaires + funnel DM Fanvue | [→](./docs/sessions/2024-12-28-x-twitter-strategy.md) |
 | 27/12/2024 | **🔥 Elena Sexy Mode** — 1 post/jour 21h + Diagnostic ban Instagram + Prompts suggestifs + Mila PAUSE | [→](./docs/sessions/2024-12-27-elena-sexy-mode.md) |
 | 26/12/2024 | **🤖 DM Automation LIVE** — Claude AI webhook + ManyChat intégré + Lead scoring + 100% DMs automatisés | [→](./docs/sessions/2024-12-26-dm-automation.md) |
