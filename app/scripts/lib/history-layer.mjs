@@ -2,7 +2,65 @@
  * History Layer — Analyze recent posts to understand narrative context
  * 
  * Infers where the character "is" in their story and what makes sense next
+ * Now includes NARRATIVE ARCS for coherent storytelling over multiple days
  */
+
+// ===========================================
+// NARRATIVE ARCS — Multi-day storytelling
+// ===========================================
+
+const NARRATIVE_ARCS = {
+  fashion_week: {
+    id: 'fashion_week',
+    name: 'Fashion Week',
+    trigger: 'Fashion Week event detected in context',
+    duration: '5-7 days',
+    locations: ['milan_fashion', 'london_mayfair', 'nyc_soho', 'paris', 'opera_garnier'],
+    story: 'Elena couvre la Fashion Week — backstage, shows, parties',
+    moods: ['fashion', 'work', 'adventure'],
+    outfitStyle: 'designer, editorial, street-style chic',
+  },
+  vacation_trip: {
+    id: 'vacation_trip',
+    name: 'Escapade Vacances',
+    trigger: 'Recent travel to vacation destination',
+    duration: '3-5 days',
+    locations: ['maldives', 'bali', 'ibiza', 'mykonos', 'yacht', 'st_tropez'],
+    story: 'Elena en vacances — détente, plage, pool, sunset',
+    moods: ['travel', 'relax', 'adventure'],
+    outfitStyle: 'bikini, resort wear, sundress',
+  },
+  paris_life: {
+    id: 'paris_life',
+    name: 'Vie Parisienne',
+    trigger: 'Default when at home or returned from travel > 2 days',
+    duration: '3-4 days',
+    locations: ['loft_living', 'loft_bedroom', 'cafe_paris', 'tuileries', 'spa_paris'],
+    story: 'Vie quotidienne parisienne — routine, cozy, lifestyle',
+    moods: ['cozy', 'relax', 'fashion'],
+    outfitStyle: 'casual chic, loungewear, lingerie at home',
+  },
+  recovery_mode: {
+    id: 'recovery_mode',
+    name: 'Recovery Mode',
+    trigger: 'Just returned from travel (< 2 days)',
+    duration: '2-3 days',
+    locations: ['loft_bedroom', 'spa_paris', 'bathroom_luxe', 'cafe_paris'],
+    story: 'Récupération post-voyage — repos, self-care, cozy',
+    moods: ['cozy', 'relax'],
+    outfitStyle: 'robe, peignoir, loungewear, lingerie cozy',
+  },
+  work_mode: {
+    id: 'work_mode',
+    name: 'Mode Travail',
+    trigger: 'Multiple fitness/work moods recently',
+    duration: '2-3 days',
+    locations: ['loft_living', 'studio_photo', 'spa_paris'],
+    story: 'Elena en mode travail — shootings, sport, productivité',
+    moods: ['work', 'fitness'],
+    outfitStyle: 'sport luxe, athleisure, professional',
+  },
+};
 
 /**
  * Fetch history and infer narrative context
@@ -204,10 +262,18 @@ function extractLocation(locationKey) {
     'yacht': 'Méditerranée',
     'airport': 'en transit',
     'spa_luxe': 'spa montagne',
+    'spa_mountains': 'spa Alpes',
     'beach': 'plage',
     'paris': 'Paris',
     'loft': 'Paris',
     'home': 'Paris',
+    'maldives': 'Maldives',
+    'dubai': 'Dubai',
+    'mykonos': 'Mykonos',
+    'ibiza': 'Ibiza',
+    'nyc': 'New York',
+    'london': 'Londres',
+    'st_tropez': 'St Tropez',
   };
 
   for (const [key, value] of Object.entries(locationMap)) {
@@ -217,6 +283,43 @@ function extractLocation(locationKey) {
   }
 
   return locationKey;
+}
+
+/**
+ * Suggest a narrative arc based on history and context
+ * @param {object} narrative - The inferred narrative from posts
+ * @param {object} context - Real-time context (from Perplexity)
+ * @returns {object} The suggested narrative arc
+ */
+export function suggestNarrativeArc(narrative, context = null) {
+  const { locationType, daysSinceTravel, recentMoods } = narrative;
+  
+  // Check for Fashion Week (detected by Perplexity context)
+  if (context?.fashionEvents?.some(e => 
+    e.toLowerCase().includes('fashion week') || 
+    e.toLowerCase().includes('fw')
+  )) {
+    return NARRATIVE_ARCS.fashion_week;
+  }
+  
+  // Just returned from travel (< 2 days) → Recovery mode
+  if (locationType === 'home' && daysSinceTravel !== null && daysSinceTravel <= 2) {
+    return NARRATIVE_ARCS.recovery_mode;
+  }
+  
+  // Currently traveling → Vacation trip
+  if (locationType === 'travel') {
+    return NARRATIVE_ARCS.vacation_trip;
+  }
+  
+  // Heavy work/fitness moods recently → Work mode
+  const workMoodCount = recentMoods.filter(m => m === 'work' || m === 'fitness').length;
+  if (workMoodCount >= 2) {
+    return NARRATIVE_ARCS.work_mode;
+  }
+  
+  // Default: Paris life
+  return NARRATIVE_ARCS.paris_life;
 }
 
 function character(post) {
@@ -246,8 +349,10 @@ function getDefaultHistory() {
 
 /**
  * Format history for prompt inclusion
+ * @param {object} history - History data
+ * @param {object} narrativeArc - Optional narrative arc (from suggestNarrativeArc)
  */
-export function formatHistoryForPrompt(history) {
+export function formatHistoryForPrompt(history, narrativeArc = null) {
   if (!history || history.recentPosts.length === 0) {
     return `Pas d'historique récent.\nNarrative: Libre de commencer n'importe où.`;
   }
@@ -266,6 +371,17 @@ export function formatHistoryForPrompt(history) {
   output += `→ ${history.narrative.storyContext}\n`;
   output += `→ Location type: ${history.narrative.locationType}\n`;
   output += `→ Moods récents: ${history.narrative.recentMoods.join(', ') || 'variés'}\n`;
+
+  // Add narrative arc if provided
+  if (narrativeArc) {
+    output += `\n### 📚 ARC NARRATIF ACTUEL:\n`;
+    output += `**${narrativeArc.name}** — "${narrativeArc.story}"\n`;
+    output += `→ Durée suggérée: ${narrativeArc.duration}\n`;
+    output += `→ Lieux recommandés: ${narrativeArc.locations.slice(0, 5).join(', ')}\n`;
+    output += `→ Moods: ${narrativeArc.moods.join(', ')}\n`;
+    output += `→ Style tenues: ${narrativeArc.outfitStyle}\n`;
+    output += `⚠️ IMPORTANT: Rester cohérent avec cet arc pour les prochains posts\n`;
+  }
 
   if (history.avoidList.length > 0) {
     output += `\n### Lieux à éviter (postés récemment):\n`;

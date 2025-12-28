@@ -25,7 +25,7 @@ import { createClient } from '@supabase/supabase-js';
 
 // Import layers
 import { analyzePerformance, formatAnalyticsForPrompt } from './lib/analytics-layer.mjs';
-import { fetchHistory, formatHistoryForPrompt } from './lib/history-layer.mjs';
+import { fetchHistory, formatHistoryForPrompt, suggestNarrativeArc } from './lib/history-layer.mjs';
 import { fetchContext, formatContextForPrompt } from './lib/context-layer.mjs';
 import { fetchMemories, formatMemoriesForPrompt } from './lib/memories-layer.mjs';
 import { fetchRelationship, formatRelationshipForPrompt } from './lib/relationship-layer.mjs';
@@ -237,13 +237,17 @@ function getRandomTravelDestination(character) {
 
 function getOptimalPostingTimes(dayOfWeek, analytics = null, character = null) {
   // ═══════════════════════════════════════════════════════════════
-  // ELENA SEXY MODE — 1 post/jour à 21h (safe mode après ban)
+  // ELENA — 2 posts/jour avec A/B Testing
+  // - 14:00 = EXPERIMENT (Claude teste des trucs créatifs)
+  // - 21:00 = SAFE (ce qui fonctionne, analytics-driven)
   // ═══════════════════════════════════════════════════════════════
   if (character === 'elena') {
     return {
-      slots: ['21:00'],  // Un seul slot, heure de pointe sexy content
+      slots: ['14:00', '21:00'],  // 2 slots: experiment + safe
       reelSlot: null,
-      postsCount: 1,
+      postsCount: 2,
+      experimentSlot: '14:00',    // Le slot où Claude peut tester
+      safeSlot: '21:00',          // Le slot basé sur analytics
     };
   }
   
@@ -463,9 +467,28 @@ function getExplorationRequirements(character, history, analytics, postsCount) {
     'nice', 'barcelona', 'lisbon', 'amsterdam', 'berlin', 'surf', 'hiking'
   ];
   
+  // Fashion capitals vs vacation destinations (for context)
+  const FASHION_CAPITALS = ['milan', 'nyc', 'london', 'paris'];
+  const VACATION_DESTINATIONS = ['maldives', 'bali', 'ibiza', 'mykonos', 'dubai', 'st_tropez', 'courchevel'];
+  
   const hasTravelRecently = recentLocations.some(loc => 
     travelKeywords.some(kw => (loc || '').toLowerCase().includes(kw))
   );
+  
+  // ═══════════════════════════════════════════════════════════════
+  // RULE 3b: Check if stuck in travel content — NEED TO RETURN HOME
+  // ═══════════════════════════════════════════════════════════════
+  const travelCount = recentLocations.filter(loc => 
+    travelKeywords.some(kw => (loc || '').toLowerCase().includes(kw))
+  ).length;
+  
+  if (travelCount >= 4 && character === 'elena') {
+    requirements.push({
+      type: 'return_home',
+      rule: 'OBLIGATOIRE: Elena doit RENTRER à Paris (vie quotidienne, loft, café parisien)',
+      reason: `${travelCount}/5 derniers posts sont en voyage — elle VIT à Paris, pas en vacances permanentes`,
+    });
+  }
   
   const tripInfo = ACTIVE_TRIPS[character];
   
@@ -514,7 +537,8 @@ function buildEnhancedPrompt(
   postingConfig,
   today,
   explorationRules,
-  abTest
+  abTest,
+  narrativeArc
 ) {
   const otherCharacter = character === 'mila' ? 'Elena' : 'Mila';
   const dayName = today.toLocaleDateString('fr-FR', { weekday: 'long' });
@@ -550,7 +574,7 @@ ${formatAnalyticsForPrompt(analytics)}
 ## 2️⃣ HISTORIQUE — Où en est-on dans l'histoire ?
 ═══════════════════════════════════════════════════════════════
 
-${formatHistoryForPrompt(history)}
+${formatHistoryForPrompt(history, narrativeArc)}
 
 ═══════════════════════════════════════════════════════════════
 ## 3️⃣ CONTEXTE TEMPS RÉEL — Que se passe-t-il ?
@@ -594,9 +618,20 @@ ${abTestSection}
 
 Génère ${postingConfig.postsCount} posts pour aujourd'hui.
 
-### Horaires optimisés (basés sur analytics):
-${postingConfig.slots.join(', ')}
-(Reel idéalement à ${postingConfig.reelSlot})
+### Horaires et stratégie:
+${postingConfig.experimentSlot ? `
+**🧪 14:00 — POST EXPERIMENT**
+→ Claude a CARTE BLANCHE pour tester quelque chose de créatif
+→ Nouveau lieu, nouveau style, nouvelle approche
+→ Marquer avec "is_experiment": true
+→ Objectif: découvrir ce qui pourrait mieux marcher
+
+**✅ 21:00 — POST SAFE**
+→ Ce qui fonctionne (basé sur analytics et historique)
+→ Utiliser les patterns qui ont déjà performé
+→ Marquer avec "is_experiment": false
+→ Objectif: engagement garanti
+` : `${postingConfig.slots.join(', ')}`}
 
 ### Lieux disponibles:
 ${character === 'elena' ? ELENA_SEXY_LOCATIONS.join('\n') : LOCATIONS[character].join('\n')}
@@ -641,10 +676,20 @@ ${character === 'elena' ? ELENA_SEXY_LOCATIONS.join('\n') : LOCATIONS[character]
 ${character === 'elena' 
   ? `
 ═══════════════════════════════════════════════════════════════
-## 🔥 ELENA SEXY MODE — OBLIGATOIRE
+## 🔥 ELENA — 2 POSTS/JOUR AVEC A/B TESTING
 ═══════════════════════════════════════════════════════════════
 
-**1 POST/JOUR, TOUJOURS SEXY (niveau 8/10)**
+**2 POSTS/JOUR: 1 EXPERIMENT (14h) + 1 SAFE (21h)**
+
+📌 **POST 14:00 (EXPERIMENT)**:
+- TESTE quelque chose de différent (lieu inhabituel, style nouveau, caption originale)
+- Claude peut être CRÉATIF et sortir des sentiers battus
+- Si ça fonctionne → on l'intègre dans le "safe"
+
+📌 **POST 21:00 (SAFE)**:
+- Utilise ce qui FONCTIONNE (analytics, lieux qui performent)
+- Style proven, caption efficace
+- Engagement garanti
 
 ### Catégories de tenues (rotation):
 - **👙 BIKINI**: yacht, plage, piscine, maldives → bikini string, maillot échancré
@@ -770,6 +815,12 @@ async function generateSchedule(character) {
   console.log(`\n🧪 A/B Test: "${abTest.hypothesis}"`);
   console.log(`   Variant: ${abTest.activeVariant}`);
 
+  // Suggest narrative arc based on history and context
+  const narrativeArc = suggestNarrativeArc(history.narrative, context);
+  console.log(`\n📚 Narrative Arc: "${narrativeArc.name}"`);
+  console.log(`   Story: ${narrativeArc.story}`);
+  console.log(`   Duration: ${narrativeArc.duration}`);
+
   // Build enhanced prompt
   console.log('\n📝 Building enhanced prompt...');
   const prompt = buildEnhancedPrompt(
@@ -782,7 +833,8 @@ async function generateSchedule(character) {
     postingConfig,
     today,
     explorationRules,
-    abTest
+    abTest,
+    narrativeArc
   );
 
   // Call Claude with Extended Thinking for better reasoning

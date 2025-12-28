@@ -30,17 +30,17 @@ export async function fetchContext(location = 'paris') {
       year: 'numeric' 
     });
 
-    const prompt = `Tu es un assistant qui aide à créer du contenu Instagram lifestyle/mode.
+    const prompt = `Tu es un assistant recherche pour créer du contenu Instagram lifestyle/mode viral.
 
 Date: ${dateStr}
 Location: ${location}
 
-Donne-moi des informations contextuelles pour créer du contenu pertinent:
+Recherche les informations TEMPS RÉEL suivantes:
 
-1. **Météo** à ${location} aujourd'hui (température, conditions)
-2. **Événements** actuels ou à venir (fêtes, événements mode, culturels)
-3. **Trends Instagram** France actuels (hashtags lifestyle/mode)
-4. **Ambiance** recommandée pour le contenu aujourd'hui
+1. **Instagram Trending Hashtags TODAY** — Les hashtags qui buzzent AUJOURD'HUI en France (lifestyle, mode, beauté). Cherche les vrais trends du jour, pas des génériques.
+2. **Viral Content Formats** — Quel format performe le mieux CETTE SEMAINE sur Instagram (photo dump, carousel storytelling, outfit transition, get ready with me, etc.)
+3. **Fashion/Lifestyle Events** — Événements mode en cours ou à venir (Fashion Week, lancements marques, collabs, événements Paris)
+4. **Weather ${location}** — Météo actuelle (température, conditions)
 
 Format JSON uniquement:
 {
@@ -49,10 +49,12 @@ Format JSON uniquement:
     "condition": "nuageux",
     "suggestion": "indoor" ou "outdoor"
   },
-  "events": ["event1", "event2"],
-  "trends": ["#hashtag1", "#hashtag2"],
-  "recommendation": "Type de contenu recommandé",
-  "seasonalContext": "Contexte saisonnier (Noël, été, etc.)"
+  "trending_hashtags_today": ["#hashtag1", "#hashtag2", "#hashtag3"],
+  "viral_format": "carousel storytelling" ou "photo dump" ou "outfit transition" ou autre,
+  "fashion_events": ["event1", "event2"],
+  "events": ["event contextuel"],
+  "content_recommendation": "Ce qui marcherait bien aujourd'hui spécifiquement",
+  "seasonalContext": "Contexte saisonnier (Noël, Nouvel An, etc.)"
 }`;
 
     const response = await fetch(PERPLEXITY_API_URL, {
@@ -95,13 +97,22 @@ Format JSON uniquement:
     const parsed = JSON.parse(jsonStr.trim());
 
     console.log(`      ✅ Context fetched: ${parsed.weather?.temp}°C, ${parsed.weather?.condition}`);
-    console.log(`      Recommendation: ${parsed.recommendation}`);
+    console.log(`      Viral format: ${parsed.viral_format || 'N/A'}`);
+    console.log(`      Recommendation: ${parsed.content_recommendation || parsed.recommendation}`);
+    if (parsed.trending_hashtags_today?.length > 0) {
+      console.log(`      Trending TODAY: ${parsed.trending_hashtags_today.slice(0, 5).join(' ')}`);
+    }
+    if (parsed.fashion_events?.length > 0) {
+      console.log(`      Fashion events: ${parsed.fashion_events.join(', ')}`);
+    }
 
     return {
       weather: parsed.weather || { temp: null, condition: 'unknown', suggestion: 'any' },
       events: parsed.events || [],
-      trends: parsed.trends || [],
-      recommendation: parsed.recommendation || '',
+      trends: parsed.trending_hashtags_today || parsed.trends || [],
+      viralFormat: parsed.viral_format || null,
+      fashionEvents: parsed.fashion_events || [],
+      recommendation: parsed.content_recommendation || parsed.recommendation || '',
       seasonalContext: parsed.seasonalContext || '',
       fetchedAt: new Date().toISOString(),
       source: 'perplexity',
@@ -188,6 +199,9 @@ function getFallbackContext(location = 'paris') {
 
   const recommendation = generateRecommendation(seasonalContext, dayOfWeek, weatherSuggestion);
 
+  // Default viral formats by season
+  const viralFormat = getViralFormat(month, dayOfWeek);
+  
   return {
     weather: {
       temp: estimatedTemp,
@@ -196,11 +210,56 @@ function getFallbackContext(location = 'paris') {
     },
     events,
     trends,
+    viralFormat,
+    fashionEvents: getFashionEvents(month, day),
     recommendation,
     seasonalContext,
     fetchedAt: new Date().toISOString(),
     source: 'fallback',
   };
+}
+
+function getViralFormat(month, dayOfWeek) {
+  // Carousel storytelling is generally safe and performs well
+  const formats = [
+    'carousel storytelling',
+    'photo dump aesthetic',
+    'outfit of the day carousel',
+    'day in my life carousel',
+  ];
+  
+  // Weekend = more lifestyle content
+  if (dayOfWeek === 0 || dayOfWeek === 6) {
+    return 'photo dump aesthetic';
+  }
+  
+  // Winter = cozy content
+  if (month >= 11 || month <= 1) {
+    return 'carousel storytelling';
+  }
+  
+  // Summer = travel/outdoor
+  if (month >= 6 && month <= 8) {
+    return 'photo dump aesthetic';
+  }
+  
+  return formats[Math.floor(Math.random() * formats.length)];
+}
+
+function getFashionEvents(month, day) {
+  const events = [];
+  
+  // Fashion Weeks (approximate dates)
+  if (month === 1 && day >= 20) events.push('New York Fashion Week (soon)');
+  if (month === 2 && day <= 10) events.push('New York Fashion Week');
+  if (month === 2 && day >= 20) events.push('Milan Fashion Week');
+  if (month === 2 && day >= 25 || month === 3 && day <= 5) events.push('Paris Fashion Week');
+  
+  if (month === 8 && day >= 5) events.push('New York Fashion Week SS (soon)');
+  if (month === 8 && day >= 20) events.push('Milan Fashion Week SS');
+  if (month === 9 && day <= 10) events.push('Paris Fashion Week SS');
+  
+  return events;
 }
 
 function getSeasonalTrends(month) {
@@ -256,14 +315,26 @@ export function formatContextForPrompt(context) {
     });
   }
 
+  if (context.fashionEvents?.length > 0) {
+    output += `\n### 🎀 Fashion Events:\n`;
+    context.fashionEvents.forEach(e => {
+      output += `- ${e}\n`;
+    });
+  }
+
   if (context.seasonalContext) {
     output += `\n### Contexte saisonnier:\n`;
     output += `${context.seasonalContext}\n`;
   }
 
+  if (context.viralFormat) {
+    output += `\n### 🔥 Format viral du moment:\n`;
+    output += `→ ${context.viralFormat}\n`;
+  }
+
   if (context.trends.length > 0) {
-    output += `\n### Trends actuels:\n`;
-    output += context.trends.slice(0, 8).join(' ') + '\n';
+    output += `\n### Hashtags trending TODAY:\n`;
+    output += context.trends.slice(0, 10).join(' ') + '\n';
   }
 
   if (context.recommendation) {
