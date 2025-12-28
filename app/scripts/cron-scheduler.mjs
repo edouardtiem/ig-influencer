@@ -476,7 +476,7 @@ function getExplorationRequirements(character, history, analytics, postsCount) {
   );
   
   // ═══════════════════════════════════════════════════════════════
-  // RULE 3b: Check if stuck in travel content — NEED TO RETURN HOME
+  // RULE 3b: Check if stuck in travel content — SUGGEST VARIETY
   // ═══════════════════════════════════════════════════════════════
   const travelCount = recentLocations.filter(loc => 
     travelKeywords.some(kw => (loc || '').toLowerCase().includes(kw))
@@ -484,9 +484,9 @@ function getExplorationRequirements(character, history, analytics, postsCount) {
   
   if (travelCount >= 4 && character === 'elena') {
     requirements.push({
-      type: 'return_home',
-      rule: 'OBLIGATOIRE: Elena doit RENTRER à Paris (vie quotidienne, loft, café parisien)',
-      reason: `${travelCount}/5 derniers posts sont en voyage — elle VIT à Paris, pas en vacances permanentes`,
+      type: 'suggest_variety',
+      rule: 'VARIÉTÉ SUGGÉRÉE: Inclure 1 post Paris (loft, café, spa parisien) OU une destination différente',
+      reason: `${travelCount}/5 derniers posts sont en voyage — ajouter de la variété dans les lieux`,
     });
   }
   
