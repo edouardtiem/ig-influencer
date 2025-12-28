@@ -438,19 +438,33 @@ function getExplorationRequirements(character, history, analytics, postsCount) {
   });
   
   // ═══════════════════════════════════════════════════════════════
-  // RULE 2: Check if stuck in home content
+  // RULE 2: Check if stuck in home OR Paris content
   // ═══════════════════════════════════════════════════════════════
   const recentLocations = history?.recentPosts?.slice(0, 5).map(p => p.location) || [];
-  const homeKeywords = ['loft', 'home', 'bedroom', 'living', 'bathroom'];
+  const homeKeywords = ['loft', 'home', 'bedroom', 'living', 'bathroom', 'dressing'];
+  const parisKeywords = ['cafe_paris', 'tuileries', 'plaza_athenee', 'opera', 'spa_paris', 'galeries'];
+  
   const homeCount = recentLocations.filter(loc => 
     homeKeywords.some(kw => (loc || '').toLowerCase().includes(kw))
+  ).length;
+  
+  // Compte tous les posts à Paris (home + lieux parisiens)
+  const parisCount = recentLocations.filter(loc => 
+    [...homeKeywords, ...parisKeywords].some(kw => (loc || '').toLowerCase().includes(kw))
   ).length;
   
   if (homeCount >= 4) {
     requirements.push({
       type: 'location_change',
-      rule: 'OBLIGATOIRE: Au moins 1 post HORS de chez elle (café, extérieur, voyage)',
+      rule: 'VARIÉTÉ: Au moins 1 post HORS de chez elle (café parisien, extérieur, voyage)',
       reason: `${homeCount}/5 derniers posts sont à la maison — besoin de variété`,
+    });
+  } else if (parisCount >= 4 && character === 'elena') {
+    // Trop à Paris en général → suggérer du voyage
+    requirements.push({
+      type: 'travel_suggestion',
+      rule: 'VARIÉTÉ: Inclure 1 post voyage/throwback (yacht, plage, spa montagne, Maldives...)',
+      reason: `${parisCount}/5 derniers posts sont à Paris — ajouter du contenu voyage pour variété`,
     });
   }
   
