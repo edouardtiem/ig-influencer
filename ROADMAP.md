@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 28 décembre 2024 (Scheduler Fix + History Layer 🔧)
+**Dernière mise à jour** : 28 décembre 2024 (Elena Personality Rebalance 🎭)
 
 ---
 
@@ -156,6 +156,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 28/12/2024 | **🎭 Elena Personality Rebalance** — Audit DM (81% bratty → 35% warm target) + Refonte prompt persona + Nouveau mix 35/25/20/15/5 | [→](./docs/sessions/2024-12-28-elena-personality-rebalance.md) |
 | 28/12/2024 | **🔧 Scheduler Fix + History Layer** — Fix cron scheduler (6:00→6:05 UTC) + History layer lit scheduled_posts + Fix throwbacks répétitifs | [→](./docs/sessions/SESSION-28-DEC-2024-SCHEDULER-FIX.md) |
 | 28/12/2024 | **📊 DM Audit + Pitch Optimization** — Audit 122 convos DM + Validation perso bratty (81% progression) + Fix pitch en 2 temps (tease → lien si demandé) + Prompt Elena "Hot Mode" Fanvue | [→](./docs/sessions/2024-12-28-dm-audit-pitch-optimization.md) |
 | 28/12/2024 | **🔥 Fanvue Bot Uncensored Research** — Recherche modèles uncensored (Replicate/OpenRouter/Venice) + Choix Venice Direct + Architecture bot Fanvue avec contenu explicite | [→](./docs/sessions/2024-12-28-fanvue-bot-uncensored-research.md) |
