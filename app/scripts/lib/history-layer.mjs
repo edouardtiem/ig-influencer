@@ -13,23 +13,38 @@
 export async function fetchHistory(supabase, character) {
   console.log(`   📜 Fetching history for ${character}...`);
 
-  // Get posts from the last 7 days
+  // Get posts from the last 7 days from scheduled_posts (has complete location data)
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const sevenDaysAgoDate = sevenDaysAgo.toISOString().split('T')[0];
 
   const { data: recentPosts, error } = await supabase
-    .from('posts')
+    .from('scheduled_posts')
     .select('*')
-    .eq('character_name', character)
-    .gte('posted_at', sevenDaysAgo.toISOString())
-    .order('posted_at', { ascending: false });
+    .eq('character', character)
+    .eq('status', 'posted')
+    .gte('scheduled_date', sevenDaysAgoDate)
+    .order('scheduled_date', { ascending: false })
+    .order('scheduled_time', { ascending: false });
 
   if (error) {
     console.log(`      ⚠️  Error fetching posts: ${error.message}`);
     return getDefaultHistory();
   }
 
-  const posts = recentPosts || [];
+  // Map scheduled_posts fields to expected format
+  const posts = (recentPosts || []).map(p => ({
+    id: p.id,
+    character_name: p.character,
+    post_type: p.post_type,
+    location_key: p.location_key,
+    location_name: p.location_name,
+    mood: p.mood,
+    caption: p.caption,
+    with_character: null, // scheduled_posts doesn't track this yet
+    posted_at: `${p.scheduled_date}T${p.scheduled_time}`,
+  }));
+  
   console.log(`      Found ${posts.length} posts in last 7 days`);
 
   // Infer narrative from posts
@@ -39,10 +54,17 @@ export async function fetchHistory(supabase, character) {
   const threeDaysAgo = new Date();
   threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
   const recentLocations = posts
-    .filter(p => new Date(p.posted_at) >= threeDaysAgo)
+    .filter(p => {
+      const postDate = new Date(p.posted_at);
+      return postDate >= threeDaysAgo;
+    })
     .map(p => p.location_key)
     .filter(Boolean);
   const avoidList = [...new Set(recentLocations)];
+  
+  if (avoidList.length > 0) {
+    console.log(`      🚫 Avoid locations: ${avoidList.join(', ')}`);
+  }
 
   // Get last duo post
   const lastDuoPost = posts.find(p => p.with_character);

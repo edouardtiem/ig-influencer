@@ -1,8 +1,10 @@
 # Content Brain — Automated Instagram Posting
 # 
 # Two workflows:
-# 1. Daily Scheduler: Runs at 6:00 UTC (7:00 Paris) to generate the day's plan
+# 1. Daily Scheduler: Runs at 6:05 UTC (7:05 Paris) to generate the day's plan
 # 2. Post Executor: Runs every 30 minutes to execute scheduled posts
+#
+# ⚠️ IMPORTANT: Scheduler runs at :05 to avoid overlap with executor at :00/:30
 #
 # 🔥 ELENA SEXY MODE — 1 post/jour à 21h (réactivé 27/12/2024)
 # Mila reste désactivée (0 posts configurés dans le scheduler)
@@ -11,8 +13,9 @@ name: Content Brain (Elena Only)
 
 on:
   schedule:
-    # Scheduler: 6:00 UTC = 7:00 Paris (winter) / 8:00 Paris (summer)
-    - cron: '0 6 * * *'
+    # Scheduler: 6:05 UTC = 7:05 Paris (winter) / 8:05 Paris (summer)
+    # NOTE: :05 pour éviter le chevauchement avec executor à :00/:30
+    - cron: '5 6 * * *'
     
     # Executor: Every 30 minutes (pour publier le post de 21h)
     - cron: '0,30 * * * *'
@@ -56,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     if: >
       github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'scheduler' ||
-      github.event.schedule == '0 6 * * *'
+      github.event.schedule == '5 6 * * *'
     
     steps:
       - name: 📥 Checkout
