@@ -350,3 +350,98 @@ export async function checkStatus(): Promise<{ ok: boolean; error?: string; prof
     };
   }
 }
+
+// ===========================================
+// MESSAGING
+// ===========================================
+
+interface SendMessageParams {
+  chatId: string;
+  text: string;
+  mediaUrls?: string[];
+}
+
+/**
+ * Send a message to a user via Fanvue chat
+ * Used for welcome DMs to new followers
+ */
+export async function sendMessage(params: SendMessageParams): Promise<unknown> {
+  console.log(`[Fanvue] Sending message to chat ${params.chatId}...`);
+  
+  const body: Record<string, unknown> = {
+    text: params.text,
+  };
+  
+  if (params.mediaUrls && params.mediaUrls.length > 0) {
+    body.media_urls = params.mediaUrls;
+  }
+  
+  return fanvueApi(`/v1/chats/${params.chatId}/messages`, {
+    method: 'POST',
+    body,
+  });
+}
+
+/**
+ * Start a new chat with a user (for welcome DMs)
+ * Returns the chat ID to use for sending messages
+ */
+export async function startChat(userId: string): Promise<{ chatId: string }> {
+  console.log(`[Fanvue] Starting chat with user ${userId}...`);
+  
+  const result = await fanvueApi<{ id: string }>('/v1/chats', {
+    method: 'POST',
+    body: { user_id: userId },
+  });
+  
+  return { chatId: result.id };
+}
+
+/**
+ * Send a welcome DM to a new follower
+ * Combines startChat + sendMessage
+ */
+export async function sendWelcomeDM(
+  userId: string, 
+  message: string, 
+  photoUrl?: string
+): Promise<{ success: boolean; chatId?: string; error?: string }> {
+  try {
+    // Start or get chat with user
+    const { chatId } = await startChat(userId);
+    
+    // Send welcome message with optional photo
+    await sendMessage({
+      chatId,
+      text: message,
+      mediaUrls: photoUrl ? [photoUrl] : undefined,
+    });
+    
+    console.log(`[Fanvue] Welcome DM sent to user ${userId}`);
+    return { success: true, chatId };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`[Fanvue] Failed to send welcome DM: ${errorMessage}`);
+    return { success: false, error: errorMessage };
+  }
+}
+
+// ===========================================
+// WEBHOOK VERIFICATION
+// ===========================================
+
+/**
+ * Verify Fanvue webhook signature
+ * Returns true if signature is valid
+ */
+export function verifyWebhookSignature(
+  payload: string,
+  signature: string,
+  secret: string
+): boolean {
+  const expectedSignature = createHash('sha256')
+    .update(payload + secret)
+    .digest('hex');
+  
+  return signature === expectedSignature;
+}
