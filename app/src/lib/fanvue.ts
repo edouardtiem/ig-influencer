@@ -304,11 +304,11 @@ async function fanvueApi<T>(endpoint: string, options: FanvueApiOptions = {}): P
 }
 
 export async function getProfile(): Promise<unknown> {
-  return fanvueApi('/v1/me');
+  return fanvueApi('/creator');
 }
 
 export async function getAnalytics(): Promise<unknown> {
-  return fanvueApi('/v1/analytics');
+  return fanvueApi('/analytics');
 }
 
 interface CreatePostParams {
@@ -321,14 +321,14 @@ interface CreatePostParams {
 
 export async function createPost(params: CreatePostParams): Promise<unknown> {
   console.log('[Fanvue] Creating post...');
-  return fanvueApi('/v1/posts', {
+  return fanvueApi('/posts', {
     method: 'POST',
     body: params,
   });
 }
 
 export async function getPosts(): Promise<unknown> {
-  return fanvueApi('/v1/posts');
+  return fanvueApi('/posts');
 }
 
 export async function checkStatus(): Promise<{ ok: boolean; error?: string; profile?: unknown }> {
@@ -376,7 +376,7 @@ export async function sendMessage(params: SendMessageParams): Promise<unknown> {
     body.media_urls = params.mediaUrls;
   }
   
-  return fanvueApi(`/v1/chats/${params.chatId}/messages`, {
+  return fanvueApi(`/chats/${params.chatId}/messages`, {
     method: 'POST',
     body,
   });
@@ -389,12 +389,12 @@ export async function sendMessage(params: SendMessageParams): Promise<unknown> {
 export async function startChat(userId: string): Promise<{ chatId: string }> {
   console.log(`[Fanvue] Starting chat with user ${userId}...`);
   
-  const result = await fanvueApi<{ id: string }>('/v1/chats', {
+  const result = await fanvueApi<{ uuid: string }>('/chats', {
     method: 'POST',
     body: { user_id: userId },
   });
   
-  return { chatId: result.id };
+  return { chatId: result.uuid };
 }
 
 /**
