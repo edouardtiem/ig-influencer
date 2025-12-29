@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 28 décembre 2024 (Elena Personality Rebalance 🎭)
+**Dernière mise à jour** : 29 décembre 2024 (Intent-Driven DM System 🎯)
 
 ---
 
@@ -60,6 +60,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-039 | **🎯 Intent-Driven DM System** — Adaptation personnalité par intent + Pitch Fanvue déclenché par wants_more (au lieu de 8 messages) + PersonalityMode dynamique | 29/12/2024 | v2.30.0 | [→](./roadmap/done/DONE-039-intent-driven-dm-system.md) |
 | DONE-038 | **🔥 Elena Sexy Mode** — 1 post/jour 21h + Prompts suggestifs (bikini/lingerie/sport) + Locations filtrées + Mila PAUSE | 27/12/2024 | v2.29.0 | [→](./docs/sessions/2024-12-27-elena-sexy-mode.md) |
 | DONE-037 | **🤖 DM Automation LIVE** — Claude AI + ManyChat + Lead scoring + English default + Fix double message + Shorter responses + Natural delay + Conversational auto-DM | 26/12/2024 | v2.28.4 | [→](./docs/sessions/2024-12-26-dm-automation.md) |
 | DONE-036 | **🔗 Fanvue OAuth 2.0 + PKCE** — Intégration API Fanvue complète avec OAuth sécurisé | 26/12/2024 | v2.27.0 | [→](./docs/sessions/2024-12-26-fanvue-oauth.md) |
@@ -143,7 +144,7 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 35 
+├── ✅ Done        : 36 
 ├── 🚧 In Progress : 3 (Elena Sexy Mode + Fanvue + Model Evolution)
 ├── 📋 Todo        : 6 
 ├── 🐛 Bugs        : 6 (6 fixed)
@@ -156,6 +157,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 29/12/2024 | **🎯 Intent-Driven DM System** — Adaptation personnalité par intent + Pitch Fanvue déclenché par wants_more + PersonalityMode dynamique (warm/playful/curious/mysterious/confident) | [→](./docs/sessions/2024-12-29-intent-driven-dm-system.md) |
 | 28/12/2024 | **🎭 Elena Personality Rebalance** — Audit DM (81% bratty → 35% warm target) + Refonte prompt persona + Nouveau mix 35/25/20/15/5 | [→](./docs/sessions/2024-12-28-elena-personality-rebalance.md) |
 | 28/12/2024 | **🔧 Scheduler Fix + History Layer** — Fix cron scheduler (6:00→6:05 UTC) + History layer lit scheduled_posts + Fix throwbacks répétitifs | [→](./docs/sessions/SESSION-28-DEC-2024-SCHEDULER-FIX.md) |
 | 28/12/2024 | **📊 DM Audit + Pitch Optimization** — Audit 122 convos DM + Validation perso bratty (81% progression) + Fix pitch en 2 temps (tease → lien si demandé) + Prompt Elena "Hot Mode" Fanvue | [→](./docs/sessions/2024-12-28-dm-audit-pitch-optimization.md) |

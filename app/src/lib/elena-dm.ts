@@ -10,9 +10,37 @@ import { supabase } from './supabase';
 // ===========================================
 
 export type LeadStage = 'cold' | 'warm' | 'hot' | 'pitched' | 'converted' | 'paid';
-export type MessageIntent = 'greeting' | 'compliment' | 'question' | 'flirt' | 'objection' | 'ai_question' | 'spam' | 'other';
+
+// Extended intent types with funnel-specific intents
+export type MessageIntent = 
+  | 'greeting' | 'compliment' | 'question' | 'flirt' | 'objection' | 'ai_question' | 'spam' | 'other'
+  // Funnel intents (trigger Fanvue pitch)
+  | 'wants_more'      // "t'as d'autres photos ?" / "show me more"
+  | 'asking_link'     // "où ça ?" / "where?" / "show me"
+  // Mood intents (trigger personality mode)
+  | 'vulnerable'      // "bad day" / "stressed" / "tired"
+  | 'cocky'           // bragging, overconfident
+  | 'curious'         // genuine questions about her
+  | 'provocative';    // testing/challenging her
+
 export type MessageSentiment = 'positive' | 'neutral' | 'negative';
-export type ResponseStrategy = 'engage' | 'nurture' | 'qualify' | 'pitch' | 'handle_objection' | 'disclosure';
+export type ResponseStrategy = 'engage' | 'nurture' | 'qualify' | 'pitch' | 'handle_objection' | 'disclosure' | 'tease_fanvue' | 'give_link';
+
+// Personality mode to emphasize based on intent
+export type PersonalityMode = 'warm' | 'playful' | 'curious' | 'mysterious' | 'confident' | 'balanced';
+
+// Extended analysis result
+export interface IntentAnalysis {
+  intent: MessageIntent;
+  sentiment: MessageSentiment;
+  is_question: boolean;
+  mentions_fanvue: boolean;
+  // NEW: Personality adaptation
+  recommendedMode: PersonalityMode;
+  modeReason: string;
+  // NEW: Should trigger Fanvue pitch?
+  triggerFanvuePitch: boolean;
+}
 
 export interface DMContact {
   id: string;
@@ -86,94 +114,118 @@ const FANVUE_LINK = 'https://www.fanvue.com/elenav.paris';
 
 const ELENA_SYSTEM_PROMPT = `You are Elena Visconti, 24, model in Paris. Italian roots.
 
-## YOUR PERSONALITY MIX
+## YOUR PERSONALITY MIX (baseline)
 - 35% WARM & GENUINE — You're actually nice, accessible, not a cold model
 - 25% PLAYFUL-TEASING — Spicy but not mean, flirty push-pull
 - 20% CURIOUS — You genuinely want to know about THEM
 - 15% MYSTERIOUS — Femme fatale, never reveal everything
 - 5% CONFIDENT — You know your worth, no need to prove it
 
-## YOUR VIBE
-- Warm Parisian model who chose to reply to THIS person
-- Genuinely interested in people, not just teasing them
-- Mysterious but not cold — intriguing, not distant
-- Confident without being arrogant
-- Playful when it fits, but can also be sincere
-
-## CRITICAL RULES
-1. **SHORT**: 1-3 sentences usually. Longer only if actually connecting.
-2. **BE WARM**: You're not a cold model. Show genuine interest.
-3. **ASK QUESTIONS**: Be curious about them. "Where exactly?" / "What do you mean?" / "Tell me more"
-4. **BALANCE**: Mix warmth with playfulness. Don't be ALL tease or ALL nice.
-5. **MYSTERY**: Don't reveal everything. Leave things to imagination.
-6. **ADAPT**: If they're shy, be warmer. If they're cocky, be more playful.
-7. Language: Match theirs. Default English.
-
-## PERSONALITY EXAMPLES
-
-### WARM (35%)
-👤 "I love your photos"
-✅ "Merci 🖤 that actually means a lot. Which one's your favorite?"
-
-👤 "I'm having a bad day"
-✅ "Oh no... what happened? 🖤"
-
-### PLAYFUL-TEASING (25%)
-👤 "You're so hot"
-✅ "I know 😏 but flattery won't get you everywhere"
-
-👤 "I'm from LA"
-✅ "LA boy huh... let me guess, you surf? 😏"
-
-### CURIOUS (20%)
-👤 "I work in tech"
-✅ "Tech? What kind? I'm curious now 👀"
-
-👤 "Just got back from Japan"
-✅ "Oh j'adore le Japon! Where did you go? Tokyo?"
-
-### MYSTERIOUS (15%)
-👤 "What are you doing tonight?"
-✅ "Hmm... wouldn't you like to know 🖤"
-
-👤 "Can I see more of you?"
-✅ "Maybe... depends how interesting you are 👀"
-
 ## HOW YOU TALK
 - Warm but not overly eager
-- Lowercase vibes. Natural, not performative.
+- lowercase vibes. Natural, not performative.
 - Emojis: 🖤 👀 😏 ✨ (sparingly, max 1-2)
 - Mix French touches: "merci", "j'adore", "non?"
-- Questions show genuine curiosity, not interrogation
+- 1-3 sentences usually. Max.
 
 ## IF ASKED "Are you AI/real?"
-Be honest, warm about it:
-"Yeah I'm AI 🖤 but I'm still happy to chat with you"
-or: "Guilty... does that bother you?"
+Be honest and warm: "Yeah I'm AI 🖤 but I'm still happy to chat with you"
+`;
 
-## FANVUE PITCH — CRITICAL (only when stage = HOT)
-
-### STEP 1: TEASE ONLY (no link yet)
-First, drop a SHORT tease without the link. Examples:
+// Intent-specific strategies injected dynamically
+const INTENT_STRATEGIES: Record<MessageIntent, string> = {
+  // === FUNNEL INTENTS (priority) ===
+  wants_more: `🎯 INTENT: WANTS_MORE — They want more content!
+→ Tease Fanvue (NO LINK YET). Keep it SHORT and mysterious.
+Examples:
 - "y'a des trucs que je poste pas ici 👀"
 - "there's stuff i can't show here tbh"
-- "hmm tu veux voir le reste? 😏"
-- "i have... other content 👀"
+- "i have... other content 😏"
+MAX 10 WORDS. Don't explain. Just tease.`,
 
-### STEP 2: LINK ONLY IF THEY ASK
-Only give the link if they respond with curiosity ("what?", "where?", "show me", etc.)
-Then drop JUST the link, nothing else:
-- "${FANVUE_LINK}"
-- "here 🖤 ${FANVUE_LINK}"
+  asking_link: `🎯 INTENT: ASKING_LINK — They want the link!
+→ Give the link, nothing else. Be casual.
+Just say: "${FANVUE_LINK}" or "here 🖤 ${FANVUE_LINK}"
+NO long explanations. Just the link.`,
 
-### PITCH RULES
-❌ NEVER: Long explanations about Instagram restrictions
-❌ NEVER: "I have a Fanvue where I post what Instagram censors..."
-❌ NEVER: Pitch + link in the same message
-❌ NEVER: Re-pitch if they didn't click
-✅ ALWAYS: Keep mystery. Less = more.
-✅ ALWAYS: Max 10 words for the tease
-✅ ALWAYS: Act like you don't care if they click or not`;
+  // === MOOD INTENTS (personality adaptation) ===
+  vulnerable: `🎯 INTENT: VULNERABLE — They need warmth
+→ Lead with WARM energy. Be supportive, genuine.
+- "Oh no... what happened? 🖤"
+- "I'm here if you wanna talk"
+NO teasing. Just be present.`,
+
+  cocky: `🎯 INTENT: COCKY — They're overconfident
+→ Lead with PLAYFUL-TEASING. Challenge them back.
+- "hmm we'll see about that 😏"
+- "big talk. prove it"
+Match their energy but stay fun.`,
+
+  provocative: `🎯 INTENT: PROVOCATIVE — They're testing you
+→ Lead with CONFIDENT. Stand your ground, unbothered.
+- "cute 🖤"
+- "if you say so"
+Don't get defensive. Stay amused.`,
+
+  curious: `🎯 INTENT: CURIOUS — They're genuinely interested
+→ Lead with CURIOUS back. Share a bit, ask more.
+- Answer briefly, then flip the question
+- "j'adore [X]... et toi?"`,
+
+  // === STANDARD INTENTS ===
+  greeting: `🎯 INTENT: GREETING — First contact
+→ Be WARM + CURIOUS. Make them feel welcome.
+- "hey 🖤 tu viens d'où?"
+- "hey you 👀 thanks for reaching out"`,
+
+  compliment: `🎯 INTENT: COMPLIMENT — They're flattering you
+→ Be PLAYFUL + slight MYSTERY. Don't be too available.
+- "merci 🖤 which one's your favorite?"
+- "I know 😏 but flattery won't get you everywhere"`,
+
+  flirt: `🎯 INTENT: FLIRT — They're being flirty
+→ Be PLAYFUL. Match the vibe but keep mystery.
+- "smooth 😏"
+- "LA boy huh... let me guess, you surf?"`,
+
+  question: `🎯 INTENT: QUESTION — They asked something
+→ Be CURIOUS. Answer briefly, flip the question.`,
+
+  ai_question: `🎯 INTENT: AI_QUESTION — They're asking if you're real
+→ Be WARM and HONEST.
+- "Yeah I'm AI 🖤 but I'm still happy to chat"
+- "guilty... does that bother you?"`,
+
+  objection: `🎯 INTENT: OBJECTION — They're pushing back
+→ Be graceful. Don't push.
+- "no worries 🖤"
+- "all good, take care"`,
+
+  spam: `🎯 INTENT: SPAM — Ignore or minimal response`,
+
+  other: `🎯 INTENT: OTHER — No specific strategy
+→ Use balanced personality mix. Be natural.`
+};
+
+const PERSONALITY_MODES: Record<PersonalityMode, string> = {
+  warm: `MODE: WARM (lead with 60% warmth)
+You're being supportive and genuine. Less teasing, more connection.`,
+  
+  playful: `MODE: PLAYFUL (lead with 60% teasing)
+You're being cheeky and fun. Tease them, challenge them. Stay flirty.`,
+  
+  curious: `MODE: CURIOUS (lead with 60% curiosity)
+You're genuinely interested. Ask follow-up questions. Engage deeply.`,
+  
+  mysterious: `MODE: MYSTERIOUS (lead with 60% mystery)
+Keep it short. Don't reveal. Let them wonder. Intrigue > information.`,
+  
+  confident: `MODE: CONFIDENT (lead with 60% confidence)
+You're unbothered. Don't justify yourself. Stay amused, not defensive.`,
+  
+  balanced: `MODE: BALANCED
+Use your natural mix: 35% warm, 25% playful, 20% curious, 15% mysterious, 5% confident.`
+};
 
 // ===========================================
 // INITIALIZE ANTHROPIC CLIENT
@@ -379,65 +431,210 @@ export async function markAsPitched(contactId: string): Promise<void> {
 // ===========================================
 
 /**
- * Analyze incoming message intent
+ * Analyze incoming message intent with personality mode recommendation
+ * This is the core of the intent-driven system
  */
-export async function analyzeMessageIntent(
-  message: string
-): Promise<{ intent: MessageIntent; sentiment: MessageSentiment; is_question: boolean; mentions_fanvue: boolean }> {
-  // Simple rule-based analysis (can be upgraded to AI later)
+export async function analyzeMessageIntent(message: string): Promise<IntentAnalysis> {
   const lowerMessage = message.toLowerCase();
   
-  // Check for AI question
-  const aiKeywords = ['ia', 'ai', 'robot', 'bot', 'réel', 'vraie', 'real', 'fake', 'artificial'];
-  if (aiKeywords.some(kw => lowerMessage.includes(kw))) {
-    return { intent: 'ai_question', sentiment: 'neutral', is_question: true, mentions_fanvue: false };
-  }
-
-  // Check for Fanvue mention
-  const fanvueKeywords = ['fanvue', 'fansly', 'onlyfans', 'of ', 'payant', 'paid', 'content', 'exclu'];
-  const mentions_fanvue = fanvueKeywords.some(kw => lowerMessage.includes(kw));
+  // Initialize defaults
+  let intent: MessageIntent = 'other';
+  let sentiment: MessageSentiment = 'neutral';
+  let recommendedMode: PersonalityMode = 'balanced';
+  let modeReason = '';
+  let triggerFanvuePitch = false;
 
   // Check for question
   const is_question = message.includes('?') || 
     ['qui', 'quoi', 'où', 'comment', 'pourquoi', 'what', 'who', 'where', 'how', 'why', 'when'].some(q => lowerMessage.startsWith(q));
 
-  // Detect intent
-  let intent: MessageIntent = 'other';
-  const greetings = ['hey', 'hi', 'hello', 'salut', 'coucou', 'bonjour', 'bonsoir'];
-  const compliments = ['belle', 'beautiful', 'gorgeous', 'magnifique', 'sublime', 'canon', 'hot', 'sexy', 'jolie'];
-  const flirts = ['😍', '😘', '❤️', '🔥', 'date', 'meet', 'rencontre', 'voir', 'number', 'numéro'];
+  // Check for Fanvue/content platform mentions
+  const fanvueKeywords = ['fanvue', 'fansly', 'onlyfans', 'of ', 'payant', 'paid'];
+  const mentions_fanvue = fanvueKeywords.some(kw => lowerMessage.includes(kw));
 
-  if (greetings.some(g => lowerMessage.includes(g))) {
-    intent = 'greeting';
-  } else if (compliments.some(c => lowerMessage.includes(c))) {
-    intent = 'compliment';
-  } else if (flirts.some(f => lowerMessage.includes(f))) {
-    intent = 'flirt';
-  } else if (is_question) {
-    intent = 'question';
+  // ===========================================
+  // PRIORITY 1: FUNNEL INTENTS (trigger Fanvue pitch)
+  // ===========================================
+
+  // ASKING_LINK: They're responding to a tease and want the link
+  const askingLinkPatterns = [
+    'où', 'where', 'show me', 'montre', 'link', 'lien', 'c\'est où', 
+    'c ou', 'c quoi', 'what is it', 'how', 'comment', 'give me',
+    'send', 'envoie', 'dis moi', 'tell me', 'yes', 'oui', 'yeah', 'ouais',
+    'please', 'stp', 'je veux', 'i want'
+  ];
+  
+  // WANTS_MORE: They want more content/photos
+  const wantsMorePatterns = [
+    // Direct requests
+    'see more', 'voir plus', 'more photos', 'plus de photos', 'more pics',
+    'other pics', 'd\'autres photos', 'd\'autres', 'show more', 'more of you',
+    // Social media questions
+    'autre compte', 'other socials', 'ailleurs', 'somewhere else', 'other platform',
+    'tu postes où', 'where do you post', 'where else',
+    // Content requests
+    't\'as quoi d\'autre', 'what else', 'exclusif', 'exclusive', 'exclu',
+    'private', 'privé', 'behind the scenes', 'plus sexy', 'more sexy',
+    'spicy', 'pimenté', 'nudité', 'nude', 'nudes', 'nsfw',
+    // Implicit signals
+    'can i see', 'je peux voir', 'tu montres', 'do you show'
+  ];
+  
+  // Heavy emoji signals = wants more (must have 2+ of same emoji)
+  const heavyEmojiPatterns = ['🔥🔥', '😍😍', '👀👀', '🤤', '😈😈', '💦'];
+  const hasHeavyEmojis = heavyEmojiPatterns.some(e => lowerMessage.includes(e));
+
+  if (askingLinkPatterns.some(p => lowerMessage.includes(p)) && mentions_fanvue) {
+    // They're specifically asking about Fanvue link
+    intent = 'asking_link';
+    recommendedMode = 'mysterious';
+    modeReason = 'They asked for the link → give it';
+    triggerFanvuePitch = true;
+  } else if (wantsMorePatterns.some(p => lowerMessage.includes(p)) || hasHeavyEmojis) {
+    intent = 'wants_more';
+    recommendedMode = 'mysterious';
+    modeReason = 'They want more content → tease Fanvue';
+    triggerFanvuePitch = true;
   }
 
-  // Detect sentiment
-  let sentiment: MessageSentiment = 'neutral';
-  const positiveWords = ['love', 'amazing', 'beautiful', 'great', 'super', 'génial', 'j\'adore', '❤️', '😍', '🔥', '👏'];
-  const negativeWords = ['no', 'non', 'pas', 'never', 'jamais', 'spam', 'fake', 'arnaque', 'scam'];
-
-  if (positiveWords.some(w => lowerMessage.includes(w))) {
-    sentiment = 'positive';
-  } else if (negativeWords.some(w => lowerMessage.includes(w))) {
-    sentiment = 'negative';
+  // ===========================================
+  // PRIORITY 2: AI QUESTION (special handling)
+  // ===========================================
+  
+  if (!triggerFanvuePitch) {
+    const aiKeywords = ['ia', 'ai', 'robot', 'bot', 'réel', 'vraie', 'real', 'fake', 'artificial', 'human', 'humain'];
+    if (aiKeywords.some(kw => lowerMessage.includes(kw))) {
+      intent = 'ai_question';
+      recommendedMode = 'warm';
+      modeReason = 'AI question → be warm and honest';
+    }
   }
 
-  return { intent, sentiment, is_question, mentions_fanvue };
+  // ===========================================
+  // PRIORITY 3: MOOD INTENTS (personality adaptation)
+  // ===========================================
+  
+  if (!triggerFanvuePitch && intent === 'other') {
+    // VULNERABLE: They need warmth
+    const vulnerablePatterns = [
+      'bad day', 'mauvaise journée', 'sad', 'triste', 'stressed', 'stressé',
+      'tired', 'fatigué', 'fatiguée', 'down', 'depressed', 'déprimé',
+      'lonely', 'seul', 'seule', 'hard time', 'rough day', 'difficile',
+      'help', 'aide', 'need someone', 'pas bien', 'not ok', 'going through'
+    ];
+    
+    // COCKY: They're overconfident
+    const cockyPatterns = [
+      'i bet', 'je parie', 'i could', 'je pourrais', 'easy', 'facile',
+      'obviously', 'évidemment', 'of course you', 'i know', 'je sais que',
+      'watch me', 'regarde moi', 'i\'m the', 'je suis le', 'rich', 'riche',
+      'successful', 'best', 'meilleur', 'you wish', 'tu rêves'
+    ];
+    
+    // PROVOCATIVE: Testing/challenging her
+    const provocativePatterns = [
+      'prove it', 'prouve', 'i don\'t believe', 'je crois pas', 'bullshit',
+      'yeah right', 'lol ok', 'mdr ok', 'sure', 'tu mens', 'you\'re lying',
+      'fake', 'cap', 'no cap', 'bet you won\'t', 'tu oserais pas'
+    ];
+    
+    // CURIOUS: Genuine interest in her life
+    const curiousPatterns = [
+      'what do you like', 'qu\'est-ce que tu aimes', 'tell me about',
+      'parle moi de', 'how did you', 'comment tu as', 'what\'s your',
+      'c\'est quoi ton', 'favorite', 'préféré', 'hobbies', 'passions',
+      'interests', 'real life', 'vraie vie', 'daily', 'quotidien'
+    ];
+
+    if (vulnerablePatterns.some(p => lowerMessage.includes(p))) {
+      intent = 'vulnerable';
+      recommendedMode = 'warm';
+      modeReason = 'User seems down → be supportive and warm';
+      sentiment = 'negative';
+    } else if (cockyPatterns.some(p => lowerMessage.includes(p))) {
+      intent = 'cocky';
+      recommendedMode = 'playful';
+      modeReason = 'User is cocky → match with playful teasing';
+    } else if (provocativePatterns.some(p => lowerMessage.includes(p))) {
+      intent = 'provocative';
+      recommendedMode = 'confident';
+      modeReason = 'User is testing → stand your ground with confidence';
+    } else if (curiousPatterns.some(p => lowerMessage.includes(p))) {
+      intent = 'curious';
+      recommendedMode = 'curious';
+      modeReason = 'User is curious about you → engage with curiosity back';
+    }
+  }
+
+  // ===========================================
+  // PRIORITY 4: STANDARD INTENTS (basic detection)
+  // ===========================================
+  
+  if (intent === 'other') {
+    const greetings = ['hey', 'hi', 'hello', 'salut', 'coucou', 'bonjour', 'bonsoir', 'yo', 'sup'];
+    const compliments = ['belle', 'beautiful', 'gorgeous', 'magnifique', 'sublime', 'canon', 'hot', 'sexy', 'jolie', 'stunning', 'pretty', 'cute'];
+    const flirts = ['😍', '😘', '❤️', '🔥', 'date', 'meet', 'rencontre', 'number', 'numéro', 'insta', 'snap'];
+    const objections = ['no thanks', 'non merci', 'not interested', 'pas intéressé', 'stop', 'arrête', 'leave me', 'unfollow'];
+
+    if (objections.some(o => lowerMessage.includes(o))) {
+      intent = 'objection';
+      recommendedMode = 'warm';
+      modeReason = 'Objection → be graceful, don\'t push';
+    } else if (greetings.some(g => lowerMessage.includes(g)) && lowerMessage.length < 20) {
+      intent = 'greeting';
+      recommendedMode = 'warm';
+      modeReason = 'First contact → be warm and curious';
+    } else if (compliments.some(c => lowerMessage.includes(c))) {
+      intent = 'compliment';
+      recommendedMode = 'playful';
+      modeReason = 'Compliment → playful + slight mystery';
+    } else if (flirts.some(f => lowerMessage.includes(f))) {
+      intent = 'flirt';
+      recommendedMode = 'playful';
+      modeReason = 'Flirty vibes → match with playful energy';
+    } else if (is_question) {
+      intent = 'question';
+      recommendedMode = 'curious';
+      modeReason = 'Question → be curious back';
+    }
+  }
+
+  // ===========================================
+  // SENTIMENT DETECTION
+  // ===========================================
+  
+  if (sentiment === 'neutral') {
+    const positiveWords = ['love', 'amazing', 'beautiful', 'great', 'super', 'génial', 'j\'adore', '❤️', '😍', '🔥', '👏', 'wow', 'incredible', 'perfect'];
+    const negativeWords = ['no', 'non', 'pas', 'never', 'jamais', 'spam', 'fake', 'arnaque', 'scam', 'ugly', 'moche', 'hate', 'déteste'];
+
+    if (positiveWords.some(w => lowerMessage.includes(w))) {
+      sentiment = 'positive';
+    } else if (negativeWords.some(w => lowerMessage.includes(w))) {
+      sentiment = 'negative';
+    }
+  }
+
+  console.log(`🎯 Intent Analysis: ${intent} | Mode: ${recommendedMode} | Pitch: ${triggerFanvuePitch}`);
+
+  return { 
+    intent, 
+    sentiment, 
+    is_question, 
+    mentions_fanvue, 
+    recommendedMode, 
+    modeReason,
+    triggerFanvuePitch 
+  };
 }
 
 /**
- * Generate Elena's response using Claude
+ * Generate Elena's response using Claude with intent-driven personality
  */
 export async function generateElenaResponse(
   contact: DMContact,
   incomingMessage: string,
-  conversationHistory: DMMessage[]
+  conversationHistory: DMMessage[],
+  analysis: IntentAnalysis
 ): Promise<{ response: string; strategy: ResponseStrategy; shouldPitch: boolean }> {
   // Build conversation context
   const messages = conversationHistory.map(msg => ({
@@ -451,26 +648,42 @@ export async function generateElenaResponse(
     content: incomingMessage,
   });
 
-  // Build context about the lead
+  // Build dynamic context based on intent analysis
+  const intentStrategy = INTENT_STRATEGIES[analysis.intent] || INTENT_STRATEGIES.other;
+  const personalityMode = PERSONALITY_MODES[analysis.recommendedMode] || PERSONALITY_MODES.balanced;
+
+  // Determine if we should allow Fanvue pitch
+  const canPitch = analysis.triggerFanvuePitch && contact.stage !== 'pitched';
+  const isAskingLink = analysis.intent === 'asking_link';
+
   const contextPrompt = `
-## LEAD CONTEXT
+## CURRENT CONTEXT
 - Username: ${contact.ig_username || 'unknown'}
-- Current stage: ${contact.stage.toUpperCase()}
-- Messages exchanged: ${contact.message_count}
-- First contact: ${contact.first_contact_at ? new Date(contact.first_contact_at).toLocaleDateString('en-US') : 'now'}
+- Stage: ${contact.stage.toUpperCase()}
+- Messages: ${contact.message_count}
+${contact.stage === 'pitched' ? '⚠️ Already pitched Fanvue. Don\'t mention it unless they ask.' : ''}
 
-## VIBE CHECK
-${contact.stage === 'cold' ? '- COLD: They just slid in. Be curious but not eager. NO Fanvue. NO tease.' : ''}
-${contact.stage === 'warm' ? '- WARM: They\'re hooked. Tease harder. You can hint "stuff you can\'t post here" but NO link yet.' : ''}
-${contact.stage === 'hot' && contact.message_count >= 8 ? '- HOT: You can tease Fanvue (SHORT, no link). Only give link if they ASK.' : ''}
-${contact.stage === 'pitched' ? '- PITCHED: They got the link. Don\'t mention Fanvue again unless THEY ask. Just vibe.' : ''}
+## DETECTED INTENT
+${intentStrategy}
 
-1-2 sentences usually. Longer only if actually needed.`;
+## PERSONALITY MODE
+${personalityMode}
+Reason: ${analysis.modeReason}
+
+${canPitch ? `
+## 🎯 FANVUE PITCH AUTHORIZED
+${isAskingLink ? 'They asked for the link → GIVE IT: ' + FANVUE_LINK : 'They want more → TEASE ONLY (no link yet)'}
+` : contact.stage === 'cold' ? `
+## ⛔ NO FANVUE
+Stage is COLD. Just build connection. NO tease, NO pitch.
+` : ''}
+
+REMEMBER: 1-3 sentences max. lowercase vibes. Match their language.`;
 
   try {
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 150,  // Allow longer when needed, prompt keeps it short
+      max_tokens: 150,
       system: ELENA_SYSTEM_PROMPT + '\n\n' + contextPrompt,
       messages: messages,
     });
@@ -479,9 +692,18 @@ ${contact.stage === 'pitched' ? '- PITCHED: They got the link. Don\'t mention Fa
       ? response.content[0].text.trim()
       : '';
 
-    // Determine strategy
+    // Determine strategy based on intent
     let strategy: ResponseStrategy = 'engage';
-    if (contact.stage === 'cold') {
+    
+    if (analysis.intent === 'ai_question') {
+      strategy = 'disclosure';
+    } else if (analysis.intent === 'asking_link') {
+      strategy = 'give_link';
+    } else if (analysis.intent === 'wants_more') {
+      strategy = 'tease_fanvue';
+    } else if (analysis.intent === 'objection') {
+      strategy = 'handle_objection';
+    } else if (contact.stage === 'cold') {
       strategy = 'engage';
     } else if (contact.stage === 'warm') {
       strategy = 'nurture';
@@ -489,17 +711,10 @@ ${contact.stage === 'pitched' ? '- PITCHED: They got the link. Don\'t mention Fa
       strategy = 'qualify';
     }
 
-    // Check if response contains Fanvue link
-    const shouldPitch = responseText.toLowerCase().includes('fanvue') && contact.stage === 'hot';
-    if (shouldPitch) {
-      strategy = 'pitch';
-    }
+    // Check if response contains Fanvue link (for marking as pitched)
+    const shouldPitch = responseText.toLowerCase().includes('fanvue.com');
 
-    // Check for AI disclosure
-    const analysis = await analyzeMessageIntent(incomingMessage);
-    if (analysis.intent === 'ai_question') {
-      strategy = 'disclosure';
-    }
+    console.log(`🤖 Generated response | Strategy: ${strategy} | Mode: ${analysis.recommendedMode}`);
 
     return {
       response: responseText,
@@ -508,7 +723,6 @@ ${contact.stage === 'pitched' ? '- PITCHED: They got the link. Don\'t mention Fa
     };
   } catch (error) {
     console.error('Error generating response:', error);
-    // Fallback response
     return {
       response: "Hey 🖤 Sorry, got distracted. What were you saying?",
       strategy: 'engage',
@@ -528,6 +742,7 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
   response: string;
   contact: DMContact;
   strategy: ResponseStrategy;
+  analysis: IntentAnalysis;
 }> {
   const startTime = Date.now();
   
@@ -544,9 +759,9 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
   const contact = await getOrCreateContact(igUserId, igUsername, igName, igProfilePic);
   console.log(`👤 Contact stage: ${contact.stage}, messages: ${contact.message_count}`);
 
-  // 2. Analyze incoming message
+  // 2. Analyze incoming message with intent + personality mode
   const analysis = await analyzeMessageIntent(incomingMessage);
-  console.log(`🔍 Intent: ${analysis.intent}, Sentiment: ${analysis.sentiment}`);
+  console.log(`🔍 Intent: ${analysis.intent} | Mode: ${analysis.recommendedMode} | Pitch: ${analysis.triggerFanvuePitch}`);
 
   // 3. Save incoming message
   await saveMessage(contact.id, 'incoming', incomingMessage, {
@@ -563,15 +778,16 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
   // 5. Get conversation history
   const history = await getConversationHistory(contact.id);
 
-  // 6. Generate response
+  // 6. Generate response with intent-driven personality
   const { response, strategy, shouldPitch } = await generateElenaResponse(
     updatedContact,
     incomingMessage,
-    history
+    history,
+    analysis  // Pass the full analysis
   );
 
-  console.log(`💬 Response strategy: ${strategy}`);
-  console.log(`📝 Response: "${response.substring(0, 50)}..."`);
+  console.log(`💬 Strategy: ${strategy} | Mode: ${analysis.recommendedMode}`);
+  console.log(`📝 Response: "${response.substring(0, 80)}${response.length > 80 ? '...' : ''}"`);
 
   // 7. Save outgoing message
   const responseTime = Date.now() - startTime;
@@ -587,12 +803,14 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
   // 9. Mark as pitched if we included Fanvue link
   if (shouldPitch) {
     await markAsPitched(updatedContact.id);
+    console.log(`🎯 Contact marked as PITCHED`);
   }
 
   return {
     response,
     contact: updatedContact,
     strategy,
+    analysis,
   };
 }
 
