@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 29 décembre 2024 (Fanvue Welcome DM 📬)
+**Dernière mise à jour** : 29 décembre 2024 (Fanvue API Fix 🔧)
 
 ---
 
@@ -159,6 +159,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 29/12/2024 | **🔧 Fanvue API Fix & OAuth Tokens** — Fix endpoints API (retrait /v1/) + Callback OAuth affiche tokens + Vérification configuration complète | [→](./docs/sessions/2024-12-29-fanvue-api-fix.md) |
 | 29/12/2024 | **🎯 Intent-Driven DM System** — Adaptation personnalité par intent + Pitch Fanvue déclenché par wants_more + PersonalityMode dynamique (warm/playful/curious/mysterious/confident) | [→](./docs/sessions/2024-12-29-intent-driven-dm-system.md) |
 | 28/12/2024 | **🎭 Elena Personality Rebalance** — Audit DM (81% bratty → 35% warm target) + Refonte prompt persona + Nouveau mix 35/25/20/15/5 | [→](./docs/sessions/2024-12-28-elena-personality-rebalance.md) |
 | 28/12/2024 | **🔧 Scheduler Fix + History Layer** — Fix cron scheduler (6:00→6:05 UTC) + History layer lit scheduled_posts + Fix throwbacks répétitifs | [→](./docs/sessions/SESSION-28-DEC-2024-SCHEDULER-FIX.md) |
