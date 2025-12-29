@@ -39,6 +39,26 @@ interface FanvueTokens {
 let cachedTokens: FanvueTokens | null = null;
 let cachedCodeVerifier: string | null = null;
 
+/**
+ * Initialize tokens from environment variables (for CI/CD like GitHub Actions)
+ * Set FANVUE_ACCESS_TOKEN and FANVUE_REFRESH_TOKEN in secrets
+ */
+export function initTokensFromEnv(): boolean {
+  const accessToken = process.env.FANVUE_ACCESS_TOKEN;
+  const refreshToken = process.env.FANVUE_REFRESH_TOKEN;
+  
+  if (accessToken && refreshToken) {
+    cachedTokens = {
+      accessToken,
+      refreshToken,
+      expiresAt: Date.now() + (3600 * 1000), // Assume 1h validity, will refresh if needed
+    };
+    console.log('[Fanvue] Tokens initialized from environment variables');
+    return true;
+  }
+  return false;
+}
+
 // ===========================================
 // PKCE HELPERS
 // ===========================================

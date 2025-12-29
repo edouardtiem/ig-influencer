@@ -1,0 +1,80 @@
+name: Elena Daily Fanvue Post
+
+# ═══════════════════════════════════════════════════════════════════
+# 📅 Posts one photo per day to Fanvue at 17h Paris time
+# Content rotates through a 14-day calendar of safe-sexy prompts
+# ═══════════════════════════════════════════════════════════════════
+
+on:
+  schedule:
+    # 16:00 UTC = 17:00 Paris (CET winter) / 18:00 Paris (CEST summer)
+    - cron: '0 16 * * *'
+  
+  workflow_dispatch:
+    inputs:
+      day:
+        description: 'Force specific day (1-14, leave empty for auto)'
+        required: false
+        default: ''
+      test_mode:
+        description: 'Test mode (generate only, no Fanvue post)'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  daily-fanvue-post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: ./app
+        run: npm install replicate
+
+      - name: Generate and Post to Fanvue
+        working-directory: ./app
+        env:
+          # Replicate (image generation)
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          
+          # Cloudinary (image hosting)
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          
+          # Fanvue OAuth
+          FANVUE_CLIENT_ID: ${{ secrets.FANVUE_CLIENT_ID }}
+          FANVUE_CLIENT_SECRET: ${{ secrets.FANVUE_CLIENT_SECRET }}
+          FANVUE_ACCESS_TOKEN: ${{ secrets.FANVUE_ACCESS_TOKEN }}
+          FANVUE_REFRESH_TOKEN: ${{ secrets.FANVUE_REFRESH_TOKEN }}
+        run: |
+          echo "🌟 Starting Elena Daily Fanvue Post"
+          echo "📅 Date: $(date)"
+          
+          # Build command with optional arguments
+          CMD="node scripts/daily-fanvue-elena.mjs"
+          
+          # Add day if specified
+          if [ -n "${{ github.event.inputs.day }}" ]; then
+            CMD="$CMD --day ${{ github.event.inputs.day }}"
+            echo "📌 Forcing day: ${{ github.event.inputs.day }}"
+          fi
+          
+          # Add test flag if specified
+          if [ "${{ github.event.inputs.test_mode }}" = "true" ]; then
+            CMD="$CMD --test"
+            echo "⚠️ Test mode: will NOT post to Fanvue"
+          fi
+          
+          echo "🚀 Running: $CMD"
+          $CMD
+

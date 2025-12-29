@@ -29,3 +29,4 @@ Intégration complète de l'API Fanvue avec OAuth 2.0 + PKCE pour permettre l'up
 - Auth method : `client_secret_basic` (pas `client_secret_post`)
 - Endpoints OAuth2 : `/oauth2/auth` et `/oauth2/token`
 
+

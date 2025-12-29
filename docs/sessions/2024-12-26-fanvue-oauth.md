@@ -107,3 +107,4 @@ headers: { 'Authorization': `Basic ${basicAuth}` }
 - [OAuth Implementation Guide](https://api.fanvue.com/docs/authentication/implementation-guide)
 - [Fanvue Discord](https://discord.com/invite/dZe3tqVTq4)
 
+

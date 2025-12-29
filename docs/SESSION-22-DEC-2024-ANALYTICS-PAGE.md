@@ -200,3 +200,4 @@ Engagement Rate = (likes + comments + saves) / reach × 100
 
 *Session documentée le 22 décembre 2024*
 
+

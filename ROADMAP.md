@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 29 décembre 2024 (Intent-Driven DM System 🎯)
+**Dernière mise à jour** : 29 décembre 2024 (Fanvue Daily System 📅)
 
 ---
 
@@ -60,6 +60,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-040 | **📅 Fanvue Daily System** — 1 photo/jour à 17h Paris + Calendrier 14 jours safe-sexy + GitHub Action auto + Posts abonnés uniquement | 29/12/2024 | v2.31.0 | [→](./roadmap/done/DONE-040-fanvue-daily-system.md) |
 | DONE-039 | **🎯 Intent-Driven DM System** — Adaptation personnalité par intent + Pitch Fanvue déclenché par wants_more (au lieu de 8 messages) + PersonalityMode dynamique | 29/12/2024 | v2.30.0 | [→](./roadmap/done/DONE-039-intent-driven-dm-system.md) |
 | DONE-038 | **🔥 Elena Sexy Mode** — 1 post/jour 21h + Prompts suggestifs (bikini/lingerie/sport) + Locations filtrées + Mila PAUSE | 27/12/2024 | v2.29.0 | [→](./docs/sessions/2024-12-27-elena-sexy-mode.md) |
 | DONE-037 | **🤖 DM Automation LIVE** — Claude AI + ManyChat + Lead scoring + English default + Fix double message + Shorter responses + Natural delay + Conversational auto-DM | 26/12/2024 | v2.28.4 | [→](./docs/sessions/2024-12-26-dm-automation.md) |
