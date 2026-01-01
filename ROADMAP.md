@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 31 décembre 2024 (Audit DM Cold/Warm 📊)
+**Dernière mise à jour** : 1er janvier 2025 (Fanvue Chat Bot avec Grok 🤖)
 
 ---
 
@@ -62,6 +62,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-043 | **💬 Fanvue Chat Bot avec Grok** — Chat automatique avec Grok AI + génération images NSFW + Webhooks (message/subscriber/tip) + Fix API posts Fanvue | 01/01/2025 | v2.34.0 | [→](./roadmap/done/DONE-043-fanvue-chat-bot-grok.md) |
 | DONE-042 | **🤖 DM Automation V2** — Caps par stage (15/25/35), closing pressure, personnalité warm/flirty, intent sexual→Fanvue, délai 15-35s, anti-hallucination | 30/12/2024 | v2.33.0 | [→](./docs/27-DM-AUTOMATION-V2.md) |
 | DONE-041 | **📬 Fanvue Welcome DM** — Webhook auto pour nouveaux followers + DM teaser photo + Conversion free → paid | 29/12/2024 | v2.32.0 | [→](./roadmap/done/DONE-041-fanvue-welcome-dm.md) |
 | DONE-040 | **📅 Fanvue Daily System** — 1 photo/jour à 17h Paris + Calendrier 14 jours safe-sexy + GitHub Action auto + Posts abonnés uniquement | 29/12/2024 | v2.31.0 | [→](./roadmap/done/DONE-040-fanvue-daily-system.md) |
