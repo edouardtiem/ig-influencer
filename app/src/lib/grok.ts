@@ -95,10 +95,9 @@ export async function generateImage(
   prompt: string,
   options: {
     model?: string;
-    size?: string;
     n?: number;
-    referenceImageUrl?: string; // Cloudinary URL to use as style reference
-    referenceImages?: string[]; // Multiple reference images
+    referenceImageUrl?: string; // Cloudinary URL to use as style reference (for prompt enhancement)
+    referenceImages?: string[]; // Multiple reference images (for prompt enhancement)
   } = {}
 ): Promise<string> {
   const apiKey = getApiKey();
@@ -107,7 +106,6 @@ export async function generateImage(
   let enhancedPrompt = prompt;
   
   if (options.referenceImageUrl || options.referenceImages) {
-    const refs = options.referenceImages || [options.referenceImageUrl!];
     enhancedPrompt = `${prompt}\n\nStyle reference: Match the composition, lighting, mood, and aesthetic quality of the reference image(s). Maintain similar pose, setting atmosphere, and visual style.`;
   }
   
@@ -115,17 +113,8 @@ export async function generateImage(
     model: options.model || 'grok-2-image',
     prompt: enhancedPrompt,
     n: options.n || 1,
-    size: options.size || '1024x1024',
     response_format: 'url',
   };
-  
-  // If Grok API supports image inputs, add them here
-  // Note: xAI API may support image_urls parameter - to be tested
-  if (options.referenceImageUrl || options.referenceImages) {
-    const imageRefs = options.referenceImages || [options.referenceImageUrl!];
-    // Try adding image references if API supports it
-    // body.image_urls = imageRefs; // Uncomment if API supports this
-  }
   
   const response = await fetch(`${XAI_API_URL}/images/generations`, {
     method: 'POST',
@@ -313,10 +302,7 @@ export async function generateElenaImage(
   // Use reference image if available and requested
   if (useReference && referenceImageUrl) {
     console.log(`[Grok] Using reference image: ${referenceImageUrl}`);
-    return generateImage(fullPrompt, {
-      referenceImageUrl,
-      size: '1024x1024',
-    });
+    return generateImage(fullPrompt, { referenceImageUrl });
   }
   
   return generateImage(fullPrompt);
@@ -341,10 +327,7 @@ export async function generateElenaImageFromReference(
   
   console.log(`[Grok] Generating variation from reference: ${referenceImageUrl}`);
   
-  return generateImage(prompt, {
-    referenceImageUrl,
-    size: '1024x1024',
-  });
+  return generateImage(prompt, { referenceImageUrl });
 }
 
 /**
@@ -383,9 +366,6 @@ export async function generateBeachPoolImage(
   
   console.log(`[Grok] Generating beach/pool image with reference style`);
   
-  return generateImage(prompt, {
-    referenceImageUrl,
-    size: '1024x1024',
-  });
+  return generateImage(prompt, { referenceImageUrl });
 }
 
