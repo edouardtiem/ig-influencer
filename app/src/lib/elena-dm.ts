@@ -920,6 +920,68 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
   const analysis = await analyzeMessageIntent(incomingMessage);
   console.log(`🔍 Intent: ${analysis.intent} | Mode: ${analysis.recommendedMode} | Pitch: ${analysis.triggerFanvuePitch}`);
 
+  // ===========================================
+  // DEDUPLICATION CHECK (prevent duplicate messages)
+  // ===========================================
+  // Check if we just processed this exact message recently (within last 10 seconds)
+  const { data: recentDuplicate } = await supabase
+    .from('elena_dm_messages')
+    .select('id, created_at')
+    .eq('contact_id', contact.id)
+    .eq('direction', 'incoming')
+    .eq('content', incomingMessage)
+    .gte('created_at', new Date(Date.now() - 10000).toISOString()) // Last 10 seconds
+    .limit(1)
+    .single();
+
+  if (recentDuplicate) {
+    const timeDiff = Date.now() - new Date(recentDuplicate.created_at).getTime();
+    console.log(`⚠️ DUPLICATE MESSAGE DETECTED (${Math.round(timeDiff / 1000)}s ago). Returning cached response.`);
+    
+    // Return the last response we generated for this contact
+    const { data: lastResponse } = await supabase
+      .from('elena_dm_messages')
+      .select('content, response_strategy')
+      .eq('contact_id', contact.id)
+      .eq('direction', 'outgoing')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (lastResponse) {
+      return {
+        response: lastResponse.content,
+        contact,
+        strategy: (lastResponse.response_strategy as ResponseStrategy) || 'engage',
+        analysis: {
+          intent: 'other',
+          sentiment: 'neutral',
+          is_question: false,
+          mentions_fanvue: false,
+          recommendedMode: 'balanced',
+          modeReason: 'Duplicate webhook call - returning cached response',
+          triggerFanvuePitch: false,
+        },
+      };
+    }
+
+    // Fallback: return simple acknowledgment if no previous response
+    return {
+      response: "hey 🖤",
+      contact,
+      strategy: 'engage',
+      analysis: {
+        intent: 'other',
+        sentiment: 'neutral',
+        is_question: false,
+        mentions_fanvue: false,
+        recommendedMode: 'balanced',
+        modeReason: 'Duplicate webhook call',
+        triggerFanvuePitch: false,
+      },
+    };
+  }
+
   // 3. Save incoming message
   await saveMessage(contact.id, 'incoming', incomingMessage, {
     intent: analysis.intent,
