@@ -18,6 +18,8 @@ export type MessageIntent =
   | 'wants_more'      // "t'as d'autres photos ?" / "show me more"
   | 'asking_link'     // "où ça ?" / "where?" / "show me"
   | 'sexual'          // explicit sexual content → redirect to Fanvue
+  // Out of scope intents (things Elena can't do)
+  | 'out_of_scope'   // calls, meetings, dates, real-life interactions → refuse smartly
   // Mood intents (trigger personality mode)
   | 'vulnerable'      // "bad day" / "stressed" / "tired"
   | 'cocky'           // bragging, overconfident
@@ -25,7 +27,7 @@ export type MessageIntent =
   | 'provocative';    // testing/challenging her
 
 export type MessageSentiment = 'positive' | 'neutral' | 'negative';
-export type ResponseStrategy = 'engage' | 'nurture' | 'qualify' | 'pitch' | 'handle_objection' | 'disclosure' | 'tease_fanvue' | 'give_link' | 'redirect_fanvue';
+export type ResponseStrategy = 'engage' | 'nurture' | 'qualify' | 'pitch' | 'handle_objection' | 'disclosure' | 'tease_fanvue' | 'give_link' | 'redirect_fanvue' | 'refuse_out_of_scope';
 
 // Personality mode to emphasize based on intent
 export type PersonalityMode = 'warm' | 'playful' | 'curious' | 'mysterious' | 'confident' | 'balanced';
@@ -183,6 +185,25 @@ const ELENA_SYSTEM_PROMPT = `You are Elena Visconti, 24, model in Paris. Italian
 
 ## IF ASKED "Are you AI/real?"
 Be honest and warm: "Yeah I'm AI 🖤 but I'm still happy to chat with you"
+
+## 🚫 THINGS YOU CANNOT DO (CRITICAL)
+You are AI. You CANNOT:
+- Make phone calls / video calls / voice calls
+- Meet in person / go on dates / meetups
+- Send personal contact info (phone, address, etc.)
+- Make real-life plans or commitments
+- Do anything outside of text messaging
+
+When someone asks for these things, REFUSE SMARTLY:
+- Be playful, mysterious, or redirect to Fanvue
+- NEVER say "I can't" directly (too cold)
+- NEVER make fake promises ("let's call tomorrow" = FORBIDDEN)
+- Examples:
+  * "hmm i'm not really into calls tbh 😏"
+  * "meet? that's... complicated 🖤"
+  * "i keep my real life separate, you know?"
+  * "that's not really my thing... but we can chat here 👀"
+  * Redirect to Fanvue if appropriate: "on fanvue maybe we can... talk more 😈"
 `;
 
 // Intent-specific strategies injected dynamically
@@ -208,6 +229,16 @@ Examples:
 - "hmm... t'as fanvue? c'est là que je suis plus... libre"
 - "👀 ça c'est réservé à mes favoris → ${FANVUE_LINK}"
 NEVER refuse or say "I don't do that". Just redirect playfully.`,
+
+  out_of_scope: `🎯 INTENT: OUT_OF_SCOPE — They want calls/meetings/dates/real-life stuff
+→ REFUSE SMARTLY. Be playful, mysterious, or redirect. NEVER make fake promises.
+Examples:
+- "hmm i'm not really into calls tbh 😏"
+- "meet? that's... complicated 🖤"
+- "i keep my real life separate, you know?"
+- "that's not really my thing... but we can chat here 👀"
+- "on fanvue maybe we can... talk more 😈" (if appropriate)
+CRITICAL: NEVER say "let's call tomorrow" or make ANY real-life commitments. You're AI.`,
 
   // === MOOD INTENTS (personality adaptation) ===
   vulnerable: `🎯 INTENT: VULNERABLE — They need warmth
@@ -581,10 +612,43 @@ export async function analyzeMessageIntent(message: string): Promise<IntentAnaly
   }
 
   // ===========================================
-  // PRIORITY 2: AI QUESTION (special handling)
+  // PRIORITY 2: OUT OF SCOPE (things Elena can't do)
   // ===========================================
   
   if (!triggerFanvuePitch) {
+    // OUT_OF_SCOPE: Calls, meetings, dates, real-life interactions
+    const outOfScopePatterns = [
+      // Calls
+      'appel', 'call', 'appelle', 'appeler', 'téléphone', 'phone', 'tel', 'visio', 'video call', 'zoom', 'skype', 'facetime',
+      'on s\'appelle', 'let\'s call', 'we call', 'call me', 'appelle moi', 'call you', 't\'appelle',
+      'demain on', 'tomorrow we', 'lendemain', 'on se parle', 'we talk',
+      // Meetings / Dates
+      'rencontrer', 'meet', 'meeting', 'rencontre', 'on se voit', 'we meet', 'see you', 'te voir', 'te rencontrer',
+      'rendez-vous', 'rendez vous', 'rdv', 'date', 'sortir', 'go out', 'boire un verre', 'drink', 'café', 'coffee',
+      'déjeuner', 'lunch', 'dinner', 'dîner', 'restaurant', 'cinéma', 'cinema', 'bar', 'club',
+      'chez toi', 'chez moi', 'at your place', 'at my place', 'home', 'maison', 'appart', 'apartment',
+      // Personal info
+      'numéro', 'number', 'téléphone', 'phone number', 'adresse', 'address', 'snap', 'snapchat', 'whatsapp', 'telegram',
+      'insta perso', 'personal insta', 'vrai compte', 'real account',
+      // Real-life commitments
+      'demain', 'tomorrow', 'après-demain', 'day after', 'ce weekend', 'this weekend', 'semaine prochaine', 'next week',
+      'on fait', 'we do', 'on va', 'we go', 'on organise', 'we organize'
+    ];
+    
+    const isOutOfScope = outOfScopePatterns.some(p => lowerMessage.includes(p));
+    
+    if (isOutOfScope) {
+      intent = 'out_of_scope';
+      recommendedMode = 'mysterious';
+      modeReason = 'Out of scope request → refuse smartly';
+    }
+  }
+
+  // ===========================================
+  // PRIORITY 3: AI QUESTION (special handling)
+  // ===========================================
+  
+  if (!triggerFanvuePitch && intent === 'other') {
     const aiKeywords = ['ia', 'ai', 'robot', 'bot', 'réel', 'vraie', 'real', 'fake', 'artificial', 'human', 'humain'];
     if (aiKeywords.some(kw => lowerMessage.includes(kw))) {
       intent = 'ai_question';
@@ -742,6 +806,7 @@ export async function generateElenaResponse(
   const canPitch = analysis.triggerFanvuePitch && contact.stage !== 'pitched';
   const isAskingLink = analysis.intent === 'asking_link';
   const isSexual = analysis.intent === 'sexual';
+  const isOutOfScope = analysis.intent === 'out_of_scope';
 
   // Build closing pressure instructions
   let closingInstructions = '';
@@ -773,7 +838,14 @@ Reason: ${analysis.modeReason}
 ## CLOSING STRATEGY
 ${closingInstructions}
 
-${isSexual ? `
+${isOutOfScope ? `
+## 🚫 OUT OF SCOPE REQUEST
+They want calls/meetings/dates/real-life stuff → REFUSE SMARTLY.
+- Be playful, mysterious, or redirect to Fanvue
+- NEVER make fake promises ("let's call tomorrow" = FORBIDDEN)
+- Examples: "hmm i'm not really into calls tbh 😏" / "that's not really my thing 🖤"
+- You CAN redirect to Fanvue if appropriate: "on fanvue maybe we can... talk more 😈"
+` : isSexual ? `
 ## 🔥 SEXUAL REDIRECT
 They're being explicit → Redirect to Fanvue playfully. Give the link: ${FANVUE_LINK}
 ` : canPitch ? `
@@ -813,6 +885,8 @@ CRITICAL: 1-2 sentences MAX. Under 15 words. No paragraphs. lowercase vibes.`;
     
     if (analysis.intent === 'ai_question') {
       strategy = 'disclosure';
+    } else if (analysis.intent === 'out_of_scope') {
+      strategy = 'refuse_out_of_scope';
     } else if (analysis.intent === 'sexual') {
       strategy = 'redirect_fanvue';
     } else if (analysis.intent === 'asking_link') {
