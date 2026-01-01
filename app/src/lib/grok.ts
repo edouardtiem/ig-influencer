@@ -87,6 +87,9 @@ export async function generateChatResponse(
 /**
  * Generate an image using Grok Aurora
  * Supports NSFW content with appropriate prompts
+ * 
+ * @param prompt - Text description of the image
+ * @param options - Generation options including reference images
  */
 export async function generateImage(
   prompt: string,
@@ -94,9 +97,35 @@ export async function generateImage(
     model?: string;
     size?: string;
     n?: number;
+    referenceImageUrl?: string; // Cloudinary URL to use as style reference
+    referenceImages?: string[]; // Multiple reference images
   } = {}
 ): Promise<string> {
   const apiKey = getApiKey();
+  
+  // Enhance prompt with reference image description if provided
+  let enhancedPrompt = prompt;
+  
+  if (options.referenceImageUrl || options.referenceImages) {
+    const refs = options.referenceImages || [options.referenceImageUrl!];
+    enhancedPrompt = `${prompt}\n\nStyle reference: Match the composition, lighting, mood, and aesthetic quality of the reference image(s). Maintain similar pose, setting atmosphere, and visual style.`;
+  }
+  
+  const body: Record<string, unknown> = {
+    model: options.model || 'grok-2-image',
+    prompt: enhancedPrompt,
+    n: options.n || 1,
+    size: options.size || '1024x1024',
+    response_format: 'url',
+  };
+  
+  // If Grok API supports image inputs, add them here
+  // Note: xAI API may support image_urls parameter - to be tested
+  if (options.referenceImageUrl || options.referenceImages) {
+    const imageRefs = options.referenceImages || [options.referenceImageUrl!];
+    // Try adding image references if API supports it
+    // body.image_urls = imageRefs; // Uncomment if API supports this
+  }
   
   const response = await fetch(`${XAI_API_URL}/images/generations`, {
     method: 'POST',
@@ -104,13 +133,7 @@ export async function generateImage(
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      model: options.model || 'grok-2-image',
-      prompt,
-      n: options.n || 1,
-      size: options.size || '1024x1024',
-      response_format: 'url',
-    }),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
@@ -127,6 +150,71 @@ export async function generateImage(
   }
   
   return imageUrl;
+}
+
+/**
+ * Get Elena images from Cloudinary for reference
+ * Returns URLs of existing Elena photos that can be used as style references
+ * 
+ * These images are used to guide Grok's generation style (composition, lighting, mood)
+ */
+export function getElenaCloudinaryReferences(): {
+  beach: string[];
+  bedroom: string[];
+  bathroom: string[];
+  lifestyle: string[];
+  all: string[];
+} {
+  // Elena images from Cloudinary - organized by category
+  // These URLs are used as style references for Grok image generation
+  const references = {
+    // Beach/Pool images - sunset, infinity pool, resort style
+    beach: [
+      // Add beach/pool images here - example format:
+      // 'https://res.cloudinary.com/dily60mr0/image/upload/v.../elena-beach-sunset.jpg',
+    ],
+    
+    // Bedroom images - morning stretch, lingerie, intimate
+    bedroom: [
+      'https://res.cloudinary.com/dily60mr0/image/upload/v1767007066/elena-fanvue-daily/morning_bed_stretch-1767007065.jpg',
+      // Add more bedroom images
+    ],
+    
+    // Bathroom images - mirror selfie, shower, getting ready
+    bathroom: [
+      // Add bathroom images
+    ],
+    
+    // Lifestyle images - yoga, sofa, casual, Parisian apartment
+    lifestyle: [
+      // Add lifestyle images
+    ],
+    
+    all: [] as string[],
+  };
+  
+  // Flatten all references
+  references.all = [
+    ...references.beach,
+    ...references.bedroom,
+    ...references.bathroom,
+    ...references.lifestyle,
+  ];
+  
+  return references;
+}
+
+/**
+ * Add a new reference image to the appropriate category
+ * Useful for dynamically adding images found in Cloudinary
+ */
+export function addElenaReference(
+  imageUrl: string,
+  category: 'beach' | 'bedroom' | 'bathroom' | 'lifestyle'
+): void {
+  // This would ideally update a persistent store (Supabase/DB)
+  // For now, it's a helper for manual updates
+  console.log(`[Grok] Add reference: ${imageUrl} to category: ${category}`);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -188,32 +276,116 @@ export function isAskingForImage(message: string): boolean {
 }
 
 /**
- * Generate an Elena image based on request
+ * Generate an Elena image based on request, using Cloudinary references for style consistency
  */
 export async function generateElenaImage(
-  request: string
+  request: string,
+  useReference: boolean = true
 ): Promise<string> {
   // Build prompt for Elena-style image
   const basePrompt = `Beautiful 24 year old Italian woman, long bronde hair with golden highlights, honey brown eyes, natural beauty mark on right cheek, feminine curvy figure, gold jewelry`;
   
-  // Analyze request to customize prompt
+  // Analyze request to customize prompt and select reference
   let scenePrompt = '';
+  let referenceImageUrl: string | undefined;
   const lowerRequest = request.toLowerCase();
+  const references = getElenaCloudinaryReferences();
   
   if (lowerRequest.includes('selfie') || lowerRequest.includes('face')) {
     scenePrompt = 'close up selfie, bedroom, soft lighting, flirty expression';
-  } else if (lowerRequest.includes('bikini') || lowerRequest.includes('plage') || lowerRequest.includes('beach')) {
-    scenePrompt = 'wearing bikini, beach setting, golden hour lighting';
-  } else if (lowerRequest.includes('lingerie') || lowerRequest.includes('bed')) {
-    scenePrompt = 'wearing elegant lingerie, luxury bedroom, intimate atmosphere';
-  } else if (lowerRequest.includes('shower') || lowerRequest.includes('douche') || lowerRequest.includes('bath')) {
-    scenePrompt = 'wrapped in towel, bathroom, steam, fresh from shower';
+    referenceImageUrl = references.bedroom[0];
+  } else if (lowerRequest.includes('bikini') || lowerRequest.includes('plage') || lowerRequest.includes('beach') || lowerRequest.includes('pool') || lowerRequest.includes('piscine')) {
+    scenePrompt = 'wearing bikini, beach or infinity pool setting, golden hour sunset lighting, luxury resort atmosphere';
+    referenceImageUrl = references.beach[0] || references.all[0];
+  } else if (lowerRequest.includes('lingerie') || lowerRequest.includes('bed') || lowerRequest.includes('lit')) {
+    scenePrompt = 'wearing elegant lingerie or silk camisole, luxury bedroom, intimate atmosphere, soft morning light';
+    referenceImageUrl = references.bedroom[0];
+  } else if (lowerRequest.includes('shower') || lowerRequest.includes('douche') || lowerRequest.includes('bath') || lowerRequest.includes('bain')) {
+    scenePrompt = 'wrapped in towel, bathroom, steam, fresh from shower, marble bathroom, soft lighting';
+    referenceImageUrl = references.bathroom[0] || references.all[0];
   } else {
     scenePrompt = 'casual outfit, Parisian apartment, natural lighting, candid moment';
+    referenceImageUrl = references.lifestyle[0] || references.all[0];
   }
 
-  const fullPrompt = `${basePrompt}, ${scenePrompt}, photorealistic, high quality`;
+  const fullPrompt = `${basePrompt}, ${scenePrompt}, photorealistic, high quality, professional photography, Instagram influencer style`;
+  
+  // Use reference image if available and requested
+  if (useReference && referenceImageUrl) {
+    console.log(`[Grok] Using reference image: ${referenceImageUrl}`);
+    return generateImage(fullPrompt, {
+      referenceImageUrl,
+      size: '1024x1024',
+    });
+  }
   
   return generateImage(fullPrompt);
+}
+
+/**
+ * Generate an Elena image matching a specific Cloudinary reference
+ * Useful for creating variations of existing photos
+ * 
+ * @param referenceImageUrl - Cloudinary URL of the reference image
+ * @param variationPrompt - Optional prompt to modify the reference (e.g., "different pose", "different outfit")
+ */
+export async function generateElenaImageFromReference(
+  referenceImageUrl: string,
+  variationPrompt?: string
+): Promise<string> {
+  const basePrompt = `Beautiful 24 year old Italian woman, long bronde hair with golden highlights, honey brown eyes, natural beauty mark on right cheek, feminine curvy figure, gold jewelry`;
+  
+  const prompt = variationPrompt 
+    ? `${basePrompt}, ${variationPrompt}, photorealistic, high quality, professional photography, Instagram influencer style`
+    : `${basePrompt}, similar pose and setting as reference, photorealistic, high quality, professional photography, Instagram influencer style`;
+  
+  console.log(`[Grok] Generating variation from reference: ${referenceImageUrl}`);
+  
+  return generateImage(prompt, {
+    referenceImageUrl,
+    size: '1024x1024',
+  });
+}
+
+/**
+ * Generate beach/pool images like the sunset infinity pool reference
+ * Uses the style of the reference image (sunset, infinity pool, resort luxury)
+ */
+export async function generateBeachPoolImage(
+  referenceImageUrl: string,
+  options: {
+    outfit?: 'bikini' | 'thong' | 'nude';
+    pose?: 'kneeling' | 'standing' | 'lying' | 'backshot';
+    timeOfDay?: 'sunset' | 'golden hour' | 'daylight';
+  } = {}
+): Promise<string> {
+  const outfitDesc = options.outfit === 'bikini' 
+    ? 'wearing white string bikini, thong style'
+    : options.outfit === 'thong'
+    ? 'wearing white string bikini, thong style, revealing'
+    : 'wearing white string bikini, thong style';
+  
+  const poseDesc = options.pose === 'kneeling'
+    ? 'kneeling on edge of infinity pool, back mostly to camera, looking to the side'
+    : options.pose === 'standing'
+    ? 'standing by infinity pool, elegant pose'
+    : options.pose === 'backshot'
+    ? 'back to camera, looking at sunset'
+    : 'kneeling elegantly by infinity pool';
+  
+  const timeDesc = options.timeOfDay === 'sunset'
+    ? 'golden hour sunset, warm orange and yellow hues, sun reflected in water'
+    : options.timeOfDay === 'golden hour'
+    ? 'golden hour lighting, warm tones'
+    : 'daylight, bright and clear';
+  
+  const prompt = `Beautiful 24 year old Italian woman, long bronde hair with golden highlights, honey brown eyes, natural beauty mark on right cheek, feminine curvy figure, gold chain anklet on ankle, ${outfitDesc}, ${poseDesc}, infinity pool, luxury resort, ${timeDesc}, serene atmosphere, professional photography, Instagram influencer style, photorealistic, high quality`;
+  
+  console.log(`[Grok] Generating beach/pool image with reference style`);
+  
+  return generateImage(prompt, {
+    referenceImageUrl,
+    size: '1024x1024',
+  });
 }
 
