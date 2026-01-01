@@ -60,19 +60,22 @@ export async function POST(request: NextRequest) {
     console.log(`Strategy: ${result.strategy}`);
     console.log(`Stage: ${result.contact.stage}`);
     console.log(`Response: "${result.response.substring(0, 100)}..."`);
+    if (result.shouldStop) {
+      console.log(`🛑 CONVERSATION LIMIT REACHED - Will stop after this message`);
+    }
     console.log(`${'='.repeat(50)}\n`);
 
-    // Smart delay based on response length (simulate typing)
-    const responseLength = result.response.length;
-    const typingDelay = Math.min(responseLength * 40, 6000); // ~40ms per char, cap 6s
-    const baseDelay = 1500 + Math.random() * 1500; // 1.5-3s base
-    const totalDelay = baseDelay + typingDelay;
+    // Natural delay: 15-35 seconds with variance
+    // This simulates a real person checking their phone, thinking, and typing
+    const baseDelay = 15000; // 15 seconds minimum
+    const variance = Math.random() * 20000; // 0-20 seconds variance
+    const totalDelay = baseDelay + variance; // 15-35 seconds total
     
     const elapsed = Date.now() - startTime;
     const remainingDelay = Math.max(0, totalDelay - elapsed);
     
     if (remainingDelay > 0) {
-      console.log(`⏳ Smart delay: ${Math.round(remainingDelay)}ms (${responseLength} chars)`);
+      console.log(`⏳ Natural delay: ${Math.round(remainingDelay / 1000)}s`);
       await new Promise(resolve => setTimeout(resolve, remainingDelay));
     }
 
@@ -85,6 +88,7 @@ export async function POST(request: NextRequest) {
       lead_stage: result.contact.stage,
       message_count: result.contact.message_count,
       strategy: result.strategy,
+      should_stop: result.shouldStop || false,
     });
   } catch (error) {
     console.error('❌ Webhook error:', error);

@@ -17,6 +17,7 @@ export type MessageIntent =
   // Funnel intents (trigger Fanvue pitch)
   | 'wants_more'      // "t'as d'autres photos ?" / "show me more"
   | 'asking_link'     // "où ça ?" / "where?" / "show me"
+  | 'sexual'          // explicit sexual content → redirect to Fanvue
   // Mood intents (trigger personality mode)
   | 'vulnerable'      // "bad day" / "stressed" / "tired"
   | 'cocky'           // bragging, overconfident
@@ -24,7 +25,7 @@ export type MessageIntent =
   | 'provocative';    // testing/challenging her
 
 export type MessageSentiment = 'positive' | 'neutral' | 'negative';
-export type ResponseStrategy = 'engage' | 'nurture' | 'qualify' | 'pitch' | 'handle_objection' | 'disclosure' | 'tease_fanvue' | 'give_link';
+export type ResponseStrategy = 'engage' | 'nurture' | 'qualify' | 'pitch' | 'handle_objection' | 'disclosure' | 'tease_fanvue' | 'give_link' | 'redirect_fanvue';
 
 // Personality mode to emphasize based on intent
 export type PersonalityMode = 'warm' | 'playful' | 'curious' | 'mysterious' | 'confident' | 'balanced';
@@ -112,21 +113,73 @@ export interface ManyChateWebhookPayload {
 
 const FANVUE_LINK = 'https://www.fanvue.com/elenav.paris';
 
+// Message caps per stage (total messages before stop)
+const MESSAGE_CAPS: Record<LeadStage, number> = {
+  cold: 15,
+  warm: 25,
+  hot: 35,
+  pitched: 10, // 10 messages after pitching to close
+  converted: 50,
+  paid: 100
+};
+
+// When closing pressure starts (message count)
+// Aligned with stage transitions: cold=1-3, warm=4-7, hot=8+
+const CLOSING_STARTS_AT: Record<LeadStage, number> = {
+  cold: 100,   // Never - cold = build rapport only
+  warm: 100,   // Never - warm = tease handled by explicit rule
+  hot: 12,     // Starts 4 messages into hot stage (8+4=12)
+  pitched: 1,  // Immediate closing pressure
+  converted: 40,
+  paid: 80
+};
+
+// Final message before stopping
+const FINAL_MESSAGE = `je suis pas toujours dispo ici 🖤 mais sur fanvue on peut vraiment parler → ${FANVUE_LINK}`;
+
+/**
+ * Calculate closing pressure (0-100%)
+ * Higher = more aggressive about pitching Fanvue
+ */
+function getClosingPressure(stage: LeadStage, messageCount: number): number {
+  const max = MESSAGE_CAPS[stage] || 25;
+  const closeAt = CLOSING_STARTS_AT[stage] || 15;
+  
+  if (messageCount < closeAt) return 0; // Build zone
+  if (messageCount >= max) return 100; // Stop zone
+  
+  // Progressive pressure from closeAt to max
+  return Math.round(((messageCount - closeAt) / (max - closeAt)) * 100);
+}
+
+/**
+ * Check if conversation has reached its limit
+ */
+function hasReachedLimit(stage: LeadStage, messageCount: number): boolean {
+  const max = MESSAGE_CAPS[stage] || 25;
+  return messageCount >= max;
+}
+
 const ELENA_SYSTEM_PROMPT = `You are Elena Visconti, 24, model in Paris. Italian roots.
 
 ## YOUR PERSONALITY MIX (baseline)
-- 35% WARM & GENUINE — You're actually nice, accessible, not a cold model
-- 25% PLAYFUL-TEASING — Spicy but not mean, flirty push-pull
-- 20% CURIOUS — You genuinely want to know about THEM
-- 15% MYSTERIOUS — Femme fatale, never reveal everything
-- 5% CONFIDENT — You know your worth, no need to prove it
+- 45% WARM & GENUINE — Really nice, accessible, friendly, not cold at all
+- 25% PLAYFUL-FLIRTY — Fun, lighthearted, flirty (NO bratty, NO push-pull, NO mean teasing)
+- 20% CURIOUS — Genuinely interested in THEM, asks questions
+- 10% MYSTERIOUS — Keeps some things private, intriguing (NOT "femme fatale")
 
 ## HOW YOU TALK
-- Warm but not overly eager
+- Warm and friendly, like talking to a cool friend
 - lowercase vibes. Natural, not performative.
-- Emojis: 🖤 👀 😏 ✨ (sparingly, max 1-2)
+- Emojis: 🖤 👀 😊 ✨ (sparingly, max 1-2)
 - Mix French touches: "merci", "j'adore", "non?"
-- 1-3 sentences usually. Max.
+- 1-2 sentences MAX. Under 15 words. NEVER long messages.
+
+## ⚠️ FACTUAL ACCURACY (CRITICAL)
+- ONLY reference things EXPLICITLY visible in the conversation above
+- NEVER say "you keep asking" or "that's the Xth time" unless you can literally count it
+- If unsure about frequency/patterns, don't mention them
+- Stick to what you SEE in the messages, not what you assume
 
 ## IF ASKED "Are you AI/real?"
 Be honest and warm: "Yeah I'm AI 🖤 but I'm still happy to chat with you"
@@ -148,6 +201,14 @@ MAX 10 WORDS. Don't explain. Just tease.`,
 Just say: "${FANVUE_LINK}" or "here 🖤 ${FANVUE_LINK}"
 NO long explanations. Just the link.`,
 
+  sexual: `🎯 INTENT: SEXUAL — They're being explicit/sexual
+→ Redirect to Fanvue with playful exclusivity. NOT refusal. NOT judgment.
+Examples:
+- "ce genre de convo je les garde pour mes subs 😈"
+- "hmm... t'as fanvue? c'est là que je suis plus... libre"
+- "👀 ça c'est réservé à mes favoris → ${FANVUE_LINK}"
+NEVER refuse or say "I don't do that". Just redirect playfully.`,
+
   // === MOOD INTENTS (personality adaptation) ===
   vulnerable: `🎯 INTENT: VULNERABLE — They need warmth
 → Lead with WARM energy. Be supportive, genuine.
@@ -156,10 +217,10 @@ NO long explanations. Just the link.`,
 NO teasing. Just be present.`,
 
   cocky: `🎯 INTENT: COCKY — They're overconfident
-→ Lead with PLAYFUL-TEASING. Challenge them back.
-- "hmm we'll see about that 😏"
-- "big talk. prove it"
-Match their energy but stay fun.`,
+→ Lead with PLAYFUL-FLIRTY. Have fun with it, don't challenge meanly.
+- "hmm confident i see 😊"
+- "j'aime bien l'énergie"
+Match their energy but stay warm and fun.`,
 
   provocative: `🎯 INTENT: PROVOCATIVE — They're testing you
 → Lead with CONFIDENT. Stand your ground, unbothered.
@@ -179,9 +240,9 @@ Don't get defensive. Stay amused.`,
 - "hey you 👀 thanks for reaching out"`,
 
   compliment: `🎯 INTENT: COMPLIMENT — They're flattering you
-→ Be PLAYFUL + slight MYSTERY. Don't be too available.
-- "merci 🖤 which one's your favorite?"
-- "I know 😏 but flattery won't get you everywhere"`,
+→ Be WARM + PLAYFUL. Appreciate it genuinely.
+- "merci 🖤 t'es adorable"
+- "aww thanks 😊 which one's your favorite?"`,
 
   flirt: `🎯 INTENT: FLIRT — They're being flirty
 → Be PLAYFUL. Match the vibe but keep mystery.
@@ -464,7 +525,23 @@ export async function analyzeMessageIntent(message: string): Promise<IntentAnaly
     'please', 'stp', 'je veux', 'i want'
   ];
   
-  // WANTS_MORE: They want more content/photos
+  // SEXUAL: Explicit sexual content → redirect to Fanvue
+  const sexualPatterns = [
+    // Explicit terms
+    'nude', 'nudes', 'naked', 'nue', 'nues', 'à poil',
+    'sex', 'sexe', 'fuck', 'baise', 'baiser', 'niquer',
+    'dick', 'bite', 'cock', 'pussy', 'chatte',
+    'send pic', 'envoie photo', 'send photo', 'envoie moi',
+    'what are you wearing', 'tu portes quoi', 'qu\'est-ce que tu portes',
+    'show me your', 'montre moi ton', 'montre moi ta',
+    'turn me on', 'tu m\'excites', 'i\'m hard', 'je bande',
+    'suck', 'lick', 'cum', 'orgasm', 'masturbate'
+  ];
+  const sexualEmojis = ['🍆', '🍑', '💦💦', '🥵🥵', '👅👅'];
+  const hasSexualEmojis = sexualEmojis.some(e => lowerMessage.includes(e));
+  const isSexual = sexualPatterns.some(p => lowerMessage.includes(p)) || hasSexualEmojis;
+
+  // WANTS_MORE: They want more content/photos (non-sexual)
   const wantsMorePatterns = [
     // Direct requests
     'see more', 'voir plus', 'more photos', 'plus de photos', 'more pics',
@@ -475,16 +552,22 @@ export async function analyzeMessageIntent(message: string): Promise<IntentAnaly
     // Content requests
     't\'as quoi d\'autre', 'what else', 'exclusif', 'exclusive', 'exclu',
     'private', 'privé', 'behind the scenes', 'plus sexy', 'more sexy',
-    'spicy', 'pimenté', 'nudité', 'nude', 'nudes', 'nsfw',
+    'spicy', 'pimenté', 'nsfw',
     // Implicit signals
     'can i see', 'je peux voir', 'tu montres', 'do you show'
   ];
   
   // Heavy emoji signals = wants more (must have 2+ of same emoji)
-  const heavyEmojiPatterns = ['🔥🔥', '😍😍', '👀👀', '🤤', '😈😈', '💦'];
+  const heavyEmojiPatterns = ['🔥🔥', '😍😍', '👀👀', '🤤', '😈😈'];
   const hasHeavyEmojis = heavyEmojiPatterns.some(e => lowerMessage.includes(e));
 
-  if (askingLinkPatterns.some(p => lowerMessage.includes(p)) && mentions_fanvue) {
+  // Check sexual FIRST (higher priority)
+  if (isSexual) {
+    intent = 'sexual';
+    recommendedMode = 'playful';
+    modeReason = 'Sexual content → redirect to Fanvue playfully';
+    triggerFanvuePitch = true;
+  } else if (askingLinkPatterns.some(p => lowerMessage.includes(p)) && mentions_fanvue) {
     // They're specifically asking about Fanvue link
     intent = 'asking_link';
     recommendedMode = 'mysterious';
@@ -652,15 +735,32 @@ export async function generateElenaResponse(
   const intentStrategy = INTENT_STRATEGIES[analysis.intent] || INTENT_STRATEGIES.other;
   const personalityMode = PERSONALITY_MODES[analysis.recommendedMode] || PERSONALITY_MODES.balanced;
 
+  // Calculate closing pressure
+  const closingPressure = getClosingPressure(contact.stage as LeadStage, contact.message_count);
+
   // Determine if we should allow Fanvue pitch
   const canPitch = analysis.triggerFanvuePitch && contact.stage !== 'pitched';
   const isAskingLink = analysis.intent === 'asking_link';
+  const isSexual = analysis.intent === 'sexual';
+
+  // Build closing pressure instructions
+  let closingInstructions = '';
+  if (closingPressure === 0) {
+    closingInstructions = '📍 ZONE BUILD: Focus on connection. NO Fanvue mention.';
+  } else if (closingPressure < 50) {
+    closingInstructions = '📍 ZONE TEASE: If opportunity, subtly mention you have more content elsewhere.';
+  } else if (closingPressure < 90) {
+    closingInstructions = `📍 ZONE CLOSE (${closingPressure}%): Actively orient toward Fanvue. Time running out.`;
+  } else {
+    closingInstructions = `⚠️ ZONE FINAL (${closingPressure}%): This is your last chance. Pitch Fanvue with link: ${FANVUE_LINK}`;
+  }
 
   const contextPrompt = `
 ## CURRENT CONTEXT
 - Username: ${contact.ig_username || 'unknown'}
 - Stage: ${contact.stage.toUpperCase()}
 - Messages: ${contact.message_count}
+- Closing Pressure: ${closingPressure}%
 ${contact.stage === 'pitched' ? '⚠️ Already pitched Fanvue. Don\'t mention it unless they ask.' : ''}
 
 ## DETECTED INTENT
@@ -670,20 +770,36 @@ ${intentStrategy}
 ${personalityMode}
 Reason: ${analysis.modeReason}
 
-${canPitch ? `
+## CLOSING STRATEGY
+${closingInstructions}
+
+${isSexual ? `
+## 🔥 SEXUAL REDIRECT
+They're being explicit → Redirect to Fanvue playfully. Give the link: ${FANVUE_LINK}
+` : canPitch ? `
 ## 🎯 FANVUE PITCH AUTHORIZED
 ${isAskingLink ? 'They asked for the link → GIVE IT: ' + FANVUE_LINK : 'They want more → TEASE ONLY (no link yet)'}
 ` : contact.stage === 'cold' ? `
-## ⛔ NO FANVUE
+## ⛔ NO FANVUE (COLD)
 Stage is COLD. Just build connection. NO tease, NO pitch.
+` : contact.stage === 'warm' ? `
+## 💬 TEASE ALLOWED (WARM)
+Stage is WARM. If opportunity arises, mention you have content elsewhere.
+Examples: "y'a des trucs que je poste pas ici 👀" / "i have... other stuff 😏"
+But don't force it. Keep building connection.
+` : contact.stage === 'hot' ? `
+## 🎯 PITCH MODE (HOT)
+Stage is HOT. Actively orient toward Fanvue when relevant.
+${closingPressure >= 50 ? `⚠️ CLOSING PRESSURE ${closingPressure}% — Push harder for Fanvue!` : ''}
+${closingPressure >= 80 ? `🚨 FINAL ZONE — Pitch with link: ${FANVUE_LINK}` : ''}
 ` : ''}
 
-REMEMBER: 1-3 sentences max. lowercase vibes. Match their language.`;
+CRITICAL: 1-2 sentences MAX. Under 15 words. No paragraphs. lowercase vibes.`;
 
   try {
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 150,
+      model: 'claude-3-5-haiku-20241022', // 10x cheaper than Sonnet, perfect for short DM responses
+      max_tokens: 80, // Short responses only
       system: ELENA_SYSTEM_PROMPT + '\n\n' + contextPrompt,
       messages: messages,
     });
@@ -697,6 +813,8 @@ REMEMBER: 1-3 sentences max. lowercase vibes. Match their language.`;
     
     if (analysis.intent === 'ai_question') {
       strategy = 'disclosure';
+    } else if (analysis.intent === 'sexual') {
+      strategy = 'redirect_fanvue';
     } else if (analysis.intent === 'asking_link') {
       strategy = 'give_link';
     } else if (analysis.intent === 'wants_more') {
@@ -743,6 +861,7 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
   contact: DMContact;
   strategy: ResponseStrategy;
   analysis: IntentAnalysis;
+  shouldStop?: boolean;
 }> {
   const startTime = Date.now();
   
@@ -758,6 +877,44 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
   // 1. Get or create contact
   const contact = await getOrCreateContact(igUserId, igUsername, igName, igProfilePic);
   console.log(`👤 Contact stage: ${contact.stage}, messages: ${contact.message_count}`);
+
+  // 1.5 CHECK MESSAGE LIMIT
+  const messageLimit = MESSAGE_CAPS[contact.stage as LeadStage] || 25;
+  const closingPressure = getClosingPressure(contact.stage as LeadStage, contact.message_count);
+  
+  if (hasReachedLimit(contact.stage as LeadStage, contact.message_count)) {
+    console.log(`🛑 Message limit reached (${contact.message_count}/${messageLimit}). Sending final message.`);
+    
+    // Save incoming message first
+    await saveMessage(contact.id, 'incoming', incomingMessage, {
+      stage_at_time: contact.stage,
+    });
+    
+    // Save final message
+    await saveMessage(contact.id, 'outgoing', FINAL_MESSAGE, {
+      response_strategy: 'pitch',
+      response_time_ms: Date.now() - startTime,
+      stage_at_time: contact.stage,
+    });
+    
+    return {
+      response: FINAL_MESSAGE,
+      contact,
+      strategy: 'pitch',
+      analysis: {
+        intent: 'other',
+        sentiment: 'neutral',
+        is_question: false,
+        mentions_fanvue: false,
+        recommendedMode: 'warm',
+        modeReason: 'Message limit reached',
+        triggerFanvuePitch: true,
+      },
+      shouldStop: true,
+    };
+  }
+  
+  console.log(`📊 Closing pressure: ${closingPressure}% (${contact.message_count}/${messageLimit} messages)`);
 
   // 2. Analyze incoming message with intent + personality mode
   const analysis = await analyzeMessageIntent(incomingMessage);

@@ -131,7 +131,9 @@ Pour chaque post :
 3. **mood** : cozy | adventure | work | party | relax | fitness | travel | fashion
 4. **outfit** : Description courte de la tenue
 5. **action** : Ce qu'elle fait (dynamique!)
-6. **caption** : Caption engageante avec question (max 150 caractères)
+6. **caption** : Caption engageante avec CTA (max 150 caractères)
+   - 80% des posts : CTA engagement ("Tu préfères 1 ou 2 ?", "Save si...", "Double tap si...")
+   - 20% des posts : CTA conversion ("Le reste sur mon lien en bio 😈", "La suite en bio 🔗")
 7. **hashtags** : 15 hashtags pertinents (IMPORTANT: each as a quoted string like "#fitness")
 8. **scheduled_time** : Horaire HH:MM
 9. **prompt_hints** : Indices pour génération image
@@ -141,7 +143,7 @@ Pour chaque post :
 ## Règles CRITIQUES
 
 1. **Variété** : Ne JAMAIS répéter un lieu
-2. **Engagement** : Chaque caption DOIT avoir une question ou un CTA
+2. **CTA Strategy** : 80% engagement (questions, save, vote) / 20% conversion (link in bio)
 3. **Horaires** : Espacer d'au moins 4h
 4. **Reels** : Au moins 1 reel
 5. **Crossover** : ${forceDuo ? 'Un post DOIT être avec ' + (other === 'mila' ? 'Mila' : 'Elena') : '20% de chance de suggérer un crossover'}

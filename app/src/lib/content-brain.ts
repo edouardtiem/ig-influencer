@@ -244,7 +244,9 @@ Génère le planning du jour avec ${postsCount} posts. Pour chaque post, fournis
 3. **mood** : cozy | adventure | work | party | relax | fitness | travel | fashion
 4. **outfit** : Description courte de la tenue
 5. **action** : Ce qu'elle fait (dynamique, pas juste poser)
-6. **caption** : Caption engageante avec question ou CTA (max 150 caractères)
+6. **caption** : Caption engageante avec CTA (max 150 caractères)
+   - 80% des posts : CTA engagement ("Tu préfères 1 ou 2 ?", "Save si...", "Double tap si...")
+   - 20% des posts : CTA conversion ("Le reste sur mon lien en bio 😈", "La suite en bio 🔗")
 7. **hashtags** : 15 hashtags pertinents
 8. **scheduled_time** : Horaire (format HH:MM)
 9. **prompt_hints** : Indices pour le prompt de génération d'image
@@ -255,7 +257,7 @@ Génère le planning du jour avec ${postsCount} posts. Pour chaque post, fournis
 
 1. **Variété** : Ne JAMAIS répéter un lieu des 3 derniers posts
 2. **Cohérence narrative** : Si un arc est actif, en tenir compte
-3. **Engagement** : Chaque caption DOIT avoir une question ou un CTA
+3. **CTA Strategy** : 80% engagement (questions, save, vote) / 20% conversion (link in bio)
 4. **Horaires** : Espacer les posts d'au moins 4h
 5. **Reels** : ${includeReel ? 'Au moins 1 reel obligatoire' : 'Carousels préférés'}
 6. **Crossover** : ${forceCrossover ? 'Un post DOIT être avec ' + (otherCharacter === 'mila' ? 'Mila' : 'Elena') : '20% de chance de suggérer un crossover'}

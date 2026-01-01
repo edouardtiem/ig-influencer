@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 29 décembre 2024 (Fanvue API Fix 🔧)
+**Dernière mise à jour** : 31 décembre 2024 (Audit DM Cold/Warm 📊)
 
 ---
 
@@ -43,6 +43,8 @@ roadmap/
 |----|---------|----------|------------|------|
 | ~~TODO-016~~ | ~~Elena AI Agent~~ — ✅ DONE via DONE-037 | - | - | [→](./docs/sessions/2024-12-26-dm-automation.md) |
 | ~~TODO-013~~ | ~~ManyChat Setup~~ — ✅ 2 automations LIVE | - | - | [→](./docs/sessions/2024-12-26-manychat-ai-agent.md) |
+| TODO-017 | **💰 Funnel DM Routing A/B/C** — Implémenter routing ManyChat (B/BMAC, C/Fanvue, A/chat) + Tracking sources IG_BIO/IG_DM/IG_STORY | 🔴 High | 2-3h | [→](./docs/26-IG-FANVUE-BMAC-STRATEGY.md) |
+| TODO-016 | **📊 Dashboard KPI Quotidiens** — Tracking DM entrants, conversions, clics Fanvue/BMAC, abonnements, tips | 🔴 High | 3-4h | [→](./docs/26-IG-FANVUE-BMAC-STRATEGY.md) |
 | TODO-014 | **Fanvue Pack Final** — Sélection 10-12 photos + Upload Fanvue + Prix 3€ | 🔴 High | 30min | [→](./docs/sessions/2024-12-25-fanvue-pack-elena.md) |
 | TODO-015 | **IG Teaser Post** — Photo pack + Caption CTA "Link in bio" / "DM PACK" | 🔴 High | 15min | - |
 | TODO-010 | **Targeting Actif** — 20 comments/jour/compte sur niches cibles | 🟡 Medium | ongoing | - |
@@ -60,6 +62,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-042 | **🤖 DM Automation V2** — Caps par stage (15/25/35), closing pressure, personnalité warm/flirty, intent sexual→Fanvue, délai 15-35s, anti-hallucination | 30/12/2024 | v2.33.0 | [→](./docs/27-DM-AUTOMATION-V2.md) |
 | DONE-041 | **📬 Fanvue Welcome DM** — Webhook auto pour nouveaux followers + DM teaser photo + Conversion free → paid | 29/12/2024 | v2.32.0 | [→](./roadmap/done/DONE-041-fanvue-welcome-dm.md) |
 | DONE-040 | **📅 Fanvue Daily System** — 1 photo/jour à 17h Paris + Calendrier 14 jours safe-sexy + GitHub Action auto + Posts abonnés uniquement | 29/12/2024 | v2.31.0 | [→](./roadmap/done/DONE-040-fanvue-daily-system.md) |
 | DONE-039 | **🎯 Intent-Driven DM System** — Adaptation personnalité par intent + Pitch Fanvue déclenché par wants_more (au lieu de 8 messages) + PersonalityMode dynamique | 29/12/2024 | v2.30.0 | [→](./roadmap/done/DONE-039-intent-driven-dm-system.md) |
@@ -159,6 +162,9 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 31/12/2024 | **📊 Audit DM Cold/Warm** — Analyse conversations bloquées (114 cold, 69 warm) + Découverte fallback crédits Claude + Validation système DM Automation V2 | [→](./docs/sessions/2024-12-31-dm-audit-cold-warm.md) |
+| 30/12/2024 | **🤖 DM Automation V2** — Caps par stage (15/25/35), closing pressure dynamique, personnalité warm/flirty (sans bratty), intent sexual→Fanvue, délai 15-35s, anti-hallucination | [→](./docs/27-DM-AUTOMATION-V2.md) |
+| 30/12/2024 | **💰 Stratégie IG + Fanvue + BMAC** — Cadrage monétisation complète : bio IG, funnel DM <30 messages (routing A/B/C), compliance BMAC SFW, KPI quotidiens pour 100€/jour | [→](./docs/sessions/2024-12-30-ig-fanvue-bmac-strategy.md) |
 | 29/12/2024 | **🔧 Fanvue API Fix & OAuth Tokens** — Fix endpoints API (retrait /v1/) + Callback OAuth affiche tokens + Vérification configuration complète | [→](./docs/sessions/2024-12-29-fanvue-api-fix.md) |
 | 29/12/2024 | **🎯 Intent-Driven DM System** — Adaptation personnalité par intent + Pitch Fanvue déclenché par wants_more + PersonalityMode dynamique (warm/playful/curious/mysterious/confident) | [→](./docs/sessions/2024-12-29-intent-driven-dm-system.md) |
 | 28/12/2024 | **🎭 Elena Personality Rebalance** — Audit DM (81% bratty → 35% warm target) + Refonte prompt persona + Nouveau mix 35/25/20/15/5 | [→](./docs/sessions/2024-12-28-elena-personality-rebalance.md) |

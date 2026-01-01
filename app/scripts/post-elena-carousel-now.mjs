@@ -61,7 +61,7 @@ async function generateCaption() {
 
 [DÉVELOPPEMENT - 3-5 phrases, ton personnel]
 
-[QUESTION/CTA - engagement]
+[CTA - 80% engagement / 20% conversion]
 
 [HASHTAGS - 15-20]
 
@@ -69,7 +69,7 @@ async function generateCaption() {
 Génère une caption Instagram pour un carousel de 2 photos (reels/images lifestyle).
 - Hook accrocheur en français (1 ligne)
 - Développement 3-5 phrases dans la voix d'Elena (mystérieuse, sensuelle, confiante)
-- Question ou CTA pour engagement
+- CTA : 80% engagement ("Tu préfères 1 ou 2 ?", "Save si...", "Double tap si...") / 20% conversion ("Le reste sur mon lien en bio 😈")
 - 15-20 hashtags pertinents (mix trending + evergreen)
 - Ton : casual luxe, confident, playful, French touch
 - Mélange français/anglais naturel si besoin
@@ -79,7 +79,7 @@ Réponds UNIQUEMENT avec un JSON valide:
 {
   "hook": "Hook accrocheur (1 ligne)",
   "body": "Développement 3-5 phrases",
-  "cta": "Question ou CTA engagement",
+  "cta": "CTA engagement ou conversion (80/20)",
   "hashtags": ["#tag1", "#tag2", ...]
 }`;
 
