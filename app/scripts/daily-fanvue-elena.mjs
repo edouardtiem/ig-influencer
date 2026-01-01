@@ -404,9 +404,9 @@ async function postToFanvue(accessToken, content, imageUrl) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      content: content.caption,
-      media_urls: [imageUrl],
-      is_premium: true, // Subscribers only, not free followers
+      text: content.caption,
+      mediaUrls: [imageUrl],
+      audience: 'subscribers', // Subscribers only, not free followers
     }),
   });
 
