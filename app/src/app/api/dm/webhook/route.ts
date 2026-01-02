@@ -14,14 +14,47 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { processDM, ManyChateWebhookPayload } from '@/lib/elena-dm';
+import { supabase } from '@/lib/supabase';
 
 // Verify request is from ManyChat (optional security)
 const MANYCHAT_WEBHOOK_SECRET = process.env.MANYCHAT_WEBHOOK_SECRET;
+
+/**
+ * Check if DM system is paused
+ */
+async function isDMSystemPaused(): Promise<boolean> {
+  try {
+    const { data } = await supabase
+      .from('elena_settings')
+      .select('value')
+      .eq('key', 'dm_system')
+      .single();
+    
+    return data?.value?.paused === true;
+  } catch {
+    // If error, assume not paused to avoid blocking
+    return false;
+  }
+}
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
   
   try {
+    // ===========================================
+    // KILL SWITCH — Check if DM system is paused
+    // ===========================================
+    const paused = await isDMSystemPaused();
+    if (paused) {
+      console.log('⏸️ DM SYSTEM PAUSED — Not responding');
+      return NextResponse.json({
+        success: true,
+        skip: true,
+        response: '',
+        reason: 'DM system paused',
+      });
+    }
+
     // Optional: Verify webhook secret
     if (MANYCHAT_WEBHOOK_SECRET) {
       const signature = request.headers.get('x-manychat-signature');

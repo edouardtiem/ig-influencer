@@ -4,6 +4,13 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 
 type Character = 'all' | 'mila' | 'elena';
+
+interface DMSettings {
+  paused: boolean;
+  paused_at: string | null;
+  paused_reason: string | null;
+  updated_at: string | null;
+}
 type Status = 'scheduled' | 'generating' | 'images_ready' | 'posting' | 'posted' | 'failed';
 
 interface ScheduledPost {
@@ -185,6 +192,50 @@ export default function CalendarPage() {
   const [loading, setLoading] = useState(true);
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  
+  // DM System state
+  const [dmSettings, setDmSettings] = useState<DMSettings | null>(null);
+  const [dmToggling, setDmToggling] = useState(false);
+
+  // Fetch DM settings
+  const fetchDmSettings = useCallback(async () => {
+    try {
+      const res = await fetch('/api/dm/settings');
+      const data = await res.json();
+      setDmSettings(data);
+    } catch (error) {
+      console.error('Failed to fetch DM settings:', error);
+    }
+  }, []);
+
+  // Toggle DM system
+  const toggleDmSystem = async () => {
+    if (!dmSettings || dmToggling) return;
+    
+    setDmToggling(true);
+    try {
+      const res = await fetch('/api/dm/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paused: !dmSettings.paused,
+          reason: dmSettings.paused ? 'Manual resume' : 'Manual pause from calendar',
+        }),
+      });
+      const data = await res.json();
+      if (data.success !== false) {
+        setDmSettings(data);
+      }
+    } catch (error) {
+      console.error('Failed to toggle DM system:', error);
+    }
+    setDmToggling(false);
+  };
+
+  // Initial DM settings fetch
+  useEffect(() => {
+    fetchDmSettings();
+  }, [fetchDmSettings]);
 
   const fetchData = useCallback(async () => {
     // Calculate week dates based on offset
@@ -274,6 +325,44 @@ export default function CalendarPage() {
               className="mt-1 text-xs text-violet-400 hover:text-violet-300 transition-colors"
             >
               🔄 Actualiser
+            </button>
+          </div>
+        </div>
+
+        {/* DM System Toggle */}
+        <div className={`mb-6 p-4 rounded-xl border ${
+          dmSettings?.paused 
+            ? 'bg-rose-500/10 border-rose-500/30' 
+            : 'bg-emerald-500/10 border-emerald-500/30'
+        }`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className={`text-2xl ${dmSettings?.paused ? 'animate-pulse' : ''}`}>
+                {dmSettings?.paused ? '⏸️' : '💬'}
+              </span>
+              <div>
+                <h3 className={`font-semibold ${dmSettings?.paused ? 'text-rose-400' : 'text-emerald-400'}`}>
+                  DM System {dmSettings?.paused ? 'PAUSED' : 'ACTIVE'}
+                </h3>
+                <p className="text-xs text-slate-400">
+                  {dmSettings?.paused 
+                    ? `Pausé ${dmSettings.paused_at ? new Date(dmSettings.paused_at).toLocaleString('fr-FR') : ''}` 
+                    : 'Elena répond aux DMs automatiquement'}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={toggleDmSystem}
+              disabled={dmToggling || !dmSettings}
+              className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                dmToggling ? 'opacity-50 cursor-not-allowed' : ''
+              } ${
+                dmSettings?.paused
+                  ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                  : 'bg-rose-500 hover:bg-rose-600 text-white'
+              }`}
+            >
+              {dmToggling ? '...' : dmSettings?.paused ? '▶️ Resume' : '⏸️ Pause'}
             </button>
           </div>
         </div>
