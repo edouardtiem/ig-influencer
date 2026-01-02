@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 2 janvier 2025 (DM Fixes — Duplicates, Hallucinations 🔧)
+**Dernière mise à jour** : 2 janvier 2025 (DM Audit + Fix FINAL_MESSAGE Duplicates 🔧)
 
 ---
 
@@ -62,6 +62,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-046 | **🔍 DM Audit + Fix FINAL_MESSAGE Duplicates** — Script audit-recent.mjs + Fix cooldown check AVANT cap check pour éviter FINAL_MESSAGE dupliqué | 02/01/2025 | v2.36.1 | [→](./docs/sessions/2025-01-02-dm-audit-fixes.md) |
 | DONE-045 | **🔧 DM Fixes — Duplicates, Hallucinations, Long Responses** — Cooldown 20s pour éviter duplicates + Règles anti-hallucination explicites + max_tokens 50 pour réponses < 15 mots | 02/01/2025 | v2.36.0 | [→](./docs/sessions/2025-01-02-dm-fixes-duplicates-hallucinations.md) |
 | DONE-044 | **🎨 Grok Image Generation** — Test génération images avec Grok API + Script manuel + Découverte limitation images de référence (API ne supporte pas) | 01/01/2025 | v2.35.0 | [→](./docs/sessions/2025-01-01-grok-image-generation.md) |
 | DONE-043 | **💬 Fanvue Chat Bot avec Grok** — Chat automatique avec Grok AI + génération images NSFW + Webhooks (message/subscriber/tip) + Fix API posts Fanvue | 01/01/2025 | v2.34.0 | [→](./roadmap/done/DONE-043-fanvue-chat-bot-grok.md) |
