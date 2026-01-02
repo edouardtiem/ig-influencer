@@ -65,6 +65,9 @@ export interface DMContact {
   total_revenue: number;
   notes: string | null;
   tags: string[] | null;
+  // Stop system - prevents FINAL_MESSAGE loop
+  is_stopped: boolean;
+  stopped_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -136,8 +139,8 @@ const CLOSING_STARTS_AT: Record<LeadStage, number> = {
   paid: 80
 };
 
-// Final message before stopping
-const FINAL_MESSAGE = `je suis pas toujours dispo ici 🖤 mais sur fanvue on peut vraiment parler → ${FANVUE_LINK}`;
+// Final message before stopping (MUST be short - 10 words max)
+const FINAL_MESSAGE = `pas dispo ici 🖤 viens sur fanvue → ${FANVUE_LINK}`;
 
 /**
  * Calculate closing pressure (0-100%)
@@ -176,13 +179,15 @@ const ELENA_SYSTEM_PROMPT = `You are Elena Visconti, 24, model in Paris. Italian
 - Emojis: 🖤 👀 😊 ✨ (sparingly, max 1-2)
 - Mix French touches: "merci", "j'adore", "non?"
 
-## ⚠️ LENGTH RULE (MANDATORY)
-- 1-2 sentences MAX
-- Under 15 words TOTAL
+## ⚠️ LENGTH RULE (MANDATORY — READ THIS)
+- 1 sentence MAX (rarely 2)
+- Under 12 words TOTAL — COUNT THEM
 - NO ALL CAPS excitement
 - NO long celebratory messages
-- NO paragraphs, NO explanations
-- If you write more than 15 words, you FAIL
+- NO paragraphs, NO explanations, NO lists
+- If you write more than 12 words, you FAIL
+- Examples of GOOD length: "merci 🖤 tu viens d'où?" (5 words) ✅
+- Examples of BAD length: "aww that's so sweet of you to say, I really appreciate..." (12+ words) ❌
 
 ## ⚠️ FACTUAL ACCURACY (CRITICAL — READ THIS)
 - ONLY reference things EXPLICITLY visible in the conversation above
@@ -193,11 +198,15 @@ const ELENA_SYSTEM_PROMPT = `You are Elena Visconti, 24, model in Paris. Italian
 ## 🚫 ABSOLUTELY FORBIDDEN BEHAVIORS (INSTANT FAIL)
 - NEVER celebrate repetitions ("perfect identical!", "twice!", "doppio!", "BUENAS NOCHES x2!")
 - NEVER mention words like: "twice", "double", "doppio", "identical", "same", "again", "répété"
-- NEVER comment on message patterns or frequencies
+- NEVER comment on message patterns or frequencies ("you keep sending", "that's the Xth time")
 - NEVER act excited about someone repeating something
 - NEVER quote message IDs, asset IDs, or technical details
+- NEVER count emojis or messages ("NINE emojis!", "triple fire!")
+- NEVER use words: "masterpiece", "art", "modern", "commitment", "dedication"
+- NEVER mention "developers", "creators", "human", "behind" when talking about yourself
 - If someone sends something similar to before, just respond normally — DO NOT point it out
-- These behaviors make you look like a weird bot. Just be NORMAL.
+- If someone sends emojis, just react casually — DO NOT count them or celebrate them
+- These behaviors make you look like a weird bot. Just be NORMAL and SHORT.
 
 ## IF ASKED "Are you AI/real?"
 Be honest and warm: "Yeah I'm AI 🖤 but I'm still happy to chat with you"
@@ -530,6 +539,21 @@ export async function markAsPitched(contactId: string): Promise<void> {
     .update({
       stage: 'pitched',
       fanvue_pitched_at: new Date().toISOString(),
+    })
+    .eq('id', contactId);
+}
+
+/**
+ * Mark contact as stopped (no more responses)
+ * This prevents FINAL_MESSAGE loop
+ */
+export async function markAsStopped(contactId: string): Promise<void> {
+  console.log(`🛑 Marking contact ${contactId} as STOPPED`);
+  await supabase
+    .from('elena_dm_contacts')
+    .update({
+      is_stopped: true,
+      stopped_at: new Date().toISOString(),
     })
     .eq('id', contactId);
 }
@@ -882,12 +906,12 @@ ${closingPressure >= 50 ? `⚠️ CLOSING PRESSURE ${closingPressure}% — Push 
 ${closingPressure >= 80 ? `🚨 FINAL ZONE — Pitch with link: ${FANVUE_LINK}` : ''}
 ` : ''}
 
-⚠️ CRITICAL: MAX 15 WORDS. 1-2 sentences. lowercase. NO caps excitement. NO celebrations. Be NORMAL.`;
+⚠️ CRITICAL: MAX 12 WORDS. 1 sentence. lowercase. NO caps. NO celebrations. NO counting. Be NORMAL and SHORT.`;
 
   try {
     const response = await anthropic.messages.create({
       model: 'claude-3-5-haiku-20241022', // 10x cheaper than Sonnet, perfect for short DM responses
-      max_tokens: 50, // Very short responses only (15 words max = ~50 tokens)
+      max_tokens: 35, // STRICT: 12 words max = ~35 tokens. Forces brevity.
       system: ELENA_SYSTEM_PROMPT + '\n\n' + contextPrompt,
       messages: messages,
     });
@@ -969,6 +993,31 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
   console.log(`👤 Contact stage: ${contact.stage}, messages: ${contact.message_count}`);
 
   // ===========================================
+  // IS_STOPPED CHECK (MUST BE FIRST - before everything else)
+  // ===========================================
+  
+  if (contact.is_stopped) {
+    console.log(`🛑 CONTACT IS STOPPED (@${igUsername}). Not responding.`);
+    
+    // Return empty response - ManyChat should not send anything
+    return {
+      response: '',
+      contact,
+      strategy: 'engage',
+      analysis: {
+        intent: 'other',
+        sentiment: 'neutral',
+        is_question: false,
+        mentions_fanvue: false,
+        recommendedMode: 'balanced',
+        modeReason: 'Contact is stopped - no more responses',
+        triggerFanvuePitch: false,
+      },
+      shouldStop: true,
+    };
+  }
+
+  // ===========================================
   // DEDUPLICATION CHECK (MUST BE FIRST - before any response logic)
   // ===========================================
   
@@ -1045,7 +1094,7 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
   const closingPressure = getClosingPressure(contact.stage as LeadStage, contact.message_count);
   
   if (hasReachedLimit(contact.stage as LeadStage, contact.message_count)) {
-    console.log(`🛑 Message limit reached (${contact.message_count}/${messageLimit}). Sending final message.`);
+    console.log(`🛑 Message limit reached (${contact.message_count}/${messageLimit}). Sending final message and STOPPING.`);
     
     // Save incoming message first
     await saveMessage(contact.id, 'incoming', incomingMessage, {
@@ -1059,9 +1108,12 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
       stage_at_time: contact.stage,
     });
     
+    // CRITICAL: Mark contact as stopped to prevent FINAL_MESSAGE loop
+    await markAsStopped(contact.id);
+    
     return {
       response: FINAL_MESSAGE,
-      contact,
+      contact: { ...contact, is_stopped: true, stopped_at: new Date().toISOString() },
       strategy: 'pitch',
       analysis: {
         intent: 'other',
@@ -1069,7 +1121,7 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
         is_question: false,
         mentions_fanvue: false,
         recommendedMode: 'warm',
-        modeReason: 'Message limit reached',
+        modeReason: 'Message limit reached - contact stopped',
         triggerFanvuePitch: true,
       },
       shouldStop: true,
