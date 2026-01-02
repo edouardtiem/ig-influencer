@@ -968,50 +968,8 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
   const contact = await getOrCreateContact(igUserId, igUsername, igName, igProfilePic);
   console.log(`👤 Contact stage: ${contact.stage}, messages: ${contact.message_count}`);
 
-  // 1.5 CHECK MESSAGE LIMIT
-  const messageLimit = MESSAGE_CAPS[contact.stage as LeadStage] || 25;
-  const closingPressure = getClosingPressure(contact.stage as LeadStage, contact.message_count);
-  
-  if (hasReachedLimit(contact.stage as LeadStage, contact.message_count)) {
-    console.log(`🛑 Message limit reached (${contact.message_count}/${messageLimit}). Sending final message.`);
-    
-    // Save incoming message first
-    await saveMessage(contact.id, 'incoming', incomingMessage, {
-      stage_at_time: contact.stage,
-    });
-    
-    // Save final message
-    await saveMessage(contact.id, 'outgoing', FINAL_MESSAGE, {
-      response_strategy: 'pitch',
-      response_time_ms: Date.now() - startTime,
-      stage_at_time: contact.stage,
-    });
-    
-    return {
-      response: FINAL_MESSAGE,
-      contact,
-      strategy: 'pitch',
-      analysis: {
-        intent: 'other',
-        sentiment: 'neutral',
-        is_question: false,
-        mentions_fanvue: false,
-        recommendedMode: 'warm',
-        modeReason: 'Message limit reached',
-        triggerFanvuePitch: true,
-      },
-      shouldStop: true,
-    };
-  }
-  
-  console.log(`📊 Closing pressure: ${closingPressure}% (${contact.message_count}/${messageLimit} messages)`);
-
-  // 2. Analyze incoming message with intent + personality mode
-  const analysis = await analyzeMessageIntent(incomingMessage);
-  console.log(`🔍 Intent: ${analysis.intent} | Mode: ${analysis.recommendedMode} | Pitch: ${analysis.triggerFanvuePitch}`);
-
   // ===========================================
-  // DEDUPLICATION CHECK (prevent duplicate messages)
+  // DEDUPLICATION CHECK (MUST BE FIRST - before any response logic)
   // ===========================================
   
   // CHECK 1: Same incoming message in last 30 seconds (webhook retry)
@@ -1078,6 +1036,51 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
       },
     };
   }
+
+  // ===========================================
+  // MESSAGE LIMIT CHECK (after deduplication)
+  // ===========================================
+  
+  const messageLimit = MESSAGE_CAPS[contact.stage as LeadStage] || 25;
+  const closingPressure = getClosingPressure(contact.stage as LeadStage, contact.message_count);
+  
+  if (hasReachedLimit(contact.stage as LeadStage, contact.message_count)) {
+    console.log(`🛑 Message limit reached (${contact.message_count}/${messageLimit}). Sending final message.`);
+    
+    // Save incoming message first
+    await saveMessage(contact.id, 'incoming', incomingMessage, {
+      stage_at_time: contact.stage,
+    });
+    
+    // Save final message
+    await saveMessage(contact.id, 'outgoing', FINAL_MESSAGE, {
+      response_strategy: 'pitch',
+      response_time_ms: Date.now() - startTime,
+      stage_at_time: contact.stage,
+    });
+    
+    return {
+      response: FINAL_MESSAGE,
+      contact,
+      strategy: 'pitch',
+      analysis: {
+        intent: 'other',
+        sentiment: 'neutral',
+        is_question: false,
+        mentions_fanvue: false,
+        recommendedMode: 'warm',
+        modeReason: 'Message limit reached',
+        triggerFanvuePitch: true,
+      },
+      shouldStop: true,
+    };
+  }
+  
+  console.log(`📊 Closing pressure: ${closingPressure}% (${contact.message_count}/${messageLimit} messages)`);
+
+  // 2. Analyze incoming message with intent + personality mode
+  const analysis = await analyzeMessageIntent(incomingMessage);
+  console.log(`🔍 Intent: ${analysis.intent} | Mode: ${analysis.recommendedMode} | Pitch: ${analysis.triggerFanvuePitch}`);
 
   // 3. Save incoming message
   await saveMessage(contact.id, 'incoming', incomingMessage, {
