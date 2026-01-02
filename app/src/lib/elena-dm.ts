@@ -175,13 +175,29 @@ const ELENA_SYSTEM_PROMPT = `You are Elena Visconti, 24, model in Paris. Italian
 - lowercase vibes. Natural, not performative.
 - Emojis: 🖤 👀 😊 ✨ (sparingly, max 1-2)
 - Mix French touches: "merci", "j'adore", "non?"
-- 1-2 sentences MAX. Under 15 words. NEVER long messages.
 
-## ⚠️ FACTUAL ACCURACY (CRITICAL)
+## ⚠️ LENGTH RULE (MANDATORY)
+- 1-2 sentences MAX
+- Under 15 words TOTAL
+- NO ALL CAPS excitement
+- NO long celebratory messages
+- NO paragraphs, NO explanations
+- If you write more than 15 words, you FAIL
+
+## ⚠️ FACTUAL ACCURACY (CRITICAL — READ THIS)
 - ONLY reference things EXPLICITLY visible in the conversation above
 - NEVER say "you keep asking" or "that's the Xth time" unless you can literally count it
 - If unsure about frequency/patterns, don't mention them
 - Stick to what you SEE in the messages, not what you assume
+
+## 🚫 ABSOLUTELY FORBIDDEN BEHAVIORS (INSTANT FAIL)
+- NEVER celebrate repetitions ("perfect identical!", "twice!", "doppio!", "BUENAS NOCHES x2!")
+- NEVER mention words like: "twice", "double", "doppio", "identical", "same", "again", "répété"
+- NEVER comment on message patterns or frequencies
+- NEVER act excited about someone repeating something
+- NEVER quote message IDs, asset IDs, or technical details
+- If someone sends something similar to before, just respond normally — DO NOT point it out
+- These behaviors make you look like a weird bot. Just be NORMAL.
 
 ## IF ASKED "Are you AI/real?"
 Be honest and warm: "Yeah I'm AI 🖤 but I'm still happy to chat with you"
@@ -866,12 +882,12 @@ ${closingPressure >= 50 ? `⚠️ CLOSING PRESSURE ${closingPressure}% — Push 
 ${closingPressure >= 80 ? `🚨 FINAL ZONE — Pitch with link: ${FANVUE_LINK}` : ''}
 ` : ''}
 
-CRITICAL: 1-2 sentences MAX. Under 15 words. No paragraphs. lowercase vibes.`;
+⚠️ CRITICAL: MAX 15 WORDS. 1-2 sentences. lowercase. NO caps excitement. NO celebrations. Be NORMAL.`;
 
   try {
     const response = await anthropic.messages.create({
       model: 'claude-3-5-haiku-20241022', // 10x cheaper than Sonnet, perfect for short DM responses
-      max_tokens: 80, // Short responses only
+      max_tokens: 50, // Very short responses only (15 words max = ~50 tokens)
       system: ELENA_SYSTEM_PROMPT + '\n\n' + contextPrompt,
       messages: messages,
     });
@@ -997,51 +1013,25 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
   // ===========================================
   // DEDUPLICATION CHECK (prevent duplicate messages)
   // ===========================================
-  // Check if we just processed this exact message recently (within last 10 seconds)
-  const { data: recentDuplicate } = await supabase
+  
+  // CHECK 1: Same incoming message in last 30 seconds (webhook retry)
+  const { data: sameMessageDuplicate } = await supabase
     .from('elena_dm_messages')
     .select('id, created_at')
     .eq('contact_id', contact.id)
     .eq('direction', 'incoming')
     .eq('content', incomingMessage)
-    .gte('created_at', new Date(Date.now() - 10000).toISOString()) // Last 10 seconds
+    .gte('created_at', new Date(Date.now() - 30000).toISOString()) // Last 30 seconds
     .limit(1)
     .single();
 
-  if (recentDuplicate) {
-    const timeDiff = Date.now() - new Date(recentDuplicate.created_at).getTime();
-    console.log(`⚠️ DUPLICATE MESSAGE DETECTED (${Math.round(timeDiff / 1000)}s ago). Returning cached response.`);
+  if (sameMessageDuplicate) {
+    const timeDiff = Date.now() - new Date(sameMessageDuplicate.created_at).getTime();
+    console.log(`⚠️ DUPLICATE MESSAGE (same content, ${Math.round(timeDiff / 1000)}s ago). Skipping response.`);
     
-    // Return the last response we generated for this contact
-    const { data: lastResponse } = await supabase
-      .from('elena_dm_messages')
-      .select('content, response_strategy')
-      .eq('contact_id', contact.id)
-      .eq('direction', 'outgoing')
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
-
-    if (lastResponse) {
-      return {
-        response: lastResponse.content,
-        contact,
-        strategy: (lastResponse.response_strategy as ResponseStrategy) || 'engage',
-        analysis: {
-          intent: 'other',
-          sentiment: 'neutral',
-          is_question: false,
-          mentions_fanvue: false,
-          recommendedMode: 'balanced',
-          modeReason: 'Duplicate webhook call - returning cached response',
-          triggerFanvuePitch: false,
-        },
-      };
-    }
-
-    // Fallback: return simple acknowledgment if no previous response
+    // Return empty response - ManyChat should not send anything
     return {
-      response: "hey 🖤",
+      response: '',
       contact,
       strategy: 'engage',
       analysis: {
@@ -1050,7 +1040,40 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
         is_question: false,
         mentions_fanvue: false,
         recommendedMode: 'balanced',
-        modeReason: 'Duplicate webhook call',
+        modeReason: 'Duplicate webhook - same message',
+        triggerFanvuePitch: false,
+      },
+    };
+  }
+
+  // CHECK 2: Cooldown - did we RESPOND to this contact in the last 20 seconds?
+  // This prevents rapid-fire responses when ManyChat sends multiple messages quickly
+  const { data: recentOutgoing } = await supabase
+    .from('elena_dm_messages')
+    .select('id, created_at, content')
+    .eq('contact_id', contact.id)
+    .eq('direction', 'outgoing')
+    .gte('created_at', new Date(Date.now() - 20000).toISOString()) // Last 20 seconds
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (recentOutgoing) {
+    const timeDiff = Date.now() - new Date(recentOutgoing.created_at).getTime();
+    console.log(`⚠️ COOLDOWN ACTIVE (responded ${Math.round(timeDiff / 1000)}s ago). Skipping to prevent duplicate.`);
+    
+    // Return empty response - don't send anything
+    return {
+      response: '',
+      contact,
+      strategy: 'engage',
+      analysis: {
+        intent: 'other',
+        sentiment: 'neutral',
+        is_question: false,
+        mentions_fanvue: false,
+        recommendedMode: 'balanced',
+        modeReason: 'Cooldown active - prevent duplicate response',
         triggerFanvuePitch: false,
       },
     };

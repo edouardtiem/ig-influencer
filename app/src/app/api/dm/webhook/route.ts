@@ -54,6 +54,20 @@ export async function POST(request: NextRequest) {
     // Process DM and generate response
     const result = await processDM(payload);
 
+    // Check if we should skip (deduplication/cooldown)
+    if (!result.response || result.response.trim() === '') {
+      console.log(`\n⏭️ SKIPPING RESPONSE (deduplication/cooldown)`);
+      console.log(`${'='.repeat(50)}\n`);
+      
+      // Return skip signal to ManyChat - don't send any message
+      return NextResponse.json({
+        success: true,
+        skip: true,
+        response: '',
+        reason: result.analysis.modeReason,
+      });
+    }
+
     // Log response
     const duration = Date.now() - startTime;
     console.log(`\n✅ RESPONSE GENERATED (${duration}ms)`);
