@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 2 janvier 2025 (DM Audit + Fix FINAL_MESSAGE Duplicates 🔧)
+**Dernière mise à jour** : 2 janvier 2025 (DM System Fixes Complet + Kill Switch ⏸️)
 
 ---
 
@@ -31,9 +31,10 @@ roadmap/
 > **Mila** : ⏸️ PAUSE temporaire (à réactiver après stabilisation Elena)  
 > **Fanvue Pack 1** : ✅ 14 photos générées (2 shootings) dans `elena-fanvue-pack1`  
 > **ManyChat** : ✅ 2 automations LIVE (Auto-DM comments + Welcome followers)  
-> **AI Agent** : 💡 Architecture définie, à implémenter  
+> **DM System** : ⏸️ **PAUSED** (ban Instagram) — Kill switch opérationnel sur `/calendar`  
+> **AI Agent** : ✅ LIVE avec fixes complets (is_stopped flag, anti-hallucination, réponses < 12 mots)  
 > **Objectif** : 500€/mois via Fanvue  
-> **Next** : Surveiller engagement posts sexy mode Elena
+> **Next** : Resume DM system après expiration ban Instagram
 
 ---
 
@@ -62,6 +63,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-047 | **🛑 DM System Fixes Complet + Kill Switch** — Flag `is_stopped` pour stopper FINAL_MESSAGE loop + Kill switch toggle sur `/calendar` + 142 contacts spammés nettoyés + Réponses < 12 mots + Anti-hallucination renforcé | 02/01/2025 | v2.37.0 | [→](./roadmap/done/DONE-047-dm-system-fixes-complete.md) |
 | DONE-046 | **🔍 DM Audit + Fix FINAL_MESSAGE Duplicates** — Script audit-recent.mjs + Fix cooldown check AVANT cap check pour éviter FINAL_MESSAGE dupliqué | 02/01/2025 | v2.36.1 | [→](./docs/sessions/2025-01-02-dm-audit-fixes.md) |
 | DONE-045 | **🔧 DM Fixes — Duplicates, Hallucinations, Long Responses** — Cooldown 20s pour éviter duplicates + Règles anti-hallucination explicites + max_tokens 50 pour réponses < 15 mots | 02/01/2025 | v2.36.0 | [→](./docs/sessions/2025-01-02-dm-fixes-duplicates-hallucinations.md) |
 | DONE-044 | **🎨 Grok Image Generation** — Test génération images avec Grok API + Script manuel + Découverte limitation images de référence (API ne supporte pas) | 01/01/2025 | v2.35.0 | [→](./docs/sessions/2025-01-01-grok-image-generation.md) |
