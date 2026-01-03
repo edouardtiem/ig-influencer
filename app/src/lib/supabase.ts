@@ -605,3 +605,83 @@ export function isSupabaseConfigured(): boolean {
   return Boolean(supabaseUrl && supabaseServiceKey && !supabaseUrl.includes('placeholder'));
 }
 
+// ===========================================
+// DAILY TRENDS CACHE
+// ===========================================
+
+export interface TrendTopic {
+  topic: string;
+  relevance: 'high' | 'medium' | 'low';
+  context: string;
+  captionAngle?: string;
+}
+
+export interface DailyTrendsData {
+  date: string;
+  topics: TrendTopic[];
+  trendingHashtags: string[];
+  suggestedHashtags: string[];
+  fetchedAt: string;
+}
+
+/**
+ * Save daily trends to Supabase cache
+ */
+export async function saveDailyTrends(trends: DailyTrendsData): Promise<boolean> {
+  if (!isSupabaseConfigured()) {
+    console.warn('[Supabase] Not configured - cannot save trends');
+    return false;
+  }
+
+  const { error } = await supabase
+    .from('daily_trends')
+    .upsert({
+      trend_date: trends.date,
+      topics: trends.topics,
+      trending_hashtags: trends.trendingHashtags,
+      suggested_hashtags: trends.suggestedHashtags,
+      fetched_at: trends.fetchedAt,
+    }, { onConflict: 'trend_date' });
+
+  if (error) {
+    console.error('❌ Error saving daily trends:', error);
+    return false;
+  }
+
+  console.log('✅ Daily trends saved to Supabase for', trends.date);
+  return true;
+}
+
+/**
+ * Get daily trends from Supabase cache
+ */
+export async function getDailyTrends(date: string): Promise<DailyTrendsData | null> {
+  if (!isSupabaseConfigured()) {
+    console.warn('[Supabase] Not configured - cannot fetch trends');
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from('daily_trends')
+    .select('*')
+    .eq('trend_date', date)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') {
+      // Not found - this is expected for new dates
+      return null;
+    }
+    console.error('❌ Error fetching daily trends:', error);
+    return null;
+  }
+
+  return {
+    date: data.trend_date,
+    topics: data.topics,
+    trendingHashtags: data.trending_hashtags,
+    suggestedHashtags: data.suggested_hashtags,
+    fetchedAt: data.fetched_at,
+  };
+}
+

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchDailyTrends, DailyTrends } from '@/lib/perplexity';
+import { fetchDailyTrends } from '@/lib/perplexity';
+import { dailyTrendsSchema, validateInput } from '@/lib/validations';
 
 /**
  * POST /api/daily-trends-fetch
@@ -20,9 +21,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Parse optional date
+    // Parse and validate optional date
     const body = await request.json().catch(() => ({}));
-    const date = body.date ? new Date(body.date) : new Date();
+    const validation = validateInput(dailyTrendsSchema, body);
+    if (!validation.success || !validation.data) {
+      return NextResponse.json({
+        success: false,
+        error: validation.error || 'Validation failed',
+      }, { status: 400 });
+    }
+    
+    const validatedData = validation.data;
+    const date = validatedData.date ? new Date(validatedData.date) : new Date();
 
     console.log('[Daily Trends] Fetching trends for', date.toISOString().split('T')[0]);
 
@@ -58,9 +68,18 @@ export async function POST(request: NextRequest) {
 /**
  * GET /api/daily-trends-fetch
  * Get today's trends (for testing/debugging)
+ * Protected by CRON_SECRET to prevent unauthorized API usage
  */
 export async function GET(request: NextRequest) {
   try {
+    // Check authorization (cron secret)
+    const authHeader = request.headers.get('authorization');
+    const cronSecret = process.env.CRON_SECRET;
+    
+    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const searchParams = request.nextUrl.searchParams;
     const dateStr = searchParams.get('date');
     const date = dateStr ? new Date(dateStr) : new Date();

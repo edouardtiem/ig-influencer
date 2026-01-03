@@ -6,9 +6,11 @@
  */
 
 import { randomBytes, createHash } from 'crypto';
+import { fetchWithTimeout } from './fetch-utils';
 
 const AUTH_BASE_URL = 'https://auth.fanvue.com';
 const API_BASE_URL = 'https://api.fanvue.com';
+const FANVUE_TIMEOUT = 30000; // 30s timeout for Fanvue API calls
 
 // Required scopes per Fanvue docs
 const REQUIRED_SCOPES = 'openid offline_access offline';
@@ -168,7 +170,7 @@ export async function exchangeCodeForTokens(code: string, codeVerifier: string):
   const basicAuth = Buffer.from(`${config.clientId}:${config.clientSecret}`).toString('base64');
 
   // Correct endpoint: /oauth2/token (not /oauth/token)
-  const response = await fetch(`${AUTH_BASE_URL}/oauth2/token`, {
+  const response = await fetchWithTimeout(`${AUTH_BASE_URL}/oauth2/token`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -179,7 +181,8 @@ export async function exchangeCodeForTokens(code: string, codeVerifier: string):
       code,
       redirect_uri: config.redirectUri,
       code_verifier: codeVerifier, // PKCE required
-    }),
+    }).toString(),
+    timeout: FANVUE_TIMEOUT,
   });
 
   if (!response.ok) {
@@ -213,7 +216,7 @@ export async function refreshAccessToken(refreshToken: string): Promise<FanvueTo
   // Use client_secret_basic auth (credentials in Authorization header)
   const basicAuth = Buffer.from(`${config.clientId}:${config.clientSecret}`).toString('base64');
 
-  const response = await fetch(`${AUTH_BASE_URL}/oauth2/token`, {
+  const response = await fetchWithTimeout(`${AUTH_BASE_URL}/oauth2/token`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -222,7 +225,8 @@ export async function refreshAccessToken(refreshToken: string): Promise<FanvueTo
     body: new URLSearchParams({
       grant_type: 'refresh_token',
       refresh_token: refreshToken,
-    }),
+    }).toString(),
+    timeout: FANVUE_TIMEOUT,
   });
 
   if (!response.ok) {
@@ -293,7 +297,10 @@ async function fanvueApi<T>(endpoint: string, options: FanvueApiOptions = {}): P
     fetchOptions.body = JSON.stringify(options.body);
   }
   
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, fetchOptions);
+  const response = await fetchWithTimeout(`${API_BASE_URL}${endpoint}`, {
+    ...fetchOptions,
+    timeout: FANVUE_TIMEOUT,
+  });
 
   if (!response.ok) {
     const error = await response.text();

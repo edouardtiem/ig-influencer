@@ -3,6 +3,8 @@
  * Daily trends & hashtags research for Instagram content
  */
 
+import { fetchWithTimeout } from './fetch-utils';
+
 // ═══════════════════════════════════════════════════════════════
 // TYPES
 // ═══════════════════════════════════════════════════════════════
@@ -77,7 +79,7 @@ Format your response as JSON:
 Only return valid JSON, no other text.`;
 
   try {
-    const response = await fetch(PERPLEXITY_API_URL, {
+    const response = await fetchWithTimeout(PERPLEXITY_API_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -92,6 +94,7 @@ Only return valid JSON, no other text.`;
         max_tokens: 1000,
         temperature: 0.3,
       }),
+      timeout: 30000, // 30s timeout
     });
 
     if (!response.ok) {
@@ -187,7 +190,7 @@ Format as JSON:
 Only return valid JSON.`;
 
   try {
-    const response = await fetch(PERPLEXITY_API_URL, {
+    const response = await fetchWithTimeout(PERPLEXITY_API_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -202,6 +205,7 @@ Only return valid JSON.`;
         max_tokens: 500,
         temperature: 0.7,
       }),
+      timeout: 30000, // 30s timeout
     });
 
     if (!response.ok) {
@@ -333,7 +337,7 @@ export async function checkPerplexityStatus(): Promise<{ ok: boolean; error?: st
 
   try {
     // Simple test request
-    const response = await fetch(PERPLEXITY_API_URL, {
+    const response = await fetchWithTimeout(PERPLEXITY_API_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -344,6 +348,7 @@ export async function checkPerplexityStatus(): Promise<{ ok: boolean; error?: st
         messages: [{ role: 'user', content: 'Hello' }],
         max_tokens: 10,
       }),
+      timeout: 10000, // 10s timeout for status check
     });
 
     if (response.ok) {

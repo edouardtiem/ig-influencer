@@ -5,7 +5,10 @@
  * Docs: https://docs.x.ai/api
  */
 
+import { fetchWithTimeout } from './fetch-utils';
+
 const XAI_API_URL = 'https://api.x.ai/v1';
+const GROK_TIMEOUT = 60000; // 60s timeout for Grok API calls
 
 interface GrokMessage {
   role: 'system' | 'user' | 'assistant';
@@ -60,7 +63,7 @@ export async function generateChatResponse(
 ): Promise<string> {
   const apiKey = getApiKey();
   
-  const response = await fetch(`${XAI_API_URL}/chat/completions`, {
+  const response = await fetchWithTimeout(`${XAI_API_URL}/chat/completions`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${apiKey}`,
@@ -72,6 +75,7 @@ export async function generateChatResponse(
       max_tokens: options.maxTokens || 500,
       temperature: options.temperature || 0.8,
     }),
+    timeout: GROK_TIMEOUT,
   });
 
   if (!response.ok) {
@@ -116,13 +120,14 @@ export async function generateImage(
     response_format: 'url',
   };
   
-  const response = await fetch(`${XAI_API_URL}/images/generations`, {
+  const response = await fetchWithTimeout(`${XAI_API_URL}/images/generations`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
+    timeout: GROK_TIMEOUT,
   });
 
   if (!response.ok) {

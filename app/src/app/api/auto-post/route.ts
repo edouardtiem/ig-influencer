@@ -3,6 +3,7 @@ import { generateFromCalendar } from '@/lib/nanobanana';
 import { postCarousel } from '@/lib/instagram';
 import { uploadImageFromUrl } from '@/lib/cloudinary';
 import { generateCaption, fetchDailyTrends, DailyTrends } from '@/lib/perplexity';
+import { getDailyTrends as getCachedTrends, saveDailyTrends, isSupabaseConfigured } from '@/lib/supabase';
 import { 
   getPostingSlotsForDate, 
   generateContentBrief, 
@@ -75,23 +76,40 @@ function verifyCronSecret(request: NextRequest): boolean {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// TRENDS CACHE
+// TRENDS CACHE - Persistent via Supabase
 // ═══════════════════════════════════════════════════════════════
-
-let cachedTrends: DailyTrends | null = null;
-let trendsDate: string | null = null;
 
 async function getTodaysTrends(): Promise<DailyTrends | null> {
   const today = new Date().toISOString().split('T')[0];
   
-  if (cachedTrends && trendsDate === today) {
-    return cachedTrends;
+  // Try Supabase cache first (persistent across cold starts)
+  if (isSupabaseConfigured()) {
+    const cachedTrends = await getCachedTrends(today);
+    if (cachedTrends) {
+      console.log('[Auto-Post] Using cached trends from Supabase');
+      return {
+        date: cachedTrends.date,
+        topics: cachedTrends.topics,
+        trendingHashtags: cachedTrends.trendingHashtags,
+        suggestedHashtags: cachedTrends.suggestedHashtags,
+        fetchedAt: cachedTrends.fetchedAt,
+      };
+    }
   }
   
+  // Fetch fresh trends from Perplexity
+  console.log('[Auto-Post] Fetching fresh trends from Perplexity');
   const trends = await fetchDailyTrends();
-  if (trends) {
-    cachedTrends = trends;
-    trendsDate = today;
+  
+  // Cache in Supabase for other requests today
+  if (trends && isSupabaseConfigured()) {
+    await saveDailyTrends({
+      date: trends.date,
+      topics: trends.topics,
+      trendingHashtags: trends.trendingHashtags,
+      suggestedHashtags: trends.suggestedHashtags,
+      fetchedAt: trends.fetchedAt,
+    });
   }
   
   return trends;

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateFromCalendar } from '@/lib/nanobanana';
+import { generateContextualSchema, validateInput } from '@/lib/validations';
 import {
   getPostingSlotsForDate,
   generateContentBrief,
@@ -20,7 +21,23 @@ import { getActiveLocationById, ACTIVE_LOCATIONS } from '@/config/locations';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({}));
-    const { auto = false, locationId, slotId } = body;
+    
+    // Validate input with Zod
+    const validation = validateInput(generateContextualSchema, body);
+    if (!validation.success || !validation.data) {
+      return NextResponse.json({
+        error: 'Validation failed',
+        details: validation.error || 'Unknown validation error',
+        usage: {
+          auto: 'POST with { "auto": true } to use current time slot',
+          slotId: 'POST with { "slotId": "morning|midday|evening" } for specific slot',
+          locationId: 'POST with { "locationId": "home_bedroom" } for specific location',
+        },
+      }, { status: 400 });
+    }
+    
+    const validatedData = validation.data;
+    const { auto = false, locationId, slotId } = validatedData;
     
     const now = new Date();
     let brief;

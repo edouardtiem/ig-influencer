@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateSmartComment } from '@/lib/smart-comments';
+import { smartCommentSchema, validateInput } from '@/lib/validations';
 
 /**
  * POST /api/smart-comment
@@ -52,8 +53,18 @@ export async function POST(request: NextRequest) {
     } else {
       // Handle JSON body (accept both 'image' and 'imageBase64' keys)
       const body = await request.json();
-      const imageData = body.image || body.imageBase64;
+      
+      // Validate input with Zod
+      const validation = validateInput(smartCommentSchema, body);
+      if (!validation.success || !validation.data) {
+        return NextResponse.json(
+          { success: false, error: validation.error || 'Validation failed' },
+          { status: 400 }
+        );
+      }
 
+      const validatedData = validation.data;
+      const imageData = validatedData.image || validatedData.imageBase64;
       if (!imageData) {
         return NextResponse.json(
           { success: false, error: 'No image provided (use "image" or "imageBase64" key)' },
@@ -62,7 +73,7 @@ export async function POST(request: NextRequest) {
       }
 
       imageBase64 = imageData;
-      mimeType = body.mimeType || 'image/jpeg';
+      mimeType = validatedData.mimeType || 'image/jpeg';
     }
 
     // Generate smart comment

@@ -3,6 +3,8 @@
  * Works for any account, generates varied, intelligent comments
  */
 
+import { fetchWithTimeout } from './fetch-utils';
+
 // ═══════════════════════════════════════════════════════════════
 // TYPES
 // ═══════════════════════════════════════════════════════════════
@@ -144,7 +146,7 @@ Be creative. Use one of the 7 approaches.
 JSON only: {"strategy":"...","comment":"...","alternatives":["...","..."]}`;
 
   try {
-    const response = await fetch(CLAUDE_API_URL, {
+    const response = await fetchWithTimeout(CLAUDE_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -179,6 +181,7 @@ JSON only: {"strategy":"...","comment":"...","alternatives":["...","..."]}`;
         ],
         system: systemPrompt,
       }),
+      timeout: 120000, // 120s timeout for extended thinking
     });
 
     if (!response.ok) {

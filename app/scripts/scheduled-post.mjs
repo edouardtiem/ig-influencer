@@ -403,13 +403,16 @@ EXPRESSION: ${expression}
 
 ${promptHints ? `ADDITIONAL HINTS: ${promptHints}` : ''}
 
-STYLE: 2026 Instagram content, iPhone 15 Pro quality
-- Natural lighting (golden hour, window light, soft diffused)
-- Authentic influencer aesthetic, casually perfect
-- Main character energy, effortlessly cool
-- The kind of post that gets organic viral engagement
-- Candid vibe like a friend took it, not overly posed
-AVOID: Professional studio, magazine editorial, stock photo look, overly retouched
+STYLE: Shot on iPhone 15 Pro, RAW unedited authentic look
+- NO Instagram filters, NO heavy color grading, natural flat colors
+- Real indoor lighting (warm lamps, cool window light, blue screen glow - mix naturally)
+- Environment VISIBLE around subject - show the room, objects, messy details
+- Subject takes 50-70% of frame, NOT perfectly centered, breathing room around
+- Natural skin with texture and imperfections (not airbrushed smooth)
+- Visible grain/noise in shadows (authentic low-light iPhone feel)
+- Candid energy like friend took it without warning
+- Show real environment details: phone, coffee cup, unmade bed, clothes, furniture
+AVOID: Professional studio, magazine editorial, stock photo, heavy retouching, perfect centering, overly clean backgrounds, saturated colors
 
 ${config.final_check}`;
 
@@ -1007,12 +1010,16 @@ export async function generateImagesForPost(postParams) {
   for (let i = 0; i < contentCount; i++) {
     log(`\n🎨 Generating image ${i + 1}/${contentCount}...`);
 
-    const actionVariations = [
-      postParams.action,
-      `${postParams.action}, different angle`,
-      `${postParams.action}, candid moment`,
+    // Framing variations for carousel diversity (real IG style)
+    const framingVariations = [
+      // Image 1: Hero shot - medium/full body, subject prominent but environment visible
+      `${postParams.action}, FRAMING: medium shot showing full body, subject takes 60% of frame, room/environment clearly visible around her, not perfectly centered`,
+      // Image 2: Different composition - close-up OR wide showing more environment
+      `${postParams.action}, FRAMING: ${i === 1 ? 'CLOSE UP from shoulders up, face fills 70% of frame, shallow depth of field, intimate portrait feel' : 'wide shot showing more environment, subject positioned to one side using rule of thirds'}`,
+      // Image 3: Candid/POV - unexpected angle, environment-focused
+      `${postParams.action}, FRAMING: candid angle as if caught off-guard, show environment details (messy bed, phone visible, real room), slightly imperfect framing adds authenticity`,
     ];
-    const action = actionVariations[i % actionVariations.length];
+    const action = framingVariations[i % framingVariations.length];
 
     const isReel = postParams.type === 'reel';
     const imageUrl = await generateImage(
@@ -1115,13 +1122,16 @@ async function main() {
   for (let i = 0; i < contentCount; i++) {
     log(`\n🎨 Generating image ${i + 1}/${contentCount}...`);
     
-    // Vary the action slightly for each image
-    const actionVariations = [
-      post.action,
-      `${post.action}, different angle`,
-      `${post.action}, candid moment`,
+    // Framing variations for carousel diversity (real IG style)
+    const framingVariations = [
+      // Image 1: Hero shot - medium/full body, subject prominent but environment visible
+      `${post.action}, FRAMING: medium shot showing full body, subject takes 60% of frame, room/environment clearly visible around her, not perfectly centered`,
+      // Image 2: Different composition - close-up OR wide showing more environment
+      `${post.action}, FRAMING: ${i === 1 ? 'CLOSE UP from shoulders up, face fills 70% of frame, shallow depth of field, intimate portrait feel' : 'wide shot showing more environment, subject positioned to one side using rule of thirds'}`,
+      // Image 3: Candid/POV - unexpected angle, environment-focused
+      `${post.action}, FRAMING: candid angle as if caught off-guard, show environment details (messy bed, phone visible, real room), slightly imperfect framing adds authenticity`,
     ];
-    const action = actionVariations[i % actionVariations.length];
+    const action = framingVariations[i % framingVariations.length];
 
     const imageUrl = await generateImage(
       character,

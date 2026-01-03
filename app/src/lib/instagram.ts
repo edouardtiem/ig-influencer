@@ -3,7 +3,10 @@
  * Documentation: https://developers.facebook.com/docs/instagram-api/guides/content-publishing
  */
 
+import { fetchWithTimeout } from './fetch-utils';
+
 const INSTAGRAM_GRAPH_API = 'https://graph.facebook.com/v21.0';
+const INSTAGRAM_TIMEOUT = 60000; // 60s timeout for Instagram API calls
 
 interface InstagramConfig {
   accessToken: string;
@@ -64,9 +67,9 @@ async function createMediaContainer(
     console.log('[Instagram] Adding location:', locationId);
   }
 
-  const response = await fetch(
+  const response = await fetchWithTimeout(
     `${INSTAGRAM_GRAPH_API}/${config.instagramAccountId}/media?${params}`,
-    { method: 'POST' }
+    { method: 'POST', timeout: INSTAGRAM_TIMEOUT }
   );
 
   const data = await response.json();
@@ -94,9 +97,9 @@ async function createCarouselContainer(
     access_token: config.accessToken,
   });
 
-  const response = await fetch(
+  const response = await fetchWithTimeout(
     `${INSTAGRAM_GRAPH_API}/${config.instagramAccountId}/media?${params}`,
-    { method: 'POST' }
+    { method: 'POST', timeout: INSTAGRAM_TIMEOUT }
   );
 
   const data = await response.json();
@@ -119,9 +122,9 @@ async function publishMedia(containerId: string): Promise<string> {
     access_token: config.accessToken,
   });
 
-  const response = await fetch(
+  const response = await fetchWithTimeout(
     `${INSTAGRAM_GRAPH_API}/${config.instagramAccountId}/media_publish?${params}`,
-    { method: 'POST' }
+    { method: 'POST', timeout: INSTAGRAM_TIMEOUT }
   );
 
   const data = await response.json();
@@ -146,8 +149,9 @@ async function waitForMediaReady(containerId: string, maxWaitMs: number = 60000)
       access_token: config.accessToken,
     });
 
-    const response = await fetch(
-      `${INSTAGRAM_GRAPH_API}/${containerId}?${params}`
+    const response = await fetchWithTimeout(
+      `${INSTAGRAM_GRAPH_API}/${containerId}?${params}`,
+      { timeout: INSTAGRAM_TIMEOUT }
     );
 
     const data = await response.json();
@@ -268,8 +272,9 @@ export async function checkInstagramConnection(): Promise<{ ok: boolean; error?:
       access_token: config.accessToken,
     });
 
-    const response = await fetch(
-      `${INSTAGRAM_GRAPH_API}/${config.instagramAccountId}?${params}`
+    const response = await fetchWithTimeout(
+      `${INSTAGRAM_GRAPH_API}/${config.instagramAccountId}?${params}`,
+      { timeout: INSTAGRAM_TIMEOUT }
     );
 
     const data = await response.json();

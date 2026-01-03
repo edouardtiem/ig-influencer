@@ -765,8 +765,14 @@ SETTING: ${setting},
 LIGHTING: ${lighting},
 MOOD: ${mood},
 
-STYLE: 2026 instagram style picture, ultra realistic Instagram photo, lifestyle editorial photography, 
-natural feminine beauty, 8k resolution, professional photography, soft focus background, candid authentic moment,
+STYLE: Shot on iPhone 15 Pro, RAW unedited authentic look
+- NO Instagram filters, NO heavy color grading, natural flat colors
+- Real indoor lighting (warm lamps, cool window light, blue screen glow - mix naturally)
+- Environment VISIBLE around subject - show the room, objects, messy details
+- Subject takes 50-70% of frame, NOT perfectly centered, breathing room around
+- Natural skin with texture and imperfections (not airbrushed smooth)
+- Candid energy like friend took it without warning
+AVOID: Professional studio, magazine editorial, stock photo, heavy retouching, perfect centering, saturated colors,
 
 ${MILA_FINAL_CHECK}`;
 }
@@ -832,14 +838,26 @@ async function main() {
 
     for (let i = 0; i < CAROUSEL_SIZE; i++) {
       const photoNum = i + 1;
-      const action = actions[i];
+      const baseAction = actions[i];
       const isHero = i === 0;
       const expression = isHero
         ? randomFrom(HERO_EXPRESSIONS)
         : randomFrom(SECONDARY_EXPRESSIONS);
 
+      // Add framing instructions for carousel diversity (real IG style)
+      const framingInstructions = [
+        // Image 1: Hero shot - medium/full body with environment
+        ', FRAMING: medium shot showing full body, subject takes 60% of frame, room/environment clearly visible around her, not perfectly centered',
+        // Image 2: Close-up portrait
+        ', FRAMING: CLOSE UP from shoulders up, face fills 70% of frame, shallow depth of field, intimate portrait feel',
+        // Image 3: Candid with environment focus
+        ', FRAMING: candid angle, show environment details (messy bed, phone visible, real room), slightly imperfect framing adds authenticity',
+      ];
+      const action = baseAction + framingInstructions[i % framingInstructions.length];
+
       log(`\n🎨 Generating Photo ${photoNum}/${CAROUSEL_SIZE}...`);
-      log(`  Action: ${action.slice(0, 60)}...`);
+      log(`  Action: ${baseAction.slice(0, 60)}...`);
+      log(`  Framing: ${framingInstructions[i % framingInstructions.length].slice(0, 50)}...`);
 
       // Build artistic prompt
       const prompt = buildPrompt(
