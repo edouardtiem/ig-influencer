@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 2 janvier 2025 (DM System Fixes Complet + Kill Switch ⏸️)
+**Dernière mise à jour** : 3 janvier 2026 (Authentic IG Photo Style 📸)
 
 ---
 
@@ -63,6 +63,9 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-050 | **📸 Authentic IG Photo Style** — Style iPhone RAW sans filtres + Variations de cadrage carousel (medium/close-up/candid) + Environnement visible + Couleurs naturelles désaturées | 03/01/2026 | v2.40.0 | [→](./roadmap/done/DONE-050-authentic-ig-photo-style.md) |
+| DONE-049 | **🔧 Fanvue Daily Post API Fix** — Correction endpoint `/v1/posts` → `/posts` + Field names (text→content, mediaUrls→media_urls, audience→is_premium) pour workflow GitHub Actions | 03/01/2025 | v2.39.0 | [→](./roadmap/done/DONE-049-fanvue-daily-post-fix.md) |
+| DONE-048 | **🔒 API Robustness & Security Fixes** — Timeouts sur tous les appels API (Perplexity 30s, Instagram 60s, Claude 120s, Grok 60s, Fanvue 30s) + Protection GET `/api/daily-trends-fetch` + Cache trends Supabase (persistent) + Validation Zod sur endpoints | 03/01/2025 | v2.38.0 | [→](./docs/sessions/2025-01-03-api-robustness-fixes.md) |
 | DONE-047 | **🛑 DM System Fixes Complet + Kill Switch** — Flag `is_stopped` pour stopper FINAL_MESSAGE loop + Kill switch toggle sur `/calendar` + 142 contacts spammés nettoyés + Réponses < 12 mots + Anti-hallucination renforcé | 02/01/2025 | v2.37.0 | [→](./roadmap/done/DONE-047-dm-system-fixes-complete.md) |
 | DONE-046 | **🔍 DM Audit + Fix FINAL_MESSAGE Duplicates** — Script audit-recent.mjs + Fix cooldown check AVANT cap check pour éviter FINAL_MESSAGE dupliqué | 02/01/2025 | v2.36.1 | [→](./docs/sessions/2025-01-02-dm-audit-fixes.md) |
 | DONE-045 | **🔧 DM Fixes — Duplicates, Hallucinations, Long Responses** — Cooldown 20s pour éviter duplicates + Règles anti-hallucination explicites + max_tokens 50 pour réponses < 15 mots | 02/01/2025 | v2.36.0 | [→](./docs/sessions/2025-01-02-dm-fixes-duplicates-hallucinations.md) |
@@ -119,6 +122,7 @@ roadmap/
 
 | ID | Bug | Sévérité | Status | Lien |
 |----|-----|----------|--------|------|
+| BUG-012 | **Fanvue Daily Post 404** — Endpoint `/v1/posts` incorrect + field names mismatch (text→content, mediaUrls→media_urls, audience→is_premium) | 🔴 High | ✅ Fixé | [→](./roadmap/done/DONE-049-fanvue-daily-post-fix.md) |
 | BUG-011 | **Table `posts` locations NULL** — History layer lisait mauvaise table → throwbacks répétitifs | 🟡 Medium | ✅ Fixé | [→](./roadmap/bugs/BUG-011-posts-table-null-locations.md) |
 | BUG-010 | **Pas de gestion d'erreurs API** — Code marque "posted" même si `instagram_post_id` est null | 🔴 High | ✅ Fixé | [→](./roadmap/bugs/BUG-010-api-error-handling.md) |
 | BUG-008 | **Sync ne met pas à jour likes/comments** — Seules impressions/reach mises à jour | 🔴 High | ✅ Fixed | [→](./docs/SESSION-23-DEC-2024-ANALYTICS-FIX.md) |
@@ -155,10 +159,10 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 36 
+├── ✅ Done        : 38
 ├── 🚧 In Progress : 3 (Elena Sexy Mode + Fanvue + Model Evolution)
 ├── 📋 Todo        : 6 
-├── 🐛 Bugs        : 6 (6 fixed)
+├── 🐛 Bugs        : 7 (7 fixed)
 └── 💡 Ideas       : 10 (Fanvue Bot Uncensored prêt à implémenter 🔥)
 ```
 
@@ -168,6 +172,9 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 03/01/2026 | **📸 Authentic IG Photo Style** — Style iPhone RAW + Variations cadrage carousel (medium/close-up/candid) + Environnement visible | [→](./roadmap/done/DONE-050-authentic-ig-photo-style.md) |
+| 03/01/2025 | **🔧 Fanvue Daily Post API Fix** — Correction endpoint et field names pour workflow GitHub Actions (404 fix) | [→](./docs/sessions/2025-01-03-fanvue-daily-post-fix.md) |
+| 03/01/2025 | **🔒 API Robustness & Security Fixes** — Timeouts sur tous les appels API + Protection endpoints + Cache Supabase trends + Validation Zod | [→](./docs/sessions/2025-01-03-api-robustness-fixes.md) |
 | 31/12/2024 | **📊 Audit DM Cold/Warm** — Analyse conversations bloquées (114 cold, 69 warm) + Découverte fallback crédits Claude + Validation système DM Automation V2 | [→](./docs/sessions/2024-12-31-dm-audit-cold-warm.md) |
 | 30/12/2024 | **🤖 DM Automation V2** — Caps par stage (15/25/35), closing pressure dynamique, personnalité warm/flirty (sans bratty), intent sexual→Fanvue, délai 15-35s, anti-hallucination | [→](./docs/27-DM-AUTOMATION-V2.md) |
 | 30/12/2024 | **💰 Stratégie IG + Fanvue + BMAC** — Cadrage monétisation complète : bio IG, funnel DM <30 messages (routing A/B/C), compliance BMAC SFW, KPI quotidiens pour 100€/jour | [→](./docs/sessions/2024-12-30-ig-fanvue-bmac-strategy.md) |
