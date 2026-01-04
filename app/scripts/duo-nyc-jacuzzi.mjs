@@ -45,7 +45,7 @@ const DUO_PROMPT = `Ultra realistic Instagram photo, two young women best friend
 
 BASED ON THE 4 PROVIDED REFERENCE IMAGES (2 per person), same faces and bodies as references:
 
-PERSON 1 - MILA: Based on reference images 1-2, 23 year old French woman, oval face soft jawline, shoulder-length auburn hair type 3A loose curls natural volume, almond-shaped hazel-green eyes with golden flecks, straight nose slightly upturned tip, naturally full lips medium pink, healthy athletic curvy figure large natural D-cup breasts, narrow waist wide hips, wearing black string bikini,
+PERSON 1 - MILA: Based on reference images 1-2, 23 year old French woman, oval face soft jawline, shoulder-length auburn hair type 3A loose curls natural volume, almond-shaped hazel-green eyes with golden flecks, straight nose slightly upturned tip, naturally full lips medium pink, healthy athletic figure large natural D-cup breasts, narrow waist, wearing black string bikini,
 
 PERSON 2 - ELENA: Based on reference images 3-4, 24 year old Italian woman, soft round pleasant face not angular, bronde hair dark roots with golden blonde balayage long beach waves wet from steam, honey brown warm eyes, naturally full lips nude-pink, small beauty mark on right cheekbone, feminine shapely figure very large natural F-cup breasts prominent, narrow waist wide hips, wearing cream string bikini, gold chunky chain bracelet on left wrist, layered gold necklaces,
 

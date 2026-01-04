@@ -277,7 +277,7 @@ export async function generateElenaImage(
   useReference: boolean = true
 ): Promise<string> {
   // Build prompt for Elena-style image
-  const basePrompt = `Beautiful 24 year old Italian woman, long bronde hair with golden highlights, honey brown eyes, natural beauty mark on right cheek, feminine curvy figure, gold jewelry`;
+  const basePrompt = `Beautiful 24 year old Italian woman, long bronde hair with golden highlights, honey brown eyes, natural beauty mark on right cheek, feminine figure, gold jewelry`;
   
   // Analyze request to customize prompt and select reference
   let scenePrompt = '';
@@ -324,7 +324,7 @@ export async function generateElenaImageFromReference(
   referenceImageUrl: string,
   variationPrompt?: string
 ): Promise<string> {
-  const basePrompt = `Beautiful 24 year old Italian woman, long bronde hair with golden highlights, honey brown eyes, natural beauty mark on right cheek, feminine curvy figure, gold jewelry`;
+  const basePrompt = `Beautiful 24 year old Italian woman, long bronde hair with golden highlights, honey brown eyes, natural beauty mark on right cheek, feminine figure, gold jewelry`;
   
   const prompt = variationPrompt 
     ? `${basePrompt}, ${variationPrompt}, photorealistic, high quality, professional photography, Instagram influencer style`
@@ -367,7 +367,7 @@ export async function generateBeachPoolImage(
     ? 'golden hour lighting, warm tones'
     : 'daylight, bright and clear';
   
-  const prompt = `Beautiful 24 year old Italian woman, long bronde hair with golden highlights, honey brown eyes, natural beauty mark on right cheek, feminine curvy figure, gold chain anklet on ankle, ${outfitDesc}, ${poseDesc}, infinity pool, luxury resort, ${timeDesc}, serene atmosphere, professional photography, Instagram influencer style, photorealistic, high quality`;
+  const prompt = `Beautiful 24 year old Italian woman, long bronde hair with golden highlights, honey brown eyes, natural beauty mark on right cheek, feminine figure, gold chain anklet on ankle, ${outfitDesc}, ${poseDesc}, infinity pool, luxury resort, ${timeDesc}, serene atmosphere, professional photography, Instagram influencer style, photorealistic, high quality`;
   
   console.log(`[Grok] Generating beach/pool image with reference style`);
   

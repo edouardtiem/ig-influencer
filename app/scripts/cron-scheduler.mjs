@@ -83,7 +83,7 @@ const CHARACTER_SHEETS = {
 - Style: Sophistiquée jet-set, street-luxe Paris, luxe discret
 - Activités: Shootings mode, voyages luxe, spa, Fashion Week, gastronomie
 - Personnalité: Warm & accessible (pas mannequin froide), confiante, secretly punk rock
-- Corps: Curvy, voluptueuse, très généreuse poitrine naturelle
+- Corps: Silhouette féminine, très généreuse poitrine naturelle
 - IMPORTANT: Elena voyage beaucoup (Milan, yachts, spas montagne, Fashion Weeks)
 
 ### 💕 Sa "meilleure amie" Mila

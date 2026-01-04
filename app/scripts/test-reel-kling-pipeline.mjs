@@ -94,7 +94,7 @@ natural feminine curves, toned Pilates body`,
 - Small beauty mark on right cheekbone (SIGNATURE)
 - Naturally full lips nude-pink color
 
-**IMAGE 2 (BODY)**: Curvy voluptuous figure, very large natural bust, narrow waist`,
+**IMAGE 2 (BODY)**: Feminine figure, very large natural bust, narrow waist`,
     
     faceDescription: `soft round face, warm approachable features,
 bronde hair with golden blonde balayage, long beach waves,

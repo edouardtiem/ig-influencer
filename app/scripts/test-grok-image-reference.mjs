@@ -49,7 +49,7 @@ async function generateWithReference() {
   }
   console.log('');
   
-  const basePrompt = `Beautiful 24 year old Italian woman, long bronde hair with golden highlights, honey brown eyes, natural beauty mark on right cheek, feminine curvy figure, gold jewelry`;
+  const basePrompt = `Beautiful 24 year old Italian woman, long bronde hair with golden highlights, honey brown eyes, natural beauty mark on right cheek, feminine figure, gold jewelry`;
   
   const prompt = VARIATION_PROMPT
     ? `${basePrompt}, ${VARIATION_PROMPT}, photorealistic, high quality, professional photography, Instagram influencer style`

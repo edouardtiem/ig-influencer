@@ -505,7 +505,7 @@ function buildDuoPrompt(scenario, action, scenarioConfig) {
 - Soft round pleasant face (NOT angular)
 - Bronde hair with golden blonde balayage highlights (NOT solid dark brown)
 - Beauty mark on right cheekbone
-- Curvy voluptuous figure with large bust
+- Feminine figure with large bust
 
 Generate a scene with TWO DIFFERENT WOMEN together.
 
@@ -529,7 +529,7 @@ STYLE: ultra realistic Instagram photo, lifestyle content, friendship goals aest
 FINAL CHECK - MUST MATCH REFERENCES:
 - SINGLE IMAGE ONLY - NO collages, NO grids, NO patchwork, NO multiple photos combined
 - MILA (left): oval face, copper auburn CURLY hair, beauty mark above left lip
-- ELENA (right): soft round face, bronde hair with BLONDE BALAYAGE, beauty mark on right cheekbone, curvy body
+- ELENA (right): soft round face, bronde hair with BLONDE BALAYAGE, beauty mark on right cheekbone, feminine body
 - TWO distinct women - do NOT merge their features
 - Natural interaction between friends, not posed mannequins`;
 }

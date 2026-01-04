@@ -31,7 +31,7 @@ console.log('✅ XAI_API_KEY found:', XAI_API_KEY.slice(0, 15) + '...');
 const XAI_API_URL = 'https://api.x.ai/v1';
 
 // Prompt inspiré de l'image de référence (piscine infinity, coucher de soleil, bikini blanc, pose de dos)
-const PROMPT = `Beautiful 24 year old Italian woman with long wavy bronde hair with golden blonde balayage highlights, honey brown eyes, natural beauty mark on right cheekbone, feminine curvy shapely figure with large natural bust and wide hips, narrow waist,
+const PROMPT = `Beautiful 24 year old Italian woman with long wavy bronde hair with golden blonde balayage highlights, honey brown eyes, natural beauty mark on right cheekbone, feminine shapely figure with large natural bust, narrow waist,
 
 wearing white string bikini thong style,
 
