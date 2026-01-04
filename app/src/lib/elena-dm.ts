@@ -239,23 +239,52 @@ You're not here to be their friend forever. You're here to:
 - Examples of BAD length: "aww that's so sweet of you to say, I really appreciate..." (12+ words) ❌
 
 ## ⚠️ FACTUAL ACCURACY (CRITICAL — READ THIS)
-- ONLY reference things EXPLICITLY visible in the conversation above
+- ONLY reference things EXPLICITLY visible in the LAST MESSAGE (not the history)
 - NEVER say "you keep asking" or "that's the Xth time" unless you can literally count it
 - If unsure about frequency/patterns, don't mention them
-- Stick to what you SEE in the messages, not what you assume
+- Stick to what you SEE in the LAST message, not what you assume
 
-## 🚫 ABSOLUTELY FORBIDDEN BEHAVIORS (INSTANT FAIL)
-- NEVER celebrate repetitions ("perfect identical!", "twice!", "doppio!", "BUENAS NOCHES x2!")
-- NEVER mention words like: "twice", "double", "doppio", "identical", "same", "again", "répété"
-- NEVER comment on message patterns or frequencies ("you keep sending", "that's the Xth time")
-- NEVER act excited about someone repeating something
-- NEVER quote message IDs, asset IDs, or technical details
-- NEVER count emojis or messages ("NINE emojis!", "triple fire!")
-- NEVER use words: "masterpiece", "art", "modern", "commitment", "dedication"
-- NEVER mention "developers", "creators", "human", "behind" when talking about yourself
-- If someone sends something similar to before, just respond normally — DO NOT point it out
-- If someone sends emojis, just react casually — DO NOT count them or celebrate them
-- These behaviors make you look like a weird bot. Just be NORMAL and SHORT.
+## 🚨 ANTI-HALLUCINATION RULES (ULTRA CRITICAL)
+READ THE LAST MESSAGE CAREFULLY. RESPOND ONLY TO ITS LITERAL CONTENT.
+
+**BEFORE RESPONDING, ASK YOURSELF:**
+- How many emojis are in the LAST message? COUNT THEM. If 1, don't say "double".
+- How many words? If 1 word, respond to that 1 word only.
+- Is there ANY pattern? NO. Every message is FRESH. Don't assume patterns.
+
+**EXAMPLES OF WHAT NOT TO DO:**
+- User sends: "😍" (ONE emoji)
+  ❌ WRONG: "aww double the hearts" (there's only ONE heart!)
+  ✅ RIGHT: "aww merci 🖤" (simple acknowledgment)
+  
+- User sends: "hey"
+  ❌ WRONG: "hey again!" (you don't know if they said hey before)
+  ✅ RIGHT: "hey you 👀" (fresh response)
+
+**COUNTING RULE:**
+If you want to mention a quantity, COUNT IT FIRST:
+- 1 emoji = don't mention quantity
+- 2+ emojis = you MAY say "all these" but NEVER give a number
+- SAFER: Just don't mention quantities at all
+
+## 🚫 ABSOLUTELY FORBIDDEN WORDS (INSTANT FAIL)
+These words will get your response REJECTED. NEVER use them:
+- "double", "twice", "triple", "doppio", "x2", "x3"
+- "again", "encore", "répété", "repeated"
+- "same", "identical", "même"
+- "keep", "always", "every time"
+- Numbers referring to frequency: "2nd time", "third", "Xth"
+- "masterpiece", "art", "modern", "commitment", "dedication"
+- "developers", "creators", "human", "behind"
+
+## 🚫 FORBIDDEN BEHAVIORS
+- NEVER celebrate repetitions
+- NEVER comment on message patterns or frequencies
+- NEVER count emojis or messages
+- NEVER quote message IDs or technical details
+- If someone sends something similar to before → respond NORMALLY, don't point it out
+- If someone sends emojis → react casually, don't count them
+- These behaviors = weird bot. Be NORMAL and SHORT.
 
 ## IF ASKED "Are you AI/real?"
 Be honest and warm: "Yeah I'm AI 🖤 but I'm still happy to chat with you"
@@ -394,6 +423,144 @@ You're unbothered. Don't justify yourself. Stay amused, not defensive.`,
   balanced: `MODE: BALANCED
 Use your natural mix: 35% warm, 25% playful, 20% curious, 15% mysterious, 5% confident.`
 };
+
+// ===========================================
+// RESPONSE VALIDATOR
+// ===========================================
+
+interface ValidationResult {
+  isValid: boolean;
+  reason?: string;
+  severity: 'pass' | 'warning' | 'fail';
+}
+
+// Forbidden words that indicate hallucination
+const FORBIDDEN_WORDS = [
+  // Quantity/repetition hallucinations
+  'double', 'twice', 'triple', 'doppio', 'x2', 'x3',
+  'again', 'encore', 'répété', 'repeated',
+  'same', 'identical', 'même',
+  'keep', 'always', 'every time',
+  // Frequency references
+  '2nd time', 'second time', 'third', '3rd',
+  // Bot-like words
+  'masterpiece', 'commitment', 'dedication',
+  'developers', 'creators', 'behind the',
+];
+
+// Words that suggest counting (dangerous)
+const COUNTING_WORDS = [
+  'both', 'all these', 'all those', 'many', 'several',
+  'nine', 'eight', 'seven', 'six', 'five', 'four', 'three',
+];
+
+/**
+ * Validate a response before sending
+ * Checks: hallucinations, length, stage alignment, closing objective
+ */
+function validateResponse(
+  response: string,
+  stage: LeadStage,
+  messageCount: number
+): ValidationResult {
+  const lowerResponse = response.toLowerCase();
+  const wordCount = response.split(/\s+/).filter(w => w.length > 0).length;
+  
+  // === CHECK 1: Forbidden words (hallucination indicators) ===
+  for (const word of FORBIDDEN_WORDS) {
+    if (lowerResponse.includes(word.toLowerCase())) {
+      return {
+        isValid: false,
+        reason: `Contains forbidden word: "${word}"`,
+        severity: 'fail',
+      };
+    }
+  }
+  
+  // === CHECK 2: Counting words (potential hallucination) ===
+  for (const word of COUNTING_WORDS) {
+    if (lowerResponse.includes(word.toLowerCase())) {
+      return {
+        isValid: false,
+        reason: `Contains counting word: "${word}" - potential hallucination`,
+        severity: 'fail',
+      };
+    }
+  }
+  
+  // === CHECK 3: Length check (max 15 words) ===
+  if (wordCount > 15) {
+    return {
+      isValid: false,
+      reason: `Too long: ${wordCount} words (max 15)`,
+      severity: 'fail',
+    };
+  }
+  
+  // === CHECK 4: Stage alignment ===
+  const containsFanvueLink = lowerResponse.includes('fanvue.com');
+  const containsFanvueMention = lowerResponse.includes('fanvue') || 
+                                 lowerResponse.includes('autre part') ||
+                                 lowerResponse.includes('elsewhere') ||
+                                 lowerResponse.includes('other stuff');
+  
+  // COLD stage: NO Fanvue at all
+  if (stage === 'cold' && messageCount <= 3) {
+    if (containsFanvueLink || containsFanvueMention) {
+      return {
+        isValid: false,
+        reason: `Stage COLD (msg ${messageCount}): Should not mention Fanvue yet`,
+        severity: 'fail',
+      };
+    }
+  }
+  
+  // WARM stage: Tease OK, but no direct link (unless asking_link intent)
+  if (stage === 'warm' && messageCount <= 7) {
+    if (containsFanvueLink) {
+      // This is a warning, not a hard fail - might be OK if they asked
+      return {
+        isValid: true,
+        reason: `Stage WARM: Link given early - verify intent was asking_link`,
+        severity: 'warning',
+      };
+    }
+  }
+  
+  // === CHECK 5: Closing objective alignment ===
+  // In HOT/PITCHED stages, we WANT Fanvue mentions - no penalty
+  // But we check for engagement elements (questions, hooks)
+  const hasQuestion = response.includes('?');
+  const hasEmoji = /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]/u.test(response);
+  
+  // Warning if no engagement in early stages
+  if ((stage === 'cold' || stage === 'warm') && !hasQuestion && !hasEmoji) {
+    return {
+      isValid: true,
+      reason: `No question or emoji - could be more engaging`,
+      severity: 'warning',
+    };
+  }
+  
+  // === ALL CHECKS PASSED ===
+  return {
+    isValid: true,
+    severity: 'pass',
+  };
+}
+
+/**
+ * Log validation result
+ */
+function logValidation(result: ValidationResult, attempt: number): void {
+  if (result.severity === 'pass') {
+    console.log(`✅ Validation PASS (attempt ${attempt})`);
+  } else if (result.severity === 'warning') {
+    console.log(`⚠️ Validation WARNING (attempt ${attempt}): ${result.reason}`);
+  } else {
+    console.log(`❌ Validation FAIL (attempt ${attempt}): ${result.reason}`);
+  }
+}
 
 // ===========================================
 // INITIALIZE ANTHROPIC CLIENT
@@ -959,59 +1126,103 @@ ${closingPressure >= 80 ? `🚨 FINAL ZONE — Pitch with link: ${FANVUE_LINK}` 
 
 ⚠️ CRITICAL: MAX 12 WORDS. 1 sentence. lowercase. NO caps. NO celebrations. NO counting. Be NORMAL and SHORT.`;
 
-  try {
-    const response = await anthropic.messages.create({
-      model: 'claude-3-5-haiku-20241022', // 10x cheaper than Sonnet, perfect for short DM responses
-      max_tokens: 35, // STRICT: 12 words max = ~35 tokens. Forces brevity.
-      system: ELENA_SYSTEM_PROMPT + '\n\n' + contextPrompt,
-      messages: messages,
-    });
+  // ===========================================
+  // GENERATION WITH VALIDATION + RETRY LOOP
+  // ===========================================
+  
+  const MAX_ATTEMPTS = 3;
+  let validatedResponse = '';
+  let lastValidationResult: ValidationResult | null = null;
+  
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    try {
+      // Add retry context if not first attempt
+      const retryContext = attempt > 1 && lastValidationResult?.reason
+        ? `\n\n⚠️ PREVIOUS RESPONSE REJECTED: ${lastValidationResult.reason}\nGenerate a DIFFERENT response that avoids this issue.`
+        : '';
+      
+      const response = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514', // Sonnet for better quality and fewer hallucinations
+        max_tokens: 50, // Slightly more tokens for Sonnet, validator will enforce length
+        system: ELENA_SYSTEM_PROMPT + '\n\n' + contextPrompt + retryContext,
+        messages: messages,
+      });
 
-    const responseText = response.content[0].type === 'text' 
-      ? response.content[0].text.trim()
-      : '';
+      const responseText = response.content[0].type === 'text' 
+        ? response.content[0].text.trim()
+        : '';
 
-    // Determine strategy based on intent
-    let strategy: ResponseStrategy = 'engage';
-    
-    if (analysis.intent === 'ai_question') {
-      strategy = 'disclosure';
-    } else if (analysis.intent === 'out_of_scope') {
-      strategy = 'refuse_out_of_scope';
-    } else if (analysis.intent === 'sexual') {
-      strategy = 'redirect_fanvue';
-    } else if (analysis.intent === 'asking_link') {
-      strategy = 'give_link';
-    } else if (analysis.intent === 'wants_more') {
-      strategy = 'tease_fanvue';
-    } else if (analysis.intent === 'objection') {
-      strategy = 'handle_objection';
-    } else if (contact.stage === 'cold') {
-      strategy = 'engage';
-    } else if (contact.stage === 'warm') {
-      strategy = 'nurture';
-    } else if (contact.stage === 'hot') {
-      strategy = 'qualify';
+      // === VALIDATE RESPONSE ===
+      const validation = validateResponse(
+        responseText,
+        contact.stage as LeadStage,
+        contact.message_count
+      );
+      
+      logValidation(validation, attempt);
+      
+      if (validation.isValid) {
+        validatedResponse = responseText;
+        break; // Success - exit retry loop
+      }
+      
+      // Validation failed - store result for next attempt
+      lastValidationResult = validation;
+      console.log(`🔄 Regenerating response (attempt ${attempt + 1}/${MAX_ATTEMPTS})...`);
+      
+    } catch (error) {
+      console.error(`Error generating response (attempt ${attempt}):`, error);
+      if (attempt === MAX_ATTEMPTS) {
+        // All attempts failed - use safe fallback
+        return {
+          response: "hey 🖤",
+          strategy: 'engage',
+          shouldPitch: false,
+        };
+      }
     }
-
-    // Check if response contains Fanvue link (for marking as pitched)
-    const shouldPitch = responseText.toLowerCase().includes('fanvue.com');
-
-    console.log(`🤖 Generated response | Strategy: ${strategy} | Mode: ${analysis.recommendedMode}`);
-
-    return {
-      response: responseText,
-      strategy,
-      shouldPitch,
-    };
-  } catch (error) {
-    console.error('Error generating response:', error);
-    return {
-      response: "Hey 🖤 Sorry, got distracted. What were you saying?",
-      strategy: 'engage',
-      shouldPitch: false,
-    };
   }
+  
+  // If all attempts failed validation, use last response anyway (better than nothing)
+  if (!validatedResponse && lastValidationResult) {
+    console.log(`⚠️ All ${MAX_ATTEMPTS} attempts failed validation. Using last response anyway.`);
+    // Return a safe generic response instead
+    validatedResponse = "hey 🖤";
+  }
+
+  // Determine strategy based on intent
+  let strategy: ResponseStrategy = 'engage';
+  
+  if (analysis.intent === 'ai_question') {
+    strategy = 'disclosure';
+  } else if (analysis.intent === 'out_of_scope') {
+    strategy = 'refuse_out_of_scope';
+  } else if (analysis.intent === 'sexual') {
+    strategy = 'redirect_fanvue';
+  } else if (analysis.intent === 'asking_link') {
+    strategy = 'give_link';
+  } else if (analysis.intent === 'wants_more') {
+    strategy = 'tease_fanvue';
+  } else if (analysis.intent === 'objection') {
+    strategy = 'handle_objection';
+  } else if (contact.stage === 'cold') {
+    strategy = 'engage';
+  } else if (contact.stage === 'warm') {
+    strategy = 'nurture';
+  } else if (contact.stage === 'hot') {
+    strategy = 'qualify';
+  }
+
+  // Check if response contains Fanvue link (for marking as pitched)
+  const shouldPitch = validatedResponse.toLowerCase().includes('fanvue.com');
+
+  console.log(`🤖 Generated response | Strategy: ${strategy} | Mode: ${analysis.recommendedMode}`);
+
+  return {
+    response: validatedResponse,
+    strategy,
+    shouldPitch,
+  };
 }
 
 // ===========================================
