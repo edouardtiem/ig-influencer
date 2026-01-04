@@ -253,13 +253,13 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('❌ Webhook error:', error);
     
-    // Return fallback response for mapping
+    // DON'T send fallback message - it creates loops when repeated
+    // Instead, skip silently to avoid spamming the user
     return NextResponse.json({
       success: false,
-      response: "Hey 🖤 Sorry, got distracted. What were you saying?",
-      lead_stage: 'cold',
-      message_count: 0,
-      strategy: 'engage',
+      skip: true,
+      response: '',
+      reason: 'Webhook error - skipping to avoid fallback loop',
     });
   }
 }

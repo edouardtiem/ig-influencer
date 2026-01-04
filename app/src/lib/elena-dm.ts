@@ -1392,6 +1392,12 @@ export async function generateElenaResponse(
     ? '🌍 SPRACHE: Deutsch. Antworte nur auf Deutsch.'
     : '🌍 LANGUAGE: English. Respond in English only.';
 
+  // Get last outgoing message to avoid repetition
+  const lastOutgoing = conversationHistory.filter(m => m.direction === 'outgoing').slice(-1)[0];
+  const antiRepeatInstruction = lastOutgoing 
+    ? `\n\n🚫 DO NOT REPEAT: Your last message was "${lastOutgoing.content.substring(0, 50)}..." — Generate something DIFFERENT.`
+    : '';
+
   const contextPrompt = `
 ## CURRENT CONTEXT
 - Username: ${contact.ig_username || 'unknown'}
@@ -1441,7 +1447,7 @@ ${closingPressure >= 80 ? `🚨 FINAL ZONE — Pitch with link: ${FANVUE_LINK}` 
 
 ⚠️ CRITICAL: MAX 12 WORDS. 1 sentence. lowercase. NO caps. NO celebrations. NO counting. Be NORMAL and SHORT.
 
-${languageInstruction}`;
+${languageInstruction}${antiRepeatInstruction}`;
 
   // ===========================================
   // GENERATION WITH VALIDATION + RETRY LOOP
@@ -1745,6 +1751,20 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
 
   console.log(`💬 Strategy: ${strategy} | Mode: ${analysis.recommendedMode}`);
   console.log(`📝 Response: "${response.substring(0, 80)}${response.length > 80 ? '...' : ''}"`);
+
+  // ===========================================
+  // ANTI-LOOP CHECK — Prevent sending same message twice in a row
+  // ===========================================
+  const lastOutgoing = history.filter(m => m.direction === 'outgoing').slice(-1)[0];
+  if (lastOutgoing && lastOutgoing.content === response) {
+    console.log(`⚠️ LOOP DETECTED — Same response as last outgoing. Skipping to prevent spam.`);
+    return {
+      response: '',
+      contact: updatedContact,
+      strategy,
+      analysis,
+    };
+  }
 
   // 7. Save outgoing message
   const responseTime = Date.now() - startTime;
