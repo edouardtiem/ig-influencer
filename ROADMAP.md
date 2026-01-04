@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 3 janvier 2025 (DM Free Trial Link + Personalized Pitch 💬)
+**Dernière mise à jour** : 3 janvier 2025 (DM Close Lead Objective 🎯)
 
 ---
 
@@ -63,6 +63,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-052 | **🎯 DM Close Lead Objective** — Objectif explicite "CLOSE THE LEAD" dans prompt AI + Funnel stages table (COLD→WARM→HOT→PITCHED) + Closing rules par stage + Pitch examples concrets | 03/01/2025 | v2.37.2 | [→](./roadmap/done/DONE-052-dm-close-lead-objective.md) |
 | DONE-051 | **💬 DM Free Trial Link + Personalized Pitch** — Lien free trial (1 jour gratuit) + Pitch "j'ai créé un lien gratuit pour toi" (geste personnel) + Intent strategies mis à jour + Emojis plus flirty | 03/01/2025 | v2.37.1 | [→](./roadmap/done/DONE-051-dm-free-trial-pitch.md) |
 | DONE-050 | **📸 Authentic IG Photo Style** — Style iPhone RAW sans filtres + Variations de cadrage carousel (medium/close-up/candid) + Environnement visible + Couleurs naturelles désaturées | 03/01/2026 | v2.40.0 | [→](./roadmap/done/DONE-050-authentic-ig-photo-style.md) |
 | DONE-049 | **🔧 Fanvue Daily Post API Fix** — Correction endpoint `/v1/posts` → `/posts` + Field names (text→content, mediaUrls→media_urls, audience→is_premium) pour workflow GitHub Actions | 03/01/2025 | v2.39.0 | [→](./roadmap/done/DONE-049-fanvue-daily-post-fix.md) |
@@ -160,7 +161,7 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 38
+├── ✅ Done        : 39
 ├── 🚧 In Progress : 3 (Elena Sexy Mode + Fanvue + Model Evolution)
 ├── 📋 Todo        : 6 
 ├── 🐛 Bugs        : 7 (7 fixed)
@@ -173,6 +174,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 03/01/2025 | **🎯 DM Close Lead Objective** — Objectif explicite "CLOSE THE LEAD" dans prompt AI + Funnel stages table + Closing rules + Pitch examples par stage | [→](./docs/sessions/2025-01-03-dm-close-lead-objective.md) |
 | 03/01/2025 | **💬 DM Free Trial Link + Personalized Pitch** — Lien free trial (1 jour gratuit) + Pitch "j'ai créé un lien gratuit pour toi" (geste personnel) + Intent strategies mis à jour | [→](./docs/sessions/2025-01-03-dm-free-trial-pitch.md) |
 | 03/01/2026 | **📸 Authentic IG Photo Style** — Style iPhone RAW + Variations cadrage carousel (medium/close-up/candid) + Environnement visible | [→](./roadmap/done/DONE-050-authentic-ig-photo-style.md) |
 | 03/01/2025 | **🔧 Fanvue Daily Post API Fix** — Correction endpoint et field names pour workflow GitHub Actions (404 fix) | [→](./docs/sessions/2025-01-03-fanvue-daily-post-fix.md) |
