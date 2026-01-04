@@ -240,21 +240,52 @@ ${config.final_check}`;
     log(`    ↳ Using scene reference for consistency`);
   }
 
-  const output = await replicate.run(NANO_BANANA_MODEL, {
-    input: {
-      prompt,
-      negative_prompt: 'ugly, deformed, noisy, blurry, low quality, cartoon, anime, illustration, painting, drawing, watermark, text, logo, bad anatomy, extra limbs, missing limbs, mutation, disfigured, poorly drawn face, cloned face, malformed limbs, fused fingers, too many fingers, username, signature, professional studio lighting, magazine cover, stock photo, overly retouched, artificial lighting, forced smile, posed expression',
-      aspect_ratio: '4:5',
-      resolution: '2K',
-      output_format: 'jpg',
-      safety_filter_level: 'block_only_high',
-      image_input: refBase64,
-    },
-  });
+  try {
+    const output = await replicate.run(NANO_BANANA_MODEL, {
+      input: {
+        prompt,
+        negative_prompt: 'ugly, deformed, noisy, blurry, low quality, cartoon, anime, illustration, painting, drawing, watermark, text, logo, bad anatomy, extra limbs, missing limbs, mutation, disfigured, poorly drawn face, cloned face, malformed limbs, fused fingers, too many fingers, username, signature, professional studio lighting, magazine cover, stock photo, overly retouched, artificial lighting, forced smile, posed expression',
+        aspect_ratio: '4:5',
+        resolution: '2K',
+        output_format: 'jpg',
+        safety_filter_level: 'block_only_high',
+        image_input: refBase64,
+      },
+    });
 
-  const imageUrl = Array.isArray(output) ? output[0] : output;
-  log(`    ✅ Generated`);
-  return imageUrl;
+    const imageUrl = Array.isArray(output) ? output[0] : output;
+    log(`    ✅ Generated`);
+    return imageUrl;
+  } catch (error) {
+    // Fallback with safer prompt if flagged
+    if (error.message?.includes('flagged') || error.message?.includes('safety') || error.message?.includes('sensitive')) {
+      log(`    ⚠️ Prompt flagged, trying safer version...`);
+      const saferPrompt = prompt
+        .replace(/sensual/gi, 'confident')
+        .replace(/sexy/gi, 'stylish')
+        .replace(/sultry/gi, 'captivating')
+        .replace(/alluring/gi, 'charming')
+        .replace(/curves/gi, 'silhouette')
+        .replace(/intimate/gi, 'cozy');
+
+      const output = await replicate.run(NANO_BANANA_MODEL, {
+        input: {
+          prompt: saferPrompt,
+          negative_prompt: 'ugly, deformed, noisy, blurry, low quality, cartoon, anime',
+          aspect_ratio: '4:5',
+          resolution: '2K',
+          output_format: 'jpg',
+          safety_filter_level: 'block_only_high',
+          image_input: refBase64,
+        },
+      });
+
+      const imageUrl = Array.isArray(output) ? output[0] : output;
+      log(`    ✅ Generated with safer prompt`);
+      return imageUrl;
+    }
+    throw error;
+  }
 }
 
 // ===========================================
