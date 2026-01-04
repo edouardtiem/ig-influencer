@@ -667,7 +667,8 @@ ${character === 'elena' ? ELENA_SEXY_LOCATIONS.join('\n') : LOCATIONS[character]
 - **mood**: cozy | adventure | work | fitness | travel | fashion | relax | nostalgic
 - **outfit**: Description tenue détaillée
 - **action**: Ce qu'elle fait (pour le prompt image)
-- **caption**: Caption engageante AVEC question (max 150 chars)
+- **caption**: MICRO-STORY caption (see format below) — NO character limit
+- **has_private_cta**: true/false (whether soft CTA to private is included)
 - **hashtags**: 12-15 hashtags (format ["#tag1", "#tag2"])
 - **scheduled_time**: Horaire parmi les slots disponibles
 - **prompt_hints**: Indices pour génération image
@@ -676,7 +677,7 @@ ${character === 'elena' ? ELENA_SEXY_LOCATIONS.join('\n') : LOCATIONS[character]
 1. **TOUS CAROUSELS**: Chaque post est un carousel de 3 images. Pas de reel.
 2. **EXPLORATION D'ABORD**: Respecte les règles d'exploration ci-dessus
 3. NE PAS répéter les lieux de l'historique récent (sauf throwback)
-4. Chaque caption DOIT avoir une question pour l'engagement
+4. **MICRO-STORY CAPTION**: Follow the caption format below (storytelling, not one-liners)
 5. Si duo est overdue (>10 jours) → inclure au moins 1 throwback/duo
 6. 1 post doit appliquer le test A/B si actif
 7. Le reasoning doit justifier le choix en citant les données
@@ -704,6 +705,58 @@ ${character === 'elena'
 - Utilise ce qui FONCTIONNE (analytics, lieux qui performent)
 - Style proven, caption efficace
 - Engagement garanti
+
+═══════════════════════════════════════════════════════════════
+## ✍️ CAPTION FORMAT — Micro-Story Style (ENGLISH)
+═══════════════════════════════════════════════════════════════
+
+### Structure (MANDATORY for Elena):
+1. **[HOOK]** — 1 atmospheric line (time, place, sensation)
+2. **[MICRO-STORY]** — 2-4 lines telling ONE precise moment with tension/mystery
+3. **[REFLECTION]** — 1-2 lines, her thought, tease, or cryptic observation
+4. **[SOFT CTA]** — Direct tease to private content (~70% of posts)
+5. **[QUESTION]** — Optional engagement question (not mandatory)
+
+### Elena's Voice:
+- LANGUAGE: English (can sprinkle French words for charm)
+- Mysterious, confident, in control
+- Never reveals everything — suggests, hints, teases
+- Observes the world like she owns it
+- Sensual but elegant, never vulgar
+
+### SOFT CTA BANK (pick ONE, adapt to context):
+Use these for carousels/photoshoots/sensual content. Be DIRECT so people understand:
+
+- "The rest of this set is on my private. 🖤"
+- "Want to see more? It's on my private."
+- "The uncensored version is on my private. 😏"
+- "More shots from this night on my private."
+- "The spicier photos didn't make it here... they're on my private. 🖤"
+- "Full set available on my private page."
+- "This is the IG version. The rest is on my private."
+- "The other angles? On my private. 🖤"
+- "Some things are too good for the feed. Check my private."
+
+### When to include soft CTA (has_private_cta: true):
+✅ Photoshoots, carousels with multiple angles
+✅ Sensual/suggestive content (bikini, lingerie, spa)
+✅ Behind the scenes moments
+✅ Travel content with "more to show"
+❌ Random lifestyle posts (coffee, city walk)
+❌ When it would break an emotional/poetic moment
+
+### CAPTION EXAMPLE:
+BAD (old style): "Spa vibes ✨ What's your favorite way to relax?"
+
+GOOD (micro-story):
+"9 PM. Steam rising, city lights fading through the window.
+
+The kind of night where you stop thinking and just... exist.
+Warm water, cold champagne, and absolutely nowhere to be.
+
+The other shots from this evening are on my private. 🖤
+
+What's your escape?"
 
 ### Catégories de tenues (rotation):
 - **👙 BIKINI**: yacht, plage, piscine, maldives → bikini string, maillot échancré
@@ -734,7 +787,7 @@ ${ELENA_SEXY_POSES.join('\n')}
 2. La pose DOIT mettre en valeur les courbes d'Elena
 3. Le lieu DOIT être dans la liste sexy-friendly
 4. CONTINUER l'histoire d'Elena (throwback voyage, soirée cozy, etc.)
-5. Caption avec question engageante`
+5. **CAPTION = MICRO-STORY en anglais avec soft CTA quand approprié**`
   : `Mila est personal trainer & photographe. Variété entre:
    → Fitness (gym, yoga)
    → Lifestyle (café, Montmartre)
@@ -744,27 +797,28 @@ ${ELENA_SEXY_POSES.join('\n')}
 
 Réponds UNIQUEMENT avec du JSON valide, format:
 {
-  "daily_theme": "Thème du jour en 1 phrase",
-  "reasoning_summary": "Résumé des décisions principales",
+  "daily_theme": "Theme of the day in 1 sentence",
+  "reasoning_summary": "Summary of main decisions",
   "exploration_applied": ["rule1", "rule2"],
   "ab_test_applied": true/false,
-  "relationship_hint": "type_du_hint_utilisé" ou null,
+  "relationship_hint": "hint_type_used" or null,
   "posts": [
     {
       "content_type": "new|throwback|duo|response|experiment",
       "is_experiment": false,
-      "reasoning": "Pourquoi ce post...",
+      "reasoning": "Why this post...",
       "location_key": "...",
       "location_name": "...",
       "post_type": "carousel",
       "mood": "...",
       "outfit": "...",
       "action": "...",
-      "caption": "... question?",
+      "caption": "MICRO-STORY caption in English with line breaks (\\n\\n between paragraphs)",
+      "has_private_cta": true,
       "hashtags": ["#..."],
       "scheduled_time": "HH:MM",
       "prompt_hints": "...",
-      "relationship_hint": "type_if_this_post_has_hint" ou null
+      "relationship_hint": "type_if_this_post_has_hint" or null
     }
   ]
 }`;
@@ -943,6 +997,7 @@ async function generateSchedule(character) {
         outfit: p.outfit,
         action: p.action,
         caption: p.caption,
+        has_private_cta: p.has_private_cta || false,
         hashtags: p.hashtags,
         prompt_hints: p.prompt_hints,
         executed: false,
@@ -997,6 +1052,7 @@ async function generateSchedule(character) {
           outfit: post.outfit,
           action: post.action,
           caption: post.caption,
+          has_private_cta: post.has_private_cta || false,
           hashtags: post.hashtags,
           prompt_hints: post.prompt_hints,
         }, { onConflict: 'schedule_id,scheduled_time' });
