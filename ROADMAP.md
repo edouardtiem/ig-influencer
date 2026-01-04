@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 3 janvier 2026 (Authentic IG Photo Style 📸)
+**Dernière mise à jour** : 3 janvier 2025 (DM Free Trial Link + Personalized Pitch 💬)
 
 ---
 
@@ -63,6 +63,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-051 | **💬 DM Free Trial Link + Personalized Pitch** — Lien free trial (1 jour gratuit) + Pitch "j'ai créé un lien gratuit pour toi" (geste personnel) + Intent strategies mis à jour + Emojis plus flirty | 03/01/2025 | v2.37.1 | [→](./roadmap/done/DONE-051-dm-free-trial-pitch.md) |
 | DONE-050 | **📸 Authentic IG Photo Style** — Style iPhone RAW sans filtres + Variations de cadrage carousel (medium/close-up/candid) + Environnement visible + Couleurs naturelles désaturées | 03/01/2026 | v2.40.0 | [→](./roadmap/done/DONE-050-authentic-ig-photo-style.md) |
 | DONE-049 | **🔧 Fanvue Daily Post API Fix** — Correction endpoint `/v1/posts` → `/posts` + Field names (text→content, mediaUrls→media_urls, audience→is_premium) pour workflow GitHub Actions | 03/01/2025 | v2.39.0 | [→](./roadmap/done/DONE-049-fanvue-daily-post-fix.md) |
 | DONE-048 | **🔒 API Robustness & Security Fixes** — Timeouts sur tous les appels API (Perplexity 30s, Instagram 60s, Claude 120s, Grok 60s, Fanvue 30s) + Protection GET `/api/daily-trends-fetch` + Cache trends Supabase (persistent) + Validation Zod sur endpoints | 03/01/2025 | v2.38.0 | [→](./docs/sessions/2025-01-03-api-robustness-fixes.md) |
@@ -172,6 +173,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 03/01/2025 | **💬 DM Free Trial Link + Personalized Pitch** — Lien free trial (1 jour gratuit) + Pitch "j'ai créé un lien gratuit pour toi" (geste personnel) + Intent strategies mis à jour | [→](./docs/sessions/2025-01-03-dm-free-trial-pitch.md) |
 | 03/01/2026 | **📸 Authentic IG Photo Style** — Style iPhone RAW + Variations cadrage carousel (medium/close-up/candid) + Environnement visible | [→](./roadmap/done/DONE-050-authentic-ig-photo-style.md) |
 | 03/01/2025 | **🔧 Fanvue Daily Post API Fix** — Correction endpoint et field names pour workflow GitHub Actions (404 fix) | [→](./docs/sessions/2025-01-03-fanvue-daily-post-fix.md) |
 | 03/01/2025 | **🔒 API Robustness & Security Fixes** — Timeouts sur tous les appels API + Protection endpoints + Cache Supabase trends + Validation Zod | [→](./docs/sessions/2025-01-03-api-robustness-fixes.md) |
