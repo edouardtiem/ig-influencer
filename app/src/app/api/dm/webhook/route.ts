@@ -19,6 +19,67 @@ import { supabase } from '@/lib/supabase';
 // Verify request is from ManyChat (optional security)
 const MANYCHAT_WEBHOOK_SECRET = process.env.MANYCHAT_WEBHOOK_SECRET;
 
+// ===========================================
+// IN-MEMORY LOCK TO PREVENT RACE CONDITIONS
+// ===========================================
+// When multiple webhooks arrive simultaneously for the same user,
+// only the first one should process. Others should skip.
+// Key format: "userId:messageHash"
+const processingLocks = new Map<string, number>();
+const LOCK_TIMEOUT_MS = 30000; // 30 seconds
+
+/**
+ * Try to acquire a lock for processing a message
+ * Returns true if lock acquired, false if already processing
+ */
+function tryAcquireLock(userId: string, messageHash: string): boolean {
+  const lockKey = `${userId}:${messageHash}`;
+  const now = Date.now();
+  
+  // Clean up expired locks
+  for (const [key, timestamp] of processingLocks.entries()) {
+    if (now - timestamp > LOCK_TIMEOUT_MS) {
+      processingLocks.delete(key);
+    }
+  }
+  
+  // Check if already locked
+  if (processingLocks.has(lockKey)) {
+    const lockTime = processingLocks.get(lockKey)!;
+    if (now - lockTime < LOCK_TIMEOUT_MS) {
+      console.log(`🔒 LOCK EXISTS for ${lockKey} (${Math.round((now - lockTime) / 1000)}s ago)`);
+      return false;
+    }
+  }
+  
+  // Acquire lock
+  processingLocks.set(lockKey, now);
+  console.log(`🔓 LOCK ACQUIRED for ${lockKey}`);
+  return true;
+}
+
+/**
+ * Release a lock after processing
+ */
+function releaseLock(userId: string, messageHash: string): void {
+  const lockKey = `${userId}:${messageHash}`;
+  processingLocks.delete(lockKey);
+  console.log(`🔓 LOCK RELEASED for ${lockKey}`);
+}
+
+/**
+ * Simple hash function for message content
+ */
+function hashMessage(message: string): string {
+  let hash = 0;
+  for (let i = 0; i < message.length; i++) {
+    const char = message.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return hash.toString(36);
+}
+
 /**
  * Check if DM system is paused
  */
@@ -120,8 +181,30 @@ export async function POST(request: NextRequest) {
     console.log(`Message: "${payload.last_input_text}"`);
     console.log(`${'='.repeat(50)}`);
 
+    // ===========================================
+    // RACE CONDITION PREVENTION — In-Memory Lock
+    // ===========================================
+    const userId = payload.subscriber.id;
+    const messageHash = hashMessage(messageText);
+    
+    if (!tryAcquireLock(userId, messageHash)) {
+      console.log(`⚠️ RACE CONDITION BLOCKED — Another webhook is already processing this message`);
+      return NextResponse.json({
+        success: true,
+        skip: true,
+        response: '',
+        reason: 'Race condition prevented - duplicate webhook blocked',
+      });
+    }
+
     // Process DM and generate response
-    const result = await processDM(payload);
+    let result;
+    try {
+      result = await processDM(payload);
+    } finally {
+      // Always release lock after processing
+      releaseLock(userId, messageHash);
+    }
 
     // Check if we should skip (deduplication/cooldown)
     if (!result.response || result.response.trim() === '') {
