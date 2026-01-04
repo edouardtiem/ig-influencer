@@ -148,19 +148,12 @@ export async function POST(request: NextRequest) {
     }
     console.log(`${'='.repeat(50)}\n`);
 
-    // Natural delay: 15-35 seconds with variance
-    // This simulates a real person checking their phone, thinking, and typing
-    const baseDelay = 15000; // 15 seconds minimum
-    const variance = Math.random() * 20000; // 0-20 seconds variance
-    const totalDelay = baseDelay + variance; // 15-35 seconds total
+    // ⚠️ NO DELAY IN WEBHOOK - Vercel has 10s timeout!
+    // Put delay in ManyChat flow using "Delay" block before Send Message
+    // Recommended: 15-30 seconds delay in ManyChat
     
-    const elapsed = Date.now() - startTime;
-    const remainingDelay = Math.max(0, totalDelay - elapsed);
-    
-    if (remainingDelay > 0) {
-      console.log(`⏳ Natural delay: ${Math.round(remainingDelay / 1000)}s`);
-      await new Promise(resolve => setTimeout(resolve, remainingDelay));
-    }
+    // Calculate suggested delay for ManyChat (random 15-35s)
+    const suggestedDelay = Math.round(15 + Math.random() * 20);
 
     // Return response in simple format for Response Mapping
     // The Send Message block will use {{elena_response}} from mapping
@@ -172,6 +165,7 @@ export async function POST(request: NextRequest) {
       message_count: result.contact.message_count,
       strategy: result.strategy,
       should_stop: result.shouldStop || false,
+      suggested_delay_seconds: suggestedDelay, // For ManyChat Delay block
     });
   } catch (error) {
     console.error('❌ Webhook error:', error);
