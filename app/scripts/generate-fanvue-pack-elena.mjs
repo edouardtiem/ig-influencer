@@ -38,9 +38,11 @@ const NANO_BANANA_MODEL = 'google/nano-banana-pro';
 const OUTPUT_DIR = path.join(__dirname, '..', 'generated', 'fanvue-packs', 'elena-fanvue-pack1');
 const MODE = process.argv[2] || 'test'; // 'test', 'full', or photo index (0-6)
 
-// Elena references
+// Elena references - 4 angles for consistency
 const ELENA_FACE_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v1765967140/replicate-prediction-qh51japkxxrma0cv52x8qs7mnc_ltc9ra.png';
 const ELENA_BODY_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v1765967073/replicate-prediction-ws5fpmjpfsrma0cv538t79j8jm_wx9nap.png';
+const ELENA_PROFILE_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v1767561713/y1r6jt0pwdrmr0cvhbf9sbenkw_z0sydx.png';
+const ELENA_BACK_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v1767562505/replicate-prediction-bjnvs97bqxrmy0cvhbpa8cx5f8_daohqh.png';
 
 // Location references
 const LOCATION_REFS = {

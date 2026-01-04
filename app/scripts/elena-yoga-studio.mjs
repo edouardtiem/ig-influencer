@@ -30,9 +30,11 @@ if (fs.existsSync(envPath)) {
 
 const NANO_BANANA_MODEL = 'google/nano-banana-pro';
 
-// Elena's reference photos
+// Elena's reference photos - 4 angles for consistency
 const ELENA_FACE_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v1765967140/replicate-prediction-qh51japkxxrma0cv52x8qs7mnc_ltc9ra.png';
 const ELENA_BODY_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v1765967073/replicate-prediction-ws5fpmjpfsrma0cv538t79j8jm_wx9nap.png';
+const ELENA_PROFILE_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v1767561713/y1r6jt0pwdrmr0cvhbf9sbenkw_z0sydx.png';
+const ELENA_BACK_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v1767562505/replicate-prediction-bjnvs97bqxrmy0cvhbpa8cx5f8_daohqh.png';
 
 // ═══════════════════════════════════════════════════════════════
 // ELENA CHARACTER
@@ -55,7 +57,11 @@ const REFERENCE_INSTRUCTION = `You are provided with reference images in order:
 - Same narrow defined waist
 - Same wide feminine hips
 
-CRITICAL: Face MUST be identical to Image 1. Body proportions MUST match Image 2.`;
+**IMAGE 3 (PROFILE REFERENCE)**: This is Elena from LEFT PROFILE. For side angles use this guide.
+
+**IMAGE 4 (BACK REFERENCE)**: This is Elena from BEHIND. For back views use this guide.
+
+CRITICAL: Face MUST be identical to Image 1. Body proportions MUST match Image 2. Side angles use Image 3. Back views use Image 4.`;
 
 const ELENA_BASE = `soft round pleasant face NOT angular, warm approachable features,
 bronde hair dark roots with golden blonde balayage long beach waves,

@@ -107,7 +107,10 @@ toned but not muscular, Pilates-sculpted shoulders`,
     name: 'Elena',
     face_ref: 'https://res.cloudinary.com/dily60mr0/image/upload/v1765967140/replicate-prediction-qh51japkxxrma0cv52x8qs7mnc_ltc9ra.png',
     body_ref: 'https://res.cloudinary.com/dily60mr0/image/upload/v1765967073/replicate-prediction-ws5fpmjpfsrma0cv538t79j8jm_wx9nap.png',
-    extra_refs: [],
+    extra_refs: [
+      'https://res.cloudinary.com/dily60mr0/image/upload/v1767561713/y1r6jt0pwdrmr0cvhbf9sbenkw_z0sydx.png', // Profile left
+      'https://res.cloudinary.com/dily60mr0/image/upload/v1767562505/replicate-prediction-bjnvs97bqxrmy0cvhbpa8cx5f8_daohqh.png', // Back view
+    ],
     reference_instruction: `You are provided with reference images in order:
 
 **IMAGE 1 (FACE REFERENCE)**: This is Elena's face. Copy this EXACTLY:
@@ -126,9 +129,21 @@ toned but not muscular, Pilates-sculpted shoulders`,
 - Same wide feminine hips
 - Same healthy fit Italian body type
 
+**IMAGE 3 (PROFILE REFERENCE)**: This is Elena from LEFT PROFILE. For side angles:
+- Same profile silhouette and jawline curve
+- Same nose profile shape
+- Same hair volume and flow from side
+
+**IMAGE 4 (BACK REFERENCE)**: This is Elena from BEHIND. For back views:
+- Same hair color, length, and balayage pattern from behind
+- Same shoulder width and body silhouette
+- Same skin tone
+
 CRITICAL RULES:
 - Face MUST be identical to Image 1 - same person, same features
 - Body proportions MUST match Image 2 - same curves, same large bust size
+- For SIDE ANGLES: use Image 3 as profile guide
+- For BACK VIEWS: use Image 4 as back guide
 - Do NOT change face to look more "model-like" or angular
 - Do NOT reduce bust size or body curves
 - Hair MUST show visible golden blonde balayage highlights, NOT solid dark brown`,

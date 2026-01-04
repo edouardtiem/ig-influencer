@@ -144,8 +144,26 @@ const CLOSING_STARTS_AT: Record<LeadStage, number> = {
   paid: 80
 };
 
-// Final message before stopping - personalized, feels like a special gesture
-const FINAL_MESSAGE = `je vois qu'on accroche 🖤 j'ai créé un lien gratuit pour toi → ${FANVUE_LINK}`;
+// ===========================================
+// EXIT MESSAGES — Natural excuses + "I'll be available on Fanvue"
+// ===========================================
+// Key: Always mention that Elena WILL RESPOND on Fanvue
+// This is critical so they know the conversation continues there
+const EXIT_MESSAGES = [
+  `shooting dans 5 min 📸 mais je réponds toujours sur fanvue 🖤 → ${FANVUE_LINK}`,
+  `je file bébé 🖤 mais on peut continuer à parler là-bas, je suis plus dispo → ${FANVUE_LINK}`,
+  `mon manager m'appelle 😅 ici j'ai plus le temps mais je réponds sur fanvue → ${FANVUE_LINK}`,
+  `je dois y aller 🖤 mais on se retrouve là-bas? je réponds toujours → ${FANVUE_LINK}`,
+  `plus le temps ici sorry 🖤 mais je suis active sur fanvue, on continue? → ${FANVUE_LINK}`,
+  `insta c'est compliqué pour moi 😅 mais sur fanvue je suis dispo, viens → ${FANVUE_LINK}`,
+];
+
+/**
+ * Get a random exit message
+ */
+function getRandomExitMessage(): string {
+  return EXIT_MESSAGES[Math.floor(Math.random() * EXIT_MESSAGES.length)];
+}
 
 /**
  * Calculate closing pressure (0-100%)
@@ -1679,25 +1697,28 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
   const closingPressure = getClosingPressure(contact.stage as LeadStage, contact.message_count);
   
   if (hasReachedLimit(contact.stage as LeadStage, contact.message_count)) {
-    console.log(`🛑 Message limit reached (${contact.message_count}/${messageLimit}). Sending final message and STOPPING.`);
+    // Get random exit message (natural excuse + "I'll respond on Fanvue")
+    const exitMessage = getRandomExitMessage();
+    console.log(`🛑 Message limit reached (${contact.message_count}/${messageLimit}). Sending exit message and STOPPING.`);
+    console.log(`📝 Exit message: "${exitMessage.substring(0, 60)}..."`);
     
     // Save incoming message first
     await saveMessage(contact.id, 'incoming', incomingMessage, {
       stage_at_time: contact.stage,
     });
     
-    // Save final message
-    await saveMessage(contact.id, 'outgoing', FINAL_MESSAGE, {
+    // Save exit message
+    await saveMessage(contact.id, 'outgoing', exitMessage, {
       response_strategy: 'pitch',
       response_time_ms: Date.now() - startTime,
       stage_at_time: contact.stage,
     });
     
-    // CRITICAL: Mark contact as stopped to prevent FINAL_MESSAGE loop
+    // CRITICAL: Mark contact as stopped to prevent message loop
     await markAsStopped(contact.id);
     
     return {
-      response: FINAL_MESSAGE,
+      response: exitMessage,
       contact: { ...contact, is_stopped: true, stopped_at: new Date().toISOString() },
       strategy: 'pitch',
       analysis: {
