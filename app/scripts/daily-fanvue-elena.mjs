@@ -412,7 +412,8 @@ async function postToFanvue(accessToken, content, imageUrl) {
 
   if (!response.ok) {
     const error = await response.text();
-    throw new Error(`Fanvue post failed: ${error}`);
+    const errorObj = { status: response.status, message: error };
+    throw errorObj;
   }
 
   return response.json();
@@ -478,12 +479,37 @@ async function main() {
         await postToFanvue(accessToken, content, cloudinaryUrl);
         log('   ✅ Posted to Fanvue (subscribers only)!');
       } catch (error) {
-        // If failed, try refreshing token
-        log('   🔄 Refreshing Fanvue token...');
-        const newTokens = await refreshFanvueToken(refreshToken);
-        await postToFanvue(newTokens.accessToken, content, cloudinaryUrl);
-        log('   ✅ Posted to Fanvue (subscribers only, with refreshed token)');
-        log(`   ℹ️  New refresh token: ${newTokens.refreshToken.substring(0, 20)}...`);
+        // Check if error is authentication-related (401 Unauthorized)
+        const isAuthError = error.status === 401 || (error.message && error.message.includes('401'));
+        
+        if (!isAuthError) {
+          // Not an auth error, rethrow
+          throw error;
+        }
+        
+        // Auth error, try refreshing token
+        log('   🔄 Access token expired, refreshing...');
+        try {
+          const newTokens = await refreshFanvueToken(refreshToken);
+          await postToFanvue(newTokens.accessToken, content, cloudinaryUrl);
+          log('   ✅ Posted to Fanvue (subscribers only, with refreshed token)');
+          log(`   ⚠️  IMPORTANT: Update GitHub Secrets with new refresh token:`);
+          log(`      FANVUE_REFRESH_TOKEN=${newTokens.refreshToken}`);
+          log(`      (Current token in secrets is now invalid)`);
+        } catch (refreshError) {
+          // Check if refresh token is invalid
+          const errorMsg = refreshError.message || '';
+          if (errorMsg.includes('invalid_grant') || errorMsg.includes('already used')) {
+            log('\n   ❌ Refresh token is invalid or expired!');
+            log('   📋 To fix this:');
+            log('      1. Visit: https://ig-influencer.vercel.app/api/oauth/auth');
+            log('      2. Authorize Fanvue');
+            log('      3. Copy the new FANVUE_ACCESS_TOKEN and FANVUE_REFRESH_TOKEN');
+            log('      4. Update GitHub Secrets with the new tokens');
+            throw new Error('Refresh token invalid. Please obtain new tokens via OAuth flow.');
+          }
+          throw refreshError;
+        }
       }
     }
   }

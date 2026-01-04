@@ -116,7 +116,8 @@ export interface ManyChateWebhookPayload {
 // CONSTANTS
 // ===========================================
 
-const FANVUE_LINK = 'https://www.fanvue.com/elenav.paris';
+// Free trial link - 1 day free, lower friction for conversion
+const FANVUE_LINK = 'https://www.fanvue.com/elenav.paris?free_trial=f9fec822-bbf5-4dae-a886-13c7f95cb73f';
 
 // Message caps per stage (total messages before stop)
 const MESSAGE_CAPS: Record<LeadStage, number> = {
@@ -139,8 +140,8 @@ const CLOSING_STARTS_AT: Record<LeadStage, number> = {
   paid: 80
 };
 
-// Final message before stopping (MUST be short - 10 words max)
-const FINAL_MESSAGE = `pas dispo ici 🖤 viens sur fanvue → ${FANVUE_LINK}`;
+// Final message before stopping - personalized, feels like a special gesture
+const FINAL_MESSAGE = `je vois qu'on accroche 🖤 j'ai créé un lien gratuit pour toi → ${FANVUE_LINK}`;
 
 /**
  * Calculate closing pressure (0-100%)
@@ -235,35 +236,37 @@ When someone asks for these things, REFUSE SMARTLY:
 const INTENT_STRATEGIES: Record<MessageIntent, string> = {
   // === FUNNEL INTENTS (priority) ===
   wants_more: `🎯 INTENT: WANTS_MORE — They want more content!
-→ Tease Fanvue (NO LINK YET). Keep it SHORT and mysterious.
+→ Mention you have more content elsewhere + offer FREE access as a special gesture.
 Examples:
-- "y'a des trucs que je poste pas ici 👀"
-- "there's stuff i can't show here tbh"
-- "i have... other content 😏"
-MAX 10 WORDS. Don't explain. Just tease.`,
+- "j'ai des trucs que je poste pas ici... tiens, un accès gratuit pour toi 👀 ${FANVUE_LINK}"
+- "y'a plus sur fanvue... je t'ai fait un lien gratuit → ${FANVUE_LINK}"
+- "i made you a free link 🖤 ${FANVUE_LINK}"
+Make it feel like a SPECIAL gesture for THEM. Not a sales pitch.`,
 
   asking_link: `🎯 INTENT: ASKING_LINK — They want the link!
-→ Give the link, nothing else. Be casual.
-Just say: "${FANVUE_LINK}" or "here 🖤 ${FANVUE_LINK}"
-NO long explanations. Just the link.`,
+→ Give the FREE link as a personal gesture.
+Examples:
+- "tiens, je t'ai créé un accès gratuit 🖤 ${FANVUE_LINK}"
+- "here, made you a free link → ${FANVUE_LINK}"
+- "voilà, c'est gratuit pour toi 👀 ${FANVUE_LINK}"
+Make it feel PERSONAL, like you did something special for them.`,
 
   sexual: `🎯 INTENT: SEXUAL — They're being explicit/sexual
-→ Redirect to Fanvue with playful exclusivity. NOT refusal. NOT judgment.
+→ Redirect to Fanvue with FREE access. NOT refusal. NOT judgment.
 Examples:
-- "ce genre de convo je les garde pour mes subs 😈"
-- "hmm... t'as fanvue? c'est là que je suis plus... libre"
-- "👀 ça c'est réservé à mes favoris → ${FANVUE_LINK}"
-NEVER refuse or say "I don't do that". Just redirect playfully.`,
+- "ce genre de convo c'est mieux là-bas 😈 tiens, c'est gratuit → ${FANVUE_LINK}"
+- "hmm... j'ai fait un accès gratuit pour toi, on sera plus libres 👀 ${FANVUE_LINK}"
+- "on peut aller plus loin là-bas... lien gratuit pour toi 🖤 ${FANVUE_LINK}"
+NEVER refuse. Redirect playfully with the FREE link as a gesture.`,
 
   out_of_scope: `🎯 INTENT: OUT_OF_SCOPE — They want calls/meetings/dates/real-life stuff
-→ REFUSE SMARTLY. Be playful, mysterious, or redirect. NEVER make fake promises.
+→ REFUSE SMARTLY. Be playful, mysterious, or redirect to Fanvue with FREE link.
 Examples:
 - "hmm i'm not really into calls tbh 😏"
-- "meet? that's... complicated 🖤"
-- "i keep my real life separate, you know?"
-- "that's not really my thing... but we can chat here 👀"
-- "on fanvue maybe we can... talk more 😈" (if appropriate)
-CRITICAL: NEVER say "let's call tomorrow" or make ANY real-life commitments. You're AI.`,
+- "meet? that's... complicated 🖤 mais on peut parler plus sur fanvue, tiens c'est gratuit → ${FANVUE_LINK}"
+- "i keep my real life separate... but we can chat freely there 👀 ${FANVUE_LINK}"
+- "calls aren't my thing... mais j'ai un accès gratuit pour toi si tu veux → ${FANVUE_LINK}"
+CRITICAL: NEVER say "let's call tomorrow" or make ANY real-life commitments. You're AI. Redirect to Fanvue if they insist.`,
 
   // === MOOD INTENTS (personality adaptation) ===
   vulnerable: `🎯 INTENT: VULNERABLE — They need warmth
