@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 4 janvier 2025 (DM Fixes Complets ✅)
+**Dernière mise à jour** : 5 janvier 2025 (DM Language Detection ✅)
 
 ---
 
@@ -32,7 +32,7 @@ roadmap/
 > **Fanvue Pack 1** : ✅ 14 photos générées (2 shootings) dans `elena-fanvue-pack1`  
 > **ManyChat** : ✅ 2 automations LIVE (Auto-DM comments + Welcome followers)  
 > **DM System** : ✅ **ACTIVE** — Kill switch opérationnel sur `/calendar`  
-> **AI Agent** : ✅ LIVE avec Response Validator + Sonnet + Story replies support + anti-hallucination renforcé (régénération auto, max 3 tentatives)  
+> **AI Agent** : ✅ LIVE avec Response Validator + Sonnet + Story replies support + anti-hallucination renforcé (régénération auto, max 3 tentatives) + Language detection (EN/FR/IT/ES/PT/DE)  
 > **Objectif** : 500€/mois via Fanvue  
 > **Next** : Resume DM system après expiration ban Instagram
 
@@ -63,6 +63,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-055 | **🌍 DM Language Detection** — Détection intelligente langue (explicite OU 3+ messages) + Stockage BDD + Réponse dynamique dans langue détectée (EN/FR/IT/ES/PT/DE) | 05/01/2025 | v2.37.5 | [→](./roadmap/done/DONE-055-dm-language-detection.md) |
 | DONE-054 | **🔧 DM Fixes Complets** — Story replies parsing + Fix webhook timeout (retrait délai) + Never ask "which one?" + Validator fonctionnel | 04/01/2025 | v2.37.4 | [→](./roadmap/done/DONE-054-dm-fixes-complete.md) |
 | DONE-053 | **🔍 DM Response Validator + Sonnet** — Triple protection anti-hallucination : Validator avec régénération (max 3 tentatives) + Prompt ultra-explicite + Claude Sonnet (meilleure qualité) | 03/01/2025 | v2.37.3 | [→](./roadmap/done/DONE-053-dm-response-validator.md) |
 | DONE-052 | **🎯 DM Close Lead Objective** — Objectif explicite "CLOSE THE LEAD" dans prompt AI + Funnel stages table (COLD→WARM→HOT→PITCHED) + Closing rules par stage + Pitch examples concrets | 03/01/2025 | v2.37.2 | [→](./roadmap/done/DONE-052-dm-close-lead-objective.md) |
