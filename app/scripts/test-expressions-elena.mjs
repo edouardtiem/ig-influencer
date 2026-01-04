@@ -134,40 +134,103 @@ const DETAIL_SHOTS = {
   bedroom: [
     'close-up of silk sheets rumpled on luxurious bed, morning golden light streaming through curtains, intimate atmosphere',
     'vanity mirror reflection showing makeup products and jewelry scattered, soft Hollywood lights glow',
-    'silk robe draped elegantly over velvet chair, golden morning light',
   ],
-  living: [
-    'coffee cup steaming on marble side table next to fashion magazine, soft morning light',
-    'cozy velvet sofa corner with cashmere throw, golden afternoon light',
+  beach: [
+    'designer sunglasses and straw hat on beach towel, turquoise Mediterranean water in background',
+    'champagne glass next to iPhone on yacht deck, Mediterranean blue sea blur',
+    'bikini top draped on lounge chair, infinity pool edge with ocean view',
   ],
-  bathroom: [
-    'bathroom mirror with steam, candles lit around marble tub, spa atmosphere',
-    'luxury skincare products arranged on marble counter, golden light',
+  pool: [
+    'champagne flute and sunglasses on pool edge, turquoise water, sunset light',
+    'white towel and designer bag on lounge chair, infinity pool backdrop',
+  ],
+  spa: [
+    'fluffy white robe and slippers on spa bed, candles and eucalyptus, zen atmosphere',
+    'hot stone massage setup next to champagne, luxury wellness',
   ],
 };
 
 // ===========================================
-// SEXY LOCATIONS (from scheduler)
+// SEXY LOCATIONS (REAL from cron-scheduler.mjs)
 // ===========================================
 
 const ELENA_LOCATIONS = [
-  { key: 'loft_bedroom', name: 'Chambre Elena', setting: 'Chambre luxe Paris 8e, vanity Hollywood lights, lit king size draps soie crème, lumière douce' },
-  { key: 'loft_living', name: 'Salon Elena', setting: 'Loft luxe Paris 8e, grandes fenêtres, canapé velours, lumière naturelle, plantes' },
-  { key: 'bathroom_luxe', name: 'Salle de bain Elena', setting: 'Salle de bain marble blanc et gold, grande baignoire, miroir éclairé' },
+  // BEACH & POOL — Bikini content
+  { 
+    key: 'yacht_mediterranean', 
+    name: 'Yacht Méditerranée', 
+    setting: 'Luxury yacht deck in Mediterranean sea, golden sunset light, champagne, turquoise water, St Tropez coastline visible, glamorous jet-set atmosphere',
+    category: 'beach'
+  },
+  { 
+    key: 'mykonos_villa', 
+    name: 'Villa Mykonos', 
+    setting: 'White luxury villa in Mykonos with infinity pool overlooking Aegean sea, golden hour sunset, minimalist Greek architecture, turquoise water',
+    category: 'pool'
+  },
+  { 
+    key: 'maldives_overwater', 
+    name: 'Bungalow Maldives', 
+    setting: 'Overwater bungalow in Maldives, crystal clear turquoise lagoon, wooden deck, palm trees, tropical paradise sunset',
+    category: 'beach'
+  },
+  { 
+    key: 'dubai_marina', 
+    name: 'Penthouse Dubai Marina', 
+    setting: 'Luxury penthouse rooftop infinity pool Dubai Marina, sunset skyline, Burj Khalifa view, modern luxury, golden hour',
+    category: 'pool'
+  },
+  // SPA & WELLNESS
+  { 
+    key: 'spa_mountains', 
+    name: 'Spa Alpes', 
+    setting: 'Luxury alpine spa with heated outdoor pool, snowy mountains backdrop, steam rising, wooden chalet architecture, cozy winter luxury',
+    category: 'spa'
+  },
+  { 
+    key: 'courchevel_chalet', 
+    name: 'Chalet Courchevel', 
+    setting: 'Luxury chalet in Courchevel with outdoor jacuzzi, panoramic mountain view, après-ski atmosphere, warm lighting against snow',
+    category: 'spa'
+  },
 ];
 
-const ELENA_OUTFITS = [
-  'matching lounge set in cream silk, camisole and shorts, effortless elegance',
-  'oversized cashmere sweater cream falling off one shoulder, cozy chic',
-  'satin slip dress champagne color, delicate straps, loungewear luxe',
-  'matching sports bra and high-waisted leggings in dusty rose, athleisure chic',
-];
+// ===========================================
+// SEXY OUTFITS (REAL from cron-scheduler.mjs)
+// ===========================================
+
+const ELENA_OUTFITS = {
+  beach: [
+    'designer bikini string noir avec détails dorés, silhouette mise en valeur, golden tan visible',
+    'bikini blanc minimaliste triangles, bronzage visible, élégance naturelle méditerranéenne',
+    'maillot une pièce plongeant noir très échancré, allure sophistiquée jet-set',
+    'bikini terracotta avec liens à nouer, style méditerranéen chic, curves accentuated',
+  ],
+  pool: [
+    'bikini blanc minimaliste, wet hair, natural beauty, pool goddess vibes',
+    'maillot une pièce plongeant noir très échancré, poolside elegance',
+    'designer bikini string noir, golden tan, infinity pool lifestyle',
+  ],
+  spa: [
+    'peignoir soie blanc entrouvert révélant maillot underneath, spa luxury',
+    'serviette nouée élégamment around body, épaules et jambes visibles, spa goddess',
+    'fluffy white robe slightly open, bikini visible, wellness vibes',
+  ],
+};
+
+// ===========================================
+// SEXY POSES (REAL from cron-scheduler.mjs)
+// ===========================================
 
 const ELENA_ACTIONS = [
-  'sitting on bed edge, morning light, relaxed pose',
-  'standing by window, looking outside, contemplative',
-  'lounging on sofa, legs tucked, cozy moment',
-  'stretching arms up, morning routine, natural movement',
+  'allongée sur le côté au bord de la piscine, appuyée sur le coude, regard captivant vers caméra',
+  'debout de dos regardant par-dessus l\'épaule, courbes mises en valeur, sunset light',
+  'assise bord de piscine, jambes dans l\'eau, posture confiante, champagne in hand',
+  'stretching yoga on deck, dos légèrement cambré, silhouette étirée against sunset',
+  'appuyée contre le bord du jacuzzi, épaules hors de l\'eau, steam rising',
+  'allongée sur transat, jambes croisées, sunbathing pose, sunglasses',
+  'walking on yacht deck, wind in hair, candid movement shot',
+  'standing at infinity pool edge, back to camera, overlooking view',
 ];
 
 // ===========================================
@@ -377,13 +440,18 @@ async function main() {
     console.log('─'.repeat(60));
 
     const location = randomFrom(ELENA_LOCATIONS);
-    const outfit = randomFrom(ELENA_OUTFITS);
+    
+    // Get outfit based on location category (beach, pool, spa)
+    const outfitCategory = location.category || 'beach';
+    const categoryOutfits = ELENA_OUTFITS[outfitCategory] || ELENA_OUTFITS.beach;
+    const outfit = randomFrom(categoryOutfits);
+    
     const baseAction = randomFrom(ELENA_ACTIONS);
-    const mood = ['cozy morning', 'peaceful', 'relaxed vibes', 'lazy afternoon'][Math.floor(Math.random() * 4)];
+    const mood = ['sunset vibes', 'jet-set luxury', 'golden hour magic', 'paradise life'][Math.floor(Math.random() * 4)];
 
-    log(`📍 Location: ${location.name}`);
+    log(`📍 Location: ${location.name} (${outfitCategory})`);
     log(`👗 Outfit: ${outfit.substring(0, 50)}...`);
-    log(`🎬 Action: ${baseAction}`);
+    log(`🎬 Action: ${baseAction.substring(0, 50)}...`);
     log(`✨ Mood: ${mood}`);
 
     // Generate carousel (3 images)
