@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 7 janvier 2025 (DM Complete Fixes ✅)
+**Dernière mise à jour** : 4 janvier 2025 (Elena Profile + Back Refs ✅)
 
 ---
 
@@ -63,6 +63,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-061 | **📸 Elena Profile + Back Refs** — Ajout refs profile (left) + back au Content Brain (4 angles total) pour meilleure consistance visage/body sur tous angles | 04/01/2025 | v2.46.0 | [→](./roadmap/done/DONE-061-elena-profile-back-refs.md) |
 | DONE-060 | **🎭 DM Natural Exit Messages** — 6 variantes avec excuses naturelles (shooting, manager, etc.) + Message clair "je réponds sur Fanvue" + Random pour variété | 07/01/2025 | v2.45.0 | [→](./roadmap/done/DONE-060-dm-natural-exit-messages.md) |
 | DONE-059 | **🔒 DM Race Condition + Anti-Loop Fix** — Lock en mémoire (webhooks simultanés) + Fix boucles répétitives (110 cas : fallback spam, AI repetition) + Instruction anti-repeat Claude | 07/01/2025 | v2.44.0 | [→](./roadmap/done/DONE-059-dm-race-condition-fix.md) |
 | DONE-058 | **🎨 Content Brain Analytics Removal** — Suppression analytics "best" (bestLocation/bestMood/bestPostType) pour éviter biais convergence + Plus de créativité et variété dans posts générés | 07/01/2025 | v2.43.0 | [→](./roadmap/done/DONE-058-content-brain-analytics-removal.md) |
@@ -186,6 +187,7 @@ Total Features:
 |------|-------|------|
 | 07/01/2025 | **🔒 DM Complete Fixes** — Race condition fix (lock) + Anti-loop (110 cas) + Natural exit messages (6 variantes avec "je réponds sur Fanvue") | [→](./docs/sessions/2025-01-07-dm-complete-fixes.md) |
 | 07/01/2025 | **🎨 Content Brain Analytics Removal** — Suppression analytics "best" pour éviter biais convergence + Plus de créativité dans génération posts | [→](./roadmap/done/DONE-058-content-brain-analytics-removal.md) |
+| 04/01/2025 | **📸 Elena Profile + Back Refs** — Ajout refs profile (left) + back au Content Brain pour meilleure consistance angles | [→](./docs/sessions/2025-01-04-elena-profile-back-refs.md) |
 | 06/01/2025 | **🧪 Test Natural Expressions** — Test des nouvelles expressions faciales : 6 images générées (2 carousels) sans BDD/IG, review Cloudinary | [→](./docs/sessions/2025-01-06-test-natural-expressions.md) |
 | 06/01/2025 | **🎭 Natural Face Variations** — Expressions naturelles : grimaces, regard ailleurs, moments candid + 25 nouvelles expressions + Notes style dans prompt | [→](./docs/sessions/2025-01-06-natural-face-variations.md) |
 | 04/01/2025 | **🔧 DM Fixes Complets** — Story replies parsing + Fix webhook timeout + Never ask "which one?" + Validator fonctionnel | [→](./docs/sessions/2025-01-04-dm-fixes-complete.md) |
