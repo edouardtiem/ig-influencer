@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 3 janvier 2025 (DM Close Lead Objective 🎯)
+**Dernière mise à jour** : 3 janvier 2025 (DM Response Validator + Sonnet 🔍)
 
 ---
 
@@ -31,8 +31,8 @@ roadmap/
 > **Mila** : ⏸️ PAUSE temporaire (à réactiver après stabilisation Elena)  
 > **Fanvue Pack 1** : ✅ 14 photos générées (2 shootings) dans `elena-fanvue-pack1`  
 > **ManyChat** : ✅ 2 automations LIVE (Auto-DM comments + Welcome followers)  
-> **DM System** : ⏸️ **PAUSED** (ban Instagram) — Kill switch opérationnel sur `/calendar`  
-> **AI Agent** : ✅ LIVE avec fixes complets (is_stopped flag, anti-hallucination, réponses < 12 mots)  
+> **DM System** : ✅ **ACTIVE** — Kill switch opérationnel sur `/calendar`  
+> **AI Agent** : ✅ LIVE avec Response Validator + Sonnet + anti-hallucination renforcé (régénération auto, max 3 tentatives)  
 > **Objectif** : 500€/mois via Fanvue  
 > **Next** : Resume DM system après expiration ban Instagram
 
@@ -63,6 +63,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-053 | **🔍 DM Response Validator + Sonnet** — Triple protection anti-hallucination : Validator avec régénération (max 3 tentatives) + Prompt ultra-explicite + Claude Sonnet (meilleure qualité) | 03/01/2025 | v2.37.3 | [→](./roadmap/done/DONE-053-dm-response-validator.md) |
 | DONE-052 | **🎯 DM Close Lead Objective** — Objectif explicite "CLOSE THE LEAD" dans prompt AI + Funnel stages table (COLD→WARM→HOT→PITCHED) + Closing rules par stage + Pitch examples concrets | 03/01/2025 | v2.37.2 | [→](./roadmap/done/DONE-052-dm-close-lead-objective.md) |
 | DONE-051 | **💬 DM Free Trial Link + Personalized Pitch** — Lien free trial (1 jour gratuit) + Pitch "j'ai créé un lien gratuit pour toi" (geste personnel) + Intent strategies mis à jour + Emojis plus flirty | 03/01/2025 | v2.37.1 | [→](./roadmap/done/DONE-051-dm-free-trial-pitch.md) |
 | DONE-050 | **📸 Authentic IG Photo Style** — Style iPhone RAW sans filtres + Variations de cadrage carousel (medium/close-up/candid) + Environnement visible + Couleurs naturelles désaturées | 03/01/2026 | v2.40.0 | [→](./roadmap/done/DONE-050-authentic-ig-photo-style.md) |
@@ -161,7 +162,7 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 39
+├── ✅ Done        : 40
 ├── 🚧 In Progress : 3 (Elena Sexy Mode + Fanvue + Model Evolution)
 ├── 📋 Todo        : 6 
 ├── 🐛 Bugs        : 7 (7 fixed)
@@ -174,6 +175,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 03/01/2025 | **🔍 DM Response Validator + Sonnet** — Triple protection anti-hallucination : Validator avec régénération + Prompt ultra-explicite + Claude Sonnet | [→](./docs/sessions/2025-01-03-dm-response-validator.md) |
 | 03/01/2025 | **🎯 DM Close Lead Objective** — Objectif explicite "CLOSE THE LEAD" dans prompt AI + Funnel stages table + Closing rules + Pitch examples par stage | [→](./docs/sessions/2025-01-03-dm-close-lead-objective.md) |
 | 03/01/2025 | **💬 DM Free Trial Link + Personalized Pitch** — Lien free trial (1 jour gratuit) + Pitch "j'ai créé un lien gratuit pour toi" (geste personnel) + Intent strategies mis à jour | [→](./docs/sessions/2025-01-03-dm-free-trial-pitch.md) |
 | 03/01/2026 | **📸 Authentic IG Photo Style** — Style iPhone RAW + Variations cadrage carousel (medium/close-up/candid) + Environnement visible | [→](./roadmap/done/DONE-050-authentic-ig-photo-style.md) |
