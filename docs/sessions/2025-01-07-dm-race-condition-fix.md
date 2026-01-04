@@ -1,7 +1,7 @@
-# 🔒 DM Race Condition Fix — Audit & Lock Implementation
+# 🔒 DM Race Condition Fix + Anti-Loop — Audit & Lock Implementation
 
 **Date** : 07 janvier 2025  
-**Durée** : ~1h30
+**Durée** : ~2h
 
 ---
 
@@ -25,12 +25,26 @@
    - Lock auto-expire après 30s ou après traitement
    - Protection contre les retries ManyChat simultanés
 
-4. **🛠️ Scripts d'audit créés** — 5 scripts pour analyser les DMs
+4. **🛠️ Scripts d'audit créés** — 6 scripts pour analyser les DMs
    - `dm-audit.mjs` — Audit général depuis une date
    - `dm-audit-jonnie.mjs` — Historique complet d'un user spécifique
    - `dm-audit-final.mjs` — Recherche FINAL_MESSAGE duplicates
    - `dm-audit-all-duplicates.mjs` — Patterns de doublons complets
    - `dm-audit-deep.mjs` — Audit approfondi (vrais doublons + double responses)
+   - `dm-audit-loops.mjs` — Recherche de boucles répétitives
+
+5. **🔄 Fix Anti-Loop (110 problèmes détectés)** — Audit a révélé des boucles de messages répétitifs :
+   - **35 POTENTIAL_LOOP** — Même message 5+ fois à la fin du funnel
+   - **75 REPEATED_MESSAGE** — Même message envoyé plusieurs fois
+   
+   **Messages problématiques :**
+   - `"Hey 🖤 Sorry, got distracted..."` — Fallback d'erreur envoyé en boucle
+   - `"je suis pas toujours dispo ici..."` — Réponse AI répétée
+   
+   **3 fixes implémentés :**
+   - Suppression du fallback message (skip silencieux sur erreur)
+   - Instruction anti-répétition à Claude ("DO NOT REPEAT: votre dernier message...")
+   - Détection post-génération (si réponse === lastOutgoing → skip)
 
 ---
 

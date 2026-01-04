@@ -63,7 +63,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
-| DONE-059 | **🔒 DM Race Condition Fix** — Lock en mémoire pour bloquer webhooks ManyChat simultanés + Élimination doublons messages (ex: 3x même message pour @JonnieLevine383) | 07/01/2025 | v2.44.0 | [→](./roadmap/done/DONE-059-dm-race-condition-fix.md) |
+| DONE-059 | **🔒 DM Race Condition + Anti-Loop Fix** — Lock en mémoire (webhooks simultanés) + Fix boucles répétitives (110 cas : fallback spam, AI repetition) + Instruction anti-repeat Claude | 07/01/2025 | v2.44.0 | [→](./roadmap/done/DONE-059-dm-race-condition-fix.md) |
 | DONE-058 | **🎨 Content Brain Analytics Removal** — Suppression analytics "best" (bestLocation/bestMood/bestPostType) pour éviter biais convergence + Plus de créativité et variété dans posts générés | 07/01/2025 | v2.43.0 | [→](./roadmap/done/DONE-058-content-brain-analytics-removal.md) |
 | DONE-057 | **🎭 Natural Face Variations** — Expressions naturelles : grimaces, regard ailleurs, moments candid (pas toujours posé) + 25 nouvelles expressions + Notes style dans prompt | 06/01/2025 | v2.42.0 | [→](./roadmap/done/DONE-057-natural-face-variations.md) |
 | DONE-056 | **📖 Elena Micro-Story Captions + Soft CTA Private** — Format storytelling captions en anglais (Hook→Story→Reflection→CTA→Question) + Soft CTA direct vers private (~70%) + Tracking `has_private_cta` en DB | 04/01/2026 | v2.41.0 | [→](./docs/sessions/2026-01-04-elena-micro-story-captions.md) |
@@ -182,7 +182,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
-| 07/01/2025 | **🔒 DM Race Condition Fix** — Lock en mémoire pour bloquer webhooks ManyChat simultanés + Élimination doublons messages (3x même message pour @JonnieLevine383) | [→](./docs/sessions/2025-01-07-dm-race-condition-fix.md) |
+| 07/01/2025 | **🔒 DM Race Condition + Anti-Loop Fix** — Lock en mémoire (webhooks simultanés) + Fix 110 boucles répétitives (fallback spam, AI repetition) + Instruction anti-repeat Claude | [→](./docs/sessions/2025-01-07-dm-race-condition-fix.md) |
 | 07/01/2025 | **🎨 Content Brain Analytics Removal** — Suppression analytics "best" pour éviter biais convergence + Plus de créativité dans génération posts | [→](./roadmap/done/DONE-058-content-brain-analytics-removal.md) |
 | 06/01/2025 | **🧪 Test Natural Expressions** — Test des nouvelles expressions faciales : 6 images générées (2 carousels) sans BDD/IG, review Cloudinary | [→](./docs/sessions/2025-01-06-test-natural-expressions.md) |
 | 06/01/2025 | **🎭 Natural Face Variations** — Expressions naturelles : grimaces, regard ailleurs, moments candid + 25 nouvelles expressions + Notes style dans prompt | [→](./docs/sessions/2025-01-06-natural-face-variations.md) |
