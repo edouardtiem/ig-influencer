@@ -66,15 +66,51 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse payload
-    const payload: ManyChateWebhookPayload = await request.json();
+    const rawPayload = await request.json();
+    
+    // Log full payload for debugging story replies
+    console.log('📦 RAW PAYLOAD:', JSON.stringify(rawPayload, null, 2).substring(0, 1000));
+    
+    // Extract message text - try multiple fields for story replies
+    // ManyChat may send story reply text in different fields
+    const messageText = 
+      rawPayload.last_input_text || 
+      rawPayload.story_reply?.text ||
+      rawPayload.story_mention?.text ||
+      rawPayload.message?.text ||
+      rawPayload.text ||
+      // For story replies, check if there's an attachment with text
+      rawPayload.last_message?.text ||
+      rawPayload.attachment?.payload?.text ||
+      '';
+    
+    // Build normalized payload
+    const payload: ManyChateWebhookPayload = {
+      ...rawPayload,
+      last_input_text: messageText,
+    };
     
     // Validate required fields
-    if (!payload.subscriber?.id || !payload.last_input_text) {
-      console.error('❌ Invalid payload:', JSON.stringify(payload).substring(0, 200));
+    if (!payload.subscriber?.id) {
+      console.error('❌ Invalid payload: missing subscriber.id');
+      console.error('Full payload:', JSON.stringify(rawPayload).substring(0, 500));
       return NextResponse.json(
-        { error: 'Invalid payload: missing subscriber.id or last_input_text' },
+        { error: 'Invalid payload: missing subscriber.id' },
         { status: 400 }
       );
+    }
+    
+    // If no message text found, log and skip (don't error)
+    if (!messageText || messageText.trim() === '') {
+      console.warn('⚠️ No message text found in payload');
+      console.warn('Payload keys:', Object.keys(rawPayload));
+      console.warn('Full payload:', JSON.stringify(rawPayload).substring(0, 800));
+      return NextResponse.json({
+        success: true,
+        skip: true,
+        response: '',
+        reason: 'No message text found - possibly unsupported message type',
+      });
     }
 
     // Log incoming message
