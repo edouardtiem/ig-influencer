@@ -475,14 +475,34 @@ export const LOCATION_ACTIONS: Record<string, string[]> = {
 };
 
 const SEXY_EXPRESSIONS: string[] = [
+  // === CLASSIC POSED (keep some) ===
   'confident sultry gaze, slight smile playing on lips, direct eye contact',
   'soft sensual expression, eyes slightly hooded, natural allure',
   'playful smirk, knowing look, effortless confidence',
-  'warm inviting smile, eyes sparkling, approachable but alluring',
-  'pensive look with soft smile, gazing slightly away, mysterious charm',
-  'genuine laugh, eyes crinkled, natural beauty',
-  'confident stare, no smile, powerful feminine energy',
-  'soft bite of lower lip (subtle), playful sensuality',
+  
+  // === REGARD AILLEURS (NOT at camera) ===
+  'gazing out window, profile view, lost in thought, contemplative',
+  'looking up at ceiling, dreamy expression, relaxed moment',
+  'eyes closed, peaceful smile, enjoying the moment',
+  'looking over shoulder, caught off-guard, mid-turn candid',
+  'staring at coffee cup, morning daze, sleepy but content',
+  'side profile looking away, unposed natural moment',
+  
+  // === GRIMACES NATURELLES (real expressions) ===
+  'genuine laugh mid-burst, eyes squeezed, mouth wide open, authentic joy',
+  'scrunched nose smile, silly playful moment, goofy energy',
+  'surprised expression, eyebrows raised, mouth slightly open, caught off-guard',
+  'concentrated face, slight frown, focused on something',
+  'yawning stretch, eyes squinting, morning authenticity',
+  'smirking with tongue slightly out, goofy playful selfie',
+  
+  // === CANDID NON-POSÉ (imperfect moments) ===
+  'mid-blink, natural imperfect moment, real life',
+  'talking mid-sentence, animated expression, hand gesturing',
+  'reaction face, wide eyes, dramatic but fun',
+  'resting face, neutral expression, not posing, authentic',
+  'slight confusion, head tilted, examining something curious',
+  'sleepy soft eyes, just woke up, natural morning face',
 ];
 
 // ═══════════════════════════════════════════════════════════════

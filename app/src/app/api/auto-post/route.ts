@@ -19,20 +19,28 @@ import { getActiveLocationById } from '@/config/locations';
 
 const CAROUSEL_SIZE = 3; // Number of images per carousel
 
-// Hero expressions (Photo 1 - most engaging)
+// Hero expressions (Photo 1 - can be candid too!)
 const HERO_EXPRESSIONS = [
   'confident sultry gaze, slight smile playing on lips, direct eye contact',
-  'warm inviting smile, eyes sparkling, approachable but alluring',
-  'confident stare, slight smile, powerful feminine energy',
+  'genuine laugh mid-burst, eyes crinkled, authentic candid joy',
+  'looking out window dreamily, profile view, contemplative',
+  'warm inviting smile, eyes sparkling, approachable energy',
+  'eyes closed peaceful smile, enjoying the moment, vibing',
 ];
 
-// Secondary expressions (Photo 2, 3 - varied)
+// Secondary expressions (Photo 2, 3 - mostly natural/candid)
 const SECONDARY_EXPRESSIONS = [
-  'soft sensual expression, eyes slightly hooded, natural allure',
-  'playful smirk, knowing look, effortless confidence',
-  'pensive look with soft smile, gazing slightly away, mysterious charm',
-  'genuine laugh, eyes crinkled, natural beauty',
-  'candid moment, caught mid-action, authentic',
+  // Natural candid - NOT always at camera
+  'looking over shoulder caught off-guard, surprised moment',
+  'eyes closed peaceful smile, enjoying the moment, vibing',
+  'laughing hard eyes squeezed, genuine uncontrolled joy',
+  'looking at something off-camera, curious distracted',
+  'mid-yawn stretching, sleepy morning authenticity',
+  'side profile looking away, pensive natural',
+  'scrunched nose silly face, goofy selfie energy',
+  'surprised wide eyes, reaction moment',
+  'resting face, not posing, just existing authentic',
+  'dreamy soft expression looking away, natural radiance',
 ];
 
 // ═══════════════════════════════════════════════════════════════

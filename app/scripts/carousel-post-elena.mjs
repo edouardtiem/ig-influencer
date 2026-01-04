@@ -106,19 +106,27 @@ const ELENA_PHONE = 'iPhone 17 Pro in blue color, sleek modern design';
 // ═══════════════════════════════════════════════════════════════
 
 const HERO_EXPRESSIONS = [
+  // Photo 1 can also be candid/natural (not always posed!)
   'intense captivating gaze at camera, lips slightly parted, smoldering confidence',
-  'enchanting knowing smile, direct eye contact, magnetic allure',
+  'genuine laugh mid-burst, eyes crinkled, authentic joy, candid energy',
   'soft alluring expression, warm inviting eyes, effortless glamour',
-  'playful charming smirk, inviting look, confident femininity',
+  'looking out window dreamily, profile view, contemplative mood',
+  'eyes closed peaceful smile, enjoying the moment, vibing',
 ];
 
 const SECONDARY_EXPRESSIONS = [
-  'looking over shoulder with captivating glance, mysterious and inviting',
-  'eyes half-closed alluring, caught in intimate moment',
-  'confident smile, head tilted, curves accentuated',
-  'dreamy soft expression, natural radiance',
-  'biting lip subtly, playful teasing energy',
-  'looking up through lashes, innocent but knowing',
+  // === NATURAL CANDID (pas toujours l'objectif) ===
+  'looking over shoulder caught off-guard, surprised candid moment',
+  'eyes closed enjoying moment, peaceful smile, vibing',
+  'laughing hard with eyes squeezed shut, genuine uncontrolled joy',
+  'looking at something off-camera, curious expression, distracted',
+  'mid-yawn stretching, sleepy morning authenticity, real life',
+  'side profile gazing out window, pensive natural moment',
+  'scrunched nose silly face, goofy selfie energy, playful',
+  'surprised wide eyes, eyebrows raised, reaction moment',
+  'thinking face looking up, lips pursed, pondering',
+  'comfortable resting expression, not posing, just existing',
+  'dreamy soft expression, natural radiance, looking away',
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -839,7 +847,15 @@ STYLE: Shot on iPhone 15 Pro, RAW unedited authentic look
 - Subject takes 50-70% of frame, NOT perfectly centered, breathing room around
 - Natural skin with texture and imperfections (not airbrushed smooth)
 - Candid energy like friend took it without warning
-AVOID: Professional studio, magazine editorial, stock photo, heavy retouching, perfect centering, saturated colors,
+
+EXPRESSION AUTHENTICITY (CRITICAL):
+- NOT always looking at camera - can look out window, away, down, at something off-frame
+- Natural imperfect moments: mid-blink, mid-laugh, mid-yawn are GOOD
+- NO forced smiles - grimaces, silly faces, surprised looks are encouraged
+- Can be caught off-guard, distracted, absorbed in thought
+- Real emotions: genuine laughs with eyes squeezed, sleepy morning faces, thinking expressions
+
+AVOID: Professional studio, magazine editorial, stock photo, heavy retouching, perfect centering, saturated colors, forced posed expressions,
 
 ${ELENA_FINAL_CHECK}`;
 
