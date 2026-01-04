@@ -179,6 +179,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 06/01/2025 | **🧪 Test Natural Expressions** — Test des nouvelles expressions faciales : 6 images générées (2 carousels) sans BDD/IG, review Cloudinary | [→](./docs/sessions/2025-01-06-test-natural-expressions.md) |
 | 06/01/2025 | **🎭 Natural Face Variations** — Expressions naturelles : grimaces, regard ailleurs, moments candid + 25 nouvelles expressions + Notes style dans prompt | [→](./docs/sessions/2025-01-06-natural-face-variations.md) |
 | 04/01/2025 | **🔧 DM Fixes Complets** — Story replies parsing + Fix webhook timeout + Never ask "which one?" + Validator fonctionnel | [→](./docs/sessions/2025-01-04-dm-fixes-complete.md) |
 | 03/01/2025 | **🔍 DM Response Validator + Sonnet** — Triple protection anti-hallucination : Validator avec régénération + Prompt ultra-explicite + Claude Sonnet | [→](./docs/sessions/2025-01-03-dm-response-validator.md) |
