@@ -160,7 +160,7 @@ healthy fit Italian body, confident posture`,
 
 // ===========================================
 // EXPRESSIONS (varied for carousel/reel)
-// Safe sexy vocabulary per docs/19-QUALITY-SEXY-STRATEGY.md
+// Mix: Sexy (docs/19-QUALITY-SEXY-STRATEGY.md) + Natural/Candid
 // ===========================================
 
 const EXPRESSIONS = {
@@ -173,12 +173,56 @@ const EXPRESSIONS = {
     'genuine relaxed smile, radiant expression, authentic moment',
   ],
   elena: [
+    // === SEXY (keep the allure) ===
     'intense captivating gaze at camera, lips slightly parted, smoldering confidence',
     'enchanting knowing smile, direct eye contact, magnetic allure, curves visible',
     'soft alluring expression, warm inviting eyes, effortless glamour',
     'looking over shoulder with captivating glance, mysterious and inviting',
-    'confident smile, head tilted, curves accentuated, body language open',
-    'playful charming smirk, inviting look, confident femininity',
+    'playful charming smirk, soft bite of lower lip, inviting look',
+    'sultry gaze through half-closed eyes, sensual confidence, alluring',
+    
+    // === NATURAL/CANDID (add authenticity) ===
+    'genuine laugh mid-burst, eyes crinkled, authentic joy, candid energy',
+    'looking out window dreamily, profile view, contemplative mood, curves silhouette',
+    'eyes closed enjoying moment, peaceful sensual smile, vibing',
+    'caught off-guard glance over shoulder, surprised candid moment',
+    'side profile gazing away, pensive natural moment, soft light on curves',
+    'comfortable resting expression, not posing, natural beauty',
+  ],
+};
+
+// ===========================================
+// DETAIL SHOTS (environment without subject - for image 3 sometimes)
+// Modern IG trend: storytelling through environment details
+// ===========================================
+
+const DETAIL_SHOTS = {
+  bedroom: [
+    'close-up of silk sheets rumpled on luxurious bed, morning golden light streaming through curtains, intimate atmosphere',
+    'vanity mirror reflection showing makeup products and jewelry scattered, soft Hollywood lights glow, feminine luxury',
+    'silk robe draped elegantly over velvet chair, golden morning light, Parisian apartment elegance',
+    'iPhone on silk pillow next to gold jewelry and coffee cup, intimate morning still life',
+  ],
+  living: [
+    'coffee cup steaming on marble side table next to fashion magazine, soft morning light, Parisian loft',
+    'cozy velvet sofa corner with cashmere throw and book, golden afternoon light, hygge vibes',
+    'iPhone propped against plant with instagram open, modern lifestyle detail shot',
+    'gold jewelry scattered on coffee table next to espresso, luxury lifestyle detail',
+  ],
+  bathroom: [
+    'bathroom mirror with steam, candles lit around marble tub, spa atmosphere',
+    'luxury skincare products arranged on marble counter, golden light, self-care ritual',
+    'silk robe hanging on golden hook, marble and gold bathroom details, feminine luxury',
+    'bath with bubbles and rose petals, candles flickering, intimate spa moment',
+  ],
+  beach: [
+    'designer sunglasses and straw hat on beach towel, turquoise water in background',
+    'champagne glass next to iPhone on yacht deck, Mediterranean blue sea blur',
+    'bikini top draped on lounge chair, infinity pool edge with ocean view',
+  ],
+  spa: [
+    'fluffy white robe and slippers on spa bed, candles and essential oils, zen atmosphere',
+    'hot stone massage setup, eucalyptus and candles, luxury wellness',
   ],
 };
 
@@ -412,7 +456,15 @@ STYLE: Shot on iPhone 15 Pro, RAW unedited authentic look
 - Visible grain/noise in shadows (authentic low-light iPhone feel)
 - Candid energy like friend took it without warning
 - Show real environment details: phone, coffee cup, unmade bed, clothes, furniture
-AVOID: Professional studio, magazine editorial, stock photo, heavy retouching, perfect centering, overly clean backgrounds, saturated colors
+
+EXPRESSION AUTHENTICITY (CRITICAL):
+- NOT always looking at camera - can look out window, away, down, at something off-frame
+- Natural imperfect moments: mid-blink, mid-laugh, mid-yawn are GOOD
+- NO forced smiles - grimaces, silly faces, surprised looks are encouraged
+- Can be caught off-guard, distracted, absorbed in thought
+- Real emotions: genuine laughs with eyes squeezed, sleepy morning faces, thinking expressions
+
+AVOID: Professional studio, magazine editorial, stock photo, heavy retouching, perfect centering, overly clean backgrounds, saturated colors, forced posed expressions
 
 ${config.final_check}`;
 
@@ -474,6 +526,71 @@ ${config.final_check}`;
       return imageUrl;
     }
     throw error;
+  }
+}
+
+// ===========================================
+// GENERATE DETAIL SHOT (environment only, no subject)
+// Modern IG trend: storytelling through environment details
+// ===========================================
+
+async function generateDetailShot(locationName, sceneReferenceBase64 = null) {
+  const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
+  
+  // Determine location category
+  const locationLower = locationName.toLowerCase();
+  let category = 'living'; // default
+  if (locationLower.includes('bedroom') || locationLower.includes('chambre')) category = 'bedroom';
+  else if (locationLower.includes('bathroom') || locationLower.includes('bain')) category = 'bathroom';
+  else if (locationLower.includes('beach') || locationLower.includes('pool') || locationLower.includes('yacht')) category = 'beach';
+  else if (locationLower.includes('spa')) category = 'spa';
+  
+  // Get detail shots for this category
+  const detailOptions = DETAIL_SHOTS[category] || DETAIL_SHOTS.living;
+  const detailPrompt = detailOptions[Math.floor(Math.random() * detailOptions.length)];
+  
+  log(`  📷 Generating DETAIL SHOT (no subject)...`);
+  log(`  Category: ${category}`);
+  log(`  Detail: ${detailPrompt.substring(0, 60)}...`);
+
+  const prompt = `DETAIL SHOT - Environment only, NO PERSON in frame:
+
+${detailPrompt}
+
+STYLE: Shot on iPhone 15 Pro, RAW unedited authentic look
+- NO Instagram filters, natural flat colors
+- Real indoor lighting (warm lamps, cool window light)
+- Intimate detail shot, as if photographing your own space
+- 4:5 portrait aspect ratio
+- Shallow depth of field, some bokeh
+- Lifestyle still life aesthetic
+
+CRITICAL: NO person, NO body parts, NO face in this image. Environment details ONLY.
+
+AVOID: People, faces, hands, body parts, professional studio lighting, stock photo look`;
+
+  // Use scene reference if available for consistent environment
+  const refs = sceneReferenceBase64 ? [sceneReferenceBase64] : [];
+
+  try {
+    const output = await replicate.run(NANO_BANANA_MODEL, {
+      input: {
+        prompt,
+        negative_prompt: 'person, human, face, body, hands, fingers, portrait, model, woman, man, people, ugly, deformed, blurry, low quality, cartoon, anime',
+        aspect_ratio: '4:5',
+        resolution: '2K',
+        output_format: 'jpg',
+        safety_filter_level: 'block_only_high',
+        image_input: refs.length > 0 ? refs : undefined,
+      },
+    });
+
+    const imageUrl = Array.isArray(output) ? output[0] : output;
+    log(`  ✅ Detail shot generated`);
+    return imageUrl;
+  } catch (error) {
+    log(`  ⚠️ Detail shot failed, falling back to regular image`);
+    return null; // Caller will fall back to regular image
   }
 }
 
@@ -1007,8 +1124,29 @@ export async function generateImagesForPost(postParams) {
   const imageUrls = [];
   let firstImageBase64 = null;
 
+  // Decide if image 3 should be a detail shot (30% chance for Elena carousels only)
+  const useDetailShot = character === 'elena' && 
+                        postParams.type !== 'reel' && 
+                        Math.random() < 0.30;
+  
+  if (useDetailShot) {
+    log(`\n📷 Detail shot mode: Image 3 will be environment-only (modern IG trend)`);
+  }
+
   for (let i = 0; i < contentCount; i++) {
     log(`\n🎨 Generating image ${i + 1}/${contentCount}...`);
+
+    // Image 3 can be a detail shot (environment only, no subject)
+    if (i === 2 && useDetailShot) {
+      const detailUrl = await generateDetailShot(postParams.location_name, firstImageBase64);
+      if (detailUrl) {
+        const cloudinaryUrl = await uploadToCloudinary(detailUrl, character, postParams.type, i);
+        imageUrls.push(cloudinaryUrl);
+        continue; // Skip to next iteration
+      }
+      // If detail shot fails, fall through to regular image generation
+      log(`  ⚠️ Detail shot failed, generating regular image instead`);
+    }
 
     // Framing variations for carousel diversity (real IG style)
     const framingVariations = [

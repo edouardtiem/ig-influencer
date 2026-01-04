@@ -579,7 +579,7 @@ function buildEnhancedPrompt(
 Ta mission: créer un planning de posts intelligent, cohérent et engageant.
 
 ═══════════════════════════════════════════════════════════════
-## 1️⃣ ANALYTICS — Ce qui FONCTIONNE
+## 1️⃣ ANALYTICS — Posts récents (inspiration)
 ═══════════════════════════════════════════════════════════════
 
 ${formatAnalyticsForPrompt(analytics)}

@@ -100,27 +100,51 @@ healthy fit Italian body, confident posture`,
 // NEW NATURAL EXPRESSIONS (the ones we just added)
 // ===========================================
 
+// Mix: Sexy (docs/19-QUALITY-SEXY-STRATEGY.md) + Natural/Candid
 const HERO_EXPRESSIONS = [
+  // SEXY
   'intense captivating gaze at camera, lips slightly parted, smoldering confidence',
-  'genuine laugh mid-burst, eyes crinkled, authentic joy, candid energy',
   'soft alluring expression, warm inviting eyes, effortless glamour',
-  'looking out window dreamily, profile view, contemplative mood',
-  'eyes closed peaceful smile, enjoying the moment, vibing',
+  'sultry gaze through half-closed eyes, sensual confidence, alluring',
+  // NATURAL
+  'genuine laugh mid-burst, eyes crinkled, authentic joy, candid energy',
+  'looking out window dreamily, profile view, contemplative mood, curves silhouette',
+  'eyes closed enjoying moment, peaceful sensual smile, vibing',
 ];
 
 const SECONDARY_EXPRESSIONS = [
-  'looking over shoulder caught off-guard, surprised candid moment',
-  'eyes closed enjoying moment, peaceful smile, vibing',
+  // SEXY
+  'looking over shoulder with captivating glance, mysterious and inviting',
+  'playful charming smirk, soft bite of lower lip, inviting look',
+  'enchanting knowing smile, direct eye contact, magnetic allure',
+  // NATURAL/CANDID
+  'caught off-guard glance over shoulder, surprised candid moment',
   'laughing hard with eyes squeezed shut, genuine uncontrolled joy',
   'looking at something off-camera, curious expression, distracted',
-  'mid-yawn stretching, sleepy morning authenticity, real life',
-  'side profile gazing out window, pensive natural moment',
-  'scrunched nose silly face, goofy selfie energy, playful',
-  'surprised wide eyes, eyebrows raised, reaction moment',
-  'thinking face looking up, lips pursed, pondering',
-  'comfortable resting expression, not posing, just existing',
+  'side profile gazing away, pensive natural moment, soft light on curves',
+  'comfortable resting expression, not posing, natural beauty',
   'dreamy soft expression, natural radiance, looking away',
 ];
+
+// ===========================================
+// DETAIL SHOTS (environment without subject)
+// ===========================================
+
+const DETAIL_SHOTS = {
+  bedroom: [
+    'close-up of silk sheets rumpled on luxurious bed, morning golden light streaming through curtains, intimate atmosphere',
+    'vanity mirror reflection showing makeup products and jewelry scattered, soft Hollywood lights glow',
+    'silk robe draped elegantly over velvet chair, golden morning light',
+  ],
+  living: [
+    'coffee cup steaming on marble side table next to fashion magazine, soft morning light',
+    'cozy velvet sofa corner with cashmere throw, golden afternoon light',
+  ],
+  bathroom: [
+    'bathroom mirror with steam, candles lit around marble tub, spa atmosphere',
+    'luxury skincare products arranged on marble counter, golden light',
+  ],
+};
 
 // ===========================================
 // SEXY LOCATIONS (from scheduler)

@@ -277,25 +277,20 @@ export function formatAnalyticsForPrompt(analytics) {
     return `Pas de données analytics disponibles.`;
   }
 
-  const { patterns, recommendations, topPerformers } = analytics;
+  const { topPerformers } = analytics;
+
+  // NOTE: On n'injecte plus les patterns/recommendations pour éviter le biais de convergence
+  // Claude peut être plus créatif sans savoir ce qui "marche le mieux"
+  // On garde juste les top posts comme inspiration (pas comme directive)
 
   let output = `Posts analysés: ${analytics.totalPostsAnalyzed}\n\n`;
 
-  output += `### Top 5 posts:\n`;
+  output += `### Top 5 posts récents (inspiration, pas obligation):\n`;
   topPerformers.slice(0, 5).forEach((p, i) => {
     output += `${i + 1}. ${p.type} @ ${p.location || 'unknown'} (${p.mood}) — ${p.likes} likes\n`;
   });
 
-  output += `\n### Patterns détectés:\n`;
-  output += `- Location: ${patterns.bestLocationType} performe ${patterns.locationTypeAdvantage} mieux\n`;
-  output += `- Format: ${patterns.bestFormat} = meilleur engagement\n`;
-  output += `- Mood: "${patterns.bestMood}" = le plus engageant\n`;
-  output += `- Créneau: ${patterns.bestTimeSlot} = meilleur reach\n`;
-
-  output += `\n### Recommandations:\n`;
-  recommendations.forEach(r => {
-    output += `→ ${r}\n`;
-  });
+  output += `\n💡 Ces posts ont bien marché, mais sois CRÉATIF et explore de nouvelles combinaisons!`;
 
   return output;
 }

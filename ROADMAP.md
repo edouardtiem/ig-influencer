@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 6 janvier 2025 (Natural Face Variations ✅)
+**Dernière mise à jour** : 7 janvier 2025 (Content Brain Analytics Removal ✅)
 
 ---
 
@@ -63,6 +63,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-058 | **🎨 Content Brain Analytics Removal** — Suppression analytics "best" (bestLocation/bestMood/bestPostType) pour éviter biais convergence + Plus de créativité et variété dans posts générés | 07/01/2025 | v2.43.0 | [→](./roadmap/done/DONE-058-content-brain-analytics-removal.md) |
 | DONE-057 | **🎭 Natural Face Variations** — Expressions naturelles : grimaces, regard ailleurs, moments candid (pas toujours posé) + 25 nouvelles expressions + Notes style dans prompt | 06/01/2025 | v2.42.0 | [→](./roadmap/done/DONE-057-natural-face-variations.md) |
 | DONE-056 | **📖 Elena Micro-Story Captions + Soft CTA Private** — Format storytelling captions en anglais (Hook→Story→Reflection→CTA→Question) + Soft CTA direct vers private (~70%) + Tracking `has_private_cta` en DB | 04/01/2026 | v2.41.0 | [→](./docs/sessions/2026-01-04-elena-micro-story-captions.md) |
 | DONE-055 | **🌍 DM Language Detection** — Détection intelligente langue (explicite OU 3+ messages) + Stockage BDD + Réponse dynamique dans langue détectée (EN/FR/IT/ES/PT/DE) | 05/01/2025 | v2.37.5 | [→](./roadmap/done/DONE-055-dm-language-detection.md) |
@@ -179,6 +180,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 07/01/2025 | **🎨 Content Brain Analytics Removal** — Suppression analytics "best" pour éviter biais convergence + Plus de créativité dans génération posts | [→](./roadmap/done/DONE-058-content-brain-analytics-removal.md) |
 | 06/01/2025 | **🧪 Test Natural Expressions** — Test des nouvelles expressions faciales : 6 images générées (2 carousels) sans BDD/IG, review Cloudinary | [→](./docs/sessions/2025-01-06-test-natural-expressions.md) |
 | 06/01/2025 | **🎭 Natural Face Variations** — Expressions naturelles : grimaces, regard ailleurs, moments candid + 25 nouvelles expressions + Notes style dans prompt | [→](./docs/sessions/2025-01-06-natural-face-variations.md) |
 | 04/01/2025 | **🔧 DM Fixes Complets** — Story replies parsing + Fix webhook timeout + Never ask "which one?" + Validator fonctionnel | [→](./docs/sessions/2025-01-04-dm-fixes-complete.md) |

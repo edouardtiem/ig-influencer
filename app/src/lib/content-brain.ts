@@ -207,12 +207,6 @@ ${context.recentPosts.slice(0, 5).map(p => `- ${p.type} @ ${p.location} (mood: $
 ## Lieux à éviter (postés récemment)
 ${context.analytics.recentLocations.join(', ') || 'Aucun'}
 
-## Analytics Insights
-- Meilleur lieu : ${context.analytics.bestLocation || 'Pas assez de données'}
-- Meilleur mood : ${context.analytics.bestMood || 'Pas assez de données'}
-- Meilleur type : ${context.analytics.bestPostType || 'Pas assez de données'}
-- Engagement moyen : ${context.analytics.avgEngagement.toFixed(1)}%
-
 ## Timeline Lore (souvenirs partagés avec ${otherCharacter === 'mila' ? 'Mila' : 'Elena'})
 ${context.timelineEvents.map(e => `- ${e.date}: "${e.title}" — ${e.description}`).join('\n') || '- Pas de timeline'}
 
