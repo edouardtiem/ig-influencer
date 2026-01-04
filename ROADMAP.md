@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 7 janvier 2025 (DM Race Condition Fix ✅)
+**Dernière mise à jour** : 7 janvier 2025 (DM Complete Fixes ✅)
 
 ---
 
@@ -63,6 +63,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-060 | **🎭 DM Natural Exit Messages** — 6 variantes avec excuses naturelles (shooting, manager, etc.) + Message clair "je réponds sur Fanvue" + Random pour variété | 07/01/2025 | v2.45.0 | [→](./roadmap/done/DONE-060-dm-natural-exit-messages.md) |
 | DONE-059 | **🔒 DM Race Condition + Anti-Loop Fix** — Lock en mémoire (webhooks simultanés) + Fix boucles répétitives (110 cas : fallback spam, AI repetition) + Instruction anti-repeat Claude | 07/01/2025 | v2.44.0 | [→](./roadmap/done/DONE-059-dm-race-condition-fix.md) |
 | DONE-058 | **🎨 Content Brain Analytics Removal** — Suppression analytics "best" (bestLocation/bestMood/bestPostType) pour éviter biais convergence + Plus de créativité et variété dans posts générés | 07/01/2025 | v2.43.0 | [→](./roadmap/done/DONE-058-content-brain-analytics-removal.md) |
 | DONE-057 | **🎭 Natural Face Variations** — Expressions naturelles : grimaces, regard ailleurs, moments candid (pas toujours posé) + 25 nouvelles expressions + Notes style dans prompt | 06/01/2025 | v2.42.0 | [→](./roadmap/done/DONE-057-natural-face-variations.md) |
@@ -131,6 +132,7 @@ roadmap/
 
 | ID | Bug | Sévérité | Status | Lien |
 |----|-----|----------|--------|------|
+| BUG-014 | **Message Loops** — 110 cas de messages répétitifs (fallback spam "Hey 🖤 Sorry..." jusqu'à 13x, AI repetition jusqu'à 30x) | 🔴 High | ✅ Fixé | [→](./roadmap/done/DONE-059-dm-race-condition-fix.md) |
 | BUG-013 | **Race Condition DM Duplicates** — ManyChat envoie plusieurs webhooks simultanés → même message envoyé 2-3 fois sur Instagram | 🔴 High | ✅ Fixé | [→](./roadmap/done/DONE-059-dm-race-condition-fix.md) |
 | BUG-012 | **Fanvue Daily Post 404** — Endpoint `/v1/posts` incorrect + field names mismatch (text→content, mediaUrls→media_urls, audience→is_premium) | 🔴 High | ✅ Fixé | [→](./roadmap/done/DONE-049-fanvue-daily-post-fix.md) |
 | BUG-011 | **Table `posts` locations NULL** — History layer lisait mauvaise table → throwbacks répétitifs | 🟡 Medium | ✅ Fixé | [→](./roadmap/bugs/BUG-011-posts-table-null-locations.md) |
@@ -169,10 +171,10 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 43
+├── ✅ Done        : 44
 ├── 🚧 In Progress : 3 (Elena Sexy Mode + Fanvue + Model Evolution)
 ├── 📋 Todo        : 6 
-├── 🐛 Bugs        : 8 (8 fixed)
+├── 🐛 Bugs        : 9 (9 fixed)
 └── 💡 Ideas       : 10 (Fanvue Bot Uncensored prêt à implémenter 🔥)
 ```
 
@@ -182,7 +184,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
-| 07/01/2025 | **🔒 DM Race Condition + Anti-Loop Fix** — Lock en mémoire (webhooks simultanés) + Fix 110 boucles répétitives (fallback spam, AI repetition) + Instruction anti-repeat Claude | [→](./docs/sessions/2025-01-07-dm-race-condition-fix.md) |
+| 07/01/2025 | **🔒 DM Complete Fixes** — Race condition fix (lock) + Anti-loop (110 cas) + Natural exit messages (6 variantes avec "je réponds sur Fanvue") | [→](./docs/sessions/2025-01-07-dm-complete-fixes.md) |
 | 07/01/2025 | **🎨 Content Brain Analytics Removal** — Suppression analytics "best" pour éviter biais convergence + Plus de créativité dans génération posts | [→](./roadmap/done/DONE-058-content-brain-analytics-removal.md) |
 | 06/01/2025 | **🧪 Test Natural Expressions** — Test des nouvelles expressions faciales : 6 images générées (2 carousels) sans BDD/IG, review Cloudinary | [→](./docs/sessions/2025-01-06-test-natural-expressions.md) |
 | 06/01/2025 | **🎭 Natural Face Variations** — Expressions naturelles : grimaces, regard ailleurs, moments candid + 25 nouvelles expressions + Notes style dans prompt | [→](./docs/sessions/2025-01-06-natural-face-variations.md) |

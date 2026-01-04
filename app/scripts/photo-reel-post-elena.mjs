@@ -41,11 +41,9 @@ const SLIDESHOW_SIZE = 3; // 3 photos per reel
 const SECONDS_PER_PHOTO = 3; // 3 seconds per photo = 9 seconds total
 const NANO_BANANA_MODEL = 'google/nano-banana-pro';
 
-// Elena's reference photos - 4 angles for consistency
+// Elena's reference photos
 const ELENA_FACE_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v1765967140/replicate-prediction-qh51japkxxrma0cv52x8qs7mnc_ltc9ra.png';
 const ELENA_BODY_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v1765967073/replicate-prediction-ws5fpmjpfsrma0cv538t79j8jm_wx9nap.png';
-const ELENA_PROFILE_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v1767561713/y1r6jt0pwdrmr0cvhbf9sbenkw_z0sydx.png';
-const ELENA_BACK_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v1767562505/replicate-prediction-bjnvs97bqxrmy0cvhbpa8cx5f8_daohqh.png';
 
 // ═══════════════════════════════════════════════════════════════
 // ELENA CHARACTER - Ultra detailed with reference instruction
@@ -71,15 +69,9 @@ const REFERENCE_INSTRUCTION = `You are provided with reference images in order:
 - Same wide feminine hips
 - Same healthy fit Italian body type
 
-**IMAGE 3 (PROFILE REFERENCE)**: This is Elena from LEFT PROFILE. For side angles use this guide.
-
-**IMAGE 4 (BACK REFERENCE)**: This is Elena from BEHIND. For back views use this guide.
-
 CRITICAL RULES:
 - Face MUST be identical to Image 1 - same person, same features
 - Body proportions MUST match Image 2 - same curves, same large bust size
-- For SIDE ANGLES: use Image 3 as profile guide
-- For BACK VIEWS: use Image 4 as back guide
 - Do NOT change face to look more "model-like" or angular
 - Do NOT reduce bust size or body curves
 - Hair MUST show visible golden blonde balayage highlights, NOT solid dark brown`;
