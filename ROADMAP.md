@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 4 janvier 2025 (Elena Profile + Back Refs ✅)
+**Dernière mise à jour** : 4 janvier 2026 (DM Anti-Loop Fix ✅)
 
 ---
 
@@ -63,6 +63,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-042 | **🔍 DM Anti-Loop & Fanvue Spam Prevention** — Fix répétition "hey 🖤" x7 + Max 2 liens Fanvue/conversation + Gestion messages emoji-only + Script audit 48h | 04/01/2026 | v2.47.0 | [→](./roadmap/done/DONE-042-dm-anti-loop-fix.md) |
 | DONE-061 | **📸 Elena Profile + Back Refs** — Ajout refs profile (left) + back au Content Brain (4 angles total) pour meilleure consistance visage/body sur tous angles | 04/01/2025 | v2.46.0 | [→](./roadmap/done/DONE-061-elena-profile-back-refs.md) |
 | DONE-060 | **🎭 DM Natural Exit Messages** — 6 variantes avec excuses naturelles (shooting, manager, etc.) + Message clair "je réponds sur Fanvue" + Random pour variété | 07/01/2025 | v2.45.0 | [→](./roadmap/done/DONE-060-dm-natural-exit-messages.md) |
 | DONE-059 | **🔒 DM Race Condition + Anti-Loop Fix** — Lock en mémoire (webhooks simultanés) + Fix boucles répétitives (110 cas : fallback spam, AI repetition) + Instruction anti-repeat Claude | 07/01/2025 | v2.44.0 | [→](./roadmap/done/DONE-059-dm-race-condition-fix.md) |
