@@ -1410,10 +1410,23 @@ export async function generateElenaResponse(
     ? '🌍 SPRACHE: Deutsch. Antworte nur auf Deutsch.'
     : '🌍 LANGUAGE: English. Respond in English only.';
 
-  // Get last outgoing message to avoid repetition
-  const lastOutgoing = conversationHistory.filter(m => m.direction === 'outgoing').slice(-1)[0];
-  const antiRepeatInstruction = lastOutgoing 
-    ? `\n\n🚫 DO NOT REPEAT: Your last message was "${lastOutgoing.content.substring(0, 50)}..." — Generate something DIFFERENT.`
+  // Get recent outgoing messages to avoid repetition
+  const recentOutgoingMessages = conversationHistory.filter(m => m.direction === 'outgoing').slice(-5);
+  const antiRepeatInstruction = recentOutgoingMessages.length > 0
+    ? `\n\n🚫 DO NOT REPEAT — Your recent messages were:
+${recentOutgoingMessages.map((m, i) => `  ${i + 1}. "${m.content.substring(0, 40)}..."`).join('\n')}
+Generate something COMPLETELY DIFFERENT. If you recently said "hey 🖤", do NOT say it again. NEVER use the same greeting twice.`
+    : '';
+  
+  // Detect if user sent emoji-only message
+  const isEmojiOnlyMessage = /^[\p{Emoji}\s\u200d]+$/u.test(incomingMessage.trim()) || 
+    incomingMessage.trim().length < 5 && /[\p{Emoji}]/u.test(incomingMessage);
+  const emojiInstruction = isEmojiOnlyMessage
+    ? `\n\n💬 EMOJI-ONLY MESSAGE — The user sent just emojis. Respond with something MEANINGFUL, not just "hey 🖤". Options:
+- Ask a question about them: "where are you from?" / "tu fais quoi dans la vie?"
+- Make a playful comment: "someone's feeling flirty 😏" / "all these emojis... i like it 👀"
+- Acknowledge warmly and ask something: "aww cute 🖤 you're from where?"
+NEVER just say "hey 🖤" to emojis. That's lazy and repetitive.`
     : '';
 
   const contextPrompt = `
@@ -1465,7 +1478,7 @@ ${closingPressure >= 80 ? `🚨 FINAL ZONE — Pitch with link: ${FANVUE_LINK}` 
 
 ⚠️ CRITICAL: MAX 12 WORDS. 1 sentence. lowercase. NO caps. NO celebrations. NO counting. Be NORMAL and SHORT.
 
-${languageInstruction}${antiRepeatInstruction}`;
+${languageInstruction}${antiRepeatInstruction}${emojiInstruction}`;
 
   // ===========================================
   // GENERATION WITH VALIDATION + RETRY LOOP
@@ -1774,11 +1787,14 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
   console.log(`📝 Response: "${response.substring(0, 80)}${response.length > 80 ? '...' : ''}"`);
 
   // ===========================================
-  // ANTI-LOOP CHECK — Prevent sending same message twice in a row
+  // ANTI-LOOP CHECK — Prevent sending same/similar message in recent history
   // ===========================================
-  const lastOutgoing = history.filter(m => m.direction === 'outgoing').slice(-1)[0];
-  if (lastOutgoing && lastOutgoing.content === response) {
-    console.log(`⚠️ LOOP DETECTED — Same response as last outgoing. Skipping to prevent spam.`);
+  const last5Outgoing = history.filter((m: DMMessage) => m.direction === 'outgoing').slice(-5);
+  
+  // Check for EXACT duplicate in last 5 messages
+  const exactDuplicate = last5Outgoing.find((m: DMMessage) => m.content === response);
+  if (exactDuplicate) {
+    console.log(`⚠️ LOOP DETECTED — Exact duplicate found in last 5 outgoing. Skipping.`);
     return {
       response: '',
       contact: updatedContact,
@@ -1786,10 +1802,55 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
       analysis,
     };
   }
+  
+  // Check for SIMILAR message (generic "hey 🖤" type responses)
+  const isGenericResponse = /^(hey|salut|coucou|hello|hi)\s*🖤?\s*\.{0,3}$/i.test(response.trim());
+  const recentGeneric = last5Outgoing.filter((m: DMMessage) => /^(hey|salut|coucou|hello|hi)\s*🖤?\s*\.{0,3}$/i.test(m.content.trim()));
+  if (isGenericResponse && recentGeneric.length >= 1) {
+    console.log(`⚠️ GENERIC LOOP — Already sent generic greeting recently. Skipping to prevent "hey 🖤" spam.`);
+    return {
+      response: '',
+      contact: updatedContact,
+      strategy,
+      analysis,
+    };
+  }
+  
+  // ===========================================
+  // FANVUE LINK SPAM PREVENTION — Max 2 links per conversation
+  // ===========================================
+  const fanvueLinkPattern = /fanvue\.com/i;
+  const responseHasFanvueLink = fanvueLinkPattern.test(response);
+  let finalResponse = response;
+  
+  if (responseHasFanvueLink) {
+    // Count how many times we've sent the Fanvue link in history
+    const fanvueLinksSent = history.filter(
+      (m: DMMessage) => m.direction === 'outgoing' && fanvueLinkPattern.test(m.content)
+    ).length;
+    
+    if (fanvueLinksSent >= 2) {
+      console.log(`⚠️ FANVUE SPAM BLOCKED — Already sent ${fanvueLinksSent} Fanvue links. Skipping this one.`);
+      // Instead of skipping entirely, remove the link and send without it
+      const responseWithoutLink = response.replace(/→?\s*https?:\/\/[^\s]+fanvue\.com[^\s]*/gi, '').trim();
+      if (responseWithoutLink.length > 5) {
+        console.log(`📝 Sending response without Fanvue link: "${responseWithoutLink.substring(0, 60)}..."`);
+        finalResponse = responseWithoutLink;
+      } else {
+        // Response was basically just the link, skip entirely
+        return {
+          response: '',
+          contact: updatedContact,
+          strategy,
+          analysis,
+        };
+      }
+    }
+  }
 
   // 7. Save outgoing message
   const responseTime = Date.now() - startTime;
-  await saveMessage(updatedContact.id, 'outgoing', response, {
+  await saveMessage(updatedContact.id, 'outgoing', finalResponse, {
     response_strategy: strategy,
     response_time_ms: responseTime,
     stage_at_time: updatedContact.stage,
@@ -1798,14 +1859,14 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
   // 8. Update contact after outgoing
   await updateContactAfterMessage(updatedContact.id, false);
 
-  // 9. Mark as pitched if we included Fanvue link
-  if (shouldPitch) {
+  // 9. Mark as pitched if we included Fanvue link (only if link wasn't stripped)
+  if (shouldPitch && fanvueLinkPattern.test(finalResponse)) {
     await markAsPitched(updatedContact.id);
     console.log(`🎯 Contact marked as PITCHED`);
   }
 
   return {
-    response,
+    response: finalResponse,
     contact: updatedContact,
     strategy,
     analysis,
