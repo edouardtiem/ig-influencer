@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 9 janvier 2026 (Content Brain Trending Layer ✅)
+**Dernière mise à jour** : 9 janvier 2026 (DM Bugs Fix ✅)
 
 ---
 
@@ -63,6 +63,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-064 | **🔧 DM Fanvue Spam & Rapid-Fire Duplicates Fix** — Fix exit message Fanvue envoyé infiniment (race condition) + Fix doublons sur messages rapides + Fresh is_stopped check + Exit message spam prevention (5min cooldown) + Rapid-fire detection (30s) | 09/01/2026 | v2.50.0 | [→](./roadmap/done/DONE-064-dm-fanvue-spam-rapid-fire-fix.md) |
 | DONE-063 | **🔥 Content Brain V2.4 — Trending Layer** — Intégration Perplexity API pour contenu dynamique (locations/outfits/poses trending) + 2 modes EXPERIMENT (14h) / SAFE (21h) + Safe Sexy Vocabulary + Architecture 7 couches | 09/01/2026 | v2.49.0 | [→](./roadmap/done/DONE-063-content-brain-trending-layer.md) |
 | DONE-062 | **🔥 NSFW Venice AI Setup** — Script génération NSFW Elena (lustify-v7) + Retry auto qualité (>1.5MB) + 3 poses explicites (face cachée) + Tests qualité validés (2.4MB, 2.5MB) | 07/01/2025 | v2.48.0 | [→](./docs/sessions/2025-01-07-nsfw-venice-ai-setup.md) |
 | DONE-042 | **🔍 DM Anti-Loop & Fanvue Spam Prevention** — Fix répétition "hey 🖤" x7 + Max 2 liens Fanvue/conversation + Gestion messages emoji-only + Script audit 48h | 04/01/2026 | v2.47.0 | [→](./roadmap/done/DONE-042-dm-anti-loop-fix.md) |
