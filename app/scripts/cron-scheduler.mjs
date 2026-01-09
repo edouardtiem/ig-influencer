@@ -29,6 +29,7 @@ import { fetchHistory, formatHistoryForPrompt, suggestNarrativeArc } from './lib
 import { fetchContext, formatContextForPrompt } from './lib/context-layer.mjs';
 import { fetchMemories, formatMemoriesForPrompt } from './lib/memories-layer.mjs';
 import { fetchRelationship, formatRelationshipForPrompt } from './lib/relationship-layer.mjs';
+import { fetchTrendingExperiment, fetchTrendingSafe, formatTrendingForPrompt, extractTopPerformers } from './lib/trending-layer.mjs';
 
 // ===========================================
 // CONFIG
@@ -552,7 +553,8 @@ function buildEnhancedPrompt(
   today,
   explorationRules,
   abTest,
-  narrativeArc
+  narrativeArc,
+  trending = {}
 ) {
   const otherCharacter = character === 'mila' ? 'Elena' : 'Mila';
   const dayName = today.toLocaleDateString('fr-FR', { weekday: 'long' });
@@ -616,7 +618,19 @@ ${formatMemoriesForPrompt(memories, character)}
 
 ${formatRelationshipForPrompt(relationship, character)}
 
+${character === 'elena' && (trending.trendingExperiment || trending.trendingSafe) ? `═══════════════════════════════════════════════════════════════
+## 🔥 7️⃣ TRENDING CONTENT — Perplexity Real-Time Insights
 ═══════════════════════════════════════════════════════════════
+
+${formatTrendingForPrompt(trending.trendingExperiment, trending.trendingSafe)}
+
+⚠️ **CRITICAL FOR ELENA**:
+- **14h POST**: Use the TRENDING EXPERIMENT content above (location + outfit + pose)
+- **21h POST**: Use the TRENDING SAFE content above (similar to top performers)
+- COPY the suggested promptFragments into your prompt_hints field
+- ADAPT the suggested caption (you can modify but keep the micro-story format)
+- The trending content is OPTIMIZED for virality AND for safe AI image generation
+` : ''}═══════════════════════════════════════════════════════════════
 ## 🔬 EXPLORATION & EXPÉRIMENTATION
 ═══════════════════════════════════════════════════════════════
 
@@ -633,18 +647,28 @@ ${abTestSection}
 Génère ${postingConfig.postsCount} posts pour aujourd'hui.
 
 ### Horaires et stratégie:
-${postingConfig.experimentSlot ? `
-**🧪 14:00 — POST EXPERIMENT**
-→ Claude a CARTE BLANCHE pour tester quelque chose de créatif
-→ Nouveau lieu, nouveau style, nouvelle approche
+${postingConfig.experimentSlot && character === 'elena' ? `
+**🧪 14:00 — POST EXPERIMENT (TRENDING)**
+→ USE the TRENDING EXPERIMENT content from Section 7
+→ Location + Outfit (petite tenue) + Pose from Perplexity
+→ Copy promptFragments into prompt_hints
+→ Adapt the suggested caption
 → Marquer avec "is_experiment": true
-→ Objectif: découvrir ce qui pourrait mieux marcher
+
+**✅ 21:00 — POST SAFE (TRENDING-CONSTRAINED)**
+→ USE the TRENDING SAFE content from Section 7
+→ Similar to your top performers but fresh trending version
+→ Copy promptFragments into prompt_hints
+→ Adapt the suggested caption
+→ Marquer avec "is_experiment": false
+` : postingConfig.experimentSlot ? `
+**🧪 14:00 — POST EXPERIMENT**
+→ Tester quelque chose de différent
+→ Marquer avec "is_experiment": true
 
 **✅ 21:00 — POST SAFE**
-→ Ce qui fonctionne (basé sur analytics et historique)
-→ Utiliser les patterns qui ont déjà performé
+→ Utiliser ce qui fonctionne
 → Marquer avec "is_experiment": false
-→ Objectif: engagement garanti
 ` : `${postingConfig.slots.join(', ')}`}
 
 ### Lieux disponibles:
@@ -661,17 +685,18 @@ ${character === 'elena' ? ELENA_SEXY_LOCATIONS.join('\n') : LOCATIONS[character]
 - **content_type**: "new" | "throwback" | "duo" | "response" | "experiment"
 - **is_experiment**: true/false (true si c'est le post A/B test)
 - **reasoning**: POURQUOI ce choix (1-2 phrases, cite les données)
-- **location_key**: ID du lieu
+- **location_key**: ID du lieu (from trending if Elena)
 - **location_name**: Nom complet du lieu
 - **post_type**: "carousel" (TOUJOURS carousel, pas de reel)
 - **mood**: cozy | adventure | work | fitness | travel | fashion | relax | nostalgic
-- **outfit**: Description tenue détaillée
-- **action**: Ce qu'elle fait (pour le prompt image)
-- **caption**: MICRO-STORY caption (see format below) — NO character limit
+- **outfit**: Description tenue détaillée (use trending "petite tenue" if Elena)
+- **action**: Ce qu'elle fait (use trending pose if Elena)
+- **caption**: MICRO-STORY caption (adapt from trending suggestion if Elena)
 - **has_private_cta**: true/false (whether soft CTA to private is included)
 - **hashtags**: 12-15 hashtags (format ["#tag1", "#tag2"])
 - **scheduled_time**: Horaire parmi les slots disponibles
-- **prompt_hints**: Indices pour génération image
+- **prompt_hints**: COPY the promptFragments from trending (location + outfit + pose)
+- **trending_source**: (Elena only) "experiment" | "safe" — which trending content was used
 
 ### Règles STRICTES (dans cet ordre de priorité):
 1. **TOUS CAROUSELS**: Chaque post est un carousel de 3 images. Pas de reel.
@@ -696,15 +721,18 @@ ${character === 'elena'
 
 **2 POSTS/JOUR: 1 EXPERIMENT (14h) + 1 SAFE (21h)**
 
-📌 **POST 14:00 (EXPERIMENT)**:
-- TESTE quelque chose de différent (lieu inhabituel, style nouveau, caption originale)
-- Claude peut être CRÉATIF et sortir des sentiers battus
-- Si ça fonctionne → on l'intègre dans le "safe"
+📌 **POST 14:00 (EXPERIMENT)** — USE TRENDING EXPERIMENT CONTENT:
+- Use the TRENDING location + outfit + pose from Section 7 above
+- COPY the promptFragments into your prompt_hints (they're optimized for AI)
+- Caption: ADAPT the suggested micro-story caption
+- Be creative with the combo but USE the trending elements
+- Mark with "is_experiment": true
 
-📌 **POST 21:00 (SAFE)**:
-- Utilise ce qui FONCTIONNE (analytics, lieux qui performent)
-- Style proven, caption efficace
-- Engagement garanti
+📌 **POST 21:00 (SAFE)** — USE TRENDING SAFE CONTENT:
+- Use the TRENDING SAFE location + outfit + pose from Section 7
+- These are SIMILAR to your top performers but fresh
+- Caption: ADAPT the suggested caption
+- Mark with "is_experiment": false
 
 ═══════════════════════════════════════════════════════════════
 ## ✍️ CAPTION FORMAT — Micro-Story Style (ENGLISH)
@@ -871,6 +899,34 @@ async function generateSchedule(character) {
     console.log(`   → ${relationship.suggestedHint.description}`);
   }
 
+  // ═══════════════════════════════════════════════════════════════
+  // TRENDING LAYER — Perplexity-powered dynamic content (Elena only)
+  // ═══════════════════════════════════════════════════════════════
+  let trendingExperiment = null;
+  let trendingSafe = null;
+  
+  if (character === 'elena') {
+    console.log('\n🔥 Fetching trending content (Perplexity)...');
+    
+    // Get recent locations to avoid
+    const recentLocations = (history?.posts || [])
+      .slice(0, 5)
+      .map(p => p.location || '')
+      .filter(Boolean);
+    
+    // Extract top performers from analytics for SAFE slot
+    const topPerformers = extractTopPerformers(analytics);
+    
+    // Fetch both in parallel
+    [trendingExperiment, trendingSafe] = await Promise.all([
+      fetchTrendingExperiment(recentLocations),
+      fetchTrendingSafe(topPerformers),
+    ]);
+    
+    console.log(`   🧪 EXPERIMENT: ${trendingExperiment?.location?.name || 'fallback'} (${trendingExperiment?.source})`);
+    console.log(`   ✅ SAFE: ${trendingSafe?.location?.name || 'fallback'} (${trendingSafe?.source})`);
+  }
+
   // Get exploration requirements (pass postsCount for min reels rule)
   const explorationRules = getExplorationRequirements(character, history, analytics, postingConfig.postsCount);
   if (explorationRules.length > 0) {
@@ -902,7 +958,8 @@ async function generateSchedule(character) {
     today,
     explorationRules,
     abTest,
-    narrativeArc
+    narrativeArc,
+    { trendingExperiment, trendingSafe }
   );
 
   // Call Claude with Extended Thinking for better reasoning

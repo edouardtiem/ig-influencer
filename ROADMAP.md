@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 4 janvier 2026 (DM Anti-Loop Fix ✅)
+**Dernière mise à jour** : 9 janvier 2026 (Content Brain Trending Layer ✅)
 
 ---
 
@@ -63,6 +63,8 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-063 | **🔥 Content Brain V2.4 — Trending Layer** — Intégration Perplexity API pour contenu dynamique (locations/outfits/poses trending) + 2 modes EXPERIMENT (14h) / SAFE (21h) + Safe Sexy Vocabulary + Architecture 7 couches | 09/01/2026 | v2.49.0 | [→](./roadmap/done/DONE-063-content-brain-trending-layer.md) |
+| DONE-062 | **🔥 NSFW Venice AI Setup** — Script génération NSFW Elena (lustify-v7) + Retry auto qualité (>1.5MB) + 3 poses explicites (face cachée) + Tests qualité validés (2.4MB, 2.5MB) | 07/01/2025 | v2.48.0 | [→](./docs/sessions/2025-01-07-nsfw-venice-ai-setup.md) |
 | DONE-042 | **🔍 DM Anti-Loop & Fanvue Spam Prevention** — Fix répétition "hey 🖤" x7 + Max 2 liens Fanvue/conversation + Gestion messages emoji-only + Script audit 48h | 04/01/2026 | v2.47.0 | [→](./roadmap/done/DONE-042-dm-anti-loop-fix.md) |
 | DONE-061 | **📸 Elena Profile + Back Refs** — Ajout refs profile (left) + back au Content Brain (4 angles total) pour meilleure consistance visage/body sur tous angles | 04/01/2025 | v2.46.0 | [→](./roadmap/done/DONE-061-elena-profile-back-refs.md) |
 | DONE-060 | **🎭 DM Natural Exit Messages** — 6 variantes avec excuses naturelles (shooting, manager, etc.) + Message clair "je réponds sur Fanvue" + Random pour variété | 07/01/2025 | v2.45.0 | [→](./roadmap/done/DONE-060-dm-natural-exit-messages.md) |
@@ -173,7 +175,7 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 44
+├── ✅ Done        : 45
 ├── 🚧 In Progress : 3 (Elena Sexy Mode + Fanvue + Model Evolution)
 ├── 📋 Todo        : 6 
 ├── 🐛 Bugs        : 9 (9 fixed)
@@ -186,6 +188,8 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 09/01/2026 | **🔥 Content Brain V2.4 — Trending Layer** — Intégration Perplexity API pour contenu dynamique (locations/outfits/poses trending) + 2 modes EXPERIMENT (14h) / SAFE (21h) + Safe Sexy Vocabulary + Architecture 7 couches | [→](./docs/sessions/2026-01-09-content-brain-trending-layer.md) |
+| 07/01/2025 | **🔥 NSFW Venice AI Setup** — Script génération NSFW Elena (lustify-v7) + Retry auto qualité (>1.5MB) + 3 poses explicites (face cachée) + Tests qualité validés | [→](./docs/sessions/2025-01-07-nsfw-venice-ai-setup.md) |
 | 07/01/2025 | **🔒 DM Complete Fixes** — Race condition fix (lock) + Anti-loop (110 cas) + Natural exit messages (6 variantes avec "je réponds sur Fanvue") | [→](./docs/sessions/2025-01-07-dm-complete-fixes.md) |
 | 07/01/2025 | **🎨 Content Brain Analytics Removal** — Suppression analytics "best" pour éviter biais convergence + Plus de créativité dans génération posts | [→](./roadmap/done/DONE-058-content-brain-analytics-removal.md) |
 | 04/01/2025 | **📸 Elena Profile + Back Refs** — Ajout refs profile (left) + back au Content Brain pour meilleure consistance angles | [→](./docs/sessions/2025-01-04-elena-profile-back-refs.md) |
