@@ -1722,6 +1722,76 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
     };
   }
 
+  // CHECK 3: EXIT MESSAGE SPAM PREVENTION — BUG FIX 2026-01-09
+  // If we already sent an exit message (containing Fanvue link) in the last 5 minutes,
+  // don't send another one. This prevents the infinite Fanvue spam bug when user
+  // keeps messaging after hitting the limit.
+  const { data: recentExitMessage } = await supabase
+    .from('elena_dm_messages')
+    .select('id, created_at')
+    .eq('contact_id', contact.id)
+    .eq('direction', 'outgoing')
+    .ilike('content', '%fanvue on peut vr%') // Match exit message pattern
+    .gte('created_at', new Date(Date.now() - 300000).toISOString()) // Last 5 minutes
+    .limit(1)
+    .single();
+
+  if (recentExitMessage) {
+    const timeDiff = Date.now() - new Date(recentExitMessage.created_at).getTime();
+    console.log(`⚠️ EXIT MESSAGE ALREADY SENT (${Math.round(timeDiff / 1000)}s ago). Skipping to prevent Fanvue spam.`);
+    
+    // Return empty response - don't send anything
+    return {
+      response: '',
+      contact,
+      strategy: 'engage',
+      analysis: {
+        intent: 'other',
+        sentiment: 'neutral',
+        is_question: false,
+        mentions_fanvue: false,
+        recommendedMode: 'balanced',
+        modeReason: 'Exit message already sent recently - prevent spam',
+        triggerFanvuePitch: false,
+      },
+    };
+  }
+
+  // CHECK 4: RAPID-FIRE INCOMING — BUG FIX 2026-01-09
+  // If we received ANY message from this contact in the last 30 seconds,
+  // and we already have pending processing, skip to prevent duplicate responses
+  const { data: recentIncoming } = await supabase
+    .from('elena_dm_messages')
+    .select('id, created_at')
+    .eq('contact_id', contact.id)
+    .eq('direction', 'incoming')
+    .neq('content', incomingMessage) // Different message than current
+    .gte('created_at', new Date(Date.now() - 30000).toISOString()) // Last 30 seconds
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (recentIncoming) {
+    const timeDiff = Date.now() - new Date(recentIncoming.created_at).getTime();
+    console.log(`⚠️ RAPID-FIRE DETECTED (another message ${Math.round(timeDiff / 1000)}s ago). Cooldown active.`);
+    
+    // Return empty response - let the first message be processed
+    return {
+      response: '',
+      contact,
+      strategy: 'engage',
+      analysis: {
+        intent: 'other',
+        sentiment: 'neutral',
+        is_question: false,
+        mentions_fanvue: false,
+        recommendedMode: 'balanced',
+        modeReason: 'Rapid-fire messages - waiting for first to process',
+        triggerFanvuePitch: false,
+      },
+    };
+  }
+
   // ===========================================
   // MESSAGE LIMIT CHECK (after deduplication)
   // ===========================================
@@ -1730,6 +1800,37 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
   const closingPressure = getClosingPressure(contact.stage as LeadStage, contact.message_count);
   
   if (hasReachedLimit(contact.stage as LeadStage, contact.message_count)) {
+    // BUG FIX 2026-01-09: Re-check is_stopped FRESH from DB before sending exit message
+    // This prevents race condition when multiple webhooks arrive simultaneously
+    const { data: freshContact } = await supabase
+      .from('elena_dm_contacts')
+      .select('is_stopped')
+      .eq('id', contact.id)
+      .single();
+    
+    if (freshContact?.is_stopped) {
+      console.log(`🛑 Contact already stopped (fresh check). Skipping exit message.`);
+      return {
+        response: '',
+        contact: { ...contact, is_stopped: true },
+        strategy: 'pitch',
+        analysis: {
+          intent: 'other',
+          sentiment: 'neutral',
+          is_question: false,
+          mentions_fanvue: false,
+          recommendedMode: 'warm',
+          modeReason: 'Already stopped by another webhook',
+          triggerFanvuePitch: false,
+        },
+        shouldStop: true,
+      };
+    }
+    
+    // CRITICAL: Mark as stopped FIRST, BEFORE sending exit message
+    // This prevents other webhooks from also sending exit messages
+    await markAsStopped(contact.id);
+    
     // Get random exit message (natural excuse + "I'll respond on Fanvue")
     const exitMessage = getRandomExitMessage();
     console.log(`🛑 Message limit reached (${contact.message_count}/${messageLimit}). Sending exit message and STOPPING.`);
@@ -1746,9 +1847,6 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
       response_time_ms: Date.now() - startTime,
       stage_at_time: contact.stage,
     });
-    
-    // CRITICAL: Mark contact as stopped to prevent message loop
-    await markAsStopped(contact.id);
     
     return {
       response: exitMessage,
