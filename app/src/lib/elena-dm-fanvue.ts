@@ -331,7 +331,7 @@ export async function getAvailablePPV(
     .select('post_uuid')
     .eq('contact_id', contactId);
 
-  const purchasedUuids = purchases?.map(p => p.post_uuid) || [];
+  const purchasedUuids = purchases?.map((p: { post_uuid: string }) => p.post_uuid) || [];
 
   // Get available PPV
   let query = supabase
