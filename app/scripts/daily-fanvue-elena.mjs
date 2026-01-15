@@ -404,17 +404,21 @@ async function refreshFanvueToken(refreshToken) {
 async function postToFanvue(accessToken, content, imageUrl) {
   log('📤 Posting to Fanvue (subscribers only)...');
   
+  // Fanvue API uses 'text' and 'media' (not 'content' and 'media_urls')
+  const postBody = {
+    text: content.caption,
+    media: [imageUrl],
+    audience: 'subscribers',
+  };
+  log(`   Request body: ${JSON.stringify(postBody)}`);
+  
   const response = await fetch(`${FANVUE_API_URL}/posts`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      content: content.caption,
-      media_urls: [imageUrl],
-      audience: 'subscribers', // Subscribers only, not free followers
-    }),
+    body: JSON.stringify(postBody),
   });
 
   if (!response.ok) {
