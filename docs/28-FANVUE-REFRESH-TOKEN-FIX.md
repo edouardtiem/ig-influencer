@@ -81,3 +81,8 @@ Pour éviter ce problème à l'avenir, on pourrait créer un script qui :
 
 Mais pour l'instant, la solution manuelle fonctionne bien.
 
+
+
+
+
+

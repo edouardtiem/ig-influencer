@@ -3,9 +3,10 @@
  * 
  * Receives events from Fanvue and processes them:
  * - follower.created: Send welcome DM to convert free followers to subscribers
- * - message.created: Chat with fans using Grok AI
+ * - message.created: Chat with fans using Venice AI (uncensored) + memory + PPV
  * - subscriber.created: Thank new paid subscribers
  * - tip.created: Thank for tips
+ * - purchase.created: Track PPV purchases
  * 
  * Webhook URL: https://ig-influencer.vercel.app/api/fanvue/webhook
  */
@@ -13,17 +14,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { 
   sendWelcomeDM, 
-  sendMessage,
   verifyWebhookSignature, 
   initTokensFromEnv 
 } from '@/lib/fanvue';
 import { WELCOME_MESSAGE, WELCOME_PHOTO_URL } from '@/config/fanvue-welcome';
+import { isVeniceConfigured } from '@/lib/venice';
 import { 
-  generateElenaFanvueResponse, 
-  isAskingForImage, 
-  generateElenaImage,
-  isGrokConfigured 
-} from '@/lib/grok';
+  processFanvueDM, 
+  handleFanvuePurchase,
+  FanvueWebhookPayload 
+} from '@/lib/elena-dm-fanvue';
 
 // Fanvue webhook event types
 interface FanvueWebhookEvent {
@@ -35,6 +35,8 @@ interface FanvueWebhookEvent {
     chat_id?: string;
     message?: string;
     amount?: number;
+    postUuid?: string;
+    price?: number;
     created_at: string;
     [key: string]: unknown;
   };
@@ -84,6 +86,9 @@ export async function POST(request: NextRequest) {
       case 'tip.created':
         return await handleTip(event);
       
+      case 'purchase.created':
+        return await handlePurchase(event);
+      
       default:
         console.log(`[Fanvue Webhook] Unhandled event type: ${event.type}`);
         return NextResponse.json({ received: true, action: 'ignored' });
@@ -132,7 +137,7 @@ async function handleNewFollower(event: FanvueWebhookEvent) {
 }
 
 /**
- * Handle incoming message - respond with Grok AI
+ * Handle incoming message - respond with Venice AI (uncensored) + memory + PPV
  */
 async function handleNewMessage(event: FanvueWebhookEvent) {
   const { user_id, username, chat_id, message } = event.data;
@@ -144,56 +149,39 @@ async function handleNewMessage(event: FanvueWebhookEvent) {
     return NextResponse.json({ received: true, action: 'message_invalid' });
   }
   
-  // Check if Grok is configured
-  if (!isGrokConfigured()) {
-    console.error('[Fanvue Webhook] Grok not configured, cannot respond');
-    return NextResponse.json({ received: true, action: 'grok_not_configured' });
+  // Check if Venice AI is configured
+  if (!isVeniceConfigured()) {
+    console.error('[Fanvue Webhook] Venice AI not configured, cannot respond');
+    return NextResponse.json({ received: true, action: 'venice_not_configured' });
   }
   
   try {
-    // Check if user is asking for an image
-    if (isAskingForImage(message)) {
-      // Generate and send image
-      console.log('[Fanvue Webhook] User asking for image, generating...');
-      
-      // First send a teasing text response
-      const textResponse = await generateElenaFanvueResponse(message);
-      await sendMessage({ chatId: chat_id, text: textResponse });
-      
-      // Then generate and send the image
-      try {
-        const imageUrl = await generateElenaImage(message);
-        await sendMessage({ chatId: chat_id, text: '💋', mediaUrls: [imageUrl] });
-        
-        return NextResponse.json({ 
-          received: true, 
-          action: 'image_sent',
-          chatId: chat_id,
-        });
-      } catch (imageError) {
-        console.error('[Fanvue Webhook] Image generation failed:', imageError);
-        // Image failed but text was sent
-        return NextResponse.json({ 
-          received: true, 
-          action: 'text_sent_image_failed',
-          chatId: chat_id,
-        });
-      }
+    // Process with full DM automation (Venice AI + memory + PPV)
+    const payload: FanvueWebhookPayload = {
+      type: event.type,
+      data: event.data,
+      timestamp: event.timestamp,
+    };
+    
+    const result = await processFanvueDM(payload);
+    
+    // Check if response was empty (stopped contact)
+    if (!result.response) {
+      return NextResponse.json({ 
+        received: true, 
+        action: 'contact_stopped',
+        chatId: chat_id,
+      });
     }
-    
-    // Regular text response
-    const response = await generateElenaFanvueResponse(message);
-    
-    await sendMessage({
-      chatId: chat_id,
-      text: response,
-    });
     
     console.log(`[Fanvue Webhook] Response sent to ${username || user_id}`);
     return NextResponse.json({ 
       received: true, 
-      action: 'message_replied',
+      action: result.ppvSent ? 'message_replied_with_ppv' : 'message_replied',
       chatId: chat_id,
+      stage: result.contact.stage,
+      intent: result.analysis.intent,
+      ppvSent: result.ppvSent || false,
     });
     
   } catch (error) {
@@ -268,6 +256,40 @@ Dis-moi ce qui te ferait plaisir 😏`;
   });
 }
 
+/**
+ * Handle PPV purchase - track in database
+ */
+async function handlePurchase(event: FanvueWebhookEvent) {
+  const { user_id, username, postUuid, price } = event.data;
+  
+  console.log(`[Fanvue Webhook] Purchase from ${username || user_id}: ${postUuid} (${price ? price / 100 : 0}€)`);
+  
+  try {
+    const payload: FanvueWebhookPayload = {
+      type: event.type,
+      data: event.data,
+      timestamp: event.timestamp,
+    };
+    
+    await handleFanvuePurchase(payload);
+    
+    return NextResponse.json({ 
+      received: true, 
+      action: 'purchase_recorded',
+      postUuid,
+      price,
+    });
+    
+  } catch (error) {
+    console.error('[Fanvue Webhook] Error recording purchase:', error);
+    return NextResponse.json({ 
+      received: true, 
+      action: 'purchase_record_failed',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+}
+
 // Also handle GET for webhook verification (if Fanvue requires it)
 export async function GET(request: NextRequest) {
   const challenge = request.nextUrl.searchParams.get('challenge');
@@ -279,8 +301,8 @@ export async function GET(request: NextRequest) {
   
   return NextResponse.json({ 
     status: 'Fanvue webhook endpoint',
-    events: ['follower.created', 'message.created', 'subscriber.created', 'tip.created'],
-    grokEnabled: isGrokConfigured(),
+    events: ['follower.created', 'message.created', 'subscriber.created', 'tip.created', 'purchase.created'],
+    veniceEnabled: isVeniceConfigured(),
+    version: 'v2-memory-ppv',
   });
 }
-

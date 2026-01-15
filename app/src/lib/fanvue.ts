@@ -314,6 +314,20 @@ export async function getProfile(): Promise<unknown> {
   return fanvueApi('/creator');
 }
 
+interface UpdateProfileParams {
+  bio?: string;
+  display_name?: string;
+  username?: string;
+}
+
+export async function updateProfile(params: UpdateProfileParams): Promise<unknown> {
+  console.log('[Fanvue] Updating profile...');
+  return fanvueApi('/creator', {
+    method: 'PATCH',
+    body: params,
+  });
+}
+
 export async function getAnalytics(): Promise<unknown> {
   return fanvueApi('/analytics');
 }
@@ -366,14 +380,25 @@ interface SendMessageParams {
   chatId: string;
   text: string;
   mediaUrls?: string[];
+  // PPV support
+  price?: number;      // Price in cents (299 = 2.99€) - makes message a PPV
+  isLocked?: boolean;  // true = requires payment to view media
 }
 
 /**
  * Send a message to a user via Fanvue chat
- * Used for welcome DMs to new followers
+ * Supports both free messages and PPV (pay-per-view) messages
+ * 
+ * @param params.chatId - Chat ID to send message to
+ * @param params.text - Message text
+ * @param params.mediaUrls - Optional media URLs (images)
+ * @param params.price - Optional price in cents for PPV (e.g., 299 = 2.99€)
+ * @param params.isLocked - If true with price, media is locked until payment
  */
 export async function sendMessage(params: SendMessageParams): Promise<unknown> {
-  console.log(`[Fanvue] Sending message to chat ${params.chatId}...`);
+  const isPPV = params.price && params.price > 0;
+  
+  console.log(`[Fanvue] Sending ${isPPV ? 'PPV' : 'free'} message to chat ${params.chatId}${isPPV ? ` (${params.price / 100}€)` : ''}...`);
   
   const body: Record<string, unknown> = {
     text: params.text,
@@ -383,9 +408,41 @@ export async function sendMessage(params: SendMessageParams): Promise<unknown> {
     body.media_urls = params.mediaUrls;
   }
   
+  // PPV message configuration
+  if (isPPV) {
+    body.price = params.price;
+    body.is_locked = params.isLocked !== false; // Default to locked if price is set
+  }
+  
   return fanvueApi(`/chats/${params.chatId}/messages`, {
     method: 'POST',
     body,
+  });
+}
+
+/**
+ * Send a PPV (pay-per-view) message with locked media
+ * Convenience function for PPV messages
+ */
+export async function sendPPVMessage(params: {
+  chatId: string;
+  text: string;
+  mediaUrls: string[];
+  price: number;  // Price in cents
+}): Promise<unknown> {
+  if (!params.mediaUrls || params.mediaUrls.length === 0) {
+    throw new Error('PPV messages must include at least one media URL');
+  }
+  if (!params.price || params.price < 100) {
+    throw new Error('PPV price must be at least 100 cents (1€)');
+  }
+  
+  return sendMessage({
+    chatId: params.chatId,
+    text: params.text,
+    mediaUrls: params.mediaUrls,
+    price: params.price,
+    isLocked: true,
   });
 }
 

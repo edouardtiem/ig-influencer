@@ -166,3 +166,8 @@ const response = await venice.chat.completions.create({
 *Session documentée le 28/12/2024*
 
 
+
+
+
+
+

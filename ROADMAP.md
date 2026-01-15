@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 9 janvier 2026 (DM Bugs Fix ✅)
+**Dernière mise à jour** : 9 janvier 2026 (IDEA-012 Comment Likes Automation 💡)
 
 ---
 
@@ -158,6 +158,7 @@ roadmap/
 
 | ID | Idée | Impact | Effort | Status | Lien |
 |----|------|--------|--------|--------|------|
+| **IDEA-012** | **👍 Automatisation Likes Commentaires** — Script auto pour liker commentaires (0 likes) sur posts similaires + 80 likes/jour max + Délais aléatoires + Tracking Supabase | 🟡 Medium | 🟡 Medium | 💡 Idea | [→](./roadmap/ideas/IDEA-012-comment-likes-automation.md) |
 | **IDEA-011** | **🔥 Fanvue Bot Uncensored** — Bot conversationnel Fanvue avec Venice Uncensored (contenu explicite/sexy) + Prompt Elena "Hot Mode" prêt | 🔴 High | 🟡 Medium | 🚀 Ready | [→](./roadmap/ideas/IDEA-011-fanvue-bot-uncensored.md) |
 | **IDEA-010** | **Stratégie X (Twitter)** — Compte X automatisé + posts + réponses commentaires + funnel DM Fanvue | 🔴 High | 🔴 High | 💡 Idea | [→](./roadmap/ideas/IDEA-010-x-twitter-strategy.md) |
 | **IDEA-009** | **Elena AI Agent** — Agent conversationnel flirty + auto-learning + Supabase tracking | 🔴 High | 🔴 High | 💡 Idea | [→](./roadmap/ideas/IDEA-009-elena-ai-agent.md) |
@@ -180,7 +181,7 @@ Total Features:
 ├── 🚧 In Progress : 3 (Elena Sexy Mode + Fanvue + Model Evolution)
 ├── 📋 Todo        : 6 
 ├── 🐛 Bugs        : 9 (9 fixed)
-└── 💡 Ideas       : 10 (Fanvue Bot Uncensored prêt à implémenter 🔥)
+└── 💡 Ideas       : 11 (Fanvue Bot Uncensored prêt à implémenter 🔥)
 ```
 
 ---
