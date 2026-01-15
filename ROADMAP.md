@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 9 janvier 2026 (IDEA-012 Comment Likes Automation 💡)
+**Dernière mise à jour** : 15 janvier 2025 (DONE-045 Fanvue DM V2 + Memory ✅)
 
 ---
 
@@ -159,7 +159,7 @@ roadmap/
 | ID | Idée | Impact | Effort | Status | Lien |
 |----|------|--------|--------|--------|------|
 | **IDEA-012** | **👍 Automatisation Likes Commentaires** — Script auto pour liker commentaires (0 likes) sur posts similaires + 80 likes/jour max + Délais aléatoires + Tracking Supabase | 🟡 Medium | 🟡 Medium | 💡 Idea | [→](./roadmap/ideas/IDEA-012-comment-likes-automation.md) |
-| **IDEA-011** | **🔥 Fanvue Bot Uncensored** — Bot conversationnel Fanvue avec Venice Uncensored (contenu explicite/sexy) + Prompt Elena "Hot Mode" prêt | 🔴 High | 🟡 Medium | 🚀 Ready | [→](./roadmap/ideas/IDEA-011-fanvue-bot-uncensored.md) |
+| ~~IDEA-011~~ | ~~Fanvue Bot Uncensored~~ — ✅ DONE via DONE-045 | - | - | ✅ Done | [→](./roadmap/done/DONE-045-fanvue-dm-v2-memory.md) |
 | **IDEA-010** | **Stratégie X (Twitter)** — Compte X automatisé + posts + réponses commentaires + funnel DM Fanvue | 🔴 High | 🔴 High | 💡 Idea | [→](./roadmap/ideas/IDEA-010-x-twitter-strategy.md) |
 | **IDEA-009** | **Elena AI Agent** — Agent conversationnel flirty + auto-learning + Supabase tracking | 🔴 High | 🔴 High | 💡 Idea | [→](./roadmap/ideas/IDEA-009-elena-ai-agent.md) |
 | **IDEA-008** | **Long-form Captions + Character Voice** — Hooks FR + textes longs + annonce bi/open | 🔴 High | 🟡 Medium | 💡 Idea | [→](./roadmap/ideas/IDEA-008-longform-captions.md) |
@@ -177,11 +177,11 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 45
+├── ✅ Done        : 46
 ├── 🚧 In Progress : 3 (Elena Sexy Mode + Fanvue + Model Evolution)
 ├── 📋 Todo        : 6 
 ├── 🐛 Bugs        : 9 (9 fixed)
-└── 💡 Ideas       : 11 (Fanvue Bot Uncensored prêt à implémenter 🔥)
+└── 💡 Ideas       : 10
 ```
 
 ---
@@ -190,6 +190,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 15/01/2025 | **🔥 Fanvue DM V2 + Memory** — Venice AI (uncensored) + Long-term memory (Claude extraction) + Language detection + PPV closing + Re-engagement 21h-1h timezone + GitHub Actions (6h/hourly) | [→](./docs/sessions/2025-01-15-fanvue-dm-v2-memory.md) |
 | 09/01/2026 | **📊 Audit Complet Elena + Content Brain V2.4** — Audit analytics IG (trend -52% clarifié comme saisonnier) + Top performers identifiés (Bali, golden hour, swimwear) + Recherche Perplexity stratégie virale + Implémentation Trending Layer (diversification lieux/outfits/poses dynamiques) | [→](./docs/sessions/2026-01-09-elena-complete-audit.md) |
 | 09/01/2026 | **🔥 Content Brain V2.4 — Trending Layer** — Intégration Perplexity API pour contenu dynamique (locations/outfits/poses trending) + 2 modes EXPERIMENT (14h) / SAFE (21h) + Safe Sexy Vocabulary + Architecture 7 couches | [→](./docs/sessions/2026-01-09-content-brain-trending-layer.md) |
 | 07/01/2025 | **🔥 NSFW Venice AI Setup** — Script génération NSFW Elena (lustify-v7) + Retry auto qualité (>1.5MB) + 3 poses explicites (face cachée) + Tests qualité validés | [→](./docs/sessions/2025-01-07-nsfw-venice-ai-setup.md) |
