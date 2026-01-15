@@ -404,10 +404,10 @@ async function refreshFanvueToken(refreshToken) {
 async function postToFanvue(accessToken, content, imageUrl) {
   log('📤 Posting to Fanvue (subscribers only)...');
   
-  // Fanvue API: text + media_urls + audience
+  // Fanvue API: text + mediaUrls (camelCase) + audience
   const postBody = {
     text: content.caption,
-    media_urls: [imageUrl],
+    mediaUrls: [imageUrl],
     audience: 'subscribers',
   };
   log(`   Request body: ${JSON.stringify(postBody)}`);
