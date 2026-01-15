@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 15 janvier 2025 (IP-005 Auto-Reply Comments 🚧)
+**Dernière mise à jour** : 15 janvier 2025 (DONE-065 Fanvue Daily Post Fix ✅)
 
 ---
 
@@ -64,6 +64,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-065 | **🔧 Fanvue Daily Post Content Filter + API Migration Fix** — Fix workflow GitHub Actions qui échouait systématiquement : stratégie "safe sexy" avec angles créatifs (11/14 body shots) + Migration API Fanvue vers multipart upload obligatoire (5 steps) + Calendrier 14 jours optimisé | 15/01/2025 | v2.51.0 | [→](./roadmap/done/DONE-065-fanvue-daily-post-content-filter-fix.md) |
 | DONE-064 | **🔧 DM Fanvue Spam & Rapid-Fire Duplicates Fix** — Fix exit message Fanvue envoyé infiniment (race condition) + Fix doublons sur messages rapides + Fresh is_stopped check + Exit message spam prevention (5min cooldown) + Rapid-fire detection (30s) | 09/01/2026 | v2.50.0 | [→](./roadmap/done/DONE-064-dm-fanvue-spam-rapid-fire-fix.md) |
 | DONE-063 | **🔥 Content Brain V2.4 — Trending Layer** — Intégration Perplexity API pour contenu dynamique (locations/outfits/poses trending) + 2 modes EXPERIMENT (14h) / SAFE (21h) + Safe Sexy Vocabulary + Architecture 7 couches | 09/01/2026 | v2.49.0 | [→](./roadmap/done/DONE-063-content-brain-trending-layer.md) |
 | DONE-062 | **🔥 NSFW Venice AI Setup** — Script génération NSFW Elena (lustify-v7) + Retry auto qualité (>1.5MB) + 3 poses explicites (face cachée) + Tests qualité validés (2.4MB, 2.5MB) | 07/01/2025 | v2.48.0 | [→](./docs/sessions/2025-01-07-nsfw-venice-ai-setup.md) |
