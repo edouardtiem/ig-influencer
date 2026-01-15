@@ -440,7 +440,15 @@ async function uploadMediaToFanvue(accessToken, imageUrl) {
     throw new Error(`Failed to get upload URL: ${error}`);
   }
   
-  const { url: signedUrl } = await urlResponse.json();
+  // Response might be plain text URL or JSON - handle both
+  const urlText = await urlResponse.text();
+  let signedUrl;
+  try {
+    const urlJson = JSON.parse(urlText);
+    signedUrl = urlJson.url || urlJson.signedUrl || urlText;
+  } catch {
+    signedUrl = urlText; // Plain URL response
+  }
   log('   ✅ Got signed URL');
   
   // Step 3: Download image from Cloudinary and upload to Fanvue
