@@ -63,15 +63,27 @@ const EXPRESSIONS = [
   'striking confident gaze, elegant smile, charming captivating presence',
 ];
 
-// Safe outfits that read as intimate
-const SAFE_INTIMATE_OUTFITS = [
-  'delicate black silk camisole top with thin straps and matching soft shorts, barefoot',
-  'elegant cream silk slip dress with lace trim, thin straps, mid-thigh length, barefoot',
-  'soft fitted ribbed tank top in nude tone and matching brief-style loungewear bottoms',
-  'luxurious oversized cream knit sweater falling off one shoulder, black brief bottoms',
-  'fitted black athletic crop top showing midriff and matching high-cut athletic briefs',
-  'delicate lace-trimmed ivory satin camisole and matching tap shorts, barefoot',
-  'soft stretchy black bodysuit with thin straps, form-fitting, showcasing silhouette',
+// ═══════════════════════════════════════════════════════════════
+// FANVUE OUTFITS - Only sexy/revealing options (NO regular clothes)
+// Bikini, lingerie, leggings, bodysuits, etc.
+// ═══════════════════════════════════════════════════════════════
+
+const FANVUE_OUTFITS = [
+  // Lingerie
+  'delicate black lace bralette with matching lace thong, sheer fabric, elegant lingerie set',
+  'white delicate lace bralette with matching lace panties, bridal style lingerie',
+  'burgundy satin lingerie set, push-up bralette with high-cut satin panties',
+  'black sheer mesh bodysuit with strategic lace panels, form-fitting',
+  'soft pink sheer babydoll with matching thong, delicate lace trim',
+  // Bikinis
+  'tiny black string bikini, triangle top, brazilian cut bottoms',
+  'white micro bikini, minimal coverage, string ties',
+  // Athletic sexy
+  'tight black sports bra showing underboob, high-waisted yoga leggings, athletic fit',
+  'cropped tank top showing midriff and sideboob, skin-tight leggings',
+  // Bodysuits
+  'black lace bodysuit, plunging neckline, high-cut legs',
+  'nude satin bodysuit, thin straps, form-fitting silhouette',
 ];
 
 // Settings that feel intimate but aren't explicit
@@ -126,7 +138,7 @@ ${ELENA_BASE},
 
 SETTING: ${INTIMATE_SETTINGS.bedroom_morning}
 
-OUTFIT: ${SAFE_INTIMATE_OUTFITS[0]},
+OUTFIT: ${FANVUE_OUTFITS[4]},
 
 POSE: ${ALLURING_POSES[0]},
 
@@ -151,7 +163,7 @@ ${ELENA_BASE},
 
 SETTING: ${INTIMATE_SETTINGS.bathroom_mirror}
 
-OUTFIT: ${SAFE_INTIMATE_OUTFITS[3]}, hair slightly damp, fresh glowing skin,
+OUTFIT: ${FANVUE_OUTFITS[1]}, hair slightly damp, fresh glowing skin,
 
 POSE: ${ALLURING_POSES[4]},
 
@@ -176,7 +188,7 @@ ${ELENA_BASE},
 
 SETTING: ${INTIMATE_SETTINGS.living_room_cozy}
 
-OUTFIT: ${SAFE_INTIMATE_OUTFITS[1]},
+OUTFIT: ${FANVUE_OUTFITS[0]},
 
 POSE: ${ALLURING_POSES[3]},
 
@@ -201,7 +213,7 @@ ${ELENA_BASE},
 
 SETTING: ${INTIMATE_SETTINGS.vanity_getting_ready}
 
-OUTFIT: ${SAFE_INTIMATE_OUTFITS[5]},
+OUTFIT: ${FANVUE_OUTFITS[2]},
 
 POSE: ${ALLURING_POSES[7]},
 
@@ -226,7 +238,7 @@ ${ELENA_BASE},
 
 SETTING: ${INTIMATE_SETTINGS.yoga_corner}
 
-OUTFIT: ${SAFE_INTIMATE_OUTFITS[4]},
+OUTFIT: ${FANVUE_OUTFITS[7]},
 
 POSE: ${ALLURING_POSES[5]},
 
@@ -251,7 +263,7 @@ ${ELENA_BASE},
 
 SETTING: ${INTIMATE_SETTINGS.balcony_sunset}
 
-OUTFIT: ${SAFE_INTIMATE_OUTFITS[2]},
+OUTFIT: ${FANVUE_OUTFITS[6]},
 
 POSE: ${ALLURING_POSES[2]},
 
@@ -301,7 +313,7 @@ ${ELENA_BASE},
 
 SETTING: ${INTIMATE_SETTINGS.bedroom_morning}
 
-OUTFIT: ${SAFE_INTIMATE_OUTFITS[6]},
+OUTFIT: ${FANVUE_OUTFITS[9]},
 
 POSE: ${ALLURING_POSES[1]},
 
@@ -326,9 +338,9 @@ ${ELENA_BASE},
 
 SETTING: ${INTIMATE_SETTINGS.living_room_cozy}, morning light
 
-OUTFIT: ${SAFE_INTIMATE_OUTFITS[3]},
+OUTFIT: ${FANVUE_OUTFITS[0]} with open sweater falling off shoulders,
 
-POSE: standing by window, hands pulling sweater down slightly, one bare leg visible, cozy casual moment,
+POSE: standing by window, sweater open showing lingerie, one bare leg visible, intimate moment,
 
 EXPRESSION: ${EXPRESSIONS[1]},
 
@@ -351,7 +363,7 @@ ${ELENA_BASE},
 
 SETTING: ${INTIMATE_SETTINGS.yoga_corner}, towel nearby, water bottle visible
 
-OUTFIT: ${SAFE_INTIMATE_OUTFITS[4]}, slight sheen of sweat, glowing skin,
+OUTFIT: ${FANVUE_OUTFITS[8]}, slight sheen of sweat, glowing skin,
 
 POSE: standing confidently, one hand on hip, towel around neck, proud accomplished energy, full body visible,
 
@@ -376,7 +388,7 @@ ${ELENA_BASE},
 
 SETTING: ${INTIMATE_SETTINGS.living_room_cozy}, evening soft lighting
 
-OUTFIT: ${SAFE_INTIMATE_OUTFITS[1]},
+OUTFIT: ${FANVUE_OUTFITS[10]},
 
 POSE: standing, hands adjusting thin strap on shoulder, hip slightly cocked, elegant feminine silhouette,
 
@@ -401,7 +413,7 @@ ${ELENA_BASE},
 
 SETTING: ${INTIMATE_SETTINGS.bedroom_morning}, messy but luxurious bedding
 
-OUTFIT: ${SAFE_INTIMATE_OUTFITS[0]},
+OUTFIT: ${FANVUE_OUTFITS[5]},
 
 POSE: lying on stomach on bed, propped up on elbows, feet playfully kicked up behind, chin resting on hands, looking at camera,
 
@@ -451,7 +463,7 @@ ${ELENA_BASE},
 
 SETTING: ${INTIMATE_SETTINGS.bedroom_morning}, soft evening lamp lighting
 
-OUTFIT: ${SAFE_INTIMATE_OUTFITS[5]},
+OUTFIT: ${FANVUE_OUTFITS[2]},
 
 POSE: sitting on bed, legs tucked to side, one hand in hair, soft romantic pose, feminine silhouette emphasized,
 
