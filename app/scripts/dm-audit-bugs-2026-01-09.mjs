@@ -44,11 +44,13 @@ async function auditBugs() {
     if (!contact.stopped_at) continue;
     
     // Get messages sent AFTER the contact was stopped
+    // Add 2 seconds buffer to ignore the message that triggered the stop (same timestamp)
+    const stoppedAtPlusBuffer = new Date(new Date(contact.stopped_at).getTime() + 2000).toISOString();
     const { data: messagesAfterStop } = await supabase
       .from('elena_dm_messages')
       .select('*')
       .eq('contact_id', contact.id)
-      .gt('created_at', contact.stopped_at)
+      .gt('created_at', stoppedAtPlusBuffer)
       .order('created_at', { ascending: true });
     
     if (messagesAfterStop?.length > 0) {

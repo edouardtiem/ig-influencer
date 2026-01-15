@@ -1731,7 +1731,7 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
     .select('id, created_at')
     .eq('contact_id', contact.id)
     .eq('direction', 'outgoing')
-    .ilike('content', '%fanvue on peut vr%') // Match exit message pattern
+    .ilike('content', '%→%fanvue.com%') // Match ALL exit messages (they all have → link pattern)
     .gte('created_at', new Date(Date.now() - 300000).toISOString()) // Last 5 minutes
     .limit(1)
     .single();
