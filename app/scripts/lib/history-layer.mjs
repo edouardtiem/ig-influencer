@@ -108,17 +108,23 @@ export async function fetchHistory(supabase, character) {
   // Infer narrative from posts
   const narrative = inferNarrative(posts);
   
-  // Get locations to avoid (last 3 days)
-  const threeDaysAgo = new Date();
-  threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+  // Get locations to avoid (last 7 days — extended to prevent repetition)
+  const sevenDaysAgoAvoid = new Date();
+  sevenDaysAgoAvoid.setDate(sevenDaysAgoAvoid.getDate() - 7);
   const recentLocations = posts
     .filter(p => {
       const postDate = new Date(p.posted_at);
-      return postDate >= threeDaysAgo;
+      return postDate >= sevenDaysAgoAvoid;
     })
     .map(p => p.location_key)
     .filter(Boolean);
   const avoidList = [...new Set(recentLocations)];
+  
+  // Also track location TYPES to force variety (not just exact locations)
+  const travelKeywordsForCount = ['bali', 'mykonos', 'maldives', 'ibiza', 'yacht', 'st_tropez', 'dubai', 'santorini', 'courchevel', 'amalfi', 'capri'];
+  const recentTravelCount = posts.slice(0, 5).filter(p => 
+    travelKeywordsForCount.some(kw => (p.location_key || '').toLowerCase().includes(kw))
+  ).length;
   
   if (avoidList.length > 0) {
     console.log(`      🚫 Avoid locations: ${avoidList.join(', ')}`);
@@ -144,6 +150,7 @@ export async function fetchHistory(supabase, character) {
     })),
     narrative,
     avoidList,
+    recentTravelCount, // How many of last 5 posts were travel — for variety enforcement
     lastDuoPost: lastDuoPost ? {
       withCharacter: lastDuoPost.with_character,
       daysAgo: daysSinceLastDuo,

@@ -76,13 +76,16 @@ Target audience: Men 26-35yo with disposable income.
 
 ${avoidList}
 
-This is for the EXPERIMENT slot (14h) — be CREATIVE, try something NEW.
+⚠️ CRITICAL: We have TOO MUCH beach/pool/vacation content lately. Need VARIETY.
+
+This is for the EXPERIMENT slot (14h) — be CREATIVE, try something NEW and DIFFERENT.
 
 Based on what's trending RIGHT NOW on Instagram (January 2026), give me:
 
 ## 1. TRENDING LOCATION (1)
 - Something FRESH and visually stunning
-- NOT: Bali, yacht, Paris apartment, spa, ski resort, rooftop (overused)
+- 🚫 BANNED: Bali, Mykonos, Maldives, yacht, St Tropez, Ibiza, Dubai (OVERUSED)
+- ✅ PREFERRED: Paris urban, Milan fashion, London exclusive, art/culture, nightlife, hotel interiors, winter destinations
 - Can be indoor or outdoor, works for revealing outfits
 
 ## 2. TRENDING "PETITE TENUE" (1)
@@ -177,60 +180,76 @@ Only return valid JSON.`;
 }
 
 // ═══════════════════════════════════════════════════════════════
-// FETCH TRENDING CONTENT (SAFE MODE - Constrained by top performers)
+// FETCH TRENDING CONTENT (SAFE MODE - Classic/timeless trending, NO analytics bias)
 // ═══════════════════════════════════════════════════════════════
 
-export async function fetchTrendingSafe(topPerformers = {}) {
+export async function fetchTrendingSafe(recentLocations = []) {
   const apiKey = process.env.PERPLEXITY_API_KEY;
   
   if (!apiKey) {
     console.log('   ⚠️ PERPLEXITY_API_KEY not found, using fallback');
-    return getFallbackTrendingSafe(topPerformers);
+    return getFallbackTrendingSafe();
   }
 
-  // Extract top performers info
-  const topLocations = topPerformers.locations || ['golden hour', 'Bali', 'travel'];
-  const topThemes = topPerformers.themes || ['vacation nostalgia', 'golden light', 'intimate moments'];
-  const topOutfitStyles = topPerformers.outfitStyles || ['swimwear', 'loungewear'];
+  // Build avoid list from recent locations
+  const avoidList = recentLocations.length > 0 
+    ? `🚫 AVOID these locations (already used recently): ${recentLocations.join(', ')}`
+    : '';
 
-  const systemPrompt = `You are an Instagram content strategist. You help create trending content that's SIMILAR to what already works, but fresh.`;
+  const systemPrompt = `You are an Instagram content strategist specializing in timeless, elegant content for female lifestyle influencers. You focus on CLASSIC aesthetics that always perform well, not fleeting trends.`;
 
-  const userPrompt = `I need SAFE content for Elena Visconti (@elenav.paris), a 24yo curvy Italian model in Paris.
+  const userPrompt = `I need SAFE/CLASSIC content for Elena Visconti (@elenav.paris), a 24yo curvy Italian model in Paris.
 
-This is for the SAFE slot (21h) — stick to what WORKS but make it fresh.
+Her aesthetic: "Street-luxe Paris Mannequin 2025" - glamorous, warm, confident, curves emphasized tastefully.
+Target audience: Men 26-35yo with disposable income.
 
-## TOP PERFORMERS (from analytics):
-- Best locations/themes: ${topLocations.join(', ')}
-- Best content themes: ${topThemes.join(', ')}
-- Best outfit styles: ${topOutfitStyles.join(', ')}
+${avoidList}
 
-Based on these top performers, give me:
+This is for the SAFE slot (21h) — focus on TIMELESS, CLASSIC content that always works.
 
-## 1. SIMILAR TRENDING LOCATION
-Something that has the SAME VIBE as the top performers but fresh
-(e.g., if Bali works → suggest similar tropical/resort destination)
+## STYLE DIRECTION
+NOT looking for experimental/edgy content. Looking for:
+- Elegant, sophisticated, timeless
+- Classic luxury aesthetics (Paris, Milan, elegant interiors)
+- Intimate but tasteful (bedroom, boudoir, spa)
+- Golden hour, soft lighting, romantic vibes
 
-## 2. SIMILAR "PETITE TENUE"
-Outfit style similar to what works, but current trending version
+## 1. CLASSIC LOCATION (1)
+Pick something TIMELESS and ELEGANT:
+- Paris: rooftops, boudoirs, luxury hotels, elegant apartments
+- European cities: Milan, London members clubs, Mediterranean terraces
+- Intimate settings: luxury bedrooms, spa, candlelit spaces
+- 🚫 NOT: Overused beach/pool destinations (Bali, Mykonos, Maldives, yacht)
+
+## 2. CLASSIC "PETITE TENUE" (1)
+Elegant, timeless outfit that always works:
+- Silk/satin slip dress or nightwear
+- Classic lingerie-inspired looks (lace, delicate)
+- Cashmere loungewear, elegant robes
+
 Use SAFE VOCABULARY for AI:
-- "bikini" → "elegant high-cut swimwear"
-- "lingerie" → "intimate sleepwear"
+- "lingerie" → "intimate sleepwear" or "delicate loungewear"
+- "sexy" → "alluring" or "captivating"
 
-## 3. TRENDING POSE
-Similar to successful poses but with current trending twist
-Include some candid/not-looking-at-camera options
+## 3. ELEGANT POSE (1)
+Classic, timeless poses:
+- Mirror reflection moments
+- Window light silhouettes
+- Seated elegance, terrace contemplation
+- Candid getting-ready moments
 
 ## 4. CAPTION
-Micro-story format that matches the winning style:
-- Hook + 2-3 story lines + soft CTA to private
+Micro-story format:
+- Atmospheric hook + 2-3 story lines + soft CTA to private
+- Elegant, mysterious, confident tone
 
 Format as JSON:
 {
-  "location": { "name": "...", "promptFragment": "...", "whyTrending": "...", "similarTo": "which top performer" },
-  "outfit": { "name": "...", "promptFragment": "safe vocabulary", "whyTrending": "..." },
-  "pose": { "name": "...", "promptFragment": "...", "whyTrending": "..." },
-  "caption": "full caption",
-  "mood": "one word"
+  "location": { "name": "...", "promptFragment": "detailed setting for AI", "whyTrending": "why this is timeless" },
+  "outfit": { "name": "...", "promptFragment": "safe vocabulary outfit description", "whyTrending": "..." },
+  "pose": { "name": "...", "promptFragment": "pose description", "whyTrending": "..." },
+  "caption": "full caption text",
+  "mood": "one word mood"
 }
 
 Only return valid JSON.`;
@@ -286,7 +305,7 @@ Only return valid JSON.`;
 
   } catch (error) {
     console.log(`   ⚠️ Trending safe fetch error: ${error.message}`);
-    return getFallbackTrendingSafe(topPerformers);
+    return getFallbackTrendingSafe();
   }
 }
 
@@ -295,92 +314,180 @@ Only return valid JSON.`;
 // ═══════════════════════════════════════════════════════════════
 
 function getFallbackTrending() {
+  // DIVERSE fallback locations — NOT just beaches/pools
   const locations = [
-    { name: 'Luxury Hotel Pool Lounge', promptFragment: 'luxury hotel rooftop pool with city skyline view, cabanas, lounge chairs, warm golden hour light, aspirational resort atmosphere', whyTrending: 'Hotel pool content trending for European influencers' },
-    { name: 'Mediterranean Terrace', promptFragment: 'elegant Mediterranean villa terrace overlooking azure sea, white architecture, bougainvillea, soft evening light', whyTrending: 'Mediterranean aesthetic viral for luxury lifestyle' },
-    { name: 'Art Gallery Opening', promptFragment: 'modern art gallery with minimalist white walls, dramatic spotlight lighting, sophisticated evening atmosphere', whyTrending: 'Cultural events content trending for fashion influencers' },
+    // Urban/City vibes
+    { name: 'Paris Rooftop Champagne', promptFragment: 'elegant Parisian rooftop terrace at golden hour, zinc rooftops stretching to horizon, Eiffel Tower silhouette in distance, champagne glasses, warm amber sunset light, sophisticated evening atmosphere', whyTrending: 'Parisian rooftop content viral for European influencers', category: 'paris' },
+    { name: 'Milan Design Hotel Lobby', promptFragment: 'sleek Milan design hotel lobby, Italian marble floors, contemporary furniture, dramatic floor-to-ceiling windows, golden afternoon light, fashion capital elegance', whyTrending: 'Milan fashion content trending during fashion season', category: 'urban' },
+    { name: 'London Members Club', promptFragment: 'exclusive London members club interior, Mayfair elegance, dark wood paneling, velvet furniture, warm fireplace glow, intimate sophisticated atmosphere', whyTrending: 'Exclusive club content trending for luxury lifestyle', category: 'urban' },
+    { name: 'Art Gallery Private View', promptFragment: 'modern art gallery private viewing, minimalist white walls with bold contemporary art, dramatic spotlight lighting, champagne in hand, sophisticated cultural evening', whyTrending: 'Cultural events content trending for fashion influencers', category: 'paris' },
+    { name: 'Parisian Boudoir', promptFragment: 'elegant Parisian boudoir, ornate gilded mirror, soft velvet chaise longue, warm candlelight, romantic intimate atmosphere, Haussmann apartment details', whyTrending: 'Intimate Parisian content viral for European aesthetic', category: 'paris' },
+    // Spa/Wellness (different vibe)
+    { name: 'Alpine Spa Sunset', promptFragment: 'luxury alpine spa exterior pool, steam rising against snow-capped mountains, warm golden sunset light, cozy winter wellness atmosphere', whyTrending: 'Winter wellness content trending in January', category: 'spa' },
+    // Only 1 beach option in fallback
+    { name: 'Amalfi Coast Terrace', promptFragment: 'elegant Amalfi Coast terrace overlooking Positano, lemon trees, bougainvillea, pastel village houses cascading to azure sea, golden hour Italian summer', whyTrending: 'Italian Riviera aesthetic always performs', category: 'travel' },
   ];
   
   const outfits = [
-    { name: 'Metallic High-Cut Swimwear', promptFragment: 'elegant metallic high-cut swimwear in champagne gold, flattering V-front silhouette emphasizing curves, luxe resort aesthetic', whyTrending: 'Metallic swimwear trending for curvy models' },
-    { name: 'Satin Slip Set', promptFragment: 'coordinated satin bralette and bias-cut slip skirt in warm nude tone, delicate intimate sleepwear aesthetic, elegant loungewear', whyTrending: 'Satin co-ords viral for evening content' },
+    { name: 'Satin Slip Dress', promptFragment: 'elegant satin slip dress in champagne gold, thin straps, flattering silhouette falling to mid-thigh, sophisticated evening aesthetic', whyTrending: 'Satin slip dresses viral for evening content' },
+    { name: 'Sheer Bodysuit + Trousers', promptFragment: 'delicate sheer bodysuit in black with high-waisted tailored trousers, elegant evening look, confident feminine silhouette', whyTrending: 'Bodysuit layering trending for fashion-forward content' },
+    { name: 'Cashmere Loungewear', promptFragment: 'luxurious cashmere loungewear set in warm camel, cropped sweater with matching wide-leg pants, cozy elegant at-home aesthetic', whyTrending: 'Elevated loungewear trending for cozy content' },
+    { name: 'LBD Parisian', promptFragment: 'classic little black dress, elegant cut, subtle décolleté, timeless Parisian chic, sophisticated evening', whyTrending: 'Classic LBD always performs for evening content' },
     { name: 'Athletic Loungewear', promptFragment: 'matching ribbed athletic loungewear set, soft support crop top with high-waist shorts, sporty chic aesthetic', whyTrending: 'Athletic intimates trending as lifestyle content' },
   ];
   
   const poses = [
-    { name: 'Seated Edge Lean', promptFragment: 'seated on edge, leaning back on hands, one leg extended, body arched naturally, looking away from camera lost in thought', whyTrending: 'Candid seated poses viral for pool/lounge content' },
-    { name: 'Over-Shoulder Glance', promptFragment: 'walking away from camera, looking over shoulder with soft knowing smile, caught mid-movement candid moment', whyTrending: 'Walk-away shots trending for storytelling' },
-    { name: 'Window Silhouette', promptFragment: 'standing by window in backlight, silhouette emphasized, profile view, contemplative expression not looking at camera', whyTrending: 'Silhouette content viral for intimate aesthetic' },
+    { name: 'Terrace Lean', promptFragment: 'leaning elegantly on terrace railing, looking at city view not camera, wind gently moving hair, contemplative sophisticated moment', whyTrending: 'Candid terrace shots trending for storytelling' },
+    { name: 'Mirror Reflection', promptFragment: 'caught in ornate mirror reflection, adjusting earring or hair, candid getting-ready moment, intimate behind-the-scenes', whyTrending: 'Mirror content viral for intimate aesthetic' },
+    { name: 'Seated Elegance', promptFragment: 'seated elegantly on velvet chair, legs crossed, one hand on armrest, confident knowing expression, sophisticated portrait', whyTrending: 'Seated portrait poses trending for fashion content' },
+    { name: 'Walking Away', promptFragment: 'walking away from camera down elegant corridor, looking over shoulder with soft smile, caught mid-movement, dynamic', whyTrending: 'Walk-away shots viral for storytelling' },
+    { name: 'Window Light', promptFragment: 'standing by tall window in natural light, profile view, contemplative expression, silhouette partially visible, artistic', whyTrending: 'Window light content trending for artistic aesthetic' },
   ];
   
   const captions = [
-    `Some views are better without explanation. ✨\n\nI found this corner by accident, stayed for the light, left with memories I'll probably post tomorrow.\n\nThe rest of this set is on my private. 🖤`,
-    `Tell me your favorite kind of trouble… and I'll dress for it.\n\nGolden hour, soft fabric, and a city that doesn't ask questions. Paris taught me that some moments are meant to be felt, not planned.\n\nThe rest of this set is on my private. 🖤`,
-    `Not all who wander are lost… some of us are just looking for better lighting.\n\nThis morning I woke up and chose chaos. The good kind. The kind that looks effortless but took three outfit changes.\n\nThe rest of this set is on my private. 🖤`,
+    `Some places just feel like they were waiting for you...\n\nParis at golden hour. The kind of light that makes everything look like a memory, even while you're still in it.\n\nThe rest of this set is on my private. 🖤`,
+    `Tell me your favorite kind of trouble… and I'll dress for it.\n\nEvening plans that started as "just one drink" and ended somewhere between champagne and chaos. The best nights always do.\n\nThe rest of this set is on my private. 🖤`,
+    `The art of doing nothing, but making it look intentional.\n\nSome evenings are meant for thinking. Others are meant for not thinking at all. This was the second kind.\n\nThe rest of this set is on my private. 🖤`,
+    `Caught somewhere between yesterday and tomorrow...\n\nThere's something about this light that makes you want to stay a little longer. So I did.\n\nThe rest of this set is on my private. 🖤`,
+    `Main character energy hits different when no one's watching.\n\nQuiet moments before the chaos. The calm before whatever comes next. I've learned to love these pauses.\n\nThe rest of this set is on my private. 🖤`,
   ];
   
-  const idx = Math.floor(Math.random() * 3);
+  // Weighted random selection — prefer Paris/urban content
+  const parisLocations = locations.filter(l => l.category === 'paris' || l.category === 'urban');
+  const useParisFirst = Math.random() < 0.6; // 60% chance to pick Paris/urban
+  
+  const selectedLocations = useParisFirst ? parisLocations : locations;
+  const locIdx = Math.floor(Math.random() * selectedLocations.length);
+  const outfitIdx = Math.floor(Math.random() * outfits.length);
+  const poseIdx = Math.floor(Math.random() * poses.length);
+  const captionIdx = Math.floor(Math.random() * captions.length);
+  
+  const moods = ['confident', 'dreamy', 'playful', 'sophisticated', 'cozy'];
   
   return {
-    location: locations[idx],
-    outfit: outfits[idx],
-    pose: poses[idx],
-    caption: captions[idx],
-    mood: ['dreamy', 'confident', 'playful'][idx],
+    location: selectedLocations[locIdx],
+    outfit: outfits[outfitIdx],
+    pose: poses[poseIdx],
+    caption: captions[captionIdx],
+    mood: moods[Math.floor(Math.random() * moods.length)],
     source: 'fallback',
   };
 }
 
-function getFallbackTrendingSafe(topPerformers) {
-  // Use top performers to guide fallback
-  const hasTravel = topPerformers.locations?.some(l => 
-    l.toLowerCase().includes('bali') || l.toLowerCase().includes('travel') || l.toLowerCase().includes('golden')
-  );
-  
-  if (hasTravel) {
-    return {
+function getFallbackTrendingSafe() {
+  // SAFE fallback — classic, timeless content (no analytics bias)
+  // Weighted random selection for variety
+
+  const safeOptions = [
+    // Option 1: Paris Evening (high weight — need more Paris content)
+    {
+      weight: 3,
       location: { 
-        name: 'Tropical Villa Morning', 
-        promptFragment: 'luxury tropical villa with infinity pool overlooking rice terraces, soft morning golden light, paradise atmosphere, Bali-inspired setting',
-        whyTrending: 'Similar to top performer: Bali/travel content',
-        similarTo: 'Bali morning content'
+        name: 'Paris Evening Glow', 
+        promptFragment: 'elegant Parisian terrace at golden hour, warm amber light, zinc rooftops stretching to horizon, Eiffel Tower silhouette, romantic evening atmosphere',
+        whyTrending: 'Golden hour Paris content consistently performs',
+        similarTo: 'Golden hour top performers'
       },
       outfit: { 
-        name: 'Resort Swimwear', 
-        promptFragment: 'elegant high-cut swimwear in warm neutral tone, flattering silhouette, luxury resort aesthetic',
-        whyTrending: 'Swimwear performs well in travel content'
+        name: 'Satin Slip Evening', 
+        promptFragment: 'elegant satin slip dress in warm champagne, thin straps, flattering silhouette falling elegantly, sophisticated evening aesthetic',
+        whyTrending: 'Evening intimate content matches audience preferences'
       },
       pose: { 
-        name: 'Poolside Contemplation', 
-        promptFragment: 'sitting at pool edge, feet in water, looking at horizon not camera, peaceful morning moment',
-        whyTrending: 'Candid pool moments match top performers'
+        name: 'Terrace Contemplation', 
+        promptFragment: 'leaning elegantly on terrace railing, looking at city view not camera, wind gently in hair, contemplative sophisticated moment',
+        whyTrending: 'Candid terrace shots match successful patterns'
       },
-      caption: `Missing these mornings... ✨\n\nThe ones where the only sound is water and the only plan is none. Bali taught me that some of the best moments come when you stop trying to capture them.\n\nThe rest of this set is on my private. 🖤`,
-      mood: 'nostalgic',
-      source: 'fallback_safe',
-    };
+      caption: `Golden hour in Paris hits different...\n\nThere's something about this light that makes everything feel possible. And maybe a little dangerous. The city doesn't ask questions at this hour.\n\nThe rest of this set is on my private. 🖤`,
+      mood: 'romantic',
+    },
+    // Option 2: Cozy Bedroom (medium weight)
+    {
+      weight: 2,
+      location: { 
+        name: 'Parisian Bedroom Morning', 
+        promptFragment: 'elegant Parisian bedroom, soft morning light through tall windows, white linen sheets, warm intimate atmosphere, Haussmann apartment details',
+        whyTrending: 'Intimate bedroom content performs well for engagement',
+        similarTo: 'Cozy intimate top performers'
+      },
+      outfit: { 
+        name: 'Delicate Loungewear', 
+        promptFragment: 'delicate silk camisole and shorts set in soft blush, intimate loungewear aesthetic, elegant at-home moment',
+        whyTrending: 'Loungewear content matches cozy aesthetic preferences'
+      },
+      pose: { 
+        name: 'Bed Stretch', 
+        promptFragment: 'stretching lazily in bed, arms above head, soft smile, morning light on face, candid waking up moment',
+        whyTrending: 'Morning stretch content viral for intimate aesthetic'
+      },
+      caption: `Some mornings deserve to be slow...\n\nThe ones where the light is too perfect to rush through. Where the sheets are warm and the coffee can wait. This was one of those.\n\nThe rest of this set is on my private. 🖤`,
+      mood: 'cozy',
+    },
+    // Option 3: Spa/Wellness (medium weight)
+    {
+      weight: 2,
+      location: { 
+        name: 'Luxury Spa Evening', 
+        promptFragment: 'luxury spa interior, steam rising, warm ambient lighting, marble surfaces, peaceful wellness atmosphere, champagne nearby',
+        whyTrending: 'Spa wellness content trending for self-care aesthetic',
+        similarTo: 'Wellness top performers'
+      },
+      outfit: { 
+        name: 'Spa Robe Elegance', 
+        promptFragment: 'plush white spa robe slightly open, elegant confident posture, fresh glowing skin, post-treatment radiance',
+        whyTrending: 'Robe content performs well for spa aesthetic'
+      },
+      pose: { 
+        name: 'Spa Relaxation', 
+        promptFragment: 'seated by spa pool edge, robe draped elegantly, looking away in peaceful contemplation, steam atmosphere',
+        whyTrending: 'Relaxation poses match wellness content patterns'
+      },
+      caption: `Self-care isn't selfish, it's survival...\n\nSome evenings you need to disappear. Steam, silence, and absolutely no notifications. The kind of reset that makes tomorrow feel possible.\n\nThe rest of this set is on my private. 🖤`,
+      mood: 'relaxed',
+    },
+    // Option 4: Urban Night (lower weight — variety)
+    {
+      weight: 1,
+      location: { 
+        name: 'Cocktail Bar Evening', 
+        promptFragment: 'sophisticated cocktail bar interior, warm ambient lighting, velvet seating, elegant glassware, intimate evening atmosphere',
+        whyTrending: 'Evening out content trending for lifestyle aesthetic',
+        similarTo: 'Evening lifestyle content'
+      },
+      outfit: { 
+        name: 'Little Black Dress', 
+        promptFragment: 'elegant little black dress, subtle décolleté, timeless Parisian chic, sophisticated evening out aesthetic',
+        whyTrending: 'LBD content classic performer for evening'
+      },
+      pose: { 
+        name: 'Bar Lean', 
+        promptFragment: 'leaning elegantly at bar, cocktail in hand, soft knowing smile, looking slightly away from camera, candid evening out',
+        whyTrending: 'Candid bar shots trending for nightlife content'
+      },
+      caption: `The best conversations happen after midnight...\n\nWhen the music gets quieter and the questions get realer. Some people are better in low light. I think I'm one of them.\n\nThe rest of this set is on my private. 🖤`,
+      mood: 'confident',
+    },
+  ];
+  
+  // Weighted random selection
+  const totalWeight = safeOptions.reduce((sum, opt) => sum + opt.weight, 0);
+  let random = Math.random() * totalWeight;
+  
+  let selected = safeOptions[0];
+  for (const option of safeOptions) {
+    random -= option.weight;
+    if (random <= 0) {
+      selected = option;
+      break;
+    }
   }
   
-  // Default safe fallback
   return {
-    location: { 
-      name: 'Golden Hour Terrace', 
-      promptFragment: 'elegant Parisian terrace at golden hour, warm amber light, city rooftops in background, romantic evening atmosphere',
-      whyTrending: 'Golden hour content consistently performs',
-      similarTo: 'Golden hour top performers'
-    },
-    outfit: { 
-      name: 'Evening Loungewear', 
-      promptFragment: 'elegant satin slip dress in warm nude, thin straps, flattering silhouette, intimate evening aesthetic',
-      whyTrending: 'Evening intimate content matches audience preferences'
-    },
-    pose: { 
-      name: 'Terrace Lean', 
-      promptFragment: 'leaning on terrace railing, looking at city view not camera, wind in hair, contemplative elegant moment',
-      whyTrending: 'Candid terrace shots match successful patterns'
-    },
-    caption: `Golden hour in Paris hits different...\n\nThere's something about this light that makes everything feel possible. And maybe a little dangerous.\n\nThe rest of this set is on my private. 🖤`,
-    mood: 'romantic',
+    location: selected.location,
+    outfit: selected.outfit,
+    pose: selected.pose,
+    caption: selected.caption,
+    mood: selected.mood,
     source: 'fallback_safe',
   };
 }
@@ -389,110 +496,67 @@ function getFallbackTrendingSafe(topPerformers) {
 // FORMAT FOR PROMPT (used in Content Brain)
 // ═══════════════════════════════════════════════════════════════
 
+/**
+ * Sanitize string to remove invalid Unicode surrogates that break JSON
+ */
+function sanitizeString(str) {
+  if (!str) return '';
+  // Remove unpaired surrogates that cause JSON errors
+  return str.replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '');
+}
+
 export function formatTrendingForPrompt(trendingExperiment, trendingSafe) {
   let output = '';
   
   if (trendingExperiment) {
+    const te = trendingExperiment;
     output += `### 🧪 TRENDING CONTENT (14h EXPERIMENT)
-**Location**: ${trendingExperiment.location.name}
-→ ${trendingExperiment.location.whyTrending}
-→ Prompt: "${trendingExperiment.location.promptFragment.substring(0, 100)}..."
+**Location**: ${sanitizeString(te.location?.name)}
+→ ${sanitizeString(te.location?.whyTrending)}
+→ Prompt: "${sanitizeString(te.location?.promptFragment || '').substring(0, 100)}..."
 
-**Outfit (Petite Tenue)**: ${trendingExperiment.outfit.name}
-→ ${trendingExperiment.outfit.whyTrending}
-→ Prompt: "${trendingExperiment.outfit.promptFragment.substring(0, 100)}..."
+**Outfit (Petite Tenue)**: ${sanitizeString(te.outfit?.name)}
+→ ${sanitizeString(te.outfit?.whyTrending)}
+→ Prompt: "${sanitizeString(te.outfit?.promptFragment || '').substring(0, 100)}..."
 
-**Pose**: ${trendingExperiment.pose.name}
-→ ${trendingExperiment.pose.whyTrending}
+**Pose**: ${sanitizeString(te.pose?.name)}
+→ ${sanitizeString(te.pose?.whyTrending)}
 
 **Suggested Caption**:
-"${trendingExperiment.caption.substring(0, 150)}..."
+"${sanitizeString(te.caption || '').substring(0, 150)}..."
 
-**Mood**: ${trendingExperiment.mood}
-**Source**: ${trendingExperiment.source}
+**Mood**: ${sanitizeString(te.mood)}
+**Source**: ${te.source}
 
 `;
   }
   
   if (trendingSafe) {
-    output += `### ✅ TRENDING CONTENT (21h SAFE)
-**Location**: ${trendingSafe.location.name}
-→ ${trendingSafe.location.whyTrending}
-${trendingSafe.location.similarTo ? `→ Similar to: ${trendingSafe.location.similarTo}` : ''}
-→ Prompt: "${trendingSafe.location.promptFragment.substring(0, 100)}..."
+    const ts = trendingSafe;
+    output += `### ✅ TRENDING CONTENT (21h SAFE/CLASSIC)
+**Location**: ${sanitizeString(ts.location?.name)}
+→ ${sanitizeString(ts.location?.whyTrending)}
+${ts.location?.similarTo ? `→ Similar to: ${sanitizeString(ts.location.similarTo)}` : ''}
+→ Prompt: "${sanitizeString(ts.location?.promptFragment || '').substring(0, 100)}..."
 
-**Outfit (Petite Tenue)**: ${trendingSafe.outfit.name}
-→ ${trendingSafe.outfit.whyTrending}
-→ Prompt: "${trendingSafe.outfit.promptFragment.substring(0, 100)}..."
+**Outfit (Petite Tenue)**: ${sanitizeString(ts.outfit?.name)}
+→ ${sanitizeString(ts.outfit?.whyTrending)}
+→ Prompt: "${sanitizeString(ts.outfit?.promptFragment || '').substring(0, 100)}..."
 
-**Pose**: ${trendingSafe.pose.name}
-→ ${trendingSafe.pose.whyTrending}
+**Pose**: ${sanitizeString(ts.pose?.name)}
+→ ${sanitizeString(ts.pose?.whyTrending)}
 
 **Suggested Caption**:
-"${trendingSafe.caption.substring(0, 150)}..."
+"${sanitizeString(ts.caption || '').substring(0, 150)}..."
 
-**Mood**: ${trendingSafe.mood}
-**Source**: ${trendingSafe.source}
+**Mood**: ${sanitizeString(ts.mood)}
+**Source**: ${ts.source}
 `;
   }
   
   return output || 'No trending content available.';
 }
 
-// ═══════════════════════════════════════════════════════════════
-// EXTRACT TOP PERFORMERS FROM ANALYTICS
-// ═══════════════════════════════════════════════════════════════
-
-export function extractTopPerformers(analytics) {
-  if (!analytics?.posts?.length) {
-    return {
-      locations: ['golden hour', 'Bali', 'travel'],
-      themes: ['vacation nostalgia', 'intimate moments'],
-      outfitStyles: ['swimwear', 'loungewear'],
-    };
-  }
-  
-  // Sort by engagement
-  const sorted = [...analytics.posts].sort((a, b) => 
-    ((b.like_count || 0) + (b.comments_count || 0) * 2) - 
-    ((a.like_count || 0) + (a.comments_count || 0) * 2)
-  );
-  
-  // Take top 5
-  const top5 = sorted.slice(0, 5);
-  
-  // Extract patterns
-  const locations = [];
-  const themes = [];
-  const outfitStyles = [];
-  
-  top5.forEach(post => {
-    const caption = (post.caption || '').toLowerCase();
-    
-    // Location patterns
-    if (caption.includes('bali') || caption.includes('rice')) locations.push('Bali');
-    if (caption.includes('golden hour') || caption.includes('golden')) locations.push('golden hour');
-    if (caption.includes('paris') || caption.includes('parisian')) locations.push('Paris');
-    if (caption.includes('spa') || caption.includes('pool')) locations.push('spa/pool');
-    if (caption.includes('beach') || caption.includes('ocean')) locations.push('beach');
-    if (caption.includes('hotel') || caption.includes('suite')) locations.push('hotel');
-    
-    // Theme patterns
-    if (caption.includes('missing') || caption.includes('throwback')) themes.push('vacation nostalgia');
-    if (caption.includes('morning') || caption.includes('sunrise')) themes.push('morning moments');
-    if (caption.includes('night') || caption.includes('evening')) themes.push('evening vibes');
-    if (caption.includes('cozy') || caption.includes('cosy')) themes.push('cozy intimate');
-    
-    // Outfit patterns (from prompt_hints if available)
-    const hints = (post.prompt_hints || '').toLowerCase();
-    if (hints.includes('swimwear') || hints.includes('bikini')) outfitStyles.push('swimwear');
-    if (hints.includes('loungewear') || hints.includes('robe')) outfitStyles.push('loungewear');
-    if (hints.includes('dress') || hints.includes('slip')) outfitStyles.push('slip dress');
-  });
-  
-  return {
-    locations: [...new Set(locations)].slice(0, 5) || ['golden hour', 'Bali'],
-    themes: [...new Set(themes)].slice(0, 3) || ['vacation nostalgia'],
-    outfitStyles: [...new Set(outfitStyles)].slice(0, 3) || ['swimwear', 'loungewear'],
-  };
-}
+// NOTE: extractTopPerformers() was removed to avoid analytics bias
+// The trending layer now uses Perplexity 100% for both EXPERIMENT and SAFE slots
+// This prevents the circular "Bali performs well → more Bali → Bali performs well" loop

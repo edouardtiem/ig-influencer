@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 15 janvier 2025 (DONE-045 Fanvue DM V2 + Memory ✅)
+**Dernière mise à jour** : 15 janvier 2025 (IP-005 Auto-Reply Comments 🚧)
 
 ---
 
@@ -23,6 +23,7 @@ roadmap/
 
 | ID | Feature | Priorité | Branche | Lien |
 |----|---------|----------|---------|------|
+| IP-005 | **💬 Auto-Reply Comments** — Backend API créé + ManyChat AI configuré pour réponses auto commentaires IG | 🔴 High | main | [→](./roadmap/in-progress/IP-005-auto-reply-comments.md) |
 | IP-004 | **🔥 Elena Sexy Mode** — 1 post/jour à 21h, contenu suggestif (bikini/lingerie/sport) | 🔴 High | main | [→](./docs/sessions/2024-12-27-elena-sexy-mode.md) |
 | IP-003 | **💰 Fanvue Monetization** — Packs photos Elena + ManyChat DM automation | 🔴 High | main | [→](./docs/sessions/2024-12-25-fanvue-pack-elena.md) |
 | IP-002 | **🔴 Model Evolution** — Mila Tesla Red + Elena blonde + bi/open relationship | 🟡 Medium | main | [→](./roadmap/in-progress/IP-002-model-evolution.md) |
@@ -158,6 +159,7 @@ roadmap/
 
 | ID | Idée | Impact | Effort | Status | Lien |
 |----|------|--------|--------|--------|------|
+| ~~IDEA-013~~ | ~~Auto-Reply Comments~~ — Moved to IP-005 | - | - | 🚧 Dev | [→](./roadmap/in-progress/IP-005-auto-reply-comments.md) |
 | **IDEA-012** | **👍 Automatisation Likes Commentaires** — Script auto pour liker commentaires (0 likes) sur posts similaires + 80 likes/jour max + Délais aléatoires + Tracking Supabase | 🟡 Medium | 🟡 Medium | 💡 Idea | [→](./roadmap/ideas/IDEA-012-comment-likes-automation.md) |
 | ~~IDEA-011~~ | ~~Fanvue Bot Uncensored~~ — ✅ DONE via DONE-045 | - | - | ✅ Done | [→](./roadmap/done/DONE-045-fanvue-dm-v2-memory.md) |
 | **IDEA-010** | **Stratégie X (Twitter)** — Compte X automatisé + posts + réponses commentaires + funnel DM Fanvue | 🔴 High | 🔴 High | 💡 Idea | [→](./roadmap/ideas/IDEA-010-x-twitter-strategy.md) |
@@ -178,10 +180,10 @@ roadmap/
 ```
 Total Features:
 ├── ✅ Done        : 46
-├── 🚧 In Progress : 3 (Elena Sexy Mode + Fanvue + Model Evolution)
+├── 🚧 In Progress : 4 (Auto-Reply Comments + Elena Sexy Mode + Fanvue + Model Evolution)
 ├── 📋 Todo        : 6 
 ├── 🐛 Bugs        : 9 (9 fixed)
-└── 💡 Ideas       : 10
+└── 💡 Ideas       : 11
 ```
 
 ---
@@ -190,6 +192,8 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 15/01/2025 | **💬 Auto-Reply Comments Backend** — Endpoint `/api/comment/reply` créé + Claude Sonnet + Spam detection + Table Supabase + Tests OK + ManyChat AI configuré (solution finale) | [→](./docs/sessions/2025-01-15-auto-reply-comments-backend.md) |
+| 15/01/2025 | **💬 Auto-Reply Comments Exploration** — 2 options analysées (ManyChat natif vs webhook custom) + Documentation IDEA-013 + Plan implémentation 3h | [→](./docs/sessions/2025-01-15-auto-reply-comments-exploration.md) |
 | 15/01/2025 | **🔥 Fanvue DM V2 + Memory** — Venice AI (uncensored) + Long-term memory (Claude extraction) + Language detection + PPV closing + Re-engagement 21h-1h timezone + GitHub Actions (6h/hourly) | [→](./docs/sessions/2025-01-15-fanvue-dm-v2-memory.md) |
 | 09/01/2026 | **📊 Audit Complet Elena + Content Brain V2.4** — Audit analytics IG (trend -52% clarifié comme saisonnier) + Top performers identifiés (Bali, golden hour, swimwear) + Recherche Perplexity stratégie virale + Implémentation Trending Layer (diversification lieux/outfits/poses dynamiques) | [→](./docs/sessions/2026-01-09-elena-complete-audit.md) |
 | 09/01/2026 | **🔥 Content Brain V2.4 — Trending Layer** — Intégration Perplexity API pour contenu dynamique (locations/outfits/poses trending) + 2 modes EXPERIMENT (14h) / SAFE (21h) + Safe Sexy Vocabulary + Architecture 7 couches | [→](./docs/sessions/2026-01-09-content-brain-trending-layer.md) |

@@ -29,7 +29,7 @@ import { fetchHistory, formatHistoryForPrompt, suggestNarrativeArc } from './lib
 import { fetchContext, formatContextForPrompt } from './lib/context-layer.mjs';
 import { fetchMemories, formatMemoriesForPrompt } from './lib/memories-layer.mjs';
 import { fetchRelationship, formatRelationshipForPrompt } from './lib/relationship-layer.mjs';
-import { fetchTrendingExperiment, fetchTrendingSafe, formatTrendingForPrompt, extractTopPerformers } from './lib/trending-layer.mjs';
+import { fetchTrendingExperiment, fetchTrendingSafe, formatTrendingForPrompt } from './lib/trending-layer.mjs';
 
 // ===========================================
 // CONFIG
@@ -320,7 +320,9 @@ function getOptimalPostingTimes(dayOfWeek, analytics = null, character = null) {
 // ===========================================
 
 const ELENA_SEXY_LOCATIONS = [
-  // BEACH & POOL — Bikini content
+  // ═══════════════════════════════════════════════════════════════
+  // BEACH & POOL — Bikini content (LIMIT: max 2/week)
+  // ═══════════════════════════════════════════════════════════════
   'yacht_mediterranean: Yacht Méditerranée (deck, champagne, sunset)',
   'st_tropez_beach: Plage St Tropez (Club 55, yacht, rosé)',
   'mykonos_villa: Villa Mykonos (infinity pool, sunset, Scorpios)',
@@ -328,18 +330,47 @@ const ELENA_SEXY_LOCATIONS = [
   'ibiza_villa: Villa Ibiza (infinity pool, sunset)',
   'dubai_marina: Penthouse Dubai Marina (infinity pool, skyline)',
   'bali_villa: Villa Bali (infinity pool, rizières)',
+  'santorini_pool: Hotel Santorini (caldera view, infinity pool, dômes bleus)',
+  'amalfi_terrace: Terrasse Amalfi Coast (Positano, citrons, mer)',
+  'capri_beach: Plage Capri (Faraglioni, eau cristalline)',
   
+  // ═══════════════════════════════════════════════════════════════
   // BEDROOM & BATHROOM — Lingerie content
-  'loft_bedroom: Chambre Elena (vanity Hollywood lights, lit king size, draps soie)',
+  // ═══════════════════════════════════════════════════════════════
+  'loft_bedroom: Chambre Elena Paris 8e (vanity Hollywood lights, lit king size, draps soie)',
   'bathroom_luxe: Salle de bain Elena marble & gold (baignoire, miroir)',
+  'hotel_suite_paris: Suite Palace Parisien (lit baldaquin, vue Eiffel, luxe)',
+  'milan_hotel_suite: Suite Hotel Milan (design italien, lumière dorée)',
   
+  // ═══════════════════════════════════════════════════════════════
   // SPA & WELLNESS — Swimwear/robe content
+  // ═══════════════════════════════════════════════════════════════
   'spa_mountains: Spa Alpes (piscine extérieure chauffée, neige, montagnes)',
   'spa_paris: Spa parisien luxe (hammam, piscine, robe)',
   'courchevel_chalet: Chalet Courchevel (jacuzzi, montagne, après-ski)',
   
-  // FITNESS — Sport moulant content
+  // ═══════════════════════════════════════════════════════════════
+  // PARIS LIFESTYLE — Urban sexy (IMPORTANT FOR VARIETY)
+  // ═══════════════════════════════════════════════════════════════
   'loft_living: Loft Elena Paris 8e (yoga, pilates, morning workout)',
+  'paris_rooftop_sunset: Rooftop Parisien (toits zinc, Eiffel au loin, champagne sunset)',
+  'paris_hotel_pool: Piscine Hôtel Paris (intérieur Art Déco, mosaïques, lumière tamisée)',
+  'paris_boudoir: Boudoir parisien (miroirs, velours, lumière intime)',
+  
+  // ═══════════════════════════════════════════════════════════════
+  // FASHION & GLAMOUR — High fashion sexy
+  // ═══════════════════════════════════════════════════════════════
+  'milan_fashion_backstage: Backstage Fashion Show Milan (miroirs, lumières, énergie)',
+  'paris_atelier: Atelier Haute Couture Paris (mannequins, tissus, lumière naturelle)',
+  'art_gallery_paris: Galerie Art Paris (murs blancs, oeuvres contemporaines, minimaliste)',
+  'opera_escalier: Escalier Opéra Garnier (marbre, dorures, majestueux)',
+  
+  // ═══════════════════════════════════════════════════════════════
+  // CITY EVENING — Urban night vibes
+  // ═══════════════════════════════════════════════════════════════
+  'paris_bar_chic: Bar à cocktails Paris (velours, lumière tamisée, sophistiqué)',
+  'milan_aperitivo: Terrasse Navigli Milan (sunset, Aperol, ambiance italienne)',
+  'london_club: Members Club London (Mayfair, cuir, boiseries, exclusive)',
 ];
 
 const ELENA_SEXY_OUTFIT_CATEGORIES = {
@@ -491,17 +522,48 @@ function getExplorationRequirements(character, history, analytics, postsCount) {
   );
   
   // ═══════════════════════════════════════════════════════════════
-  // RULE 3b: Check if stuck in travel content — SUGGEST VARIETY
+  // RULE 3b: Check if stuck in travel content — FORCE VARIETY
   // ═══════════════════════════════════════════════════════════════
   const travelCount = recentLocations.filter(loc => 
     travelKeywords.some(kw => (loc || '').toLowerCase().includes(kw))
   ).length;
   
-  if (travelCount >= 4 && character === 'elena') {
+  // Count specific repeated destinations
+  const locationCounts = {};
+  recentLocations.forEach(loc => {
+    const base = (loc || '').toLowerCase().replace(/_flashback|_throwback/g, '');
+    locationCounts[base] = (locationCounts[base] || 0) + 1;
+  });
+  const repeatedLocations = Object.entries(locationCounts)
+    .filter(([_, count]) => count >= 2)
+    .map(([loc, count]) => `${loc}(${count}x)`);
+  
+  if (travelCount >= 3 && character === 'elena') {
     requirements.push({
-      type: 'suggest_variety',
-      rule: 'VARIÉTÉ SUGGÉRÉE: Inclure 1 post Paris (loft, café, spa parisien) OU une destination différente',
-      reason: `${travelCount}/5 derniers posts sont en voyage — ajouter de la variété dans les lieux`,
+      type: 'force_paris_content',
+      rule: `⚠️ OBLIGATOIRE: Au moins 1 post DOIT être à PARIS (loft, rooftop, hotel pool, bar, galerie, opéra) — PAS de plage/piscine/yacht`,
+      reason: `ALERTE RÉPÉTITION: ${travelCount}/5 derniers posts sont travel/vacation. Besoin urgent de contenu Paris lifestyle.`,
+      priority: 'HIGH',
+    });
+  }
+  
+  if (repeatedLocations.length > 0) {
+    requirements.push({
+      type: 'avoid_repeated_destinations',
+      rule: `🚫 INTERDIT de réutiliser: ${repeatedLocations.join(', ')} — choisir des destinations DIFFÉRENTES`,
+      reason: `Ces destinations ont été utilisées plusieurs fois récemment`,
+      priority: 'HIGH',
+    });
+  }
+  
+  // Mood variety check
+  const recentMoods = history?.recentPosts?.slice(0, 5).map(p => p.mood) || [];
+  const nostalgicCount = recentMoods.filter(m => m === 'nostalgic').length;
+  if (nostalgicCount >= 3) {
+    requirements.push({
+      type: 'mood_variety',
+      rule: `🎭 VARIER LES MOODS: Éviter "nostalgic" — essayer: confident, playful, dreamy, cozy, adventurous`,
+      reason: `${nostalgicCount}/5 derniers posts sont "nostalgic" — trop de throwbacks`,
     });
   }
   
@@ -908,23 +970,23 @@ async function generateSchedule(character) {
   if (character === 'elena') {
     console.log('\n🔥 Fetching trending content (Perplexity)...');
     
-    // Get recent locations to avoid
-    const recentLocations = (history?.posts || [])
-      .slice(0, 5)
-      .map(p => p.location || '')
-      .filter(Boolean);
+    // Get recent locations to avoid — use the full avoidList from history (7 days)
+    const recentLocations = history?.avoidList || [];
+    console.log(`   🚫 Avoid list (7 days): ${recentLocations.slice(0, 8).join(', ')}${recentLocations.length > 8 ? '...' : ''}`);
     
-    // Extract top performers from analytics for SAFE slot
-    const topPerformers = extractTopPerformers(analytics);
+    // NOTE: No longer using analytics for trending — avoids bias/circular recommendations
+    // Both slots now use Perplexity with different styles:
+    // - EXPERIMENT (14h): Creative, edgy, new trends
+    // - SAFE (21h): Classic, timeless, elegant
     
-    // Fetch both in parallel
+    // Fetch both in parallel — both use recentLocations to avoid repetition
     [trendingExperiment, trendingSafe] = await Promise.all([
       fetchTrendingExperiment(recentLocations),
-      fetchTrendingSafe(topPerformers),
+      fetchTrendingSafe(recentLocations),  // No more analytics dependency!
     ]);
     
     console.log(`   🧪 EXPERIMENT: ${trendingExperiment?.location?.name || 'fallback'} (${trendingExperiment?.source})`);
-    console.log(`   ✅ SAFE: ${trendingSafe?.location?.name || 'fallback'} (${trendingSafe?.source})`);
+    console.log(`   ✅ SAFE/CLASSIC: ${trendingSafe?.location?.name || 'fallback'} (${trendingSafe?.source})`);
   }
 
   // Get exploration requirements (pass postsCount for min reels rule)
@@ -1047,6 +1109,7 @@ async function generateSchedule(character) {
         reel_theme: null,
         content_type: p.content_type,
         is_experiment: p.is_experiment || false,
+        trending_source: p.trending_source || null,  // Track Perplexity vs fallback
         reasoning: p.reasoning,
         location_key: p.location_key,
         location_name: p.location_name,
