@@ -413,7 +413,7 @@ async function postToFanvue(accessToken, content, imageUrl) {
     body: JSON.stringify({
       content: content.caption,
       media_urls: [imageUrl],
-      is_premium: true, // Subscribers only, not free followers
+      audience: 'subscribers', // Subscribers only, not free followers
     }),
   });
 
