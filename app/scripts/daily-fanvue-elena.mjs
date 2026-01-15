@@ -401,23 +401,111 @@ async function refreshFanvueToken(refreshToken) {
   };
 }
 
+async function uploadMediaToFanvue(accessToken, imageUrl) {
+  log('   📤 Step 1: Creating upload session...');
+  
+  const headers = {
+    'Authorization': `Bearer ${accessToken}`,
+    'Content-Type': 'application/json',
+    'X-Fanvue-API-Version': '2025-06-26',
+  };
+  
+  // Step 1: Create upload session
+  const sessionResponse = await fetch(`${FANVUE_API_URL}/media/uploads`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      name: 'Elena Daily Post',
+      filename: 'elena-post.jpg',
+      mediaType: 'image',
+    }),
+  });
+  
+  if (!sessionResponse.ok) {
+    const error = await sessionResponse.text();
+    throw new Error(`Failed to create upload session: ${error}`);
+  }
+  
+  const { mediaUuid, uploadId } = await sessionResponse.json();
+  log(`   ✅ Upload session created: ${mediaUuid}`);
+  
+  // Step 2: Get signed URL for upload
+  log('   📤 Step 2: Getting signed upload URL...');
+  const urlResponse = await fetch(`${FANVUE_API_URL}/media/uploads/${uploadId}/parts/1/url`, {
+    headers,
+  });
+  
+  if (!urlResponse.ok) {
+    const error = await urlResponse.text();
+    throw new Error(`Failed to get upload URL: ${error}`);
+  }
+  
+  const { url: signedUrl } = await urlResponse.json();
+  log('   ✅ Got signed URL');
+  
+  // Step 3: Download image from Cloudinary and upload to Fanvue
+  log('   📤 Step 3: Uploading image to Fanvue...');
+  const imageResponse = await fetch(imageUrl);
+  const imageBuffer = await imageResponse.arrayBuffer();
+  
+  const uploadResponse = await fetch(signedUrl, {
+    method: 'PUT',
+    body: imageBuffer,
+    headers: {
+      'Content-Type': 'image/jpeg',
+    },
+  });
+  
+  if (!uploadResponse.ok) {
+    throw new Error(`Failed to upload image: ${uploadResponse.status}`);
+  }
+  
+  const etag = uploadResponse.headers.get('ETag');
+  log(`   ✅ Image uploaded, ETag: ${etag}`);
+  
+  // Step 4: Complete upload session
+  log('   📤 Step 4: Completing upload session...');
+  const completeResponse = await fetch(`${FANVUE_API_URL}/media/uploads/${uploadId}`, {
+    method: 'PATCH',
+    headers,
+    body: JSON.stringify({
+      parts: [{ PartNumber: 1, ETag: etag?.replace(/"/g, '') || '' }],
+    }),
+  });
+  
+  if (!completeResponse.ok) {
+    const error = await completeResponse.text();
+    throw new Error(`Failed to complete upload: ${error}`);
+  }
+  
+  log('   ✅ Upload completed');
+  return mediaUuid;
+}
+
 async function postToFanvue(accessToken, content, imageUrl) {
   log('📤 Posting to Fanvue (subscribers only)...');
   
-  // Fanvue API: text + mediaUrls (camelCase) + audience
+  const headers = {
+    'Authorization': `Bearer ${accessToken}`,
+    'Content-Type': 'application/json',
+    'X-Fanvue-API-Version': '2025-06-26',
+  };
+  
+  // First, upload the media to Fanvue's servers
+  const mediaUuid = await uploadMediaToFanvue(accessToken, imageUrl);
+  
+  // Then create the post with the uploaded media UUID
+  log('   📤 Step 5: Creating post...');
   const postBody = {
     text: content.caption,
-    mediaUrls: [imageUrl],
+    mediaUuids: [mediaUuid],
     audience: 'subscribers',
   };
   log(`   Request body: ${JSON.stringify(postBody)}`);
   
   const response = await fetch(`${FANVUE_API_URL}/posts`, {
     method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
+    headers,
     body: JSON.stringify(postBody),
   });
 
