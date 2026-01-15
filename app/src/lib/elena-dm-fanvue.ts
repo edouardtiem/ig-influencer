@@ -352,7 +352,7 @@ export async function getAvailablePPV(
 
   // If we have profile preferences, prioritize matching content
   if (profile?.content_preferences?.length || profile?.tone_preference) {
-    return available.sort((a, b) => {
+    return available.sort((a: PPVContent, b: PPVContent) => {
       let scoreA = 0;
       let scoreB = 0;
 

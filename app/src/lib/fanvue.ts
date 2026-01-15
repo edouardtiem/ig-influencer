@@ -278,7 +278,7 @@ export function getTokens(): FanvueTokens | null {
 // ===========================================
 
 interface FanvueApiOptions {
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   body?: unknown;
 }
 
@@ -396,9 +396,10 @@ interface SendMessageParams {
  * @param params.isLocked - If true with price, media is locked until payment
  */
 export async function sendMessage(params: SendMessageParams): Promise<unknown> {
-  const isPPV = params.price && params.price > 0;
+  const price = params.price;
+  const isPPV = price && price > 0;
   
-  console.log(`[Fanvue] Sending ${isPPV ? 'PPV' : 'free'} message to chat ${params.chatId}${isPPV ? ` (${params.price / 100}€)` : ''}...`);
+  console.log(`[Fanvue] Sending ${isPPV ? 'PPV' : 'free'} message to chat ${params.chatId}${isPPV ? ` (${price / 100}€)` : ''}...`);
   
   const body: Record<string, unknown> = {
     text: params.text,
@@ -410,7 +411,7 @@ export async function sendMessage(params: SendMessageParams): Promise<unknown> {
   
   // PPV message configuration
   if (isPPV) {
-    body.price = params.price;
+    body.price = price;
     body.is_locked = params.isLocked !== false; // Default to locked if price is set
   }
   

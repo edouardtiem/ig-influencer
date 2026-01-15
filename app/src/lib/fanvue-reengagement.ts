@@ -36,6 +36,19 @@ export interface ReengagementResult {
   error?: string;
 }
 
+interface ReengagementContactRow {
+  id: string;
+  fanvue_user_id: string;
+  fanvue_chat_id: string | null;
+  username: string | null;
+  stage: string;
+  message_count: number;
+  detected_language: string | null;
+  last_user_message_at: string;
+  last_reengagement_at: string | null;
+  reengagement_count: number;
+}
+
 // ===========================================
 // CONFIGURATION
 // ===========================================
@@ -260,19 +273,19 @@ export async function getReengagementCandidates(
   }
   
   // Get profiles for these contacts
-  const contactIds = contacts.map(c => c.id);
+  const contactIds = (contacts as ReengagementContactRow[]).map(c => c.id);
   
   const { data: profiles } = await supabase
     .from('fanvue_user_profiles')
     .select('*')
     .in('contact_id', contactIds);
   
-  const profileMap = new Map(
-    profiles?.map(p => [p.contact_id, p]) || []
+  const profileMap = new Map<string, FanvueUserProfile>(
+    profiles?.map((p: FanvueUserProfile) => [p.contact_id, p] as [string, FanvueUserProfile]) || []
   );
   
   // Combine contacts with profiles
-  return contacts.map(contact => ({
+  return (contacts as ReengagementContactRow[]).map(contact => ({
     ...contact,
     profile: profileMap.get(contact.id) || null,
   }));
