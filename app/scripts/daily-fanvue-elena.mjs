@@ -49,167 +49,155 @@ const dayArg = args.find(a => a.startsWith('--day'));
 const FORCED_DAY = dayArg ? parseInt(args[args.indexOf(dayArg) + 1] || args[args.indexOf('--day') + 1]) : null;
 
 // ═══════════════════════════════════════════════════════════════
-// CONTENT CALENDAR (inline for script portability)
+// CONTENT CALENDAR - SAFE SEXY STRATEGY
+// Uses creative angles, body-focused shots, and filter-friendly vocabulary
 // ═══════════════════════════════════════════════════════════════
 
-const REFERENCE_INSTRUCTION = `You are provided with reference images in order:
+// Simplified reference - focus on consistency, not explicit descriptions
+const REFERENCE_INSTRUCTION = `You are provided with reference images. Match the subject EXACTLY:
+- Same face shape, features, and beauty mark on right cheekbone
+- Same bronde hair with golden blonde balayage highlights
+- Same body proportions and feminine figure
+- Same gold jewelry (chain bracelet, layered necklaces)`;
 
-**IMAGE 1 (FACE REFERENCE)**: This is Elena's face. Copy this EXACTLY:
-- Same soft round pleasant face shape (NOT angular, NOT sharp jawline)
-- Same smooth feminine jawline and rounded chin
-- Same honey brown warm almond-shaped eyes
-- Same naturally full lips nude-pink color
-- Same small beauty mark on right cheekbone (SIGNATURE MARK)
-- Same bronde hair with VISIBLE golden blonde balayage highlights
-- Same naturally thick well-groomed eyebrows
-
-**IMAGE 2 (BODY REFERENCE)**: This is Elena's body. Match these proportions EXACTLY:
-- Same feminine shapely figure (NOT skinny, NOT thin)
-- Same very large natural F-cup breasts (prominent, NOT reduced)
-- Same narrow defined waist
-- Same wide feminine hips
-
-CRITICAL: Face MUST be identical to Image 1. Body proportions MUST match Image 2.`;
-
-const ELENA_BASE = `soft round pleasant face NOT angular, warm approachable features,
+// Safe vocabulary - no explicit body descriptions
+const ELENA_BASE = `24 year old Italian woman, warm approachable features,
 bronde hair dark roots with golden blonde balayage long beach waves,
-honey brown warm almond-shaped eyes, naturally thick eyebrows,
-small beauty mark on right cheekbone (SIGNATURE),
-gold chunky chain bracelet on left wrist ALWAYS visible,
+honey brown almond-shaped eyes, naturally thick eyebrows,
+small beauty mark on right cheekbone,
+gold chunky chain bracelet on left wrist,
 layered gold necklaces with medallion pendant,
-feminine shapely figure 172cm, very large natural F-cup breasts,
-narrow defined waist, wide feminine hips`;
+feminine shapely figure, Italian curves`;
 
-const ELENA_FINAL_CHECK = `FINAL CHECK - MUST MATCH REFERENCES:
-- SINGLE IMAGE ONLY - NO collages, NO grids, NO patchwork, NO multiple photos combined
-- Face: IDENTICAL to Image 1 (soft round face, NOT angular)
-- Body: IDENTICAL to Image 2 (shapely with large bust visible)
-- Hair: bronde with VISIBLE golden blonde balayage
-- Beauty mark: on right cheekbone MUST be visible
-- Jewelry: gold bracelet, layered gold necklaces`;
+const ELENA_FINAL_CHECK = `CRITICAL REQUIREMENTS:
+- SINGLE IMAGE ONLY - NO collages, NO grids, NO multiple photos
+- Match reference face and body exactly
+- Beauty mark on right cheekbone visible when face shown
+- Gold jewelry visible when applicable`;
 
-// Safe-sexy expressions
+// Safe-sexy expressions using approved vocabulary
 const EXPRESSIONS = [
-  'captivating warm gaze directly at camera, soft confident smile, magnetic feminine presence',
-  'enchanting eyes with playful knowing smile, radiating warmth and charm',
-  'alluring gaze with soft parted lips, eyes sparkling with feminine allure',
-  'inviting warm expression, confident soft smile, eyes full of warmth',
-  'striking confident gaze, elegant smile, charming captivating presence',
+  'captivating warm gaze, soft confident smile, magnetic presence',
+  'enchanting eyes with playful knowing smile, radiating charm',
+  'alluring gaze, soft parted lips, sparkling feminine allure',
+  'inviting warm expression, confident soft smile',
+  'striking confident gaze, elegant charming presence',
 ];
 
-// 14-day calendar
+// 14-day calendar with CREATIVE ANGLES and SAFE SEXY approach
+// Key strategies: high-angle selfies, body without head, over-shoulder, from above
 const DAILY_CALENDAR = [
   {
-    day: 1, id: 'morning_bed_stretch', name: 'Morning Stretch',
+    day: 1, id: 'morning_selfie_above', name: 'Morning From Above',
     caption: 'Good morning from Paris... barely awake 💋',
-    setting: 'Elegant Parisian apartment bedroom, king bed with crisp white linen sheets and cream pillows, soft morning golden light through sheer curtains, warm intimate atmosphere',
-    outfit: 'delicate black silk camisole top with thin straps and matching soft shorts, barefoot',
-    pose: 'lounging elegantly on bed, propped on elbow, legs naturally positioned, hair flowing on pillows',
+    setting: 'Elegant Parisian bedroom, crisp white linen sheets, soft morning golden light',
+    outfit: 'oversized white t-shirt as sleepwear, hair messy on pillow',
+    pose: 'HIGH ANGLE SELFIE from above looking down at her lying in bed, phone held above face, soft morning light illuminating her face and pillow, intimate morning moment',
     expression: EXPRESSIONS[0],
   },
   {
-    day: 2, id: 'bathroom_mirror_selfie', name: 'Mirror Moment',
+    day: 2, id: 'mirror_body_crop', name: 'Mirror Moment',
     caption: 'Just got out of the shower... 🚿✨',
-    setting: 'Luxurious marble bathroom, large ornate gold-framed mirror, soft warm lighting, steam from shower visible, spa-like intimate setting',
-    outfit: 'luxurious oversized cream knit sweater falling off one shoulder, black brief bottoms, hair slightly damp, fresh glowing skin',
-    pose: 'taking mirror selfie with phone, body slightly angled to show curves, natural candid moment',
-    expression: EXPRESSIONS[1],
+    setting: 'Luxurious marble bathroom, large gold-framed mirror, soft warm lighting, steam visible',
+    outfit: 'white fluffy bathrobe loosely tied, hair wrapped in towel turban, fresh dewy skin',
+    pose: 'BODY-FOCUSED mirror selfie cropped from neck down, robe slightly open showing collarbone, phone visible in mirror, bathroom mirror reflection',
+    expression: 'face not visible - body shot only',
   },
   {
-    day: 3, id: 'sofa_evening', name: 'Sofa Vibes',
+    day: 3, id: 'sofa_legs_closeup', name: 'Sofa Vibes',
     caption: 'Netflix and... 🍷',
-    setting: 'Bright Parisian loft with dusty rose velvet sofa, herringbone parquet floor, tall French windows, soft afternoon light, cozy intimate space',
-    outfit: 'elegant cream silk slip dress with lace trim, thin straps, mid-thigh length, barefoot',
-    pose: 'lying on sofa, one arm above head, body curved gracefully, relaxed confident pose',
-    expression: EXPRESSIONS[2],
+    setting: 'Parisian loft with dusty rose velvet sofa, herringbone floor, soft afternoon light, wine glass on side table',
+    outfit: 'cozy oversized cream knit sweater, bare legs visible',
+    pose: 'LEGS AND LOWER BODY FOCUS shot from her POV looking down at her legs stretched on sofa, sweater covering torso, wine glass in hand, cozy intimate moment',
+    expression: 'face not visible - POV leg shot',
   },
   {
-    day: 4, id: 'vanity_getting_ready', name: 'Getting Ready',
+    day: 4, id: 'vanity_over_shoulder', name: 'Getting Ready',
     caption: 'Getting ready for something special tonight... 💄',
-    setting: 'Elegant vanity area with Hollywood mirror lights, makeup scattered on marble top, getting ready intimate moment',
-    outfit: 'delicate lace-trimmed ivory satin camisole and matching tap shorts, barefoot',
-    pose: 'sitting at vanity applying lipstick, mirror reflection visible, intimate getting ready moment',
-    expression: EXPRESSIONS[3],
+    setting: 'Elegant vanity area with Hollywood mirror lights, makeup scattered on marble',
+    outfit: 'silk champagne robe, hair being styled, elegant earrings visible',
+    pose: 'OVER SHOULDER shot FROM BEHIND, back and bare shoulder visible, blurred mirror reflection in background, focus on shoulder and hair, getting ready moment',
+    expression: 'face not visible - back/shoulder focus',
   },
   {
-    day: 5, id: 'yoga_flexibility', name: 'Yoga Time',
+    day: 5, id: 'yoga_from_above', name: 'Yoga Time',
     caption: 'Flexibility is key 🧘‍♀️',
-    setting: 'Minimalist home yoga corner, black yoga mat on light wood floor, large mirror, soft natural light, peaceful wellness space',
-    outfit: 'fitted black athletic crop top showing midriff and matching high-cut athletic briefs',
-    pose: 'stretching on yoga mat, impressive flexibility displayed, athletic feminine strength',
+    setting: 'Minimalist yoga corner, black mat on light wood floor, plants, natural light',
+    outfit: 'black fitted athletic wear, sports top and high-waisted leggings',
+    pose: 'HIGH ANGLE shot from above showing her in yoga pose on mat, body stretched elegantly, artistic top-down composition, fitness aesthetic',
     expression: EXPRESSIONS[4],
   },
   {
-    day: 6, id: 'balcony_golden_hour', name: 'Golden Hour',
+    day: 6, id: 'balcony_silhouette', name: 'Golden Hour',
     caption: 'Paris sunsets hit different ✨',
-    setting: 'Private Parisian balcony with wrought iron railing, golden hour sunset light, Paris rooftops in background, warm romantic atmosphere',
-    outfit: 'soft fitted ribbed tank top in nude tone and matching brief-style loungewear bottoms',
-    pose: 'standing by window, one hand touching hair, soft backlight creating silhouette, looking over shoulder',
-    expression: EXPRESSIONS[0],
+    setting: 'Private Parisian balcony, wrought iron railing, golden sunset backlight, Paris rooftops distant',
+    outfit: 'flowy summer dress silhouette, barefoot',
+    pose: 'BACKLIT SILHOUETTE standing at balcony, body outline against sunset, looking out at Paris, hair catching golden light, romantic atmospheric shot',
+    expression: 'face in shadow - silhouette focus',
   },
   {
-    day: 7, id: 'bath_self_care', name: 'Self-Care Sunday',
+    day: 7, id: 'bath_shoulders_up', name: 'Self-Care Sunday',
     caption: 'Sunday self-care ritual 🛁🕯️',
-    setting: 'Luxurious deep soaking tub filled with bubbles, candles lit around, eucalyptus hanging, steam rising, self-care sanctuary',
-    outfit: 'hair up in messy bun, shoulders and collarbone visible above bubbles, gold necklaces visible, natural dewy skin',
-    pose: 'relaxing in bubble bath, head tilted back slightly, one arm resting on tub edge, peaceful self-care moment',
-    expression: 'eyes closed blissfully with soft content smile, complete relaxation, spa day energy',
+    setting: 'Luxurious bathtub with bubbles, candles lit around, eucalyptus hanging, steam rising',
+    outfit: 'hair up in messy bun, shoulders and collarbone above bubbles, gold necklaces visible, dewy skin',
+    pose: 'SHOULDERS AND FACE selfie from above, relaxing in bubble bath, bubbles covering everything below collarbone, peaceful spa moment, candles glowing',
+    expression: 'eyes closed blissfully with soft content smile, complete relaxation',
   },
   {
-    day: 8, id: 'bed_edge_confident', name: 'Bedroom Confidence',
+    day: 8, id: 'bed_pov_looking_down', name: 'Bedroom Confidence',
     caption: 'Feeling myself today 💋',
-    setting: 'Elegant Parisian apartment bedroom, king bed with crisp white linen sheets and cream pillows, soft morning golden light through sheer curtains, warm intimate atmosphere',
-    outfit: 'soft stretchy black bodysuit with thin straps, form-fitting, showcasing silhouette',
-    pose: 'sitting on edge of bed, leaning forward slightly, hands on knees, confident feminine pose',
-    expression: EXPRESSIONS[2],
+    setting: 'Elegant bedroom, white linen sheets, soft golden morning light',
+    outfit: 'black fitted loungewear set, comfortable elegant',
+    pose: 'POV SHOT looking down at her body lying on bed, sheets draped artistically, her hands visible adjusting clothing, intimate first-person perspective',
+    expression: 'face not visible - body POV shot',
   },
   {
-    day: 9, id: 'oversized_sweater', name: 'Cozy Morning',
+    day: 9, id: 'sweater_shoulder_closeup', name: 'Cozy Morning',
     caption: 'Boyfriend sweater but no boyfriend needed 😏',
-    setting: 'Bright Parisian loft with dusty rose velvet sofa, herringbone parquet floor, tall French windows, morning light',
-    outfit: 'luxurious oversized cream knit sweater falling off one shoulder, black brief bottoms',
-    pose: 'standing by window, hands pulling sweater down slightly, one bare leg visible, cozy casual moment',
-    expression: EXPRESSIONS[1],
+    setting: 'Parisian loft, tall French windows, soft morning light streaming in',
+    outfit: 'luxurious oversized cream cable-knit sweater, falling off one shoulder',
+    pose: 'EXTREME CLOSE-UP DETAIL SHOT of bare shoulder and collarbone, sweater fabric falling off, gold necklaces catching morning light, skin texture visible, intimate cropped composition',
+    expression: 'face not visible - shoulder/collarbone detail shot',
   },
   {
-    day: 10, id: 'post_workout_glow', name: 'Post-Workout Glow',
+    day: 10, id: 'workout_mirror_body', name: 'Post-Workout Glow',
     caption: 'That after workout feeling 💪✨',
-    setting: 'Minimalist home yoga corner, black yoga mat on light wood floor, large mirror, soft natural light, towel nearby, water bottle visible',
-    outfit: 'fitted black athletic crop top showing midriff and matching high-cut athletic briefs, slight sheen of sweat, glowing skin',
-    pose: 'standing confidently, one hand on hip, towel around neck, proud accomplished energy, full body visible',
-    expression: EXPRESSIONS[4],
+    setting: 'Home gym area, large mirror, yoga mat, water bottle, natural light',
+    outfit: 'black athletic set, sports top and leggings, slight glow on skin, hair in ponytail',
+    pose: 'MIRROR SELFIE body shot from chest down, one hand on hip, towel around neck, proud athletic stance, gym mirror reflection, fitness influencer style',
+    expression: 'face cropped out - body focus',
   },
   {
-    day: 11, id: 'silk_slip_evening', name: 'Evening Ready',
+    day: 11, id: 'dress_strap_detail', name: 'Evening Ready',
     caption: 'Ready for tonight... or staying in? 🖤',
-    setting: 'Bright Parisian loft with dusty rose velvet sofa, herringbone parquet floor, tall French windows, evening soft lighting',
-    outfit: 'elegant cream silk slip dress with lace trim, thin straps, mid-thigh length, barefoot',
-    pose: 'standing, hands adjusting thin strap on shoulder, hip slightly cocked, elegant feminine silhouette',
-    expression: EXPRESSIONS[3],
+    setting: 'Bedroom with soft evening lamp lighting, elegant atmosphere',
+    outfit: 'elegant black slip dress, thin straps, delicate fabric',
+    pose: 'DETAIL SHOT of hand adjusting thin dress strap on shoulder, collarbone and neck visible, gold jewelry catching light, getting ready moment, artistic close-up',
+    expression: 'face not visible - detail shot',
   },
   {
-    day: 12, id: 'lazy_bed_day', name: 'Lazy Day',
+    day: 12, id: 'bed_feet_playful', name: 'Lazy Day',
     caption: 'Some days you just stay in bed 😴💕',
-    setting: 'Elegant Parisian apartment bedroom, messy but luxurious white bedding, soft daylight',
-    outfit: 'delicate black silk camisole top with thin straps and matching soft shorts, barefoot',
-    pose: 'lying on stomach on bed, propped up on elbows, feet playfully kicked up behind, chin resting on hands, looking at camera',
-    expression: EXPRESSIONS[1],
+    setting: 'Luxurious bedroom, messy white bedding, soft daylight through curtains',
+    outfit: 'cozy oversized shirt, bare legs under sheets',
+    pose: 'POV SHOT from her perspective lying in bed, looking at her feet playfully kicked up at end of bed, white sheets, lazy Sunday morning vibes',
+    expression: 'face not visible - POV feet shot',
   },
   {
-    day: 13, id: 'fresh_from_shower', name: 'Fresh Out',
+    day: 13, id: 'towel_back_shot', name: 'Fresh Out',
     caption: 'That fresh feeling ✨🚿',
-    setting: 'Luxurious marble bathroom, large ornate gold-framed mirror, soft warm lighting, steam visible',
-    outfit: 'wrapped in large white fluffy towel, wet hair slicked back, fresh natural skin, gold jewelry visible',
-    pose: 'stepping out of bath wrapped in towel, wet hair, fresh glowing skin, candid moment',
-    expression: EXPRESSIONS[0],
+    setting: 'Luxurious marble bathroom, soft warm lighting, steam in air',
+    outfit: 'wrapped in large white fluffy towel from behind, wet hair cascading down back',
+    pose: 'BACK SHOT walking away from camera, wrapped in white towel, wet dark hair with blonde highlights falling down back, steam atmosphere, elegant marble bathroom, figure disappearing into steam',
+    expression: 'face not visible - back shot walking away',
   },
   {
-    day: 14, id: 'satin_loungewear', name: 'Satin Dreams',
+    day: 14, id: 'hands_jewelry_detail', name: 'Satin Dreams',
     caption: 'Ending the day right 🌙',
-    setting: 'Elegant Parisian apartment bedroom, soft evening lamp lighting, warm intimate atmosphere',
-    outfit: 'delicate lace-trimmed ivory satin camisole and matching tap shorts, barefoot',
-    pose: 'sitting on bed, legs tucked to side, one hand in hair, soft romantic pose, feminine silhouette emphasized',
-    expression: EXPRESSIONS[2],
+    setting: 'Bedroom with soft evening lamp lighting, warm intimate atmosphere, silk sheets',
+    outfit: 'elegant ivory satin sleepwear, delicate fabric',
+    pose: 'ARTISTIC DETAIL SHOT of her hands on silk sheets, gold bracelet and rings visible, soft fabric texture, intimate nighttime moment, jewelry catching lamplight',
+    expression: 'face not visible - hands/jewelry detail',
   },
 ];
 
@@ -240,20 +228,39 @@ function getTodaysContent() {
 }
 
 function buildPrompt(content) {
-  return `${REFERENCE_INSTRUCTION}
-
-SUBJECT: Elena, 24 year old Italian woman,
-${ELENA_BASE},
+  // Check if this is a body-only shot (no face)
+  const isBodyShot = content.expression.includes('not visible') || content.expression.includes('face not');
+  
+  // Build prompt based on shot type
+  if (isBodyShot) {
+    // Body-focused shots don't need face reference instructions
+    return `SUBJECT: Young Italian woman, ${ELENA_BASE},
 
 SETTING: ${content.setting}
 
-OUTFIT: ${content.outfit},
+OUTFIT: ${content.outfit}
 
-POSE: ${content.pose},
+COMPOSITION: ${content.pose}
 
-EXPRESSION: ${content.expression},
+STYLE: lifestyle influencer photography, premium content, warm intimate lighting, magazine quality, aspirational aesthetic
 
-STYLE: lifestyle influencer content, warm intimate atmosphere, premium Fanvue quality, aspirational,
+IMPORTANT: This is a creative artistic shot - follow the composition exactly as described. ${content.pose.includes('POV') ? 'First-person perspective shot.' : ''}`;
+  }
+  
+  // For shots with face visible, include reference
+  return `${REFERENCE_INSTRUCTION}
+
+SUBJECT: Elena, ${ELENA_BASE},
+
+SETTING: ${content.setting}
+
+OUTFIT: ${content.outfit}
+
+COMPOSITION: ${content.pose}
+
+EXPRESSION: ${content.expression}
+
+STYLE: lifestyle influencer photography, premium content, warm intimate lighting, magazine quality, aspirational aesthetic
 
 ${ELENA_FINAL_CHECK}`;
 }
@@ -423,6 +430,22 @@ async function postToFanvue(accessToken, content, imageUrl) {
 // MAIN
 // ═══════════════════════════════════════════════════════════════
 
+// Helper to check if shot needs face reference
+function needsFaceReference(content) {
+  const expr = (content.expression || '').toLowerCase();
+  const pose = (content.pose || '').toLowerCase();
+  
+  // Body shots, detail shots, POV shots, silhouettes don't need references
+  const noFaceKeywords = [
+    'not visible', 'face not', 'body shot', 'body focus', 'pov shot', 
+    'detail shot', 'silhouette', 'face in shadow', 'cropped out',
+    'from behind', 'back shot', 'legs and lower'
+  ];
+  
+  const combined = expr + ' ' + pose;
+  return !noFaceKeywords.some(kw => combined.includes(kw));
+}
+
 async function main() {
   log('═══════════════════════════════════════════════════════════════');
   log('🌟 ELENA DAILY FANVUE POST');
@@ -440,23 +463,32 @@ async function main() {
   
   log(`\n📅 Day ${content.day}: ${content.name}`);
   log(`   Caption: ${content.caption}`);
+  
+  const useReferences = needsFaceReference(content);
+  log(`   Shot type: ${useReferences ? 'Face visible (with references)' : 'Body/detail shot (no references)'}`);
 
   // Initialize Replicate
   const replicate = new Replicate({
     auth: process.env.REPLICATE_API_TOKEN,
   });
 
-  // Load reference images
-  log('\n📸 Loading reference images...');
-  const base64Refs = await Promise.all([
-    urlToBase64(ELENA_FACE_REF),
-    urlToBase64(ELENA_BODY_REF),
-  ]);
-  log('   ✅ References loaded');
+  // Load reference images only if needed
+  let base64Refs = null;
+  if (useReferences) {
+    log('\n📸 Loading reference images...');
+    base64Refs = await Promise.all([
+      urlToBase64(ELENA_FACE_REF),
+      urlToBase64(ELENA_BODY_REF),
+    ]);
+    log('   ✅ References loaded');
+  } else {
+    log('\n📸 Skipping references (body/detail shot)');
+  }
 
   // Generate image
   log('\n🎨 Generating image with Nano Banana Pro...');
   const prompt = buildPrompt(content);
+  log(`   Prompt preview: ${prompt.substring(0, 150)}...`);
   const imageData = await generateImage(replicate, prompt, base64Refs);
   log('   ✅ Image generated');
 
