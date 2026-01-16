@@ -62,7 +62,20 @@ const REFERENCE_INSTRUCTION = `Reference images provided:
 
 CRITICAL: Generated image must look like the same person as references.`;
 
-// Safe vocabulary - no explicit body descriptions
+// ELENA BODY DESCRIPTION - Detailed (from Content Brain V2)
+// Used for body shots where face is hidden
+const ELENA_BODY_DETAILED = `24 year old Italian woman,
+feminine shapely figure 172cm tall,
+very large natural bust prominent and natural shape,
+narrow defined waist creating hourglass silhouette,
+wide feminine hips,
+healthy fit Italian body with confident posture,
+bronde hair dark roots with golden blonde balayage long beach waves,
+gold chunky chain bracelet on left wrist,
+layered gold necklaces with medallion pendant,
+glowing sun-kissed Italian skin tone`;
+
+// Base description (shorter version for prompts with face)
 const ELENA_BASE = `24 year old Italian woman, warm approachable features,
 bronde hair dark roots with golden blonde balayage long beach waves,
 honey brown almond-shaped eyes, naturally thick eyebrows,
@@ -277,24 +290,23 @@ function buildPrompt(content) {
   
   if (isBodyShot) {
     // Body shot - no refs (filter blocks refs + lingerie)
-    // Use detailed description instead
-    return `SUBJECT: Elena, 24 year old Italian model, ${ELENA_BASE},
+    // Use DETAILED body description from Content Brain V2
+    return `SUBJECT: Elena, ${ELENA_BODY_DETAILED},
 
 SETTING: ${content.setting}
 
 OUTFIT: ${content.outfit}
 
 COMPOSITION: ${content.pose}
-NOTE: Face is NOT visible in this shot - artistic body-focused composition.
 
-STYLE: luxury fashion photography, intimate apparel editorial, premium lifestyle content, warm golden lighting, magazine quality, high-end lingerie campaign, Vogue editorial aesthetic
+FACE INSTRUCTION: Face is NOT visible in this shot. Either cropped out, turned away, hidden by arm/pillow, or back to camera.
 
-BODY TYPE: feminine shapely Italian figure, hourglass silhouette, natural curves
-${content.pose.includes('POV') ? 'PERSPECTIVE: First-person POV shot.' : ''}
+STYLE: luxury fashion photography, intimate apparel editorial, premium Fanvue content, warm golden lighting, magazine quality, high-end lingerie campaign, Vogue editorial aesthetic
+${content.pose.includes('POV') ? 'PERSPECTIVE: First-person POV shot looking down at own body.' : ''}
 
-QUALITY: 8K resolution, professional studio quality, sharp focus, natural skin texture
+QUALITY: 8K resolution, professional studio quality, sharp focus, natural skin texture, realistic body
 
-NEGATIVE: skinny, thin, flat, angular, low quality, blurry, amateur, different body type`;
+NEGATIVE: face visible, head visible, skinny, thin, flat chest, angular, low quality, blurry, amateur, different body type, small bust`;
   }
   
   // Face visible shot - with reference matching
