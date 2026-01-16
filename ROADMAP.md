@@ -196,7 +196,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
-| 16/01/2026 | **🔧 DM Unicode JSON Error Fix** — Investigation erreur 400 Anthropic API (surrogate pairs incomplets) + Fix sanitizeUnicode() pour nettoyer caractères corrompus avant envoi API + Application à conversationHistory | [→](./roadmap/bugs/BUG-015-dm-unicode-json-error.md) |
+| 16/01/2026 | **🔧 DM Unicode JSON Error Fix** — Investigation erreur 400 Anthropic API (surrogate pairs incomplets) + Fix sanitizeUnicode() pour nettoyer caractères corrompus avant envoi API + Application à conversationHistory | [→](./docs/sessions/2026-01-16-dm-unicode-json-error-fix.md) |
 | 15/01/2025 | **💬 Auto-Reply Comments Backend** — Endpoint `/api/comment/reply` créé + Claude Sonnet + Spam detection + Table Supabase + Tests OK + ManyChat AI configuré (solution finale) | [→](./docs/sessions/2025-01-15-auto-reply-comments-backend.md) |
 | 15/01/2025 | **💬 Auto-Reply Comments Exploration** — 2 options analysées (ManyChat natif vs webhook custom) + Documentation IDEA-013 + Plan implémentation 3h | [→](./docs/sessions/2025-01-15-auto-reply-comments-exploration.md) |
 | 15/01/2025 | **🔥 Fanvue DM V2 + Memory** — Venice AI (uncensored) + Long-term memory (Claude extraction) + Language detection + PPV closing + Re-engagement 21h-1h timezone + GitHub Actions (6h/hourly) | [→](./docs/sessions/2025-01-15-fanvue-dm-v2-memory.md) |
