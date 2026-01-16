@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 16 janvier 2025 (DONE-066 Fanvue Sexy Prompts Upgrade ✅)
+**Dernière mise à jour** : 16 janvier 2026 (BUG-015 DM Unicode JSON Error Fix ✅)
 
 ---
 
@@ -64,6 +64,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-067 | **🔧 DM Unicode JSON Error Fix** — Fix erreur 400 Anthropic API causée par caractères Unicode invalides (surrogate pairs incomplets) dans historique conversation + Fonction sanitizeUnicode() pour nettoyer messages avant envoi API + Application à conversationHistory et incomingMessage | 16/01/2026 | v2.53.0 | [→](./roadmap/done/DONE-067-dm-unicode-json-error-fix.md) |
 | DONE-066 | **🔥 Fanvue Daily Prompts Upgrade (Sexy Poses + Body Description)** — Upgrade majeur prompts Fanvue : 14 poses sexy variées (back shots, chest visible, angles variés) + Instructions explicites "Face NOT visible" dans chaque prompt + Description détaillée corps Content Brain V2 (172cm, bust, waist, hips) + Vocabulaire optimisé (suppression "curvy", termes safe) | 16/01/2025 | v2.52.0 | [→](./roadmap/done/DONE-066-fanvue-sexy-prompts-upgrade.md) |
 | DONE-065 | **🔧 Fanvue Daily Post Content Filter + API Migration Fix** — Fix workflow GitHub Actions qui échouait systématiquement : stratégie "safe sexy" avec angles créatifs (11/14 body shots) + Migration API Fanvue vers multipart upload obligatoire (5 steps) + Calendrier 14 jours optimisé | 15/01/2025 | v2.51.0 | [→](./roadmap/done/DONE-065-fanvue-daily-post-content-filter-fix.md) |
 | DONE-064 | **🔧 DM Fanvue Spam & Rapid-Fire Duplicates Fix** — Fix exit message Fanvue envoyé infiniment (race condition) + Fix doublons sur messages rapides + Fresh is_stopped check + Exit message spam prevention (5min cooldown) + Rapid-fire detection (30s) | 09/01/2026 | v2.50.0 | [→](./roadmap/done/DONE-064-dm-fanvue-spam-rapid-fire-fix.md) |
@@ -140,6 +141,7 @@ roadmap/
 
 | ID | Bug | Sévérité | Status | Lien |
 |----|-----|----------|--------|------|
+| BUG-015 | **DM Unicode JSON Error** — Erreur 400 Anthropic API causée par caractères Unicode invalides (surrogate pairs incomplets) dans historique conversation → Fallback sur "hey 🖤" sans contexte | 🔴 High | ✅ Fixé | [→](./roadmap/bugs/BUG-015-dm-unicode-json-error.md) |
 | BUG-014 | **Message Loops** — 110 cas de messages répétitifs (fallback spam "Hey 🖤 Sorry..." jusqu'à 13x, AI repetition jusqu'à 30x) | 🔴 High | ✅ Fixé | [→](./roadmap/done/DONE-059-dm-race-condition-fix.md) |
 | BUG-013 | **Race Condition DM Duplicates** — ManyChat envoie plusieurs webhooks simultanés → même message envoyé 2-3 fois sur Instagram | 🔴 High | ✅ Fixé | [→](./roadmap/done/DONE-059-dm-race-condition-fix.md) |
 | BUG-012 | **Fanvue Daily Post 404** — Endpoint `/v1/posts` incorrect + field names mismatch (text→content, mediaUrls→media_urls, audience→is_premium) | 🔴 High | ✅ Fixé | [→](./roadmap/done/DONE-049-fanvue-daily-post-fix.md) |
@@ -181,10 +183,10 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 46
+├── ✅ Done        : 47
 ├── 🚧 In Progress : 4 (Auto-Reply Comments + Elena Sexy Mode + Fanvue + Model Evolution)
 ├── 📋 Todo        : 6 
-├── 🐛 Bugs        : 9 (9 fixed)
+├── 🐛 Bugs        : 10 (10 fixed)
 └── 💡 Ideas       : 11
 ```
 
@@ -194,6 +196,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 16/01/2026 | **🔧 DM Unicode JSON Error Fix** — Investigation erreur 400 Anthropic API (surrogate pairs incomplets) + Fix sanitizeUnicode() pour nettoyer caractères corrompus avant envoi API + Application à conversationHistory | [→](./roadmap/bugs/BUG-015-dm-unicode-json-error.md) |
 | 15/01/2025 | **💬 Auto-Reply Comments Backend** — Endpoint `/api/comment/reply` créé + Claude Sonnet + Spam detection + Table Supabase + Tests OK + ManyChat AI configuré (solution finale) | [→](./docs/sessions/2025-01-15-auto-reply-comments-backend.md) |
 | 15/01/2025 | **💬 Auto-Reply Comments Exploration** — 2 options analysées (ManyChat natif vs webhook custom) + Documentation IDEA-013 + Plan implémentation 3h | [→](./docs/sessions/2025-01-15-auto-reply-comments-exploration.md) |
 | 15/01/2025 | **🔥 Fanvue DM V2 + Memory** — Venice AI (uncensored) + Long-term memory (Claude extraction) + Language detection + PPV closing + Re-engagement 21h-1h timezone + GitHub Actions (6h/hourly) | [→](./docs/sessions/2025-01-15-fanvue-dm-v2-memory.md) |

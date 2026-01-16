@@ -710,6 +710,20 @@ function logValidation(result: ValidationResult, attempt: number): void {
 }
 
 // ===========================================
+// UNICODE SANITIZATION
+// ===========================================
+
+/**
+ * Remove invalid Unicode surrogate pairs from a string.
+ * Lone surrogates (U+D800 to U+DFFF without a pair) cause JSON serialization errors.
+ */
+function sanitizeUnicode(str: string): string {
+  // Remove lone surrogates (high surrogate not followed by low, or lone low surrogate)
+  // eslint-disable-next-line no-control-regex
+  return str.replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '');
+}
+
+// ===========================================
 // INITIALIZE ANTHROPIC CLIENT
 // ===========================================
 
@@ -1377,16 +1391,16 @@ export async function generateElenaResponse(
   conversationHistory: DMMessage[],
   analysis: IntentAnalysis
 ): Promise<{ response: string; strategy: ResponseStrategy; shouldPitch: boolean }> {
-  // Build conversation context
+  // Build conversation context (sanitize to prevent invalid Unicode errors)
   const messages = conversationHistory.map(msg => ({
     role: msg.direction === 'incoming' ? 'user' as const : 'assistant' as const,
-    content: msg.content,
+    content: sanitizeUnicode(msg.content),
   }));
 
   // Add current message
   messages.push({
     role: 'user' as const,
-    content: incomingMessage,
+    content: sanitizeUnicode(incomingMessage),
   });
 
   // Build dynamic context based on intent analysis
