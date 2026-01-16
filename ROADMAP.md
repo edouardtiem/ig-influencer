@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 16 janvier 2026 (BUG-015 DM Unicode JSON Error Fix ✅)
+**Dernière mise à jour** : 16 janvier 2025 (DONE-068 Fanvue DM Audit & Fix ✅)
 
 ---
 
@@ -33,6 +33,7 @@ roadmap/
 > **Fanvue Pack 1** : ✅ 14 photos générées (2 shootings) dans `elena-fanvue-pack1`  
 > **ManyChat** : ✅ 2 automations LIVE (Auto-DM comments + Welcome followers)  
 > **DM System** : ✅ **ACTIVE** — Kill switch opérationnel sur `/calendar`  
+> **DM Fanvue** : ✅ **ACTIVE** — Venice AI configuré + OAuth valide (audit 16/01/2025)  
 > **AI Agent** : ✅ LIVE avec Response Validator + Sonnet + Story replies support + anti-hallucination renforcé (régénération auto, max 3 tentatives) + Language detection (EN/FR/IT/ES/PT/DE)  
 > **Objectif** : 500€/mois via Fanvue  
 > **Next** : Resume DM system après expiration ban Instagram
@@ -64,6 +65,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-068 | **🔍 Audit & Fix DM Fanvue** — Audit système DM Fanvue suite messages non répondus + Fix Venice AI non configuré sur Vercel + Ré-authentification OAuth Fanvue (tokens expirés) + Script audit `audit-fanvue-dm-today.mjs` + Système opérationnel | 16/01/2025 | v2.54.0 | [→](./roadmap/done/DONE-068-fanvue-dm-audit-fix.md) |
 | DONE-067 | **🔧 DM Unicode JSON Error Fix** — Fix erreur 400 Anthropic API causée par caractères Unicode invalides (surrogate pairs incomplets) dans historique conversation + Fonction sanitizeUnicode() pour nettoyer messages avant envoi API + Application à conversationHistory et incomingMessage | 16/01/2026 | v2.53.0 | [→](./roadmap/done/DONE-067-dm-unicode-json-error-fix.md) |
 | DONE-066 | **🔥 Fanvue Daily Prompts Upgrade (Sexy Poses + Body Description)** — Upgrade majeur prompts Fanvue : 14 poses sexy variées (back shots, chest visible, angles variés) + Instructions explicites "Face NOT visible" dans chaque prompt + Description détaillée corps Content Brain V2 (172cm, bust, waist, hips) + Vocabulaire optimisé (suppression "curvy", termes safe) | 16/01/2025 | v2.52.0 | [→](./roadmap/done/DONE-066-fanvue-sexy-prompts-upgrade.md) |
 | DONE-065 | **🔧 Fanvue Daily Post Content Filter + API Migration Fix** — Fix workflow GitHub Actions qui échouait systématiquement : stratégie "safe sexy" avec angles créatifs (11/14 body shots) + Migration API Fanvue vers multipart upload obligatoire (5 steps) + Calendrier 14 jours optimisé | 15/01/2025 | v2.51.0 | [→](./roadmap/done/DONE-065-fanvue-daily-post-content-filter-fix.md) |
