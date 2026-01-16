@@ -555,17 +555,18 @@ async function uploadMediaToFanvue(accessToken, imageUrl) {
 async function postToFanvue(accessToken, content, imageUrl) {
   log('📤 Posting to Fanvue (subscribers only)...');
   
+  // First, upload the media to Fanvue's servers
+  const mediaUuid = await uploadMediaToFanvue(accessToken, imageUrl);
+  
+  // Then create the post with the uploaded media UUID
+  log('   📤 Step 5: Creating post...');
+  
   const headers = {
     'Authorization': `Bearer ${accessToken}`,
     'Content-Type': 'application/json',
     'X-Fanvue-API-Version': '2025-06-26',
   };
   
-  // First, upload the media to Fanvue's servers
-  const mediaUuid = await uploadMediaToFanvue(accessToken, imageUrl);
-  
-  // Then create the post with the uploaded media UUID
-  log('   📤 Step 5: Creating post...');
   const postBody = {
     text: content.caption,
     mediaUuids: [mediaUuid],
@@ -670,8 +671,12 @@ async function main() {
         await postToFanvue(accessToken, content, cloudinaryUrl);
         log('   ✅ Posted to Fanvue (subscribers only)!');
       } catch (error) {
-        // Check if error is authentication-related (401 Unauthorized)
-        const isAuthError = error.status === 401 || (error.message && error.message.includes('401'));
+        // Check if error is authentication-related (401 Unauthorized or "Unauthorized" in message)
+        const errorMsg = error.message || String(error);
+        const isAuthError = error.status === 401 || 
+          errorMsg.includes('401') || 
+          errorMsg.includes('Unauthorized') ||
+          errorMsg.includes('unauthorized');
         
         if (!isAuthError) {
           // Not an auth error, rethrow
@@ -689,8 +694,8 @@ async function main() {
           log(`      (Current token in secrets is now invalid)`);
         } catch (refreshError) {
           // Check if refresh token is invalid
-          const errorMsg = refreshError.message || '';
-          if (errorMsg.includes('invalid_grant') || errorMsg.includes('already used')) {
+          const refreshErrorMsg = refreshError.message || '';
+          if (refreshErrorMsg.includes('invalid_grant') || refreshErrorMsg.includes('already used') || refreshErrorMsg.includes('Unauthorized')) {
             log('\n   ❌ Refresh token is invalid or expired!');
             log('   📋 To fix this:');
             log('      1. Visit: https://ig-influencer.vercel.app/api/oauth/auth');
