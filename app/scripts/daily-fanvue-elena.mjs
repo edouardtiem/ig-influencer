@@ -179,10 +179,10 @@ const DAILY_CALENDAR = [
   {
     day: 5, id: 'high_angle_yoga', name: 'Yoga Time',
     caption: 'Flexibility is key 🧘‍♀️',
-    setting: 'Minimalist yoga corner, black mat on light wood floor, plants, natural light',
+    setting: 'Minimalist yoga corner, black mat on light wood floor, soft golden morning light',
     outfit: FANVUE_OUTFITS.sports_bra_leggings,
-    pose: 'HIGH ANGLE shot from above, downward dog yoga pose, back arched, athletic body visible, leggings accentuating figure. CRITICAL: Face hidden - looking down at mat',
-    expression: 'face not visible - looking down',
+    pose: 'HIGH ANGLE shot from above, lying on back on yoga mat, deep stretch with one leg raised straight up toward ceiling, hands holding ankle, back arched off mat, athletic curves visible, leggings tight on hips and thighs. CRITICAL: Face hidden - head tilted back or cropped',
+    expression: 'face not visible - head tilted back',
   },
   {
     day: 6, id: 'pool_bikini_back', name: 'Pool Day',
