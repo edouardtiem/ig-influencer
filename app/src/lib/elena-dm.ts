@@ -125,21 +125,22 @@ export interface ManyChateWebhookPayload {
 const FANVUE_LINK = 'https://www.fanvue.com/elenav.paris/fv-2?free_trial=a873adf0-4d08-4f84-aa48-a8861df6669f';
 
 // Message caps per stage (total messages before stop)
+// OPTIMIZED: Reduced to pitch earlier and limit post-pitch waste
 const MESSAGE_CAPS: Record<LeadStage, number> = {
   cold: 15,
-  warm: 25,
-  hot: 35,
-  pitched: 10, // 10 messages after pitching to close
+  warm: 20,    // Reduced from 25 - push to HOT faster
+  hot: 20,     // Reduced from 35 - force pitch within 20 msgs
+  pitched: 5,  // Reduced from 10 - max 5 msgs after pitch then stop
   converted: 50,
   paid: 100
 };
 
 // When closing pressure starts (message count)
-// Aligned with stage transitions: cold=1-3, warm=4-7, hot=8+
+// OPTIMIZED: Start pitching earlier in HOT stage
 const CLOSING_STARTS_AT: Record<LeadStage, number> = {
   cold: 100,   // Never - cold = build rapport only
   warm: 100,   // Never - warm = tease handled by explicit rule
-  hot: 12,     // Starts 4 messages into hot stage (8+4=12)
+  hot: 10,     // Reduced from 12 - start pitching at msg 10 (2 msgs into HOT)
   pitched: 1,  // Immediate closing pressure
   converted: 40,
   paid: 80

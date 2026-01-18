@@ -11,13 +11,14 @@
 
 ### Métriques cibles
 
-| Métrique | Actuel | Objectif |
-|----------|--------|----------|
-| Taux de pitch (Cold → Pitched) | 27.5% | 50%+ |
-| Messages avant pitch | 35 avg | 12 max |
-| Conversion Pitched → Free | 0% | 10%+ |
-| Conversion Free → Paid | 0% | 20%+ |
-| Conversion globale (Cold → Paid) | 0% | 2-5% |
+| Métrique | Actuel | Objectif | Status |
+|----------|--------|----------|--------|
+| Taux de pitch (Cold → Pitched) | 27.5% | 50%+ | ⏳ |
+| Messages avant pitch | 35 avg | 20 max | ✅ Implémenté |
+| Messages post-pitch | 34.8 avg | 5 max | ✅ Implémenté |
+| Conversion Pitched → Free | 0% | 10%+ | ⏳ Tracking à configurer |
+| Conversion Free → Paid | 0% | 20%+ | ⏳ |
+| Conversion globale (Cold → Paid) | 0% | 2-5% | ⏳ |
 
 ---
 
@@ -47,6 +48,13 @@
 - ✅ **Fuzzy Matching** — Attribution automatique IG → Fanvue par username
 - ✅ **Attribution Logic** — 3 niveaux : exact match → fuzzy match → timing match
 - ✅ **Database Updates** — Marque contacts comme `converted` ou `paid`
+- ✅ **Tracking Link Combiné** — Lien `/fv-2` + free trial pour double tracking (Fanvue dashboard + notre système)
+
+### Phase 4 : Optimisation Timing (Janvier 2026)
+
+- ✅ **Pitch plus tôt** — `CLOSING_STARTS_AT[hot]` réduit de 12 → 10
+- ✅ **Limite HOT** — `MESSAGE_CAPS[hot]` réduit de 35 → 20 (force pitch)
+- ✅ **Limite post-pitch** — `MESSAGE_CAPS[pitched]` réduit de 10 → 5
 
 ---
 
@@ -108,7 +116,7 @@ Converted → Paid:    0%
 
 **Cause** : Le système attend trop pour pitcher (message 35+)
 
-**Action** : ⏳ Pitcher plus tôt (avant message 15)
+**Action** : ✅ FIXÉ — `MESSAGE_CAPS[hot]` réduit de 35 → 20, `CLOSING_STARTS_AT[hot]` de 12 → 10
 
 ### 3. **Exit messages répétitifs**
 
@@ -136,7 +144,7 @@ Converted → Paid:    0%
 
 **Symptôme** : En moyenne **34.8 messages** échangés APRÈS le pitch
 
-**Action** : ⏳ Limiter à 5 messages max après pitch
+**Action** : ✅ FIXÉ — `MESSAGE_CAPS[pitched]` réduit de 10 → 5 (max 5 msgs après pitch)
 
 ---
 
@@ -165,9 +173,9 @@ Converted → Paid:    0%
 ### 🔴 URGENT
 
 - [ ] **Configurer webhook Fanvue** — Ajouter endpoint dans Fanvue Developer Portal
-- [ ] **Tester free trial link** — Vérifier que le lien donne bien 7 jours gratuits
-- [ ] **Pitcher plus tôt** — Réduire à 15 messages max avant pitch
-- [ ] **Limiter messages post-pitch** — Max 5 messages après pitch puis stop
+- [x] **Tester free trial link** — ✅ Combiné avec tracking link `/fv-2` pour attribution
+- [x] **Pitcher plus tôt** — ✅ `CLOSING_STARTS_AT[hot]` réduit de 12 → 10, `MESSAGE_CAPS[hot]` de 35 → 20
+- [x] **Limiter messages post-pitch** — ✅ `MESSAGE_CAPS[pitched]` réduit de 10 → 5
 
 ### 🟠 IMPORTANT
 
@@ -190,10 +198,10 @@ Converted → Paid:    0%
 | Objectif | Progrès | Status |
 |----------|---------|--------|
 | Infrastructure DM | ✅ 100% | Terminé |
-| Optimisation Funnel | ✅ 80% | En cours |
-| Tracking Conversions | ✅ 50% | Webhook implémenté, config à faire |
+| Optimisation Funnel | ✅ 90% | Timing pitch + post-pitch limités |
+| Tracking Conversions | ✅ 60% | Webhook implémenté + tracking link `/fv-2`, config Fanvue à faire |
 | Attribution Automatique | ✅ 70% | Fuzzy matching fait, tests à faire |
-| Conversion Rate | ❌ 0% | **BLOQUANT** |
+| Conversion Rate | ❌ 0% | **À surveiller après déploiement** |
 
 ---
 
