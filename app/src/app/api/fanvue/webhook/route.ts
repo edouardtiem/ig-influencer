@@ -69,8 +69,8 @@ export async function POST(request: NextRequest) {
     const event: FanvueWebhookEvent = JSON.parse(rawBody);
     console.log(`[Fanvue Webhook] Event type: ${event.type}`);
     
-    // Initialize tokens from env (for Vercel deployment)
-    initTokensFromEnv();
+    // Initialize tokens from Supabase (preferred) or env vars (fallback)
+    await initTokensFromEnv();
     
     // Handle different event types
     switch (event.type) {

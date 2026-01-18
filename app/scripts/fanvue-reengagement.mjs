@@ -72,11 +72,51 @@ function hoursBetween(date1, date2) {
 }
 
 // ===========================================
-// FANVUE API
+// FANVUE API - Tokens from Supabase
 // ===========================================
 
-let accessToken = process.env.FANVUE_ACCESS_TOKEN;
-const refreshToken = process.env.FANVUE_REFRESH_TOKEN;
+let accessToken = null;
+let refreshToken = null;
+
+async function loadTokensFromSupabase() {
+  const { data, error } = await supabase
+    .from('oauth_tokens')
+    .select('*')
+    .eq('service_name', 'fanvue')
+    .single();
+  
+  if (error || !data) {
+    console.log('[Fanvue] No tokens in Supabase, trying env vars');
+    accessToken = process.env.FANVUE_ACCESS_TOKEN;
+    refreshToken = process.env.FANVUE_REFRESH_TOKEN;
+    return !!accessToken;
+  }
+  
+  console.log('[Fanvue] Tokens loaded from Supabase');
+  accessToken = data.access_token;
+  refreshToken = data.refresh_token;
+  return true;
+}
+
+async function saveTokensToSupabase(newAccessToken, newRefreshToken) {
+  const { error } = await supabase
+    .from('oauth_tokens')
+    .upsert({
+      service_name: 'fanvue',
+      access_token: newAccessToken,
+      refresh_token: newRefreshToken,
+      expires_at: Date.now() + 3600 * 1000,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'service_name' });
+  
+  if (error) {
+    console.error('[Fanvue] Failed to save tokens:', error.message);
+    return false;
+  }
+  
+  console.log('[Fanvue] New tokens saved to Supabase');
+  return true;
+}
 
 async function refreshFanvueToken() {
   const clientId = process.env.FANVUE_CLIENT_ID;
@@ -102,6 +142,11 @@ async function refreshFanvueToken() {
   
   const data = await response.json();
   accessToken = data.access_token;
+  refreshToken = data.refresh_token;
+  
+  // CRITICAL: Save new tokens to Supabase (token rotation)
+  await saveTokensToSupabase(accessToken, refreshToken);
+  
   return accessToken;
 }
 
@@ -326,6 +371,9 @@ async function main() {
   console.log('🔔 FANVUE RE-ENGAGEMENT');
   console.log(`📅 ${new Date().toISOString()}`);
   console.log('═══════════════════════════════════════════════════════════════');
+  
+  // Load tokens from Supabase (or fallback to env vars)
+  await loadTokensFromSupabase();
   
   // Check if Fanvue is configured
   if (!accessToken || !refreshToken) {

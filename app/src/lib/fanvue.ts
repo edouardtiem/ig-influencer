@@ -3,10 +3,13 @@
  * OAuth 2.0 + PKCE authentication for premium content monetization
  * 
  * Documentation: https://api.fanvue.com/docs/authentication/implementation-guide
+ * 
+ * Token storage: Supabase (persists across refreshes) with env vars fallback
  */
 
 import { randomBytes, createHash } from 'crypto';
 import { fetchWithTimeout } from './fetch-utils';
+import { createClient } from '@supabase/supabase-js';
 
 const AUTH_BASE_URL = 'https://auth.fanvue.com';
 const API_BASE_URL = 'https://api.fanvue.com';
@@ -14,6 +17,11 @@ const FANVUE_TIMEOUT = 30000; // 30s timeout for Fanvue API calls
 
 // Required scopes per Fanvue docs
 const REQUIRED_SCOPES = 'openid offline_access offline';
+
+// Supabase client for token storage
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
 interface FanvueConfig {
   clientId: string;
@@ -42,10 +50,81 @@ let cachedTokens: FanvueTokens | null = null;
 let cachedCodeVerifier: string | null = null;
 
 /**
- * Initialize tokens from environment variables (for CI/CD like GitHub Actions)
- * Set FANVUE_ACCESS_TOKEN and FANVUE_REFRESH_TOKEN in secrets
+ * Load tokens from Supabase (preferred) or environment variables (fallback)
  */
-export function initTokensFromEnv(): boolean {
+async function loadTokensFromSupabase(): Promise<FanvueTokens | null> {
+  if (!supabase) {
+    return null;
+  }
+  
+  try {
+    const { data, error } = await supabase
+      .from('oauth_tokens')
+      .select('*')
+      .eq('service_name', 'fanvue')
+      .single();
+    
+    if (error || !data) {
+      return null;
+    }
+    
+    console.log('[Fanvue] Tokens loaded from Supabase');
+    return {
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token,
+      expiresAt: data.expires_at,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Save tokens to Supabase for persistence across refreshes
+ */
+async function saveTokensToSupabase(tokens: FanvueTokens): Promise<boolean> {
+  if (!supabase) {
+    console.warn('[Fanvue] Supabase not configured - tokens will not persist');
+    return false;
+  }
+  
+  try {
+    const { error } = await supabase
+      .from('oauth_tokens')
+      .upsert({
+        service_name: 'fanvue',
+        access_token: tokens.accessToken,
+        refresh_token: tokens.refreshToken,
+        expires_at: tokens.expiresAt,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'service_name' });
+    
+    if (error) {
+      console.error('[Fanvue] Failed to save tokens to Supabase:', error.message);
+      return false;
+    }
+    
+    console.log('[Fanvue] Tokens saved to Supabase');
+    return true;
+  } catch (err) {
+    console.error('[Fanvue] Error saving tokens:', err);
+    return false;
+  }
+}
+
+/**
+ * Initialize tokens from Supabase (preferred) or environment variables (fallback)
+ * For Vercel/GitHub Actions - tries Supabase first, then env vars
+ */
+export async function initTokensFromEnv(): Promise<boolean> {
+  // First, try Supabase
+  const supabaseTokens = await loadTokensFromSupabase();
+  if (supabaseTokens) {
+    cachedTokens = supabaseTokens;
+    return true;
+  }
+  
+  // Fallback to environment variables
   const accessToken = process.env.FANVUE_ACCESS_TOKEN;
   const refreshToken = process.env.FANVUE_REFRESH_TOKEN;
   
@@ -207,6 +286,7 @@ export async function exchangeCodeForTokens(code: string, codeVerifier: string):
 
 /**
  * Refresh access token using refresh token
+ * IMPORTANT: Saves new tokens to Supabase for persistence (token rotation)
  */
 export async function refreshAccessToken(refreshToken: string): Promise<FanvueTokens> {
   const config = getConfig();
@@ -245,6 +325,9 @@ export async function refreshAccessToken(refreshToken: string): Promise<FanvueTo
 
   cachedTokens = tokens;
   console.log('[Fanvue] Token refreshed successfully');
+  
+  // CRITICAL: Save new tokens to Supabase for next request (token rotation)
+  await saveTokensToSupabase(tokens);
   
   return tokens;
 }
