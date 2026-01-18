@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 16 janvier 2025 (DONE-068 Fanvue DM Audit & Fix ✅)
+**Dernière mise à jour** : 18 janvier 2026 (IP-006 DM Funnel Audit + Attribution Tracking ✅)
 
 ---
 
@@ -23,6 +23,7 @@ roadmap/
 
 | ID | Feature | Priorité | Branche | Lien |
 |----|---------|----------|---------|------|
+| IP-006 | **📊 DM Funnel Progress** — Audit complet funnel DM + Tracking Fanvue attribution (fuzzy matching) + 0% conversion identifié comme problème critique | 🔴 High | main | [→](./roadmap/in-progress/IP-006-dm-funnel-progress.md) |
 | IP-005 | **💬 Auto-Reply Comments** — Backend API créé + ManyChat AI configuré pour réponses auto commentaires IG | 🔴 High | main | [→](./roadmap/in-progress/IP-005-auto-reply-comments.md) |
 | IP-004 | **🔥 Elena Sexy Mode** — 1 post/jour à 21h, contenu suggestif (bikini/lingerie/sport) | 🔴 High | main | [→](./docs/sessions/2024-12-27-elena-sexy-mode.md) |
 | IP-003 | **💰 Fanvue Monetization** — Packs photos Elena + ManyChat DM automation | 🔴 High | main | [→](./docs/sessions/2024-12-25-fanvue-pack-elena.md) |
@@ -143,6 +144,8 @@ roadmap/
 
 | ID | Bug | Sévérité | Status | Lien |
 |----|-----|----------|--------|------|
+| BUG-017 | **Free Trial Link Non Vérifié** — Le lien free trial 7 jours n'a pas été testé pour vérifier qu'il fonctionne correctement | 🔴 High | ⏳ À tester | [→](./roadmap/in-progress/IP-006-dm-funnel-progress.md#bug-017-free-trial-link-non-vérifié) |
+| BUG-016 | **Attribution Non Fonctionnelle** — Fuzzy matching implémenté mais webhook Fanvue pas configuré dans Developer Portal → conversions non trackées | 🔴 High | ⏳ Config à faire | [→](./roadmap/in-progress/IP-006-dm-funnel-progress.md#bug-016-attribution-non-fonctionnelle) |
 | BUG-015 | **DM Unicode JSON Error** — Erreur 400 Anthropic API causée par caractères Unicode invalides (surrogate pairs incomplets) dans historique conversation → Fallback sur "hey 🖤" sans contexte | 🔴 High | ✅ Fixé | [→](./roadmap/bugs/BUG-015-dm-unicode-json-error.md) |
 | BUG-014 | **Message Loops** — 110 cas de messages répétitifs (fallback spam "Hey 🖤 Sorry..." jusqu'à 13x, AI repetition jusqu'à 30x) | 🔴 High | ✅ Fixé | [→](./roadmap/done/DONE-059-dm-race-condition-fix.md) |
 | BUG-013 | **Race Condition DM Duplicates** — ManyChat envoie plusieurs webhooks simultanés → même message envoyé 2-3 fois sur Instagram | 🔴 High | ✅ Fixé | [→](./roadmap/done/DONE-059-dm-race-condition-fix.md) |
@@ -198,6 +201,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 18/01/2026 | **📊 Audit Funnel DM Instagram** — Analyse complète 925 contacts + Identification 0% conversion critique + Implémentation tracking Fanvue (fuzzy matching) + Documentation progression | [→](./docs/sessions/2026-01-18-dm-funnel-audit.md) |
 | 16/01/2026 | **🔧 DM Unicode JSON Error Fix** — Investigation erreur 400 Anthropic API (surrogate pairs incomplets) + Fix sanitizeUnicode() pour nettoyer caractères corrompus avant envoi API + Application à conversationHistory | [→](./docs/sessions/2026-01-16-dm-unicode-json-error-fix.md) |
 | 15/01/2025 | **💬 Auto-Reply Comments Backend** — Endpoint `/api/comment/reply` créé + Claude Sonnet + Spam detection + Table Supabase + Tests OK + ManyChat AI configuré (solution finale) | [→](./docs/sessions/2025-01-15-auto-reply-comments-backend.md) |
 | 15/01/2025 | **💬 Auto-Reply Comments Exploration** — 2 options analysées (ManyChat natif vs webhook custom) + Documentation IDEA-013 + Plan implémentation 3h | [→](./docs/sessions/2025-01-15-auto-reply-comments-exploration.md) |

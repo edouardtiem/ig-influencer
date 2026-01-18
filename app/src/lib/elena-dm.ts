@@ -120,8 +120,8 @@ export interface ManyChateWebhookPayload {
 // CONSTANTS
 // ===========================================
 
-// Free trial link - 1 day free, lower friction for conversion
-const FANVUE_LINK = 'https://www.fanvue.com/elenav.paris?free_trial=f9fec822-bbf5-4dae-a886-13c7f95cb73f';
+// Free trial link - 7 days free, tracked as ig-dm source
+const FANVUE_LINK = 'https://www.fanvue.com/elenav.paris?free_trial=a873adf0-4d08-4f84-aa48-a8861df6669f';
 
 // Message caps per stage (total messages before stop)
 const MESSAGE_CAPS: Record<LeadStage, number> = {

@@ -24,6 +24,7 @@ import {
   handleFanvuePurchase,
   FanvueWebhookPayload 
 } from '@/lib/elena-dm-fanvue';
+import { attributeFanvueConversion } from '@/lib/fanvue-attribution';
 
 // Fanvue webhook event types
 interface FanvueWebhookEvent {
@@ -105,11 +106,29 @@ export async function POST(request: NextRequest) {
 
 /**
  * Handle new free follower - send welcome DM to convert to subscriber
+ * + Try to attribute to IG DM contact (fuzzy matching)
  */
 async function handleNewFollower(event: FanvueWebhookEvent) {
   const { user_id, username } = event.data;
+  const displayName = event.data.displayName as string | undefined;
   
   console.log(`[Fanvue Webhook] New follower: ${username || user_id}`);
+  
+  // === ATTRIBUTION: Try to match with IG contact ===
+  let attribution = null;
+  if (username) {
+    attribution = await attributeFanvueConversion(
+      username,
+      displayName,
+      false // isPaid = false for followers
+    );
+    
+    if (attribution.attributed) {
+      console.log(`[Fanvue Webhook] ✅ ATTRIBUTED: @${username} → IG @${attribution.igUsername} (${attribution.confidence} confidence, ${attribution.matchType})`);
+    } else {
+      console.log(`[Fanvue Webhook] ⚠️ Could not attribute @${username} to any IG contact`);
+    }
+  }
   
   // Send welcome DM with teaser photo
   const result = await sendWelcomeDM(
@@ -124,6 +143,11 @@ async function handleNewFollower(event: FanvueWebhookEvent) {
       received: true, 
       action: 'welcome_dm_sent',
       chatId: result.chatId,
+      attribution: attribution?.attributed ? {
+        igUsername: attribution.igUsername,
+        confidence: attribution.confidence,
+        matchType: attribution.matchType,
+      } : null,
     });
   } else {
     console.error(`[Fanvue Webhook] Failed to send welcome DM: ${result.error}`);
@@ -132,6 +156,11 @@ async function handleNewFollower(event: FanvueWebhookEvent) {
       received: true, 
       action: 'welcome_dm_failed',
       error: result.error,
+      attribution: attribution?.attributed ? {
+        igUsername: attribution.igUsername,
+        confidence: attribution.confidence,
+        matchType: attribution.matchType,
+      } : null,
     });
   }
 }
@@ -196,11 +225,29 @@ async function handleNewMessage(event: FanvueWebhookEvent) {
 
 /**
  * Handle new paid subscriber - send thank you message
+ * + Try to attribute to IG DM contact (fuzzy matching)
  */
 async function handleNewSubscriber(event: FanvueWebhookEvent) {
   const { user_id, username } = event.data;
+  const displayName = event.data.displayName as string | undefined;
   
   console.log(`[Fanvue Webhook] New subscriber: ${username || user_id}`);
+  
+  // === ATTRIBUTION: Try to match with IG contact ===
+  let attribution = null;
+  if (username) {
+    attribution = await attributeFanvueConversion(
+      username,
+      displayName,
+      true // isPaid = true for subscribers
+    );
+    
+    if (attribution.attributed) {
+      console.log(`[Fanvue Webhook] ✅ PAID ATTRIBUTED: @${username} → IG @${attribution.igUsername} (${attribution.confidence} confidence, ${attribution.matchType})`);
+    } else {
+      console.log(`[Fanvue Webhook] ⚠️ Could not attribute paid sub @${username} to any IG contact`);
+    }
+  }
   
   const thankYouMessage = `Hey ${username || 'toi'} ! 💕
 
@@ -215,6 +262,11 @@ Maintenant on peut vraiment discuter. N'hésite pas à m'écrire, je suis là po
       received: true, 
       action: 'subscriber_thanked',
       chatId: result.chatId,
+      attribution: attribution?.attributed ? {
+        igUsername: attribution.igUsername,
+        confidence: attribution.confidence,
+        matchType: attribution.matchType,
+      } : null,
     });
   }
   
@@ -222,6 +274,11 @@ Maintenant on peut vraiment discuter. N'hésite pas à m'écrire, je suis là po
     received: true, 
     action: 'subscriber_thank_failed',
     error: result.error,
+    attribution: attribution?.attributed ? {
+      igUsername: attribution.igUsername,
+      confidence: attribution.confidence,
+      matchType: attribution.matchType,
+    } : null,
   });
 }
 
