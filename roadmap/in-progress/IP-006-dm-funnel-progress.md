@@ -166,21 +166,19 @@ Converted → Paid:    0%
 - Quand détecté → retourne `response: ''` avec `skip: true`
 - **MAIS** ManyChat semble ignorer le `skip: true` et envoyer quand même
 
-**Causes probables** :
-1. ⚠️ **ManyChat fallback** — Un message par défaut "hey 🖤" est configuré dans ManyChat quand la réponse est vide
-2. ⚠️ **Condition ManyChat** — Le flow ManyChat n'est pas configuré pour vérifier `skip: true`
-3. 🔴 **Erreur API Claude** — Timeout ou quota dépassé → fallback "hey 🖤" dans le code (ligne 1568, 1580)
+**Cause confirmée** :
+- ❌ Pas de fallback dans ManyChat
+- ✅ **Erreur API Claude** — Timeout ou quota dépassé → fallback "hey 🖤" dans le code
 
-**Fix proposé** :
-1. **Vérifier ManyChat** — Supprimer tout fallback message "hey 🖤"
-2. **Ajouter condition** — Dans ManyChat, vérifier `{{skip}} != true` avant d'envoyer
-3. **Changer le fallback code** — Remplacer "hey 🖤" par quelque chose de plus varié
-4. **Vérifier logs Vercel** — Voir si c'est une erreur API ou ManyChat
+**Fix appliqué** (commit `a5d1660`) :
+- Supprimé le fallback "hey 🖤" dans `elena-dm.ts`
+- En cas d'erreur API → retourne `response: ''` → webhook skip
+- L'anti-loop était déjà en place mais bypassé par le fallback
 
 **Impact** : 🔴 CRITIQUE — Détruit l'expérience utilisateur et toute chance de conversion
 
 **Priorité** : 🔴 High  
-**Status** : ⏳ À investiguer dans ManyChat
+**Status** : ✅ Fix déployé (18/01/2026) — À monitorer
 
 ---
 
@@ -206,10 +204,11 @@ Converted → Paid:    0%
 
 ### 🔴 URGENT
 
-- [ ] **Configurer webhook Fanvue** — Ajouter endpoint dans Fanvue Developer Portal
+- [x] **Configurer webhook Fanvue** — ✅ Configuré dans Fanvue Developer Portal (18/01/2026)
 - [x] **Tester free trial link** — ✅ Combiné avec tracking link `/fv-2` pour attribution
 - [x] **Pitcher plus tôt** — ✅ `CLOSING_STARTS_AT[hot]` réduit de 12 → 10, `MESSAGE_CAPS[hot]` de 35 → 20
 - [x] **Limiter messages post-pitch** — ✅ `MESSAGE_CAPS[pitched]` réduit de 10 → 5
+- [x] **Fix BUG-018 "hey 🖤"** — ✅ Supprimé fallback, retourne `''` en cas d'erreur
 
 ### 🟠 IMPORTANT
 
@@ -232,10 +231,10 @@ Converted → Paid:    0%
 | Objectif | Progrès | Status |
 |----------|---------|--------|
 | Infrastructure DM | ✅ 100% | Terminé |
-| Optimisation Funnel | ✅ 90% | Timing pitch + post-pitch limités |
-| Tracking Conversions | ✅ 60% | Webhook implémenté + tracking link `/fv-2`, config Fanvue à faire |
-| Attribution Automatique | ✅ 70% | Fuzzy matching fait, tests à faire |
-| Conversion Rate | ❌ 0% | **À surveiller après déploiement** |
+| Optimisation Funnel | ✅ 100% | Timing pitch + post-pitch limités + BUG-018 fixé |
+| Tracking Conversions | ✅ 90% | Webhook configuré + tracking link `/fv-2` |
+| Attribution Automatique | ✅ 80% | Fuzzy matching fait, tests réels à venir |
+| Conversion Rate | ❌ 0% | **À surveiller — système prêt** |
 
 ---
 
@@ -315,4 +314,4 @@ ManyChat (DM) → Webhook → /api/dm/webhook → Claude AI
 
 ---
 
-**Prochaine session** : Configurer webhook Fanvue + Tester attribution + Optimiser timing pitch
+**Prochaine session** : Améliorer wording pitch + Varier exit messages + Détecter time-wasters
