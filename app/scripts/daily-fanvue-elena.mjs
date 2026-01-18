@@ -16,6 +16,7 @@ import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createClient } from '@supabase/supabase-js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -37,6 +38,76 @@ if (fs.existsSync(envPath)) {
 // ═══════════════════════════════════════════════════════════════
 
 const NANO_BANANA_MODEL = 'google/nano-banana-pro';
+
+// ═══════════════════════════════════════════════════════════════
+// SUPABASE TOKEN STORAGE
+// ═══════════════════════════════════════════════════════════════
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
+const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
+
+async function loadTokensFromSupabase() {
+  if (!supabase) {
+    log('⚠️ Supabase not configured, using env vars for tokens');
+    return null;
+  }
+  
+  try {
+    const { data, error } = await supabase
+      .from('oauth_tokens')
+      .select('*')
+      .eq('service_name', 'fanvue')
+      .single();
+    
+    if (error || !data) {
+      log('📦 No tokens in Supabase, will use env vars');
+      return null;
+    }
+    
+    log('✅ Loaded Fanvue tokens from Supabase');
+    log(`   Last updated: ${data.updated_at}`);
+    return {
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token,
+      expiresAt: data.expires_at,
+    };
+  } catch (err) {
+    log(`⚠️ Error loading tokens from Supabase: ${err.message}`);
+    return null;
+  }
+}
+
+async function saveTokensToSupabase(tokens) {
+  if (!supabase) {
+    log('⚠️ Supabase not configured, cannot persist new tokens');
+    log('   ⚠️ IMPORTANT: Update GitHub Secrets manually with new tokens!');
+    return false;
+  }
+  
+  try {
+    const { error } = await supabase
+      .from('oauth_tokens')
+      .upsert({
+        service_name: 'fanvue',
+        access_token: tokens.accessToken,
+        refresh_token: tokens.refreshToken,
+        expires_at: tokens.expiresAt,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'service_name' });
+    
+    if (error) {
+      log(`❌ Error saving tokens to Supabase: ${error.message}`);
+      return false;
+    }
+    
+    log('✅ New tokens saved to Supabase (will be used for next run)');
+    return true;
+  } catch (err) {
+    log(`❌ Error saving tokens to Supabase: ${err.message}`);
+    return false;
+  }
+}
 
 // Elena references
 const ELENA_FACE_REF = 'https://res.cloudinary.com/dily60mr0/image/upload/v1765967140/replicate-prediction-qh51japkxxrma0cv52x8qs7mnc_ltc9ra.png';
@@ -659,16 +730,31 @@ async function main() {
 
   // Post to Fanvue (unless test mode)
   if (!TEST_MODE) {
-    const accessToken = process.env.FANVUE_ACCESS_TOKEN;
-    const refreshToken = process.env.FANVUE_REFRESH_TOKEN;
+    // Try to load tokens from Supabase first, then fall back to env vars
+    let tokens = await loadTokensFromSupabase();
     
-    if (!accessToken || !refreshToken) {
+    if (!tokens) {
+      // Fallback to environment variables (GitHub Secrets)
+      const accessToken = process.env.FANVUE_ACCESS_TOKEN;
+      const refreshToken = process.env.FANVUE_REFRESH_TOKEN;
+      
+      if (accessToken && refreshToken) {
+        tokens = {
+          accessToken,
+          refreshToken,
+          expiresAt: Date.now() + 3600 * 1000, // Assume 1h, will refresh if needed
+        };
+        log('📦 Using tokens from environment variables');
+      }
+    }
+    
+    if (!tokens) {
       log('\n⚠️  No Fanvue tokens found. Skipping Fanvue post.');
       log('   Set FANVUE_ACCESS_TOKEN and FANVUE_REFRESH_TOKEN to enable posting.');
     } else {
       try {
         // Try with current token first
-        await postToFanvue(accessToken, content, cloudinaryUrl);
+        await postToFanvue(tokens.accessToken, content, cloudinaryUrl);
         log('   ✅ Posted to Fanvue (subscribers only)!');
       } catch (error) {
         // Check if error is authentication-related (401 Unauthorized or "Unauthorized" in message)
@@ -686,12 +772,24 @@ async function main() {
         // Auth error, try refreshing token
         log('   🔄 Access token expired, refreshing...');
         try {
-          const newTokens = await refreshFanvueToken(refreshToken);
+          const newTokens = await refreshFanvueToken(tokens.refreshToken);
+          
+          // Post with new token
           await postToFanvue(newTokens.accessToken, content, cloudinaryUrl);
           log('   ✅ Posted to Fanvue (subscribers only, with refreshed token)');
-          log(`   ⚠️  IMPORTANT: Update GitHub Secrets with new refresh token:`);
-          log(`      FANVUE_REFRESH_TOKEN=${newTokens.refreshToken}`);
-          log(`      (Current token in secrets is now invalid)`);
+          
+          // IMPORTANT: Save new tokens to Supabase for next run
+          const saved = await saveTokensToSupabase({
+            accessToken: newTokens.accessToken,
+            refreshToken: newTokens.refreshToken,
+            expiresAt: Date.now() + 3600 * 1000,
+          });
+          
+          if (!saved) {
+            log(`   ⚠️  Could not save to Supabase. Update GitHub Secrets manually:`);
+            log(`      FANVUE_ACCESS_TOKEN=${newTokens.accessToken}`);
+            log(`      FANVUE_REFRESH_TOKEN=${newTokens.refreshToken}`);
+          }
         } catch (refreshError) {
           // Check if refresh token is invalid
           const refreshErrorMsg = refreshError.message || '';

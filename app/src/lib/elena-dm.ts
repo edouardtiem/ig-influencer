@@ -1530,7 +1530,7 @@ ${languageInstruction}${antiRepeatInstruction}${emojiInstruction}`;
         : '';
       
       const response = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514', // Sonnet for better quality and fewer hallucinations
+        model: 'claude-3-5-haiku-20241022', // Haiku for cost efficiency (4x cheaper)
         max_tokens: 50, // Slightly more tokens for Sonnet, validator will enforce length
         system: ELENA_SYSTEM_PROMPT + '\n\n' + contextPrompt + retryContext,
         messages: messages,

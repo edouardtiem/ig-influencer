@@ -1,0 +1,70 @@
+{
+  "name": "Checkpoint 1 - Big Lust Baseline (NSFW Working)",
+  "description": "Basic txt2img workflow with Big Lust v1.6 - All NSFW levels working",
+  "date": "2026-01-17",
+  "nodes": {
+    "checkpoint_loader": {
+      "class_type": "CheckpointLoaderSimple",
+      "inputs": {
+        "ckpt_name": "bigLust_v16.safetensors"
+      }
+    },
+    "empty_latent": {
+      "class_type": "EmptyLatentImage",
+      "inputs": {
+        "width": 1024,
+        "height": 1024,
+        "batch_size": 1
+      }
+    },
+    "ksampler": {
+      "class_type": "KSampler",
+      "inputs": {
+        "seed": "random",
+        "steps": 30,
+        "cfg": 3.5,
+        "sampler_name": "dpmpp_2m_sde",
+        "scheduler": "karras",
+        "denoise": 1.0
+      }
+    },
+    "clip_text_positive": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "text": "masterpiece, best quality, photorealistic, 8k uhd, ultra detailed, 24 year old Italian woman, soft round pleasant face, honey brown warm eyes, bronde hair dark roots golden blonde balayage long beach waves, very large natural F-cup breasts, narrow waist, wide hips, feminine shapely body, glowing sun-kissed skin natural texture, small beauty mark on right cheekbone, gold layered necklaces, luxurious bedroom, soft warm lighting, shot on Canon EOS 5D, shallow depth of field, r/gonewild style, amateur photo, uncensored"
+      }
+    },
+    "clip_text_negative": {
+      "class_type": "CLIPTextEncode", 
+      "inputs": {
+        "text": "angular face, sharp jawline, skinny body, flat chest, small breasts, A-cup, B-cup, C-cup, D-cup, worst quality, low quality, blurry, cartoon, anime, illustration, bad anatomy, bad hands, extra fingers, deformed, watermark, censored, mosaic, plastic skin"
+      }
+    },
+    "vae_decode": {
+      "class_type": "VAEDecode"
+    },
+    "save_image": {
+      "class_type": "SaveImage",
+      "inputs": {
+        "filename_prefix": "BigLust_Checkpoint1"
+      }
+    }
+  },
+  "settings_summary": {
+    "model": "bigLust_v16.safetensors",
+    "resolution": "1024x1024",
+    "steps": 30,
+    "cfg": 3.5,
+    "sampler": "dpmpp_2m_sde",
+    "scheduler": "karras"
+  },
+  "restore_instructions": [
+    "1. Open ComfyUI at http://127.0.0.1:8188",
+    "2. Clear workflow or load default",
+    "3. Set checkpoint to bigLust_v16.safetensors",
+    "4. Set Empty Latent Image to 1024x1024",
+    "5. Set KSampler: steps=30, cfg=3.5, sampler=dpmpp_2m_sde, scheduler=karras",
+    "6. Paste prompts from this file",
+    "7. Queue prompt"
+  ]
+}

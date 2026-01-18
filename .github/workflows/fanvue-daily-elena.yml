@@ -51,7 +51,11 @@ jobs:
           CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
           CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
           
-          # Fanvue OAuth
+          # Supabase (token storage - tokens persist across runs)
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          
+          # Fanvue OAuth (fallback if not in Supabase)
           FANVUE_CLIENT_ID: ${{ secrets.FANVUE_CLIENT_ID }}
           FANVUE_CLIENT_SECRET: ${{ secrets.FANVUE_CLIENT_SECRET }}
           FANVUE_ACCESS_TOKEN: ${{ secrets.FANVUE_ACCESS_TOKEN }}

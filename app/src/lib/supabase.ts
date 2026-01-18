@@ -606,6 +606,82 @@ export function isSupabaseConfigured(): boolean {
 }
 
 // ===========================================
+// FANVUE OAUTH TOKENS STORAGE
+// ===========================================
+
+export interface FanvueTokensData {
+  access_token: string;
+  refresh_token: string;
+  expires_at: number; // Unix timestamp ms
+  updated_at: string;
+}
+
+/**
+ * Save Fanvue OAuth tokens to Supabase
+ * Uses oauth_tokens table with service_name as key
+ */
+export async function saveFanvueTokens(tokens: {
+  accessToken: string;
+  refreshToken: string;
+  expiresAt: number;
+}): Promise<boolean> {
+  if (!isSupabaseConfigured()) {
+    console.warn('[Supabase] Not configured - cannot save Fanvue tokens');
+    return false;
+  }
+
+  const { error } = await supabase
+    .from('oauth_tokens')
+    .upsert({
+      service_name: 'fanvue',
+      access_token: tokens.accessToken,
+      refresh_token: tokens.refreshToken,
+      expires_at: tokens.expiresAt,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'service_name' });
+
+  if (error) {
+    console.error('❌ Error saving Fanvue tokens:', error);
+    return false;
+  }
+
+  console.log('✅ Fanvue tokens saved to Supabase');
+  return true;
+}
+
+/**
+ * Get Fanvue OAuth tokens from Supabase
+ */
+export async function getFanvueTokens(): Promise<FanvueTokensData | null> {
+  if (!isSupabaseConfigured()) {
+    console.warn('[Supabase] Not configured - cannot fetch Fanvue tokens');
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from('oauth_tokens')
+    .select('*')
+    .eq('service_name', 'fanvue')
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') {
+      // Not found
+      return null;
+    }
+    console.error('❌ Error fetching Fanvue tokens:', error);
+    return null;
+  }
+
+  return {
+    access_token: data.access_token,
+    refresh_token: data.refresh_token,
+    expires_at: data.expires_at,
+    updated_at: data.updated_at,
+  };
+}
+
+// ===========================================
 // DAILY TRENDS CACHE
 // ===========================================
 
