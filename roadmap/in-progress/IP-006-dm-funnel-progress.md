@@ -150,6 +150,40 @@ Converted → Paid:    0%
 
 ## 🐛 Bugs restants
 
+### BUG-018 : Bot répond "hey 🖤" en boucle ⚠️ CRITIQUE
+
+**Description** : Le bot Elena répond "hey 🖤" à chaque message, même quand l'utilisateur se plaint ("only hey 😟", "Please tell me", "Not hey").
+
+**Symptômes** (screenshot 18/01/2026 - @arsalanashraf...) :
+- User : "Have a nice day" → Bot : "hey 🖤"
+- User : "only hey 😟" → Bot : "hey 🖤"
+- User : "A réagi à votre story 😂" → Bot : "hey 🖤"
+- User : "Please tell me" → Bot : "hey 🖤"
+- User : "Not hey" → Bot : "hey 🖤" (x2)
+
+**Analyse technique** :
+- Le code a une protection anti-loop (lignes 1940-1950 de `elena-dm.ts`)
+- Quand détecté → retourne `response: ''` avec `skip: true`
+- **MAIS** ManyChat semble ignorer le `skip: true` et envoyer quand même
+
+**Causes probables** :
+1. ⚠️ **ManyChat fallback** — Un message par défaut "hey 🖤" est configuré dans ManyChat quand la réponse est vide
+2. ⚠️ **Condition ManyChat** — Le flow ManyChat n'est pas configuré pour vérifier `skip: true`
+3. 🔴 **Erreur API Claude** — Timeout ou quota dépassé → fallback "hey 🖤" dans le code (ligne 1568, 1580)
+
+**Fix proposé** :
+1. **Vérifier ManyChat** — Supprimer tout fallback message "hey 🖤"
+2. **Ajouter condition** — Dans ManyChat, vérifier `{{skip}} != true` avant d'envoyer
+3. **Changer le fallback code** — Remplacer "hey 🖤" par quelque chose de plus varié
+4. **Vérifier logs Vercel** — Voir si c'est une erreur API ou ManyChat
+
+**Impact** : 🔴 CRITIQUE — Détruit l'expérience utilisateur et toute chance de conversion
+
+**Priorité** : 🔴 High  
+**Status** : ⏳ À investiguer dans ManyChat
+
+---
+
 ### BUG-016 : Attribution non fonctionnelle
 
 **Description** : Le fuzzy matching est implémenté mais les conversions ne sont pas trackées car :
@@ -157,14 +191,14 @@ Converted → Paid:    0%
 2. Pas de test réel avec vraie conversion
 
 **Priorité** : 🔴 High  
-**Status** : ⏳ À tester après configuration webhook
+**Status** : ✅ Webhook configuré (18/01/2026)
 
 ### BUG-017 : Free trial link non vérifié
 
 **Description** : Le lien `?free_trial=a873adf0-4d08-4f84-aa48-a8861df6669f` n'a pas été testé pour vérifier qu'il donne bien 7 jours gratuits.
 
-**Priorité** : 🔴 High  
-**Status** : ⏳ À tester manuellement
+**Priorité** : 🟡 Medium  
+**Status** : ✅ Combiné avec tracking link `/fv-2`
 
 ---
 

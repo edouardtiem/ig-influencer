@@ -1563,9 +1563,11 @@ ${languageInstruction}${antiRepeatInstruction}${emojiInstruction}`;
     } catch (error) {
       console.error(`Error generating response (attempt ${attempt}):`, error);
       if (attempt === MAX_ATTEMPTS) {
-        // All attempts failed - use safe fallback
+        // All attempts failed - DON'T send fallback to avoid "hey 🖤" loop
+        // Return empty string so webhook skips sending
+        console.log(`⚠️ All ${MAX_ATTEMPTS} attempts failed. Skipping to avoid fallback loop.`);
         return {
-          response: "hey 🖤",
+          response: '',  // Empty = webhook will skip
           strategy: 'engage',
           shouldPitch: false,
         };
@@ -1573,11 +1575,11 @@ ${languageInstruction}${antiRepeatInstruction}${emojiInstruction}`;
     }
   }
   
-  // If all attempts failed validation, use last response anyway (better than nothing)
+  // If all attempts failed validation, skip instead of sending generic fallback
   if (!validatedResponse && lastValidationResult) {
-    console.log(`⚠️ All ${MAX_ATTEMPTS} attempts failed validation. Using last response anyway.`);
-    // Return a safe generic response instead
-    validatedResponse = "hey 🖤";
+    console.log(`⚠️ All ${MAX_ATTEMPTS} attempts failed validation. Skipping to avoid loop.`);
+    // Return empty string so webhook skips - better than "hey 🖤" loop
+    validatedResponse = '';
   }
 
   // Determine strategy based on intent
