@@ -147,6 +147,23 @@ export async function POST(request: NextRequest) {
       '';
     
     // ===========================================
+    // MEDIA URL DETECTION — Convert CDN URLs to tokens
+    // ===========================================
+    // ManyChat sometimes sends media URLs directly in last_input_text
+    // instead of as proper attachments. Detect and convert them.
+    const isInstagramMediaUrl = messageText && (
+      messageText.includes('lookaside.fbsbx.com/ig_messaging_cdn') ||
+      messageText.includes('cdn.fbsbx.com') ||
+      messageText.includes('scontent') ||
+      messageText.match(/^https?:\/\/[^\s]+\.(jpg|jpeg|png|gif|webp|mp4|mov)(\?|$)/i)
+    );
+    
+    if (isInstagramMediaUrl) {
+      console.log(`📸 MEDIA URL detected in last_input_text: ${messageText.substring(0, 80)}...`);
+      messageText = '[IMAGE_SENT]';
+    }
+    
+    // ===========================================
     // STICKER/REACTION HANDLING — Convert to meaningful text
     // ===========================================
     // ManyChat sends stickers/reactions as attachments without text
