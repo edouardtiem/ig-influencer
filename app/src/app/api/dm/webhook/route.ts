@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
     
     // Extract message text - try multiple fields for story replies
     // ManyChat may send story reply text in different fields
-    const messageText = 
+    let messageText = 
       rawPayload.last_input_text || 
       rawPayload.story_reply?.text ||
       rawPayload.story_mention?.text ||
@@ -144,6 +144,40 @@ export async function POST(request: NextRequest) {
       rawPayload.last_message?.text ||
       rawPayload.attachment?.payload?.text ||
       '';
+    
+    // ===========================================
+    // STICKER/REACTION HANDLING — Convert to meaningful text
+    // ===========================================
+    // ManyChat sends stickers/reactions as attachments without text
+    // We need to convert these to text so the bot can respond
+    const hasAttachment = rawPayload.attachment || rawPayload.last_message?.attachment;
+    const attachmentType = hasAttachment?.type || rawPayload.last_message?.attachment?.type;
+    const isStoryReply = rawPayload.story_reply || rawPayload.is_story_reply;
+    const isStoryMention = rawPayload.story_mention || rawPayload.is_story_mention;
+    
+    // If no text but has attachment (sticker, reaction, like, etc.)
+    if ((!messageText || messageText.trim() === '') && hasAttachment) {
+      // Convert attachment types to meaningful text for the AI
+      if (attachmentType === 'sticker' || attachmentType === 'like') {
+        messageText = '[STICKER_REACTION]'; // AI will know to engage warmly
+        console.log(`📌 STICKER/LIKE detected - converting to engagement signal`);
+      } else if (attachmentType === 'image') {
+        messageText = '[IMAGE_SENT]';
+        console.log(`📸 IMAGE detected - converting to engagement signal`);
+      } else if (attachmentType === 'audio' || attachmentType === 'voice') {
+        messageText = '[VOICE_MESSAGE]';
+        console.log(`🎤 VOICE MESSAGE detected - converting to engagement signal`);
+      } else {
+        messageText = '[ATTACHMENT]';
+        console.log(`📎 Unknown attachment type: ${attachmentType}`);
+      }
+    }
+    
+    // If story reply without text (just an emoji reaction to story)
+    if ((!messageText || messageText.trim() === '') && (isStoryReply || isStoryMention)) {
+      messageText = '[STORY_REACTION]';
+      console.log(`📖 STORY REACTION detected (no text) - converting to engagement signal`);
+    }
     
     // Build normalized payload
     const payload: ManyChateWebhookPayload = {
@@ -161,9 +195,9 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // If no message text found, log and skip (don't error)
+    // If STILL no message text found after all conversions, log and skip
     if (!messageText || messageText.trim() === '') {
-      console.warn('⚠️ No message text found in payload');
+      console.warn('⚠️ No message text found in payload (even after attachment conversion)');
       console.warn('Payload keys:', Object.keys(rawPayload));
       console.warn('Full payload:', JSON.stringify(rawPayload).substring(0, 800));
       return NextResponse.json({
