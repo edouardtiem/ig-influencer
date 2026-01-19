@@ -603,6 +603,22 @@ const COUNTING_WORDS = [
   'nine', 'eight', 'seven', 'six', 'five', 'four', 'three',
 ];
 
+// Fallback responses when API fails - varied questions to keep conversation going
+const SMART_FALLBACKS = [
+  "tu viens d'où? 🖤",
+  "where are you from? 👀",
+  "what's your day looking like? 😊",
+  "tu fais quoi dans la vie? 👀",
+  "tell me something about you 🖤",
+  "how's your evening going? 😏",
+  "tu me racontes un peu? 👀",
+  "what brings you here? 🖤",
+  "something on your mind? 😊",
+  "so what do you do? 👀",
+  "qu'est-ce que tu fais ce soir? 😏",
+  "got any plans today? 🖤",
+];
+
 /**
  * Validate a response before sending
  * Checks: hallucinations, length, stage alignment, closing objective
@@ -1563,11 +1579,23 @@ ${languageInstruction}${antiRepeatInstruction}${emojiInstruction}`;
     } catch (error) {
       console.error(`Error generating response (attempt ${attempt}):`, error);
       if (attempt === MAX_ATTEMPTS) {
-        // All attempts failed - DON'T send fallback to avoid "hey 🖤" loop
-        // Return empty string so webhook skips sending
-        console.log(`⚠️ All ${MAX_ATTEMPTS} attempts failed. Skipping to avoid fallback loop.`);
+        // All attempts failed - use smart fallback (varied question)
+        const recentContents = conversationHistory
+          .filter(m => m.direction === 'outgoing')
+          .slice(-5)
+          .map(m => m.content.toLowerCase());
+        
+        // Pick a fallback that wasn't recently used
+        const availableFallbacks = SMART_FALLBACKS.filter(
+          fb => !recentContents.some(c => c.includes(fb.substring(0, 15).toLowerCase()))
+        );
+        const fallback = availableFallbacks.length > 0 
+          ? availableFallbacks[Math.floor(Math.random() * availableFallbacks.length)]
+          : SMART_FALLBACKS[Math.floor(Math.random() * SMART_FALLBACKS.length)];
+        
+        console.log(`⚠️ API failed. Using smart fallback: "${fallback}"`);
         return {
-          response: '',  // Empty = webhook will skip
+          response: fallback,
           strategy: 'engage',
           shouldPitch: false,
         };
@@ -1575,11 +1603,20 @@ ${languageInstruction}${antiRepeatInstruction}${emojiInstruction}`;
     }
   }
   
-  // If all attempts failed validation, skip instead of sending generic fallback
+  // If all attempts failed validation, use smart fallback instead of empty
   if (!validatedResponse && lastValidationResult) {
-    console.log(`⚠️ All ${MAX_ATTEMPTS} attempts failed validation. Skipping to avoid loop.`);
-    // Return empty string so webhook skips - better than "hey 🖤" loop
-    validatedResponse = '';
+    console.log(`⚠️ All ${MAX_ATTEMPTS} attempts failed validation. Using smart fallback.`);
+    const recentContents = conversationHistory
+      .filter(m => m.direction === 'outgoing')
+      .slice(-5)
+      .map(m => m.content.toLowerCase());
+    
+    const availableFallbacks = SMART_FALLBACKS.filter(
+      fb => !recentContents.some(c => c.includes(fb.substring(0, 15).toLowerCase()))
+    );
+    validatedResponse = availableFallbacks.length > 0 
+      ? availableFallbacks[Math.floor(Math.random() * availableFallbacks.length)]
+      : SMART_FALLBACKS[Math.floor(Math.random() * SMART_FALLBACKS.length)];
   }
 
   // Determine strategy based on intent
