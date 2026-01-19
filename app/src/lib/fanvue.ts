@@ -373,6 +373,7 @@ async function fanvueApi<T>(endpoint: string, options: FanvueApiOptions = {}): P
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
+      'X-Fanvue-API-Version': '2025-06-26', // Required by Fanvue API
     },
   };
   
@@ -482,23 +483,25 @@ export async function sendMessage(params: SendMessageParams): Promise<unknown> {
   const price = params.price;
   const isPPV = price && price > 0;
   
-  console.log(`[Fanvue] Sending ${isPPV ? 'PPV' : 'free'} message to chat ${params.chatId}${isPPV ? ` (${price / 100}€)` : ''}...`);
+  console.log(`[Fanvue] Sending ${isPPV ? 'PPV' : 'free'} message to user ${params.chatId}${isPPV ? ` (${price / 100}€)` : ''}...`);
   
   const body: Record<string, unknown> = {
     text: params.text,
   };
   
+  // Note: API uses mediaUuids (not media_urls) per 2026 documentation
   if (params.mediaUrls && params.mediaUrls.length > 0) {
-    body.media_urls = params.mediaUrls;
+    body.mediaUuids = params.mediaUrls; // Changed from media_urls to mediaUuids
   }
   
   // PPV message configuration
   if (isPPV) {
     body.price = price;
-    body.is_locked = params.isLocked !== false; // Default to locked if price is set
+    // Note: is_locked is not in the 2026 API docs, price alone makes it PPV
   }
   
-  return fanvueApi(`/chats/${params.chatId}/messages`, {
+  // Correct endpoint: /chats/:userUuid/message (singular, not plural)
+  return fanvueApi(`/chats/${params.chatId}/message`, {
     method: 'POST',
     body,
   });

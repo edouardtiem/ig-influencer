@@ -94,13 +94,13 @@ export interface FanvueWebhookPayload {
 // CONSTANTS
 // ===========================================
 
-// Message caps per stage
+// Message caps per stage (MUCH higher for Fanvue — conversations never stop)
 const MESSAGE_CAPS: Record<FanvueLeadStage, number> = {
-  cold: 20,
-  warm: 40,
-  hot: 60,
-  pitched: 20,
-  paid: 200,
+  cold: 50,      // More messages to build connection
+  warm: 100,     // Extended teasing phase
+  hot: 200,      // Long explicit conversations
+  pitched: 100,  // Keep engaging after pitch
+  paid: 999999,  // Unlimited for paying customers
 };
 
 // When to start PPV teasing
@@ -557,7 +557,9 @@ export async function generateFanvueResponse(
   availablePPV: PPVContent[]
 ): Promise<{ response: string; shouldSendPPV: boolean; ppvContent?: PPVContent }> {
   // Build conversation messages for Venice AI
-  const messages: VeniceMessage[] = conversationHistory.slice(-10).map(msg => ({
+  // Use MUCH more history for Fanvue (up to 50 messages = ~25 exchanges)
+  // This allows for long, continuous explicit conversations
+  const messages: VeniceMessage[] = conversationHistory.slice(-50).map(msg => ({
     role: msg.direction === 'incoming' ? 'user' as const : 'assistant' as const,
     content: msg.content,
   }));
@@ -725,6 +727,16 @@ export async function processFanvueDM(payload: FanvueWebhookPayload): Promise<{
 
   // 14. Update contact after outgoing
   await updateFanvueContactAfterMessage(updatedContact.id, false);
+
+  // 14.5. Trigger memory extraction every 5 messages (async, don't wait)
+  if (updatedContact.message_count % 5 === 0) {
+    // Import dynamically to avoid circular dependencies
+    import('./fanvue-memory').then(({ processContactMemory }) => {
+      processContactMemory(updatedContact.id).catch(err => {
+        console.error('[Fanvue DM] Memory extraction error:', err);
+      });
+    });
+  }
 
   // 15. Send PPV if appropriate
   let ppvSent = false;

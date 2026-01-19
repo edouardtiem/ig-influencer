@@ -1060,4 +1060,140 @@ node app/scripts/test-elena-nude.mjs
 
 ---
 
-**Last Updated:** January 18, 2026 (Night — Nude Generation WORKING)
+# 🔖 CHECKPOINT 6: Masturbation Selfies Working
+
+**Date:** January 18, 2026 (Night)
+**Status:** ✅ Selfie masturbation explicite fonctionnelle
+
+## What Works at This Checkpoint
+
+| Feature | Status |
+|---------|--------|
+| Solo masturbation selfies | ✅ Working |
+| Wet pussy close-ups | ✅ Generated |
+| Multiple angles | ✅ 4 different poses |
+| Self-shot aesthetic | ✅ Authentic |
+| Fanvue sales ready | ✅ Teasers created |
+
+## Optimal Settings for Masturbation
+
+```
+IP-Adapter Weight: 0.3 (body consistent, scene controlled)
+Focus: Solo, alone, one person only
+Explicit: Wet pussy, glistening, fingers on clitoris
+Angles: POV, mirror, closeup, side view
+```
+
+## Generated Collections
+
+### Nude Poses (5 images)
+- POV from above, legs spread
+- Sitting edge bed (back view)
+- On knees spread
+- Lying side leg up
+- Doggy looking back
+
+**Location:** `~/ComfyUI/output/Elena_Nude_*.png`
+
+### Masturbation Selfies (4 images)
+- POV selfie above (solo version)
+- Mirror selfie spread
+- Closeup pussy selfie (best seller)
+- Side angle bed
+
+**Location:** `~/ComfyUI/output/Elena_Masturbation_*.png`
+
+## Scripts Created
+
+| Script | Purpose | Usage |
+|--------|---------|-------|
+| `batch-elena-nude.mjs` | 5 nude poses | `node batch-elena-nude.mjs` |
+| `batch-elena-masturbation.mjs` | 4 masturbation angles | `node batch-elena-masturbation.mjs` |
+| `regen-masturbation-solo.mjs` | Fix solo masturbation | `node regen-masturbation-solo.mjs` |
+
+## Fanvue Sales Strategy
+
+### Pack Teaser (Nude)
+```
+"Hey baby, I've got something special for you tonight... a private collection of 5 brand new photos that will make you cum harder than ever. 💦"
+```
+
+### Single Photo Teaser (Masturbation)
+```
+"Hey baby, I've got something special just for you... a super intimate close-up selfie I took while touching myself"
+```
+
+## Key Learnings
+
+1. **IP-Adapter weight 0.3** = Perfect balance for explicit content
+2. **Explicit prompts work** — "wet pussy, glistening, fingers on clitoris"
+3. **Solo enforcement** — Add "SOLO, ALONE, NO man" to negative prompts
+4. **Selfie angles matter** — Closeup pussy = highest conversion
+5. **Fanvue pricing** — $25 packs, $5 singles
+
+## Business Results
+
+- **Nude pack:** 5 poses, legs spread, pussy visible
+- **Masturbation pack:** 4 angles, self-shot, wet closeups
+- **Ready for sale:** Teasers created, pricing set
+
+---
+
+## Final Status Summary
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| Big Lust setup | ✅ Working | Mac M3 Pro, 18GB RAM |
+| Face consistency | ❌ Abandoned | InstantID too slow, IP-Adapter FaceID working but not used |
+| Body consistency | ✅ Working | IP-Adapter Plus 0.3 weight |
+| Pose control | ✅ Working | ControlNet OpenPose (face hiding) |
+| Nude generation | ✅ Working | 5 poses, explicit |
+| Masturbation selfies | ✅ Working | 4 angles, wet closeups |
+| Fanvue sales | ✅ Ready | Teasers and pricing set |
+
+**All core NSFW generation working!** Elena can now generate and sell explicit content with consistent body and various poses.
+
+---
+
+---
+
+## 🔮 FUTURE WORK: Face Consistency
+
+**Priority:** High  
+**Status:** ⬜ Not started (but models already installed)
+
+### What's Needed
+
+Le visage d'Elena varie entre chaque génération. Pour une vraie cohérence, il faut intégrer **IP-Adapter FaceID** dans le workflow.
+
+### Already Installed
+
+| Model | Location | Status |
+|-------|----------|--------|
+| IP-Adapter FaceID Plus V2 | `~/ComfyUI/models/ipadapter/faceid.plusv2.sdxl.bin` | ✅ Ready |
+| CLIP Vision ViT-H | `~/ComfyUI/models/clip_vision/CLIP-ViT-H-14...` | ✅ Ready |
+| FaceID LoRA | `~/ComfyUI/models/loras/faceid.plusv2.sdxl.lora.safetensors` | ✅ Ready |
+| InsightFace buffalo_l | `~/ComfyUI/models/insightface/` | ✅ Ready |
+
+### What to Do
+
+1. Créer une **face reference image** d'Elena (visage seul, haute qualité)
+2. Combiner dans le workflow:
+   - IP-Adapter FaceID (visage) — weight ~0.5
+   - IP-Adapter Plus (corps) — weight 0.3
+3. Tester la cohérence faciale entre générations
+
+### Expected Result
+
+Toutes les images auront le **même visage** d'Elena, permettant de:
+- Montrer le visage sans crop
+- Créer des séries cohérentes
+- Améliorer l'authenticité du personnage
+
+### Reference
+
+Voir CHECKPOINT 2 dans ce doc pour les détails de setup IP-Adapter FaceID.
+
+---
+
+**Last Updated:** January 19, 2026 (Night — Masturbation Selfies WORKING — Face Consistency TODO)
