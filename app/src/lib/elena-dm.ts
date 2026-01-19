@@ -1002,6 +1002,37 @@ export async function markAsStopped(contactId: string): Promise<void> {
     .eq('id', contactId);
 }
 
+/**
+ * Reactivate a stopped contact after cooling period (7 days)
+ * Resets stage to 'cold' but keeps message history
+ */
+export async function reactivateContact(contactId: string): Promise<void> {
+  console.log(`🔄 Reactivating contact ${contactId} after 7-day cooling period`);
+  await supabase
+    .from('elena_dm_contacts')
+    .update({
+      is_stopped: false,
+      stopped_at: null,
+      stage: 'cold',  // Reset to cold for fresh start
+      // Keep message_count to preserve history
+    })
+    .eq('id', contactId);
+}
+
+/**
+ * Check if a stopped contact should be reactivated (7+ days since stopped)
+ */
+function shouldReactivateContact(contact: DMContact): boolean {
+  if (!contact.is_stopped || !contact.stopped_at) {
+    return false;
+  }
+  
+  const stoppedDate = new Date(contact.stopped_at);
+  const daysSinceStopped = (Date.now() - stoppedDate.getTime()) / (1000 * 60 * 60 * 24);
+  
+  return daysSinceStopped >= 7;
+}
+
 // ===========================================
 // LANGUAGE DETECTION
 // ===========================================
@@ -1795,28 +1826,42 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
   console.log(`👤 Contact stage: ${contact.stage}, messages: ${contact.message_count}`);
 
   // ===========================================
-  // IS_STOPPED CHECK (MUST BE FIRST - before everything else)
+  // IS_STOPPED CHECK (with 7-day reactivation)
   // ===========================================
   
   if (contact.is_stopped) {
-    console.log(`🛑 CONTACT IS STOPPED (@${igUsername}). Not responding.`);
-    
-    // Return empty response - ManyChat should not send anything
-    return {
-      response: '',
-      contact,
-      strategy: 'engage',
-      analysis: {
-        intent: 'other',
-        sentiment: 'neutral',
-        is_question: false,
-        mentions_fanvue: false,
-        recommendedMode: 'balanced',
-        modeReason: 'Contact is stopped - no more responses',
-        triggerFanvuePitch: false,
-      },
-      shouldStop: true,
-    };
+    // Check if contact should be reactivated (stopped for 7+ days)
+    if (shouldReactivateContact(contact)) {
+      console.log(`🔄 REACTIVATING CONTACT (@${igUsername}) — Stopped for 7+ days, giving another chance`);
+      await reactivateContact(contact.id);
+      // Update local contact object
+      contact.is_stopped = false;
+      contact.stopped_at = null;
+      contact.stage = 'cold';
+      // Continue processing normally (don't return)
+    } else {
+      // Still within 7-day cooling period
+      const stoppedDate = contact.stopped_at ? new Date(contact.stopped_at) : new Date();
+      const daysSinceStopped = Math.round((Date.now() - stoppedDate.getTime()) / (1000 * 60 * 60 * 24));
+      console.log(`🛑 CONTACT IS STOPPED (@${igUsername}). Day ${daysSinceStopped}/7 — Not responding.`);
+      
+      // Return empty response - ManyChat should not send anything
+      return {
+        response: '',
+        contact,
+        strategy: 'engage',
+        analysis: {
+          intent: 'other',
+          sentiment: 'neutral',
+          is_question: false,
+          mentions_fanvue: false,
+          recommendedMode: 'balanced',
+          modeReason: `Contact is stopped - ${7 - daysSinceStopped} days until reactivation`,
+          triggerFanvuePitch: false,
+        },
+        shouldStop: true,
+      };
+    }
   }
 
   // ===========================================
