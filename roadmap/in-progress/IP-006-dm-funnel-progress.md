@@ -170,15 +170,21 @@ Converted → Paid:    0%
 - ❌ Pas de fallback dans ManyChat
 - ✅ **Erreur API Claude** — Timeout ou quota dépassé → fallback "hey 🖤" dans le code
 
-**Fix appliqué** (commit `a5d1660`) :
-- Supprimé le fallback "hey 🖤" dans `elena-dm.ts`
-- En cas d'erreur API → retourne `response: ''` → webhook skip
-- L'anti-loop était déjà en place mais bypassé par le fallback
+**Fix appliqué** :
+1. `a5d1660` — Supprimé fallback "hey 🖤" → réponses vides
+2. `6e343f3` — Check empty response avant sauvegarde
+3. `7431087` — **Smart fallbacks** : 12 questions variées FR/EN au lieu de vide
+
+**Smart fallbacks** (quand API échoue) :
+- "tu viens d'où? 🖤"
+- "where are you from? 👀"
+- "what's your day looking like? 😊"
+- etc. (12 variations, évite répétition)
 
 **Impact** : 🔴 CRITIQUE — Détruit l'expérience utilisateur et toute chance de conversion
 
 **Priorité** : 🔴 High  
-**Status** : ✅ Fix déployé (18/01/2026) — À monitorer
+**Status** : ✅ Fix complet déployé (18/01/2026)
 
 ---
 
