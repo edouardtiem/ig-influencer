@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 19 janvier 2026 (DONE-070 Fanvue Language Consistency ✅)
+**Dernière mise à jour** : 19 janvier 2026 (DONE-071 Elena Custom Linktree ✅)
 
 ---
 
@@ -67,6 +67,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-071 | **🔗 Elena Custom Linktree** — Linktree personnalisé /elena avec vidéo background, galerie défilante, timer countdown A/B testing, modal 18+, CTA Fanvue promo 7 jours, design Soft Boudoir (rose #E8A0BF), mobile-first | 19/01/2026 | v2.57.0 | [→](./roadmap/done/DONE-071-elena-custom-linktree.md) |
 | DONE-070 | **🌍 Fanvue Language Consistency** — Fix mélange de langues dans réponses Elena Fanvue DM + Instructions strictes par langue (FR/EN/IT/ES/PT/DE) + Vocabulaire explicite adapté par langue + Tests validation 100% cohérence | 19/01/2026 | v2.56.0 | [→](./docs/sessions/2026-01-19-fanvue-language-consistency.md) |
 | DONE-069 | **🔧 Hard Fix DM Bugs** — Investigation systématique avec script diagnostic complet (8 tests) + Fix 105 contacts > MESSAGE_CAPS non STOPPED (77 HOT + 28 PITCHED) + Fix Elena demande anglais (suppression défaut 'en', mirror user's language) + Tous bugs critiques résolus | 19/01/2026 | v2.55.0 | [→](./docs/sessions/2026-01-19-dm-hard-fix-session.md) |
 | DONE-068 | **🔍 Audit & Fix DM Fanvue** — Audit système DM Fanvue suite messages non répondus + Fix Venice AI non configuré sur Vercel + Ré-authentification OAuth Fanvue (tokens expirés) + Script audit `audit-fanvue-dm-today.mjs` + Système opérationnel | 16/01/2025 | v2.54.0 | [→](./roadmap/done/DONE-068-fanvue-dm-audit-fix.md) |
