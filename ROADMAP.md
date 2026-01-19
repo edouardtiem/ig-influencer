@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 19 janvier 2026 (IP-007 Hard Fix DM Bugs ✅)
+**Dernière mise à jour** : 19 janvier 2026 (DONE-070 Fanvue Language Consistency ✅)
 
 ---
 
@@ -67,6 +67,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-070 | **🌍 Fanvue Language Consistency** — Fix mélange de langues dans réponses Elena Fanvue DM + Instructions strictes par langue (FR/EN/IT/ES/PT/DE) + Vocabulaire explicite adapté par langue + Tests validation 100% cohérence | 19/01/2026 | v2.56.0 | [→](./docs/sessions/2026-01-19-fanvue-language-consistency.md) |
 | DONE-069 | **🔧 Hard Fix DM Bugs** — Investigation systématique avec script diagnostic complet (8 tests) + Fix 105 contacts > MESSAGE_CAPS non STOPPED (77 HOT + 28 PITCHED) + Fix Elena demande anglais (suppression défaut 'en', mirror user's language) + Tous bugs critiques résolus | 19/01/2026 | v2.55.0 | [→](./docs/sessions/2026-01-19-dm-hard-fix-session.md) |
 | DONE-068 | **🔍 Audit & Fix DM Fanvue** — Audit système DM Fanvue suite messages non répondus + Fix Venice AI non configuré sur Vercel + Ré-authentification OAuth Fanvue (tokens expirés) + Script audit `audit-fanvue-dm-today.mjs` + Système opérationnel | 16/01/2025 | v2.54.0 | [→](./roadmap/done/DONE-068-fanvue-dm-audit-fix.md) |
 | DONE-067 | **🔧 DM Unicode JSON Error Fix** — Fix erreur 400 Anthropic API causée par caractères Unicode invalides (surrogate pairs incomplets) dans historique conversation + Fonction sanitizeUnicode() pour nettoyer messages avant envoi API + Application à conversationHistory et incomingMessage | 16/01/2026 | v2.53.0 | [→](./roadmap/done/DONE-067-dm-unicode-json-error-fix.md) |
@@ -203,6 +204,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 19/01/2026 | **🌍 Fanvue Language Consistency** — Fix mélange de langues dans réponses Elena Fanvue DM + Instructions strictes par langue + Vocabulaire explicite adapté + Tests validation 100% cohérence | [→](./docs/sessions/2026-01-19-fanvue-language-consistency.md) |
 | 18/01/2026 | **📊 Audit Funnel DM Instagram** — Analyse complète 925 contacts + Identification 0% conversion critique + Implémentation tracking Fanvue (fuzzy matching) + Documentation progression | [→](./docs/sessions/2026-01-18-dm-funnel-audit.md) |
 | 16/01/2026 | **🔧 DM Unicode JSON Error Fix** — Investigation erreur 400 Anthropic API (surrogate pairs incomplets) + Fix sanitizeUnicode() pour nettoyer caractères corrompus avant envoi API + Application à conversationHistory | [→](./docs/sessions/2026-01-16-dm-unicode-json-error-fix.md) |
 | 15/01/2025 | **💬 Auto-Reply Comments Backend** — Endpoint `/api/comment/reply` créé + Claude Sonnet + Spam detection + Table Supabase + Tests OK + ManyChat AI configuré (solution finale) | [→](./docs/sessions/2025-01-15-auto-reply-comments-backend.md) |
