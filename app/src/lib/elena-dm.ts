@@ -595,6 +595,24 @@ const FORBIDDEN_WORDS = [
   'developers', 'creators', 'behind the',
   // Story reply bot behavior (never ask which one)
   'which one', 'which photo', 'which story', 'what do you mean',
+  // EXAGGERATION words (prevent over-the-top responses)
+  'absoluto', 'absolute', 'supremo', 'supreme', 'olimpo', 'olympus',
+  'cosmos', 'universal', 'universe', 'eterno', 'eternal', 'eterna',
+  'histórico', 'historic', 'historical', 'divino', 'divine', 'sagrado', 'sacred',
+  'perfecto', 'perfect', 'perfecta', 'parfait', 'parfaite',
+  'maestro', 'master', 'técnico', 'technique',
+  'final del', 'definitivo', 'definitive',
+  'existencia', 'existence',
+  // Multi-word exaggeration
+  'the best', 'lo mejor', 'le meilleur', 'ever seen', 'of all time',
+  'in history', 'en la historia', 'dans l\'histoire',
+];
+
+// Forbidden patterns (regex) for more complex exaggeration detection
+const FORBIDDEN_PATTERNS = [
+  /[A-Z]{3,}/g, // More than 3 consecutive caps = shouting
+  /!{2,}/g,     // Multiple exclamation marks
+  /\.{4,}/g,    // More than 3 dots
 ];
 
 // Words that suggest counting (dangerous)
@@ -640,6 +658,35 @@ function validateResponse(
         severity: 'fail',
       };
     }
+  }
+  
+  // === CHECK 1.5: Forbidden patterns (ALL CAPS, multiple exclamation marks) ===
+  // Check for ALL CAPS words (shouting) - but allow single-letter caps and emojis
+  const capsWords = response.match(/[A-Z]{3,}/g);
+  if (capsWords && capsWords.length > 0) {
+    return {
+      isValid: false,
+      reason: `Contains ALL CAPS word: "${capsWords[0]}" - no shouting`,
+      severity: 'fail',
+    };
+  }
+  
+  // Check for multiple exclamation marks
+  if (/!{2,}/.test(response)) {
+    return {
+      isValid: false,
+      reason: `Contains multiple exclamation marks - too excited`,
+      severity: 'fail',
+    };
+  }
+  
+  // Check for excessive dots (ellipsis spam)
+  if (/\.{4,}/.test(response)) {
+    return {
+      isValid: false,
+      reason: `Contains too many dots - excessive ellipsis`,
+      severity: 'fail',
+    };
   }
   
   // === CHECK 2: Counting words (potential hallucination) ===
@@ -1162,6 +1209,41 @@ export async function analyzeMessageIntent(message: string): Promise<IntentAnaly
   let modeReason = '';
   let triggerFanvuePitch = false;
 
+  // ===========================================
+  // PRIORITY 0: SPECIAL TOKENS (stickers, reactions, attachments)
+  // ===========================================
+  // These are converted from ManyChat attachments - NEVER trigger Fanvue pitch on first contact
+  const isSpecialToken = [
+    '[STICKER_REACTION]', 
+    '[STORY_REACTION]', 
+    '[IMAGE_SENT]', 
+    '[VOICE_MESSAGE]', 
+    '[ATTACHMENT]'
+  ].includes(message);
+  
+  if (isSpecialToken) {
+    // User sent a non-text engagement (sticker, reaction, image)
+    // This is positive intent - they're engaged! But DO NOT pitch Fanvue yet.
+    // Just be warm and re-engage to continue the conversation.
+    intent = 'greeting'; // Treat as greeting/engagement
+    sentiment = 'positive';
+    recommendedMode = 'warm';
+    modeReason = 'Non-text engagement (sticker/reaction) → be warm and ask a question';
+    triggerFanvuePitch = false; // CRITICAL: Never pitch on just a sticker/reaction
+    
+    console.log(`📌 SPECIAL TOKEN detected: ${message} → warm engagement, no pitch`);
+    
+    return { 
+      intent, 
+      sentiment, 
+      is_question: false, 
+      mentions_fanvue: false, 
+      recommendedMode, 
+      modeReason,
+      triggerFanvuePitch 
+    };
+  }
+
   // Check for question
   const is_question = message.includes('?') || 
     ['qui', 'quoi', 'où', 'comment', 'pourquoi', 'what', 'who', 'where', 'how', 'why', 'when'].some(q => lowerMessage.startsWith(q));
@@ -1428,11 +1510,25 @@ export async function generateElenaResponse(
   // Calculate closing pressure
   const closingPressure = getClosingPressure(contact.stage as LeadStage, contact.message_count);
 
+  // ===========================================
+  // MINIMUM MESSAGE RULE — Prevent premature Fanvue pitch
+  // ===========================================
+  // NEVER pitch Fanvue before message 4, regardless of intent.
+  // First 3 messages = build rapport ONLY.
+  const MIN_MESSAGES_BEFORE_PITCH = 4;
+  const hasEnoughMessages = contact.message_count >= MIN_MESSAGES_BEFORE_PITCH;
+  
   // Determine if we should allow Fanvue pitch
-  const canPitch = analysis.triggerFanvuePitch && contact.stage !== 'pitched';
-  const isAskingLink = analysis.intent === 'asking_link';
-  const isSexual = analysis.intent === 'sexual';
+  // Must have: (1) intent triggers pitch, (2) not already pitched, (3) enough messages exchanged
+  const canPitch = analysis.triggerFanvuePitch && contact.stage !== 'pitched' && hasEnoughMessages;
+  const isAskingLink = analysis.intent === 'asking_link' && hasEnoughMessages;
+  const isSexual = analysis.intent === 'sexual' && hasEnoughMessages;
   const isOutOfScope = analysis.intent === 'out_of_scope';
+  
+  // Log if we blocked early pitch
+  if (analysis.triggerFanvuePitch && !hasEnoughMessages) {
+    console.log(`⏳ EARLY PITCH BLOCKED — Only ${contact.message_count} messages (need ${MIN_MESSAGES_BEFORE_PITCH}). Building rapport first.`);
+  }
 
   // Build closing pressure instructions
   let closingInstructions = '';
@@ -1479,6 +1575,21 @@ Generate something COMPLETELY DIFFERENT. If you recently said "hey 🖤", do NOT
 - Make a playful comment: "someone's feeling flirty 😏" / "all these emojis... i like it 👀"
 - Acknowledge warmly and ask something: "aww cute 🖤 you're from where?"
 NEVER just say "hey 🖤" to emojis. That's lazy and repetitive.`
+    : '';
+  
+  // Detect special tokens (stickers, reactions, attachments)
+  const isSpecialToken = ['[STICKER_REACTION]', '[STORY_REACTION]', '[IMAGE_SENT]', '[VOICE_MESSAGE]', '[ATTACHMENT]'].includes(incomingMessage);
+  const specialTokenInstruction = isSpecialToken
+    ? `\n\n📌 NON-TEXT ENGAGEMENT — The user sent a ${incomingMessage.replace(/[\[\]]/g, '').toLowerCase().replace('_', ' ')}.
+This is POSITIVE engagement - they like you! But DO NOT pitch Fanvue yet - they haven't texted.
+Your goal: Re-engage warmly and GET THEM TALKING.
+Options:
+- "aww cute 🖤 where are you from?"
+- "hey you 👀 how's your day going?"
+- "merci 🖤 tu me racontes un peu?"
+- "that's sweet 😊 tell me about yourself"
+Keep it SHORT (max 8 words). Ask a QUESTION to continue the conversation.
+NEVER mention Fanvue or content on non-text messages.`
     : '';
 
   const contextPrompt = `
@@ -1530,7 +1641,7 @@ ${closingPressure >= 80 ? `🚨 FINAL ZONE — Pitch with link: ${FANVUE_LINK}` 
 
 ⚠️ CRITICAL: MAX 12 WORDS. 1 sentence. lowercase. NO caps. NO celebrations. NO counting. Be NORMAL and SHORT.
 
-${languageInstruction}${antiRepeatInstruction}${emojiInstruction}`;
+${languageInstruction}${antiRepeatInstruction}${emojiInstruction}${specialTokenInstruction}`;
 
   // ===========================================
   // GENERATION WITH VALIDATION + RETRY LOOP
@@ -2000,6 +2111,47 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
       strategy,
       analysis,
     };
+  }
+  
+  // ===========================================
+  // SEMANTIC SIMILARITY CHECK — Prevent sending nearly-identical messages
+  // ===========================================
+  // Normalize response for comparison (lowercase, remove emojis, trim)
+  const normalizeForComparison = (text: string): string => {
+    return text
+      .toLowerCase()
+      .replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '') // Remove emojis
+      .replace(/[^\w\s]/g, '') // Remove punctuation
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+  
+  const normalizedResponse = normalizeForComparison(response);
+  
+  // Check if any recent message is >70% similar (simple word overlap)
+  for (const recentMsg of last5Outgoing) {
+    const normalizedRecent = normalizeForComparison(recentMsg.content);
+    
+    // Skip very short messages (less reliable comparison)
+    if (normalizedResponse.length < 10 || normalizedRecent.length < 10) continue;
+    
+    // Calculate word overlap similarity
+    const responseWords = new Set(normalizedResponse.split(' '));
+    const recentWords = new Set(normalizedRecent.split(' '));
+    const intersection = [...responseWords].filter(w => recentWords.has(w) && w.length > 2);
+    const similarity = intersection.length / Math.max(responseWords.size, recentWords.size);
+    
+    if (similarity > 0.7) {
+      console.log(`⚠️ SEMANTIC DUPLICATE — ${Math.round(similarity * 100)}% similar to recent message. Skipping.`);
+      console.log(`   Recent: "${recentMsg.content.substring(0, 50)}..."`);
+      console.log(`   New: "${response.substring(0, 50)}..."`);
+      return {
+        response: '',
+        contact: updatedContact,
+        strategy,
+        analysis,
+      };
+    }
   }
   
   // ===========================================
