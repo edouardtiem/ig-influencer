@@ -111,6 +111,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         skip: true,
+        should_send: false,  // <-- DON'T SEND
         response: '',
         reason: 'DM system paused',
       });
@@ -203,6 +204,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         skip: true,
+        should_send: false,  // <-- DON'T SEND
         response: '',
         reason: 'No message text found - possibly unsupported message type',
       });
@@ -226,6 +228,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         skip: true,
+        should_send: false,  // <-- DON'T SEND
         response: '',
         reason: 'Race condition prevented - duplicate webhook blocked',
       });
@@ -246,9 +249,11 @@ export async function POST(request: NextRequest) {
       console.log(`${'='.repeat(50)}\n`);
       
       // Return skip signal to ManyChat - don't send any message
+      // should_send = false tells ManyChat to NOT send
       return NextResponse.json({
         success: true,
         skip: true,
+        should_send: false,  // <-- CLEAR SIGNAL FOR MANYCHAT
         response: '',
         reason: result.analysis.modeReason,
       });
@@ -277,6 +282,7 @@ export async function POST(request: NextRequest) {
     // DO NOT use v2 format with messages[] as it auto-sends!
     return NextResponse.json({
       success: true,
+      should_send: true,  // <-- CLEAR SIGNAL FOR MANYCHAT: YES, send this message
       response: result.response,
       lead_stage: result.contact.stage,
       message_count: result.contact.message_count,
@@ -292,6 +298,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: false,
       skip: true,
+      should_send: false,  // <-- DON'T SEND
       response: '',
       reason: 'Webhook error - skipping to avoid fallback loop',
     });
