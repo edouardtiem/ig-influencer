@@ -1919,6 +1919,19 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
     analysis  // Pass the full analysis
   );
 
+  // ===========================================
+  // EMPTY RESPONSE CHECK — Skip if generation failed
+  // ===========================================
+  if (!response || response.trim() === '') {
+    console.log(`⚠️ EMPTY RESPONSE — Generation failed or returned empty. Skipping.`);
+    return {
+      response: '',
+      contact: updatedContact,
+      strategy,
+      analysis,
+    };
+  }
+
   console.log(`💬 Strategy: ${strategy} | Mode: ${analysis.recommendedMode}`);
   console.log(`📝 Response: "${response.substring(0, 80)}${response.length > 80 ? '...' : ''}"`);
 

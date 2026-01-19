@@ -520,34 +520,43 @@ embeds_scaling: V only
    - API script: `app/scripts/comfyui-controlnet-test.mjs`
    - Test: 832x1216 image generated in ~8 min
 
+7. ✅ **Option C: IP-Adapter Body Reference — WORKING**
+   - Model: `ip-adapter-plus_sdxl_vit-h.safetensors` (808 MB)
+   - Body ref: `elena_body_reference.png` (fit body + large breasts)
+   - API script: `app/scripts/test-ipadapter-body.mjs`
+   - Test: 832x1216 image generated in ~4 min
+   - **Optimal weight: 0.4** (balance corps ref + prompt scène)
+
 **Issues Identified:**
 
 | Issue | Description | Solution | Status |
 |-------|-------------|----------|--------|
 | **Face visible** | Prompts ignored — face often fully visible | B) ControlNet OpenPose | ✅ Working |
-| **Body inconsistency** | Proportions vary significantly | C) IP-Adapter body reference | ⏸️ Waiting URLs |
-| **Intimate parts vary** | Anatomy details inconsistent | B) ControlNet + C) IP-Adapter | ✅ B done, C pending |
+| **Body inconsistency** | Proportions vary significantly | C) IP-Adapter body reference | ✅ Working |
+| **Intimate parts vary** | Anatomy details inconsistent | B) ControlNet + C) IP-Adapter | ✅ Both done |
 
 **Completed:**
 
 1. ✅ **B) ControlNet OpenPose** — Model + poses + API workflow working
+2. ✅ **C) IP-Adapter Body Reference** — Body consistency working with weight 0.4
 
 **Active Work:**
 
-2. ⬜ **A) Post-processing script** — Backup si ControlNet insuffisant
-3. ⏸️ **C) IP-Adapter body** — En attente URLs Cloudinary pour images référence
+3. ⬜ **Combine B + C** — ControlNet pose + IP-Adapter body dans même workflow
+4. ⬜ **A) Post-processing script** — Backup si combinaison insuffisante
 
 **Next Steps:**
 1. ✅ ~~Complete B implementation~~ DONE
-2. Test ControlNet with different poses (back turned, head cropped)
-3. Once C URLs provided, integrate body reference
-4. Combine ControlNet + IP-Adapter for best results
+2. ✅ ~~Complete C implementation~~ DONE  
+3. Create combined workflow (ControlNet + IP-Adapter body)
+4. Test with poses where face is hidden (back, cropped, phone)
 
-### Models Installed for Face Consistency
+### Models Installed for Face & Body Consistency
 
 | Model | Location | Size |
 |-------|----------|------|
-| IP-Adapter FaceID Plus V2 | `~/ComfyUI/models/ipadapter/ip-adapter-faceid-plusv2_sdxl.bin` | 1.4 GB |
+| IP-Adapter FaceID Plus V2 | `~/ComfyUI/models/ipadapter/faceid.plusv2.sdxl.bin` | 1.4 GB |
+| **IP-Adapter Plus SDXL** | `~/ComfyUI/models/ipadapter/ip-adapter-plus_sdxl_vit-h.safetensors` | **808 MB** |
 | CLIP Vision | `~/ComfyUI/models/clip_vision/CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors` | 2.4 GB |
 | FaceID LoRA | `~/ComfyUI/models/loras/ip-adapter-faceid-plusv2_sdxl_lora.safetensors` | 354 MB |
 | InstantID (unused) | `~/ComfyUI/models/instantid/ip-adapter.bin` | 1.6 GB |
@@ -950,4 +959,105 @@ Instead of extracting poses with DWPose:
 
 ---
 
-**Last Updated:** January 18, 2026 (Evening — ControlNet OpenPose WORKING)
+# 🔖 CHECKPOINT 4: IP-Adapter Body Reference Working
+
+**Date:** January 18, 2026 (Night)
+**Status:** ✅ Body consistency avec IP-Adapter fonctionnel
+
+## What Works at This Checkpoint
+
+| Feature | Status |
+|---------|--------|
+| IP-Adapter Plus SDXL | ✅ Working |
+| Body reference image | ✅ elena_body_reference.png |
+| Body proportions consistent | ✅ Tested |
+| Big Lust style preserved | ✅ (weight 0.4) |
+| Prompt scene respected | ✅ (weight 0.4) |
+| API workflow | ✅ Created |
+
+## IP-Adapter Body Settings
+
+```
+Model: ip-adapter-plus_sdxl_vit-h.safetensors
+Weight: 0.4 (optimal balance)
+Weight Type: linear
+Embeds Scaling: V only
+CLIP Vision: CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors
+Resolution: 832x1216 (portrait)
+Generation time: ~4 min (Mac M3 Pro)
+```
+
+## Weight Guide
+
+| Weight | Effect |
+|--------|--------|
+| 0.7+ | Strong body ref, scene follows reference too |
+| 0.4-0.5 | **Optimal** — Body consistent, prompt controls scene |
+| 0.2-0.3 | Weak influence, prompt dominant |
+
+## Script API
+
+```bash
+# Run IP-Adapter body test
+node app/scripts/test-ipadapter-body.mjs
+```
+
+## Test Results
+
+**Weight 0.7:** Corps identique à référence, MAIS scène aussi copiée (piscine + montagnes)
+**Weight 0.4:** Corps fit + poitrine généreuse ✅, scène lit + selfie ✅
+**Weight 0.3:** Corps consistant ✅, scène 100% contrôlée par prompt ✅ (RECOMMANDÉ pour nude)
+
+## Reference Image
+
+- **File:** `~/ComfyUI/input/elena_body_reference.png`
+- **Content:** Fit body, large breasts, white swimsuit
+- **Source:** ELENA_BODY_REF Cloudinary
+
+---
+
+# 🔖 CHECKPOINT 5: Nude Generation Working
+
+**Date:** January 18, 2026 (Night)
+**Status:** ✅ Génération nude explicite fonctionnelle
+
+## What Works at This Checkpoint
+
+| Feature | Status |
+|---------|--------|
+| Nude generation | ✅ Fully working |
+| Body consistency | ✅ IP-Adapter weight 0.3 |
+| Scene control | ✅ Prompt controls 100% |
+| Explicit poses | ✅ Legs spread, pussy visible |
+| Hotel room scene | ✅ Indoor, no more mountains |
+
+## Optimal Settings for Nude
+
+```
+IP-Adapter Weight: 0.3 (body ref without scene leakage)
+Scene: Controlled by prompt only
+Body: Fit athletic + large natural breasts
+```
+
+## Script API
+
+```bash
+# Run nude generation
+node app/scripts/test-elena-nude.mjs
+```
+
+## Key Learnings
+
+1. **Weight 0.3** = Best for nude — body consistent, scene follows prompt
+2. **Explicit prompts work** — Big Lust handles NSFW content well
+3. **Scene in negative** — Add "NOT mountains, NOT outdoor" to avoid ref bleed
+4. **Face still visible** — Need post-crop or ControlNet for face hiding
+
+## Current Limitation
+
+- Face consistency not solved yet (visible in generations)
+- Workaround: Manual crop/blur for now
+
+---
+
+**Last Updated:** January 18, 2026 (Night — Nude Generation WORKING)
