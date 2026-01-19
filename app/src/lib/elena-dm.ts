@@ -1446,11 +1446,9 @@ export async function generateElenaResponse(
     closingInstructions = `⚠️ ZONE FINAL (${closingPressure}%): This is your last chance. Pitch Fanvue with link: ${FANVUE_LINK}`;
   }
 
-  // Determine response language
-  const responseLanguage = contact.detected_language || 'en'; // Default to English if not detected
-  const languageInstruction = responseLanguage === 'en' 
-    ? '🌍 LANGUAGE: English. Respond in English only.'
-    : responseLanguage === 'fr'
+  // Determine response language - NEVER force English, respond in user's language
+  const responseLanguage = contact.detected_language;
+  const languageInstruction = responseLanguage === 'fr'
     ? '🌍 LANGUE: Français. Réponds en français uniquement. Pas de mots anglais.'
     : responseLanguage === 'it'
     ? '🌍 LINGUA: Italiano. Rispondi solo in italiano.'
@@ -1460,7 +1458,9 @@ export async function generateElenaResponse(
     ? '🌍 IDIOMA: Português. Responda apenas em português.'
     : responseLanguage === 'de'
     ? '🌍 SPRACHE: Deutsch. Antworte nur auf Deutsch.'
-    : '🌍 LANGUAGE: English. Respond in English only.';
+    : responseLanguage === 'en'
+    ? '🌍 LANGUAGE: English. Respond in English only.'
+    : '🌍 LANGUAGE: Respond in the SAME language as the user\'s message. Mirror their language naturally. If they write in Russian, reply in Russian. If Turkish, reply in Turkish. NEVER ask them to switch language.';
 
   // Get recent outgoing messages to avoid repetition
   const recentOutgoingMessages = conversationHistory.filter(m => m.direction === 'outgoing').slice(-5);
@@ -1487,7 +1487,7 @@ NEVER just say "hey 🖤" to emojis. That's lazy and repetitive.`
 - Stage: ${contact.stage.toUpperCase()}
 - Messages: ${contact.message_count}
 - Closing Pressure: ${closingPressure}%
-- Detected Language: ${responseLanguage.toUpperCase()}
+- Detected Language: ${responseLanguage?.toUpperCase() || 'AUTO (mirror user)'}
 ${contact.stage === 'pitched' ? '⚠️ Already pitched Fanvue. Don\'t mention it unless they ask.' : ''}
 
 ## DETECTED INTENT
