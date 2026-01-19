@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 19 janvier 2026 (DONE-072 DM ManyChat Conditional Flow Fix ✅)
+**Dernière mise à jour** : 19 janvier 2026 (DONE-073 DM Auto-Reactivation After 7 Days ✅)
 
 ---
 
@@ -67,6 +67,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-073 | **🔄 DM Auto-Reactivation After 7 Days** — Réactivation automatique contacts stopped après 7 jours de cooldown + Stage remis à cold (fresh start) + Historique préservé + Réactivation uniquement quand utilisateur réécrit (limitation Instagram 24h) | 19/01/2026 | v2.59.0 | [→](./roadmap/done/DONE-073-dm-auto-reactivation.md) |
 | DONE-072 | **🔧 DM ManyChat Conditional Flow Fix** — Fix boucles infinies Fanvue + réponses mauvaise langue en ajoutant condition ManyChat (should_send flag) + Flow conditionnel : External Request → Condition → Send Message (si true) | 19/01/2026 | v2.58.0 | [→](./roadmap/done/DONE-072-dm-manychat-conditional-fix.md) |
 | DONE-071 | **🔗 Elena Custom Linktree** — Linktree personnalisé /elena avec vidéo background, galerie défilante, timer countdown A/B testing, modal 18+, CTA Fanvue promo 7 jours, design Soft Boudoir (rose #E8A0BF), mobile-first | 19/01/2026 | v2.57.0 | [→](./roadmap/done/DONE-071-elena-custom-linktree.md) |
 | DONE-070 | **🌍 Fanvue Language Consistency** — Fix mélange de langues dans réponses Elena Fanvue DM + Instructions strictes par langue (FR/EN/IT/ES/PT/DE) + Vocabulaire explicite adapté par langue + Tests validation 100% cohérence | 19/01/2026 | v2.56.0 | [→](./docs/sessions/2026-01-19-fanvue-language-consistency.md) |
@@ -206,7 +207,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
-| 19/01/2026 | **🔧 DM ManyChat Conditional Flow Fix** — Fix boucles infinies Fanvue + réponses mauvaise langue en ajoutant condition ManyChat (should_send flag) + Configuration flow conditionnel External Request → Condition → Send Message | [→](./docs/sessions/2026-01-19-dm-manychat-conditional-fix.md) |
+| 19/01/2026 | **🔧 DM Complete Fix Session** — Fix boucles infinies Fanvue + réponses mauvaise langue (ManyChat conditional flow) + Auto-réactivation contacts stopped après 7 jours + Configuration flow ManyChat avec condition should_send | [→](./docs/sessions/2026-01-19-dm-complete-fix-session.md) |
 | 19/01/2026 | **🌍 Fanvue Language Consistency** — Fix mélange de langues dans réponses Elena Fanvue DM + Instructions strictes par langue + Vocabulaire explicite adapté + Tests validation 100% cohérence | [→](./docs/sessions/2026-01-19-fanvue-language-consistency.md) |
 | 18/01/2026 | **📊 Audit Funnel DM Instagram** — Analyse complète 925 contacts + Identification 0% conversion critique + Implémentation tracking Fanvue (fuzzy matching) + Documentation progression | [→](./docs/sessions/2026-01-18-dm-funnel-audit.md) |
 | 16/01/2026 | **🔧 DM Unicode JSON Error Fix** — Investigation erreur 400 Anthropic API (surrogate pairs incomplets) + Fix sanitizeUnicode() pour nettoyer caractères corrompus avant envoi API + Application à conversationHistory | [→](./docs/sessions/2026-01-16-dm-unicode-json-error-fix.md) |
