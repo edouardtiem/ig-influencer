@@ -44,6 +44,9 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 const LOOKAHEAD_HOURS = 1;
 const CATCHUP_HOURS = 18;
 
+// Timeout for stuck posts (in minutes) - posts stuck in "generating" or "posting"
+const STUCK_TIMEOUT_MINUTES = 60;
+
 // ===========================================
 // IMPORT GENERATION & PUBLISHING FUNCTIONS
 // ===========================================
@@ -85,11 +88,12 @@ async function getNextPost(character = null) {
   const yesterdayStr = `${yesterdayYear}-${yesterdayMonth}-${yesterdayDay}`;
   
   // Build query - check both today and yesterday
+  // Include 'generating' and 'posting' to detect stuck posts
   let query = supabase
     .from('scheduled_posts')
     .select('*')
     .in('scheduled_date', [today, yesterdayStr])
-    .in('status', ['scheduled', 'images_ready', 'failed']);
+    .in('status', ['scheduled', 'images_ready', 'failed', 'generating', 'posting']);
 
   if (character) {
     query = query.eq('character', character);
@@ -101,8 +105,47 @@ async function getNextPost(character = null) {
     return null;
   }
 
+  // Check for stuck posts and reset them
+  const stuckTimeout = STUCK_TIMEOUT_MINUTES * 60 * 1000; // Convert to milliseconds
+  for (const post of posts) {
+    if (post.status === 'generating' || post.status === 'posting') {
+      const startedAt = post.status === 'generating' 
+        ? post.generation_started_at 
+        : post.posting_started_at;
+      
+      if (startedAt) {
+        const elapsed = now.getTime() - new Date(startedAt).getTime();
+        if (elapsed > stuckTimeout) {
+          console.log(`   ⚠️ Found stuck post (${post.status} for ${Math.round(elapsed/60000)}min): ${post.location_name}`);
+          console.log(`      🔄 Resetting to 'failed' for retry...`);
+          
+          // Reset stuck post to failed status for retry
+          await supabase
+            .from('scheduled_posts')
+            .update({
+              status: 'failed',
+              error_message: `Stuck in ${post.status} for ${Math.round(elapsed/60000)} minutes - auto-reset`,
+              error_step: post.status,
+              retry_count: (post.retry_count || 0) + 1,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', post.id);
+          
+          // Update local post object
+          post.status = 'failed';
+          post.error_step = post.status;
+        }
+      }
+    }
+  }
+
   // Filter posts within time window
   const eligiblePosts = posts.filter(post => {
+    // Skip posts still in progress (generating/posting) - they were already handled above
+    if (post.status === 'generating' || post.status === 'posting') {
+      return false;
+    }
+    
     // Skip failed posts that have exceeded retries
     if (post.status === 'failed' && post.retry_count >= post.max_retries) {
       return false;
@@ -138,7 +181,8 @@ async function getNextPost(character = null) {
   }
 
   // Prioritize: images_ready first (ready to post), then scheduled, then failed (retry)
-  const priorityOrder = { 'images_ready': 0, 'scheduled': 1, 'failed': 2 };
+  // Note: generating/posting should have been reset to failed by now, but include them just in case
+  const priorityOrder = { 'images_ready': 0, 'scheduled': 1, 'failed': 2, 'generating': 3, 'posting': 3 };
   eligiblePosts.sort((a, b) => {
     const priorityDiff = priorityOrder[a.status] - priorityOrder[b.status];
     if (priorityDiff !== 0) return priorityDiff;
@@ -469,7 +513,17 @@ async function showStatus(character = null) {
         ? ` (retry ${post.retry_count}/${post.max_retries})`
         : '';
 
-      console.log(`   ${statusIcon} ${post.scheduled_time} │ ${post.post_type.padEnd(8)} │ ${post.status}${retryInfo}`);
+      // Show elapsed time for in-progress statuses
+      let elapsedInfo = '';
+      if (post.status === 'generating' && post.generation_started_at) {
+        const elapsed = Math.round((Date.now() - new Date(post.generation_started_at).getTime()) / 60000);
+        elapsedInfo = ` (${elapsed}min)`;
+      } else if (post.status === 'posting' && post.posting_started_at) {
+        const elapsed = Math.round((Date.now() - new Date(post.posting_started_at).getTime()) / 60000);
+        elapsedInfo = ` (${elapsed}min)`;
+      }
+
+      console.log(`   ${statusIcon} ${post.scheduled_time} │ ${post.post_type.padEnd(8)} │ ${post.status}${retryInfo}${elapsedInfo}`);
       console.log(`      └─ ${post.location_name}`);
 
       if (post.status === 'failed' && post.error_message) {
