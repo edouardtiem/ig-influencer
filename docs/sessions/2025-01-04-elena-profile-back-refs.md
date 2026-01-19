@@ -1,13 +1,14 @@
-# 📸 Elena Profile + Back Reference Images — Content Brain Enhancement
+# 📸 Elena Back Reference Image — Content Brain Enhancement
 
 **Date** : 4 janvier 2025  
+**Mise à jour** : 19 janvier 2025 (suppression profile, non représentatif)  
 **Durée** : ~1h
 
 ---
 
 ## 🎯 Objectif
 
-Améliorer la consistance du visage et du corps d'Elena dans les images générées par le Content Brain en ajoutant des références de profil (left) et de dos.
+Améliorer la consistance du visage et du corps d'Elena dans les images générées par le Content Brain en ajoutant une référence de dos.
 
 ---
 
@@ -16,26 +17,25 @@ Améliorer la consistance du visage et du corps d'Elena dans les images génér�
 ### 1. Ajout des nouvelles références Elena
 
 **Références ajoutées au Content Brain (`scheduled-post.mjs`)** :
-- **Profile (left)** : `v1767561713/y1r6jt0pwdrmr0cvhbf9sbenkw_z0sydx.png`
 - **Back view** : `v1767562505/replicate-prediction-bjnvs97bqxrmy0cvhbpa8cx5f8_daohqh.png`
 
-**Total références Elena** : 4 angles
+**⚠️ Supprimée (19 jan 2025)** : Profile (left) — image non représentative d'Elena
+
+**Total références Elena** : 3 angles
 1. Face (frontal)
 2. Body (proportions)
-3. Profile (left) ✅ NEW
-4. Back ✅ NEW
+3. Back ✅ NEW
 
 ### 2. Mise à jour des instructions de référence
 
 Ajout des instructions spécifiques dans `reference_instruction` pour :
-- **IMAGE 3 (PROFILE)** : Guide pour angles de côté (silhouette, jawline, nez, cheveux)
-- **IMAGE 4 (BACK)** : Guide pour vues de dos (cheveux, largeur épaules, silhouette)
+- **IMAGE 3 (BACK)** : Guide pour vues de dos (cheveux, largeur épaules, silhouette)
 
 ### 3. Test dry run réussi
 
 Test effectué avec un post carousel Bali pool :
 - ✅ 3 images générées avec succès
-- ✅ 4 références utilisées (face + body + profile + back)
+- ✅ 3 références utilisées (face + body + back)
 - ✅ Images uploadées sur Cloudinary
 - ✅ Caption générée avec micro-story style
 
@@ -49,8 +49,8 @@ Test effectué avec un post carousel Bali pool :
 ## 📁 Fichiers modifiés
 
 - `app/scripts/scheduled-post.mjs`
-  - Ajout `extra_refs` pour Elena (profile + back)
-  - Mise à jour `reference_instruction` avec IMAGE 3 et IMAGE 4
+  - Ajout `extra_refs` pour Elena (back view uniquement)
+  - Mise à jour `reference_instruction` avec IMAGE 3 (back)
   - Les refs sont automatiquement incluses via `...config.extra_refs`
 
 **Note** : Les autres scripts (`carousel-post-elena.mjs`, `test-expressions-elena.mjs`, etc.) ont été **laissés inchangés** comme demandé. Seul le Content Brain utilise les 4 références.
@@ -64,11 +64,9 @@ Test effectué avec un post carousel Bali pool :
 - Consistance parfois variable sur angles de côté et vues de dos
 
 ### Après
-- 4 références (face + body + profile + back)
+- 3 références (face + body + back)
 - Meilleure consistance sur tous les angles
-- Le modèle a maintenant des guides visuels pour :
-  - Profils latéraux (jawline, nez, cheveux)
-  - Vues de dos (cheveux, silhouette, épaules)
+- Le modèle a maintenant des guides visuels pour vues de dos (cheveux, silhouette, épaules)
 
 ---
 
@@ -81,7 +79,7 @@ node scripts/scheduled-post.mjs --test
 ```
 
 **Résultat** : ✅ Succès
-- Génération avec 4 refs
+- Génération avec 3 refs
 - Upload Cloudinary OK
 - Caption micro-story générée
 
@@ -98,7 +96,6 @@ node scripts/scheduled-post.mjs --test
 ## 🔄 Prochaines étapes
 
 - [ ] Monitorer la consistance sur les prochains posts générés
-- [ ] Si résultats positifs, considérer ajouter profile right (si généré)
 - [ ] Documenter les résultats dans une session future
 
 ---

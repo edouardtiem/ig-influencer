@@ -18,7 +18,6 @@ dotenv.config({ path: path.join(__dirname, '..', '.env.local') });
 const ELENA_REFS = {
   face: 'https://res.cloudinary.com/dily60mr0/image/upload/v1765967140/replicate-prediction-qh51japkxxrma0cv52x8qs7mnc_ltc9ra.png',
   body: 'https://res.cloudinary.com/dily60mr0/image/upload/v1765967073/replicate-prediction-ws5fpmjpfsrma0cv538t79j8jm_wx9nap.png',
-  profile: 'https://res.cloudinary.com/dily60mr0/image/upload/v1767561713/y1r6jt0pwdrmr0cvhbf9sbenkw_z0sydx.png',
   back: 'https://res.cloudinary.com/dily60mr0/image/upload/v1767562505/replicate-prediction-bjnvs97bqxrmy0cvhbpa8cx5f8_daohqh.png',
 };
 

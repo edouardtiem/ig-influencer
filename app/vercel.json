@@ -15,6 +15,27 @@
     "src/app/api/smart-comment/route.ts": {
       "maxDuration": 60
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "elenav.link"
+        }
+      ],
+      "destination": "/elena"
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.elenav.link"
+        }
+      ],
+      "destination": "/elena"
+    }
+  ]
 }
-
