@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 18 janvier 2026 (IP-006 DM Funnel Audit + Attribution Tracking ✅)
+**Dernière mise à jour** : 19 janvier 2026 (IP-007 Hard Fix DM Bugs ✅)
 
 ---
 
@@ -23,6 +23,7 @@ roadmap/
 
 | ID | Feature | Priorité | Branche | Lien |
 |----|---------|----------|---------|------|
+| IP-007 | **🔧 Hard Fix DM Bugs** — Investigation systématique + Fix 105 contacts > cap non STOPPED + Fix Elena demande anglais (multilingue) + Script diagnostic complet | 🔴 High | main | [→](./roadmap/in-progress/IP-007-dm-hard-fix.md) |
 | IP-006 | **📊 DM Funnel Progress** — Audit complet funnel DM + Tracking Fanvue attribution (fuzzy matching) + 0% conversion identifié comme problème critique | 🔴 High | main | [→](./roadmap/in-progress/IP-006-dm-funnel-progress.md) |
 | IP-005 | **💬 Auto-Reply Comments** — Backend API créé + ManyChat AI configuré pour réponses auto commentaires IG | 🔴 High | main | [→](./roadmap/in-progress/IP-005-auto-reply-comments.md) |
 | IP-004 | **🔥 Elena Sexy Mode** — 1 post/jour à 21h, contenu suggestif (bikini/lingerie/sport) | 🔴 High | main | [→](./docs/sessions/2024-12-27-elena-sexy-mode.md) |
@@ -35,7 +36,7 @@ roadmap/
 > **ManyChat** : ✅ 2 automations LIVE (Auto-DM comments + Welcome followers)  
 > **DM System** : ✅ **ACTIVE** — Kill switch opérationnel sur `/calendar`  
 > **DM Fanvue** : ✅ **ACTIVE** — Venice AI configuré + OAuth valide (audit 16/01/2025)  
-> **AI Agent** : ✅ LIVE avec Response Validator + Sonnet + Story replies support + anti-hallucination renforcé (régénération auto, max 3 tentatives) + Language detection (EN/FR/IT/ES/PT/DE)  
+> **AI Agent** : ✅ LIVE avec Response Validator + Sonnet + Story replies support + anti-hallucination renforcé (régénération auto, max 3 tentatives) + Language detection multilingue (mirror user's language)  
 > **Objectif** : 500€/mois via Fanvue  
 > **Next** : Resume DM system après expiration ban Instagram
 
@@ -66,6 +67,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-069 | **🔧 Hard Fix DM Bugs** — Investigation systématique avec script diagnostic complet (8 tests) + Fix 105 contacts > MESSAGE_CAPS non STOPPED (77 HOT + 28 PITCHED) + Fix Elena demande anglais (suppression défaut 'en', mirror user's language) + Tous bugs critiques résolus | 19/01/2026 | v2.55.0 | [→](./docs/sessions/2026-01-19-dm-hard-fix-session.md) |
 | DONE-068 | **🔍 Audit & Fix DM Fanvue** — Audit système DM Fanvue suite messages non répondus + Fix Venice AI non configuré sur Vercel + Ré-authentification OAuth Fanvue (tokens expirés) + Script audit `audit-fanvue-dm-today.mjs` + Système opérationnel | 16/01/2025 | v2.54.0 | [→](./roadmap/done/DONE-068-fanvue-dm-audit-fix.md) |
 | DONE-067 | **🔧 DM Unicode JSON Error Fix** — Fix erreur 400 Anthropic API causée par caractères Unicode invalides (surrogate pairs incomplets) dans historique conversation + Fonction sanitizeUnicode() pour nettoyer messages avant envoi API + Application à conversationHistory et incomingMessage | 16/01/2026 | v2.53.0 | [→](./roadmap/done/DONE-067-dm-unicode-json-error-fix.md) |
 | DONE-066 | **🔥 Fanvue Daily Prompts Upgrade (Sexy Poses + Body Description)** — Upgrade majeur prompts Fanvue : 14 poses sexy variées (back shots, chest visible, angles variés) + Instructions explicites "Face NOT visible" dans chaque prompt + Description détaillée corps Content Brain V2 (172cm, bust, waist, hips) + Vocabulaire optimisé (suppression "curvy", termes safe) | 16/01/2025 | v2.52.0 | [→](./roadmap/done/DONE-066-fanvue-sexy-prompts-upgrade.md) |
