@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 19 janvier 2026 (DONE-077 DM Sticker/Reaction Handling ✅)
+**Dernière mise à jour** : 20 janvier 2026 (DONE-078 ComfyUI Output Organization ✅)
 
 ---
 
@@ -67,6 +67,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-078 | **📁 ComfyUI Output Organization** — Script réorganisation 80 images par catégories + Configuration workflows création automatique sous-dossiers + Patterns dynamiques (%date%) | 20/01/2026 | - | [→](./roadmap/done/DONE-078-comfyui-output-organization.md) |
 | DONE-077 | **📱 DM Sticker/Reaction Handling** — Gestion stickers/réactions (tokens) + Détection sémantique duplications (70%+) + Règle min 4 msgs avant pitch + Anti-exagération + Sauvegarde messages contacts stoppés | 19/01/2026 | v2.63.0 | [→](./roadmap/done/DONE-077-dm-sticker-reaction-handling.md) |
 | DONE-076 | **🔗 Elena Linktree Domain + Analytics** — Configuration domaine elenav.link (middleware Next.js) + Linktree à la racine + Mise à jour lien Instagram @elenav.paris + Vercel Analytics pour tracking visites | 19/01/2026 | v2.62.0 | [→](./roadmap/done/DONE-076-elena-linktree-domain-analytics.md) |
 | DONE-075 | **📈 Extension Funnel DM + Stages CLOSING/FOLLOWUP** — Fix bug intent `ai_question` (faux positifs) + Système anti-répétition questions + Détection "Toi"/"Et toi?" + Follow-up Fanvue (questions flirty au lieu de spam) + Nouveaux stages CLOSING/FOLLOWUP (~56 messages total) + Followup automatique +20h via GitHub Action | 19/01/2026 | v2.61.0 | [→](./roadmap/done/DONE-075-dm-funnel-extension-closing-followup.md) |
@@ -198,7 +199,7 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 47
+├── ✅ Done        : 48
 ├── 🚧 In Progress : 4 (Auto-Reply Comments + Elena Sexy Mode + Fanvue + Model Evolution)
 ├── 📋 Todo        : 6 
 ├── 🐛 Bugs        : 10 (10 fixed)
@@ -211,6 +212,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 20/01/2026 | **📁 ComfyUI Output Organization** — Script réorganisation 80 images par catégories (9 sous-dossiers) + Configuration workflows création automatique sous-dossiers + Patterns dynamiques avec variables date | [→](./docs/sessions/2026-01-20-comfyui-output-organization.md) |
 | 19/01/2026 | **🔗 Elena Linktree Domain + Analytics** — Configuration domaine elenav.link (middleware Next.js) + Linktree à la racine + Mise à jour lien Instagram @elenav.paris + Vercel Analytics pour tracking visites | [→](./docs/sessions/2026-01-19-elena-linktree-domain-analytics.md) |
 | 19/01/2026 | **🔧 DM Complete Fix Session** — Fix boucles infinies Fanvue + réponses mauvaise langue (ManyChat conditional flow) + Auto-réactivation contacts stopped après 7 jours + Configuration flow ManyChat avec condition should_send | [→](./docs/sessions/2026-01-19-dm-complete-fix-session.md) |
 | 19/01/2026 | **🌍 Fanvue Language Consistency** — Fix mélange de langues dans réponses Elena Fanvue DM + Instructions strictes par langue + Vocabulaire explicite adapté + Tests validation 100% cohérence | [→](./docs/sessions/2026-01-19-fanvue-language-consistency.md) |
