@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 20 janvier 2026 (IP-008 Elena LoRA Cloud Training 🚧)
+**Dernière mise à jour** : 20 janvier 2026 (DONE-079 Nano Banana Pro Audit & Fix ✅)
 
 ---
 
@@ -68,6 +68,7 @@ roadmap/
 
 | ID | Feature | Date | Lien |
 |----|---------|------|------|
+| DONE-079 | **🔧 Nano Banana Pro Audit & Fix** — Audit filtres Google + Fix Content Brain Elena (face ref only, expressions nettoyées) → 30%→90% success rate | 20/01/2026 | [→](./roadmap/done/DONE-079-nano-banana-pro-audit-fix.md) |
 | DONE-078 | **📁 ComfyUI Output Organization** — Script réorganisation 80 images | 20/01/2026 | [→](./roadmap/done/DONE-078-comfyui-output-organization.md) |
 | DONE-077 | **📱 DM Sticker/Reaction Handling** — Gestion tokens + anti-duplication | 19/01/2026 | [→](./roadmap/done/DONE-077-dm-sticker-reaction-handling.md) |
 | DONE-076 | **🔗 Elena Linktree Domain** — elenav.link + Vercel Analytics | 19/01/2026 | [→](./roadmap/done/DONE-076-elena-linktree-domain-analytics.md) |
@@ -137,7 +138,7 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 78 (16 en janvier 2026)
+├── ✅ Done        : 79 (17 en janvier 2026)
 ├── 🚧 In Progress : 8
 ├── 📋 Todo        : 6 
 ├── 🐛 Bugs        : 2 actifs + 15 fixés
@@ -152,6 +153,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 20/01/2026 | **🔧 Nano Banana Pro Audit** — Audit filtres Google + Fix Content Brain Elena (30%→90%) | [→](./docs/sessions/2026-01-20-nano-banana-pro-audit.md) |
 | 20/01/2026 | **📚 Documentation Cleanup** — Nettoyage complet doc (root, sessions, roadmap) + README mis à jour Elena | [→](./docs/sessions/2026-01-20-documentation-cleanup.md) |
 | 20/01/2026 | **📁 ComfyUI Output Organization** | [→](./docs/sessions/2026-01-20-comfyui-output-organization.md) |
 | 20/01/2026 | **🎨 Elena LoRA RunPod Setup** | [→](./docs/sessions/2026-01-20-elena-lora-runpod-setup.md) |

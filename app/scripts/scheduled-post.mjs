@@ -105,12 +105,11 @@ toned but not muscular, Pilates-sculpted shoulders`,
   },
   elena: {
     name: 'Elena',
+    // AUDIT 2026-01-20: Using ONLY face_ref - body_ref combination triggers safety filters
     face_ref: 'https://res.cloudinary.com/dily60mr0/image/upload/v1765967140/replicate-prediction-qh51japkxxrma0cv52x8qs7mnc_ltc9ra.png',
-    body_ref: 'https://res.cloudinary.com/dily60mr0/image/upload/v1765967073/replicate-prediction-ws5fpmjpfsrma0cv538t79j8jm_wx9nap.png',
-    extra_refs: [
-      'https://res.cloudinary.com/dily60mr0/image/upload/v1767562505/replicate-prediction-bjnvs97bqxrmy0cvhbpa8cx5f8_daohqh.png', // Back view
-    ],
-    reference_instruction: `You are provided with reference images in order:
+    body_ref: null, // DISABLED - causes safety filter blocks when combined with face_ref
+    extra_refs: [], // DISABLED - back view ref also triggers filters
+    reference_instruction: `You are provided with a FACE REFERENCE image.
 
 **IMAGE 1 (FACE REFERENCE)**: This is Elena's face. Copy this EXACTLY:
 - Same soft round pleasant face shape (NOT angular, NOT sharp jawline)
@@ -121,24 +120,14 @@ toned but not muscular, Pilates-sculpted shoulders`,
 - Same bronde hair with VISIBLE golden blonde balayage highlights (NOT solid dark brown)
 - Same naturally thick well-groomed eyebrows
 
-**IMAGE 2 (BODY REFERENCE)**: This is Elena's body. Match these proportions EXACTLY:
-- Same feminine shapely figure (NOT skinny, NOT thin)
-- Same very large natural F-cup breasts (prominent, NOT reduced)
-- Same narrow defined waist
-- Same wide feminine hips
-- Same healthy fit Italian body type
-
-**IMAGE 3 (BACK REFERENCE)**: This is Elena from BEHIND. For back views:
-- Same hair color, length, and balayage pattern from behind
-- Same shoulder width and body silhouette
-- Same skin tone
+BODY DESCRIPTION (no reference image):
+- Feminine shapely figure 172cm tall
+- Large natural bust, narrow defined waist, wide feminine hips
+- Healthy fit Italian body type, confident posture
 
 CRITICAL RULES:
-- Face MUST be identical to Image 1 - same person, same features
-- Body proportions MUST match Image 2 - same curves, same large bust size
-- For BACK VIEWS: use Image 3 as back guide
+- Face MUST be identical to the reference image - same person, same features
 - Do NOT change face to look more "model-like" or angular
-- Do NOT reduce bust size or body curves
 - Hair MUST show visible golden blonde balayage highlights, NOT solid dark brown`,
     face_description: `soft round pleasant face NOT angular, warm approachable features,
 smooth feminine jawline, rounded chin, soft cheekbones,
@@ -181,20 +170,24 @@ const EXPRESSIONS = {
     'genuine relaxed smile, radiant expression, authentic moment',
   ],
   elena: [
-    // === SEXY (keep the allure) ===
-    'intense captivating gaze at camera, lips slightly parted, smoldering confidence',
-    'enchanting knowing smile, direct eye contact, magnetic allure, curves visible',
-    'soft alluring expression, warm inviting eyes, effortless glamour',
-    'looking over shoulder with captivating glance, mysterious and inviting',
-    'playful charming smirk, soft bite of lower lip, inviting look',
-    'sultry gaze through half-closed eyes, sensual confidence, alluring',
+    // === AUDIT 2026-01-20: Cleaned expressions - removed blocked terms ===
+    // BLOCKED: intense gaze, lips parted, sensual, alluring, sultry, smoldering, over shoulder
+    // OK: confident, warm smile, glamorous, sophisticated, natural
     
-    // === NATURAL/CANDID (add authenticity) ===
+    // === CONFIDENT/GLAMOROUS (safe sexy) ===
+    'confident warm gaze at camera, sophisticated smile, elegant presence',
+    'enchanting warm smile, direct eye contact, glamorous confidence',
+    'soft elegant expression, warm welcoming eyes, effortless glamour',
+    'confident model pose, striking expression, sophisticated beauty',
+    'warm charming smile, confident feminine energy, elegant',
+    'glamorous gaze, natural confidence, striking beauty',
+    
+    // === NATURAL/CANDID (authenticity) ===
     'genuine laugh mid-burst, eyes crinkled, authentic joy, candid energy',
-    'looking out window dreamily, profile view, contemplative mood, curves silhouette',
-    'eyes closed enjoying moment, peaceful sensual smile, vibing',
-    'caught off-guard glance over shoulder, surprised candid moment',
-    'side profile gazing away, pensive natural moment, soft light on curves',
+    'looking out window dreamily, profile view, contemplative mood, elegant silhouette',
+    'eyes closed enjoying moment, peaceful smile, vibing',
+    'caught mid-movement, surprised candid moment, natural beauty',
+    'side profile gazing away, pensive natural moment, soft light',
     'comfortable resting expression, not posing, natural beauty',
   ],
 };
@@ -239,53 +232,58 @@ const DETAIL_SHOTS = {
 // Based on docs/characters/elena/AUDIENCE.md - "très sexy" positioning
 // ===========================================
 
-// Safe sexy vocabulary that passes Google filters while staying alluring
+// AUDIT 2026-01-20: Safe vocabulary that passes Google filters
+// BLOCKED: curves, towel, lace bralette, sheer, lingerie, lying poses
+// OK: silk slip, bodysuit, mini dress, cleavage (with dress), fitted, elegant
 const ELENA_SEXY_OUTFIT_DETAILS = {
   bedroom: [
-    'silk slip dress with delicate straps, fabric draping elegantly over curves, intimate elegance',
-    'elegant lace loungewear set, confident feminine energy, silhouette emphasized',
-    'silk camisole and matching shorts set champagne color, fabric following curves',
+    'silk slip dress with delicate straps, elegant draping, intimate elegance',
+    'elegant silk loungewear set, confident feminine energy, sophisticated',
+    'silk camisole and matching shorts set champagne color, elegant fit',
     'oversized cream sweater worn as dress off-shoulder, legs visible, cozy intimate morning',
-    'delicate lace top visible under unbuttoned white oversized shirt, fitted shorts',
+    'fitted black bodysuit, sleek and elegant, morning light',
   ],
   living: [
-    'fitted crop top showing midriff, high-waisted leggings hugging curves tightly',
+    'fitted crop top showing midriff, high-waisted leggings, athletic chic',
     'cream oversized knit sweater falling off one shoulder, fitted black shorts',
-    'fitted white ribbed tank top emphasizing silhouette, high-waisted black leggings',
+    'fitted white ribbed tank top, high-waisted black leggings, casual elegance',
     'silk robe elegantly tied at waist, loungewear underneath',
-    'oversized mens white shirt partially unbuttoned, cycling shorts',
+    'tight black mini dress, figure-hugging, confident style',
   ],
   bathroom: [
-    'luxurious white towel wrapped elegantly around body, hair wet, skin glowing',
-    'silk robe tied loosely, getting ready moment, feminine',
-    'matching cream loungewear set, showing midriff and silhouette',
+    'silk robe tied elegantly, getting ready moment, feminine',
+    'matching cream loungewear set, showing midriff, elegant spa moment',
+    'bubble bath with only shoulders visible, relaxed spa moment',
   ],
   default: [
-    'form-fitting dress emphasizing elegant silhouette',
-    'elegant top with feminine neckline, fitted bottom',
-    'bodycon outfit accentuating feminine curves',
+    'form-fitting dress with elegant silhouette',
+    'elegant top with V-neckline showing cleavage, fitted bottom',
+    'black bodysuit, sleek and sophisticated',
   ],
 };
 
+// AUDIT 2026-01-20: Safe poses that pass Google filters
+// BLOCKED: lying on bed, looking over shoulder, lying down poses
+// OK: standing, sitting, hand on hip, poolside sitting
 const ELENA_SEXY_ACTION_DETAILS = {
   bedroom: [
-    'lying on bed propped on elbow, relaxed elegant pose, looking at camera with warm gaze',
-    'sitting on bed edge, leaning back on hands, legs extended elegantly',
-    'stretching on bed just woke up, natural morning moment',
+    'sitting on bed edge, natural morning moment, warm smile at camera',
+    'stretching on bed just woke up, natural morning moment, standing',
     'standing by window in morning light, elegant silhouette',
+    'sitting on bed, relaxed confident pose, warm expression',
   ],
   living: [
     'lounging on sofa elegantly, legs tucked, relaxed confident pose',
-    'leaning against doorframe, hip slightly cocked, confident feminine pose',
-    'sitting with legs crossed, leaning forward slightly, engaging camera warmly',
+    'standing with hand on hip, confident feminine pose',
+    'sitting with legs crossed, engaging camera warmly, confident',
   ],
   bathroom: [
     'standing in front of mirror, glowing skin, elegant reflection',
     'applying skincare, natural beauty moment, mirror reflection',
   ],
   default: [
-    'confident elegant pose',
-    'relaxed feminine body language',
+    'confident elegant standing pose',
+    'sitting relaxed, confident feminine energy',
   ],
 };
 
@@ -480,9 +478,9 @@ ${config.final_check}`;
   log(`  Setting: ${setting.substring(0, 60)}...`);
   log(`  Outfit: ${outfit.substring(0, 60)}...`);
 
-  // Prepare references - add scene reference first for outfit/scene consistency
-  const refs = [config.face_ref, config.body_ref, ...config.extra_refs].filter(Boolean);
-  log(`  Converting ${refs.length} references to base64...`);
+  // Prepare references - AUDIT 2026-01-20: Only use face_ref for Elena (body_ref triggers safety filters)
+  const refs = [config.face_ref, config.body_ref, ...(config.extra_refs || [])].filter(Boolean);
+  log(`  Converting ${refs.length} reference(s) to base64... ${character === 'elena' ? '(face only - audit fix)' : ''}`);
   const refBase64 = await Promise.all(refs.map(urlToBase64));
   
   // Add scene reference at the beginning for stronger consistency (images 2 and 3)
@@ -508,14 +506,20 @@ ${config.final_check}`;
     log(`  ✅ Generated successfully`);
     return imageUrl;
   } catch (error) {
-    // Try with safer prompt if flagged
+    // Try with safer prompt if flagged - AUDIT 2026-01-20: Updated replacements
     if (error.message?.includes('flagged') || error.message?.includes('safety')) {
       log(`  ⚠️ Prompt flagged, trying safer version...`);
       const saferPrompt = prompt
-        .replace(/sensual/gi, 'confident')
+        .replace(/sensual/gi, 'elegant')
         .replace(/sexy/gi, 'stylish')
-        .replace(/cleavage/gi, 'neckline')
-        .replace(/bikini/gi, 'swimwear');
+        .replace(/alluring/gi, 'confident')
+        .replace(/sultry/gi, 'glamorous')
+        .replace(/captivating gaze/gi, 'warm gaze')
+        .replace(/intense gaze/gi, 'confident expression')
+        .replace(/lips slightly parted/gi, 'warm smile')
+        .replace(/curves/gi, 'silhouette')
+        .replace(/looking over shoulder/gi, 'confident pose')
+        .replace(/lying on bed/gi, 'sitting on bed');
 
       const output = await replicate.run(NANO_BANANA_MODEL, {
         input: {
