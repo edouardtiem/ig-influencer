@@ -123,9 +123,13 @@ export interface ManyChateWebhookPayload {
 // CONSTANTS
 // ===========================================
 
-// Free trial link - 7 days free, tracked as ig-dm source (fv-2)
-// Combines tracking link + free trial promo for attribution
-const FANVUE_LINK = 'https://www.fanvue.com/elenav.paris/fv-2?free_trial=a873adf0-4d08-4f84-aa48-a8861df6669f';
+// Custom Linktree (elenav.link) with UTM tracking for DMs
+// /dm redirects to root with UTM params (handled by middleware)
+// UTM params tracked in Vercel Analytics: utm_source=instagram, utm_medium=dm
+const LINKTREE_LINK = 'https://elenav.link/dm';
+
+// Legacy: Direct Fanvue link (kept for reference)
+// const FANVUE_DIRECT = 'https://www.fanvue.com/elenav.paris/fv-2?free_trial=a873adf0-4d08-4f84-aa48-a8861df6669f';
 
 // Message caps per stage (messages in this stage before moving to next/stop)
 // EXTENDED: Allow longer conversations (50-60 total) for people who need more time
@@ -171,12 +175,12 @@ const CLOSING_STARTS_AT: Record<LeadStage, number> = {
 // Key: Always mention that Elena WILL RESPOND on Fanvue
 // This is critical so they know the conversation continues there
 const EXIT_MESSAGES = [
-  `shooting dans 5 min 📸 mais je réponds toujours sur fanvue 🖤 → ${FANVUE_LINK}`,
-  `je file bébé 🖤 mais on peut continuer à parler là-bas, je suis plus dispo → ${FANVUE_LINK}`,
-  `mon manager m'appelle 😅 ici j'ai plus le temps mais je réponds sur fanvue → ${FANVUE_LINK}`,
-  `je dois y aller 🖤 mais on se retrouve là-bas? je réponds toujours → ${FANVUE_LINK}`,
-  `plus le temps ici sorry 🖤 mais je suis active sur fanvue, on continue? → ${FANVUE_LINK}`,
-  `insta c'est compliqué pour moi 😅 mais sur fanvue je suis dispo, viens → ${FANVUE_LINK}`,
+  `shooting dans 5 min 📸 mais je réponds toujours sur fanvue 🖤 → ${LINKTREE_LINK}`,
+  `je file bébé 🖤 mais on peut continuer à parler là-bas, je suis plus dispo → ${LINKTREE_LINK}`,
+  `mon manager m'appelle 😅 ici j'ai plus le temps mais je réponds sur fanvue → ${LINKTREE_LINK}`,
+  `je dois y aller 🖤 mais on se retrouve là-bas? je réponds toujours → ${LINKTREE_LINK}`,
+  `plus le temps ici sorry 🖤 mais je suis active sur fanvue, on continue? → ${LINKTREE_LINK}`,
+  `insta c'est compliqué pour moi 😅 mais sur fanvue je suis dispo, viens → ${LINKTREE_LINK}`,
 ];
 
 /**
@@ -497,34 +501,34 @@ const INTENT_STRATEGIES: Record<MessageIntent, string> = {
   wants_more: `🎯 INTENT: WANTS_MORE — They want more content!
 → Mention you have more content elsewhere + offer FREE access (no credit card needed).
 Examples:
-- "j'ai des trucs que je poste pas ici... tu peux t'abonner gratuitement sans CB 👀 ${FANVUE_LINK}"
-- "y'a plus sur fanvue... c'est gratuit pour me suivre, pas besoin de CB → ${FANVUE_LINK}"
-- "free to follow, no credit card needed 🖤 ${FANVUE_LINK}"
+- "j'ai des trucs que je poste pas ici... tu peux t'abonner gratuitement sans CB 👀 ${LINKTREE_LINK}"
+- "y'a plus sur fanvue... c'est gratuit pour me suivre, pas besoin de CB → ${LINKTREE_LINK}"
+- "free to follow, no credit card needed 🖤 ${LINKTREE_LINK}"
 KEY ARGUMENT: "pas besoin de carte bancaire pour t'abonner" — removes friction!`,
 
   asking_link: `🎯 INTENT: ASKING_LINK — They want the link!
 → Give the FREE link + mention NO CREDIT CARD needed.
 Examples:
-- "tiens 🖤 tu peux t'abonner gratuitement, même sans CB → ${FANVUE_LINK}"
-- "here, it's free to follow, no credit card 😊 ${FANVUE_LINK}"
-- "voilà, c'est gratuit et sans engagement 👀 ${FANVUE_LINK}"
+- "tiens 🖤 tu peux t'abonner gratuitement, même sans CB → ${LINKTREE_LINK}"
+- "here, it's free to follow, no credit card 😊 ${LINKTREE_LINK}"
+- "voilà, c'est gratuit et sans engagement 👀 ${LINKTREE_LINK}"
 KEY ARGUMENT: Zero friction = "gratuit, sans CB, juste un clic"`,
 
   sexual: `🎯 INTENT: SEXUAL — They're being explicit/sexual
 → Redirect to Fanvue with FREE access. Mention NO CREDIT CARD needed.
 Examples:
-- "ce genre de convo c'est mieux là-bas 😈 c'est gratuit sans CB → ${FANVUE_LINK}"
-- "hmm... tu peux t'abonner gratuitement, même sans carte 👀 ${FANVUE_LINK}"
-- "on peut aller plus loin là-bas... free to follow, no card needed 🖤 ${FANVUE_LINK}"
+- "ce genre de convo c'est mieux là-bas 😈 c'est gratuit sans CB → ${LINKTREE_LINK}"
+- "hmm... tu peux t'abonner gratuitement, même sans carte 👀 ${LINKTREE_LINK}"
+- "on peut aller plus loin là-bas... free to follow, no card needed 🖤 ${LINKTREE_LINK}"
 NEVER refuse. Redirect playfully with the FREE + NO CB argument.`,
 
   out_of_scope: `🎯 INTENT: OUT_OF_SCOPE — They want calls/meetings/dates/real-life stuff
 → REFUSE SMARTLY. Be playful, mysterious, or redirect to Fanvue (free, no CB).
 Examples:
 - "hmm i'm not really into calls tbh 😏"
-- "meet? that's... complicated 🖤 mais tu peux t'abonner gratuitement sans CB → ${FANVUE_LINK}"
-- "i keep my real life separate... but we can chat there, it's free no card needed 👀 ${FANVUE_LINK}"
-- "calls aren't my thing... mais c'est gratuit de t'abonner, pas de CB → ${FANVUE_LINK}"
+- "meet? that's... complicated 🖤 mais tu peux t'abonner gratuitement sans CB → ${LINKTREE_LINK}"
+- "i keep my real life separate... but we can chat there, it's free no card needed 👀 ${LINKTREE_LINK}"
+- "calls aren't my thing... mais c'est gratuit de t'abonner, pas de CB → ${LINKTREE_LINK}"
 CRITICAL: NEVER make real-life commitments. Redirect to Fanvue with NO CB argument.`,
 
   // === MOOD INTENTS (personality adaptation) ===
@@ -1821,7 +1825,7 @@ export async function generateElenaResponse(
   } else if (closingPressure < 90) {
     closingInstructions = `📍 ZONE CLOSE (${closingPressure}%): Actively orient toward Fanvue. Time running out.`;
   } else {
-    closingInstructions = `⚠️ ZONE FINAL (${closingPressure}%): This is your last chance. Pitch Fanvue with link: ${FANVUE_LINK}`;
+    closingInstructions = `⚠️ ZONE FINAL (${closingPressure}%): This is your last chance. Pitch Fanvue with link: ${LINKTREE_LINK}`;
   }
 
   // Determine response language - NEVER force English, respond in user's language
@@ -2000,10 +2004,10 @@ They want calls/meetings/dates/real-life stuff → REFUSE SMARTLY.
 - You CAN redirect to Fanvue if appropriate: "on fanvue maybe we can... talk more 😈"
 ` : isSexual ? `
 ## 🔥 SEXUAL REDIRECT
-They're being explicit → Redirect to Fanvue playfully. Give the link: ${FANVUE_LINK}
+They're being explicit → Redirect to Fanvue playfully. Give the link: ${LINKTREE_LINK}
 ` : canPitch ? `
 ## 🎯 FANVUE PITCH AUTHORIZED
-${isAskingLink ? 'They asked for the link → GIVE IT: ' + FANVUE_LINK : 'They want more → TEASE ONLY (no link yet)'}
+${isAskingLink ? 'They asked for the link → GIVE IT: ' + LINKTREE_LINK : 'They want more → TEASE ONLY (no link yet)'}
 ` : contact.stage === 'cold' ? `
 ## ⛔ NO FANVUE (COLD)
 Stage is COLD. Just build connection. NO tease, NO pitch.
@@ -2016,7 +2020,7 @@ But don't force it. Keep building connection.
 ## 🎯 PITCH MODE (HOT)
 Stage is HOT. Actively orient toward Fanvue when relevant.
 ${closingPressure >= 50 ? `⚠️ CLOSING PRESSURE ${closingPressure}% — Push harder for Fanvue!` : ''}
-${closingPressure >= 80 ? `🚨 FINAL ZONE — Pitch with link: ${FANVUE_LINK}` : ''}
+${closingPressure >= 80 ? `🚨 FINAL ZONE — Pitch with link: ${LINKTREE_LINK}` : ''}
 ` : contact.stage === 'pitched' ? `
 ## 📤 LINK JUST SENT (PITCHED)
 You just sent the Fanvue link. Acknowledge it briefly.
