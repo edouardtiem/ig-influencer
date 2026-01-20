@@ -2161,6 +2161,16 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
       const daysSinceStopped = Math.round((Date.now() - stoppedDate.getTime()) / (1000 * 60 * 60 * 24));
       console.log(`🛑 CONTACT IS STOPPED (@${igUsername}). Day ${daysSinceStopped}/7 — Not responding.`);
       
+      // ===========================================
+      // SAVE INCOMING MESSAGE (even when stopped) — for analytics & reactivation context
+      // ===========================================
+      // This lets us see what they're saying while stopped, useful when we reactivate
+      await saveMessage(contact.id, 'incoming', incomingMessage, {
+        stage_at_time: contact.stage,
+        note: 'saved_while_stopped',
+      });
+      console.log(`💾 Saved incoming message from stopped contact (for future reference)`);
+      
       // Return empty response - ManyChat should not send anything
       return {
         response: '',
