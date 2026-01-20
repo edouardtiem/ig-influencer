@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 20 janvier 2026 (DONE-081 Haiku Model Migration ✅)
+**Dernière mise à jour** : 20 janvier 2026 (DONE-082 DM Prompt Audit & Fix ✅)
 
 ---
 
@@ -23,7 +23,7 @@ roadmap/
 
 | ID | Feature | Priorité | Branche | Lien |
 |----|---------|----------|---------|------|
-| IP-008 | **🎨 Elena LoRA Cloud Training** — Training LoRA haute qualité sur RunPod (GPU A100) avec 25-30 images, rank 32, 300-500 steps pour meilleure consistance visage | 🟡 Medium | main | [→](./roadmap/in-progress/IP-008-elena-lora-cloud-training.md) |
+| IP-008 | **🎨 Elena LoRA Cloud Training** — Training v3 complété mais NaN loss → à relancer avec bf16 et LR plus bas. Voir [session 20/01](./docs/sessions/2026-01-20-elena-lora-cloud-training.md) | 🔴 High | main | [→](./roadmap/in-progress/IP-008-elena-lora-cloud-training.md) |
 | IP-007 | **🔧 Hard Fix DM Bugs** — Investigation systématique + Fix 105 contacts > cap non STOPPED + Fix Elena demande anglais (multilingue) + Script diagnostic complet | 🔴 High | main | [→](./roadmap/in-progress/IP-007-dm-hard-fix.md) |
 | IP-006 | **📊 DM Funnel Progress** — Audit complet funnel DM + Tracking Fanvue attribution (fuzzy matching) + 0% conversion identifié comme problème critique | 🔴 High | main | [→](./roadmap/in-progress/IP-006-dm-funnel-progress.md) |
 | IP-005 | **💬 Auto-Reply Comments** — Backend API créé + ManyChat AI configuré pour réponses auto commentaires IG | 🔴 High | main | [→](./roadmap/in-progress/IP-005-auto-reply-comments.md) |
@@ -68,6 +68,7 @@ roadmap/
 
 | ID | Feature | Date | Lien |
 |----|---------|------|------|
+| DONE-082 | **🔍 DM Prompt Audit & Fix** — Audit conversations 6h + Fix limite 12 mots → concise + Utilisation historique + Profil utilisateur + Détection langue temps réel + Limite 3 liens max | 20/01/2026 | [→](./roadmap/done/DONE-082-dm-prompt-audit-fix.md) |
 | DONE-081 | **🔄 Haiku Model Migration** — Migration claude-3-5-haiku-20241022 (deprecated) → claude-haiku-4-5-20251001 | 20/01/2026 | [→](./roadmap/done/DONE-081-haiku-model-migration.md) |
 | DONE-080 | **🔗 DM Linktree UTM Tracking** — Router DMs vers Linktree (meilleure conversion) + URLs propres /bio et /dm avec UTM cachés + OG image pour previews | 20/01/2026 | [→](./roadmap/done/DONE-080-dm-linktree-utm-tracking.md) |
 | DONE-079 | **🔧 Nano Banana Pro Audit & Fix** — Audit filtres Google + Fix Content Brain Elena (face ref only, expressions nettoyées) → 30%→90% success rate | 20/01/2026 | [→](./roadmap/done/DONE-079-nano-banana-pro-audit-fix.md) |
@@ -140,7 +141,7 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 80 (18 en janvier 2026)
+├── ✅ Done        : 81 (19 en janvier 2026)
 ├── 🚧 In Progress : 8
 ├── 📋 Todo        : 6 
 ├── 🐛 Bugs        : 2 actifs + 15 fixés
@@ -155,6 +156,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 20/01/2026 | **🔍 DM Prompt Audit & Fix** — Audit complet + Corrections majeures prompts (limite mots, historique, langue, liens) | [→](./docs/sessions/2026-01-20-dm-prompt-audit-fix.md) |
 | 20/01/2026 | **🔄 Haiku Model Migration** — Migration deprecated Haiku → Haiku 4.5 | [→](./docs/sessions/2026-01-20-haiku-model-migration.md) |
 | 20/01/2026 | **🔧 Nano Banana Pro Audit** — Audit filtres Google + Fix Content Brain Elena (30%→90%) | [→](./docs/sessions/2026-01-20-nano-banana-pro-audit.md) |
 | 20/01/2026 | **📚 Documentation Cleanup** — Nettoyage complet doc (root, sessions, roadmap) + README mis à jour Elena | [→](./docs/sessions/2026-01-20-documentation-cleanup.md) |

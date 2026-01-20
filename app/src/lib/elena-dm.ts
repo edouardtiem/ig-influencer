@@ -60,6 +60,7 @@ export interface DMContact {
   last_contact_at: string | null;
   fanvue_pitched_at: string | null;
   fanvue_link_clicked: boolean;
+  fanvue_link_sent_count: number;  // Track how many times we sent the link (max 3)
   fanvue_converted_at: string | null;
   fanvue_paid_at: string | null;
   total_revenue: number;
@@ -397,44 +398,36 @@ If they refuse twice:
 - Mix French touches: "merci", "j'adore", "non?"
 - Short, punchy responses. Like texting, not emailing.
 
-## ⚠️ LENGTH RULE (MANDATORY — READ THIS)
-- 1 sentence MAX (rarely 2)
-- Under 12 words TOTAL — COUNT THEM
-- NO ALL CAPS excitement
-- NO long celebratory messages
-- NO paragraphs, NO explanations, NO lists
-- If you write more than 12 words, you FAIL
-- Examples of GOOD length: "merci 🖤 tu viens d'où?" (5 words) ✅
-- Examples of BAD length: "aww that's so sweet of you to say, I really appreciate..." (12+ words) ❌
+## ⚠️ LENGTH RULE — BE CONCISE, NOT LIMITED
+- NO hard word limit, but say what you need with MINIMUM words
+- Text like a real person: short when appropriate, longer when needed
+- NO ALL CAPS, NO paragraphs, NO lists, NO corporate speak
+- If you can say it in 5 words, don't use 15
+- But if answering a question needs 20 words, that's fine
+- Examples:
+  - Simple greeting → "hey 🖤 ça va?" (short)
+  - Answering their question → "je suis model à Paris, italienne d'origine 😊 et toi tu fais quoi?" (longer but natural)
+  - Flirty response → "mmm j'aime bien quand tu dis ça 😏" (medium)
 
-## ⚠️ FACTUAL ACCURACY (CRITICAL — READ THIS)
-- ONLY reference things EXPLICITLY visible in the LAST MESSAGE (not the history)
-- NEVER say "you keep asking" or "that's the Xth time" unless you can literally count it
-- If unsure about frequency/patterns, don't mention them
-- Stick to what you SEE in the LAST message, not what you assume
+## ⚠️ USE THE CONVERSATION HISTORY — BE SMART
+- You have access to the FULL conversation history — USE IT
+- REMEMBER what they told you: their job, location, interests, name
+- NEVER ask a question they already answered (makes you look like a bot)
+- Reference past info naturally: "ah tu travailles toujours dans [their job]?" 
+- If they told you their name, use it occasionally
+- Build on previous topics, don't start fresh every message
+- BUT: Never invent things they didn't say (no hallucination)
 
-## 🚨 ANTI-HALLUCINATION RULES (ULTRA CRITICAL)
-READ THE LAST MESSAGE CAREFULLY. RESPOND ONLY TO ITS LITERAL CONTENT.
+## 🚨 ANTI-HALLUCINATION RULES (CRITICAL)
+- NEVER invent facts about the user that weren't in the conversation
+- NEVER assume patterns or frequencies: no "you keep asking", "that's the Xth time"
+- If you mention a quantity, COUNT IT FIRST (1 emoji ≠ "double")
+- Use history to remember facts, NOT to comment on repetition
 
-**BEFORE RESPONDING, ASK YOURSELF:**
-- How many emojis are in the LAST message? COUNT THEM. If 1, don't say "double".
-- How many words? If 1 word, respond to that 1 word only.
-- Is there ANY pattern? NO. Every message is FRESH. Don't assume patterns.
-
-**EXAMPLES OF WHAT NOT TO DO:**
-- User sends: "😍" (ONE emoji)
-  ❌ WRONG: "aww double the hearts" (there's only ONE heart!)
-  ✅ RIGHT: "aww merci 🖤" (simple acknowledgment)
-  
-- User sends: "hey"
-  ❌ WRONG: "hey again!" (you don't know if they said hey before)
-  ✅ RIGHT: "hey you 👀" (fresh response)
-
-**COUNTING RULE:**
-If you want to mention a quantity, COUNT IT FIRST:
-- 1 emoji = don't mention quantity
-- 2+ emojis = you MAY say "all these" but NEVER give a number
-- SAFER: Just don't mention quantities at all
+**Examples:**
+- User sends: "😍" → ✅ "aww merci 🖤" (NOT "double the hearts")
+- User asks same thing twice → ✅ Answer normally (NOT "you already asked")
+- User told you their job earlier → ✅ Reference it: "alors le boulot ça va?"
 
 ## 🚫 ABSOLUTELY FORBIDDEN WORDS (INSTANT FAIL)
 These words will get your response REJECTED. NEVER use them:
@@ -701,12 +694,13 @@ const SMART_FALLBACKS = [
 
 /**
  * Validate a response before sending
- * Checks: hallucinations, length, stage alignment, closing objective, generic responses
+ * Checks: hallucinations, length, stage alignment, closing objective, generic responses, language
  */
 function validateResponse(
   response: string,
   stage: LeadStage,
-  messageCount: number
+  messageCount: number,
+  expectedLanguage?: string | null
 ): ValidationResult {
   const lowerResponse = response.toLowerCase();
   const trimmedResponse = response.trim();
@@ -810,13 +804,45 @@ function validateResponse(
     }
   }
   
-  // === CHECK 3: Length check (max 15 words) ===
-  if (wordCount > 15) {
+  // === CHECK 3: Length check (max 50 words - allow natural responses) ===
+  if (wordCount > 50) {
     return {
       isValid: false,
-      reason: `Too long: ${wordCount} words (max 15)`,
+      reason: `Too long: ${wordCount} words (max 50)`,
       severity: 'fail',
     };
+  }
+  
+  // === CHECK 3.5: Language mismatch detection ===
+  if (expectedLanguage) {
+    // Common English words/phrases that shouldn't appear in non-English responses
+    const englishOnlyWords = ['what', 'where', 'how are you', 'tell me', 'what\'s up', 'what brings', 'how\'s your'];
+    // Common French words that shouldn't appear in non-French responses  
+    const frenchOnlyWords = ['qu\'est-ce', 'comment ça', 'tu fais quoi', 'tu viens d\'où', 'ça va'];
+    
+    if (expectedLanguage === 'fr') {
+      // French expected - check for English words
+      for (const englishWord of englishOnlyWords) {
+        if (lowerResponse.includes(englishWord)) {
+          return {
+            isValid: false,
+            reason: `Language mismatch: Found "${englishWord}" but expected French`,
+            severity: 'fail',
+          };
+        }
+      }
+    } else if (expectedLanguage === 'en') {
+      // English expected - check for French words
+      for (const frenchWord of frenchOnlyWords) {
+        if (lowerResponse.includes(frenchWord)) {
+          return {
+            isValid: false,
+            reason: `Language mismatch: Found "${frenchWord}" but expected English`,
+            severity: 'fail',
+          };
+        }
+      }
+    }
   }
   
   // === CHECK 4: Stage alignment ===
@@ -1111,16 +1137,58 @@ export async function updateContactAfterMessage(
 }
 
 /**
- * Mark contact as pitched
+ * Mark contact as pitched and increment link sent count
  */
 export async function markAsPitched(contactId: string): Promise<void> {
+  // First get current count
+  const { data: contact } = await supabase
+    .from('elena_dm_contacts')
+    .select('fanvue_link_sent_count')
+    .eq('id', contactId)
+    .single();
+  
+  const currentCount = contact?.fanvue_link_sent_count || 0;
+  
   await supabase
     .from('elena_dm_contacts')
     .update({
       stage: 'pitched',
       fanvue_pitched_at: new Date().toISOString(),
+      fanvue_link_sent_count: currentCount + 1,
     })
     .eq('id', contactId);
+  
+  console.log(`🔗 Link sent count: ${currentCount + 1}/3`);
+}
+
+/**
+ * Check if we can still send the Fanvue link (max 3 times)
+ */
+export function canSendFanvueLink(contact: DMContact): boolean {
+  const count = contact.fanvue_link_sent_count || 0;
+  return count < 3;
+}
+
+/**
+ * Get link sending status for prompt context
+ */
+export function getLinkSendingContext(contact: DMContact): string {
+  const count = contact.fanvue_link_sent_count || 0;
+  
+  if (count === 0) {
+    return '🔗 LIEN: Jamais envoyé. Tu peux l\'envoyer si le moment est bon.';
+  } else if (count === 1) {
+    return '🔗 LIEN: Envoyé 1 fois. Tu peux le renvoyer UNE fois si nécessaire.';
+  } else if (count === 2) {
+    return `🔗 LIEN: Envoyé 2 fois. DERNIÈRE CHANCE - si tu l'envoies, dis "je te le remets une dernière fois 🖤"`;
+  } else {
+    return `🔗 LIEN: DÉJÀ ENVOYÉ 3 FOIS. NE PLUS ENVOYER LE LIEN.
+Au lieu de renvoyer, référence-le:
+- "tu l'as toujours le lien? 🖤"
+- "je t'ai déjà envoyé le lien, tu l'as vu?"
+- "t'as eu le temps de checker?"
+- "le lien est dans nos messages 👀"`;
+  }
 }
 
 /**
@@ -1827,21 +1895,65 @@ export async function generateElenaResponse(
     closingInstructions = `⚠️ ZONE FINAL (${closingPressure}%): This is your last chance. Pitch Fanvue with link: ${LINKTREE_LINK}`;
   }
 
-  // Determine response language - NEVER force English, respond in user's language
-  const responseLanguage = contact.detected_language;
+  // Determine response language - STRICT language matching
+  // First, detect language from CURRENT message (real-time detection)
+  const detectCurrentLanguage = (msg: string): string | null => {
+    const lower = msg.toLowerCase();
+    // French indicators
+    if (/\b(je|tu|il|elle|nous|vous|ils|elles|est|sont|suis|fait|fais|c'est|qu'est|d'où|merci|bonjour|salut|oui|non|quoi|pourquoi|comment)\b/.test(lower)) {
+      return 'fr';
+    }
+    // Spanish indicators
+    if (/\b(hola|qué|cómo|estás|soy|tengo|quiero|gracias|bueno|bien|amor|mucho)\b/.test(lower)) {
+      return 'es';
+    }
+    // Italian indicators
+    if (/\b(ciao|sono|cosa|come|stai|bene|grazie|molto|bella|bello)\b/.test(lower)) {
+      return 'it';
+    }
+    // German indicators
+    if (/\b(ich|du|ist|sind|hallo|danke|gut|wie|was|schön)\b/.test(lower)) {
+      return 'de';
+    }
+    // Russian indicators (cyrillic)
+    if (/[а-яА-ЯёЁ]{3,}/.test(msg)) {
+      return 'ru';
+    }
+    // Portuguese indicators
+    if (/\b(olá|obrigado|você|estou|como|muito|bem|tudo)\b/.test(lower)) {
+      return 'pt';
+    }
+    // English indicators (check last to avoid false positives)
+    if (/\b(i'm|you're|what|where|how|when|thanks|hello|hi|good|nice)\b/.test(lower)) {
+      return 'en';
+    }
+    return null;
+  };
+  
+  const currentMsgLanguage = detectCurrentLanguage(incomingMessage);
+  // Use current message language if detected, otherwise fall back to stored contact language
+  const responseLanguage = currentMsgLanguage || contact.detected_language;
+  
   const languageInstruction = responseLanguage === 'fr'
-    ? '🌍 LANGUE: Français. Réponds en français uniquement. Pas de mots anglais.'
+    ? `🌍 LANGUE: FRANÇAIS OBLIGATOIRE. Réponds UNIQUEMENT en français. 
+⚠️ NE JAMAIS utiliser de mots anglais ("what", "how", "tell me", etc). 
+Si tu écris en anglais → ERREUR GRAVE. Le user parle français, réponds en français.`
     : responseLanguage === 'it'
-    ? '🌍 LINGUA: Italiano. Rispondi solo in italiano.'
+    ? '🌍 LINGUA: ITALIANO OBBLIGATORIO. Rispondi SOLO in italiano. NO parole inglesi.'
     : responseLanguage === 'es'
-    ? '🌍 IDIOMA: Español. Responde solo en español.'
+    ? '🌍 IDIOMA: ESPAÑOL OBLIGATORIO. Responde SOLO en español. NO palabras inglesas.'
     : responseLanguage === 'pt'
-    ? '🌍 IDIOMA: Português. Responda apenas em português.'
+    ? '🌍 IDIOMA: PORTUGUÊS OBRIGATÓRIO. Responda APENAS em português. NÃO palavras inglesas.'
     : responseLanguage === 'de'
-    ? '🌍 SPRACHE: Deutsch. Antworte nur auf Deutsch.'
+    ? '🌍 SPRACHE: DEUTSCH PFLICHT. Antworte NUR auf Deutsch. KEINE englischen Wörter.'
+    : responseLanguage === 'ru'
+    ? '🌍 ЯЗЫК: РУССКИЙ ОБЯЗАТЕЛЬНО. Отвечай ТОЛЬКО на русском. БЕЗ английских слов.'
     : responseLanguage === 'en'
-    ? '🌍 LANGUAGE: English. Respond in English only.'
-    : '🌍 LANGUAGE: Respond in the SAME language as the user\'s message. Mirror their language naturally. If they write in Russian, reply in Russian. If Turkish, reply in Turkish. NEVER ask them to switch language.';
+    ? '🌍 LANGUAGE: ENGLISH ONLY. Respond in English. No French/Italian words.'
+    : `🌍 LANGUAGE: Match the user's language EXACTLY. 
+Look at their LAST message and respond in THE SAME language. 
+If they write in Russian → reply in Russian. Turkish → Turkish. Arabic → Arabic.
+NEVER default to English if they're not speaking English.`;
 
   // Get recent outgoing messages to avoid repetition
   const recentOutgoingMessages = conversationHistory.filter(m => m.direction === 'outgoing').slice(-5);
@@ -1852,112 +1964,292 @@ Generate something COMPLETELY DIFFERENT. If you recently said "hey 🖤", do NOT
     : '';
 
   // ===========================================
-  // SMART TOPIC EXTRACTION — Prevent asking answered questions
+  // USER PROFILE EXTRACTION — Build comprehensive user summary
   // ===========================================
-  // Analyze conversation to find what we already know about the user
-  const knownFacts: string[] = [];
-  const askedQuestions: string[] = [];
   
-  // Topic patterns to detect in incoming messages (user answers)
-  const topicPatterns = {
+  interface UserProfile {
+    name: string | null;
+    location: string | null;
+    country: string | null;
+    job: string | null;
+    age: string | null;
+    interests: string[];
+    sports: string[];
+    relationshipStatus: string | null;
+    tonePreference: 'formal' | 'casual' | 'flirty' | null;
+    recentTopics: string[];
+    questionsAlreadyAsked: string[];
+  }
+  
+  const userProfile: UserProfile = {
+    name: null,
+    location: null,
+    country: null,
+    job: null,
+    age: null,
+    interests: [],
+    sports: [],
+    relationshipStatus: null,
+    tonePreference: null,
+    recentTopics: [],
+    questionsAlreadyAsked: [],
+  };
+  
+  // Extraction patterns - more comprehensive
+  const extractionPatterns = {
+    name: [
+      /(?:je m'appelle|my name is|i'm|je suis|call me|c'est)\s+([A-ZÀ-ÿ][a-zà-ÿ]+)(?:\s|$|,|\.)/i,
+      /^([A-ZÀ-ÿ][a-zà-ÿ]+)$/,  // Single word that could be a name
+    ],
     location: [
-      /\b(from|de|viens de|je suis de|i'm from|im from|live in|habite)\s+([A-Za-zÀ-ÿ\s]+)/i,
-      /\b(new york|paris|london|los angeles|la|miami|montreal|toronto|canada|usa|états[- ]unis|france|italie|italy|spain|espagne|uk|england|germany|allemagne|australia|brazil|brésil)\b/i,
+      /(?:habite|live in|viens de|from|à|in)\s+([A-ZÀ-ÿ][A-Za-zÀ-ÿ\s-]+?)(?:\s*[,.]|$|\s+et|\s+and)/i,
+      /(?:je suis de|i'm from)\s+([A-Za-zÀ-ÿ\s-]+)/i,
+    ],
+    country: [
+      /\b(france|usa|états[- ]unis|united states|canada|belgique|belgium|suisse|switzerland|italie|italy|espagne|spain|allemagne|germany|uk|england|maroc|morocco|algérie|algeria|tunisie|tunisia|brésil|brazil|russie|russia|chine|china|japon|japan|inde|india|mexique|mexico|australie|australia)\b/i,
     ],
     job: [
-      /\b(i'm a|je suis|i work|je travaille|i do|je fais|enseigne|teacher|prof|engineer|ingénieur|developer|dev|student|étudiant|nurse|doctor|médecin|lawyer|avocat|chef|artist|artiste|musician|musicien|entrepreneur|business)\b/i,
-      /\b(teach|enseigner|construction|equipment|machines?|hockey)\b/i,
-    ],
-    sport: [
-      /\b(play|joue|training|sport|gym|fitness|football|soccer|basketball|tennis|hockey|golf|swim|natation|run|course|yoga|boxe|boxing|mma|martial)\b/i,
-    ],
-    hobby: [
-      /\b(like|j'aime|love|adore|hobby|hobbies|passion|passions?|music|musique|movies?|films?|gaming|games?|jeux|travel|voyage|cook|cuisine|read|lire|art|photo|photography)\b/i,
+      /(?:je suis|i'm a|i am a|je travaille comme|i work as|je fais|i do)\s+([A-Za-zÀ-ÿ\s-]+?)(?:\s*[,.]|$|\s+et|\s+and|\s+à|\s+in)/i,
+      /(?:je travaille dans|i work in)\s+(?:le |la |l'|the )?([A-Za-zÀ-ÿ\s-]+)/i,
+      /\b(développeur|developer|ingénieur|engineer|médecin|doctor|avocat|lawyer|professeur|teacher|étudiant|student|infirmier|nurse|chef|artiste|artist|musicien|musician|barbier|barber|coiffeur|hairdresser|trader|entrepreneur|commercial|sales)\b/i,
     ],
     age: [
-      /\b(\d{1,2})\s*(ans|years?|yo)\b/i,
-      /\b(i'm|je suis|i am)\s*(\d{1,2})\b/i,
+      /\b(\d{2})\s*(?:ans|years|yo)\b/i,
+      /(?:j'ai|i'm|i am)\s+(\d{2})\b/i,
     ],
-    name: [
-      /\b(i'm|je suis|je m'appelle|my name is|name's|call me)\s+([A-Za-zÀ-ÿ]+)\b/i,
+    interests: [
+      /(?:j'aime|i like|i love|j'adore|je kiffe|passion)\s+(?:le |la |les |the )?([A-Za-zÀ-ÿ\s-]+?)(?:\s*[,.]|$|\s+et|\s+and)/gi,
+    ],
+    sports: [
+      /\b(football|soccer|basket|basketball|tennis|golf|natation|swimming|gym|musculation|fitness|yoga|boxe|boxing|mma|running|course|vélo|cycling|ski|surf|hockey)\b/gi,
+    ],
+    relationship: [
+      /\b(marié|married|célibataire|single|en couple|in a relationship|divorcé|divorced|bachelor)\b/i,
     ],
   };
   
-  // Question patterns to detect in outgoing messages (what Elena asked)
-  const questionPatterns = {
-    location: [/\b(where|où|d'où|from|viens|habite|live|quel pays|what country|what state|quel état)\b.*\?/i],
-    job: [/\b(what do you do|tu fais quoi|que fais-tu|work|travail|job|métier|profession|occupation)\b.*\?/i],
-    sport: [/\b(sport|gym|training|exercise|fitness|tu fais du sport)\b.*\?/i],
-    hobby: [/\b(hobby|hobbies|passion|like|aimes|adore|free time|temps libre|plaisir)\b.*\?/i],
-    tell_me: [/\b(tell me|raconte|parle-moi|tu me racontes)\b/i],
-  };
-  
-  // Scan conversation history
+  // Scan all incoming messages to build profile
   for (const msg of conversationHistory) {
     if (msg.direction === 'incoming') {
-      // User message - extract facts
       const content = msg.content;
       
-      for (const [topic, patterns] of Object.entries(topicPatterns)) {
-        for (const pattern of patterns) {
-          if (pattern.test(content)) {
-            // Extract the matched info
-            const match = content.match(pattern);
-            if (match) {
-              const info = match[2] || match[1] || match[0];
-              if (info && info.length > 1) {
-                knownFacts.push(`${topic}: "${info.trim()}"`);
-              }
+      // Extract name
+      if (!userProfile.name) {
+        for (const pattern of extractionPatterns.name) {
+          const match = content.match(pattern);
+          if (match && match[1] && match[1].length > 2 && match[1].length < 20) {
+            // Validate it looks like a name (capitalized, not common word)
+            const potentialName = match[1].trim();
+            const commonWords = ['oui', 'non', 'yes', 'no', 'ok', 'bien', 'good', 'merci', 'thanks'];
+            if (!commonWords.includes(potentialName.toLowerCase())) {
+              userProfile.name = potentialName;
+              break;
             }
           }
         }
       }
-    } else {
-      // Elena message - track questions asked
-      const content = msg.content;
       
-      for (const [topic, patterns] of Object.entries(questionPatterns)) {
-        for (const pattern of patterns) {
-          if (pattern.test(content)) {
-            askedQuestions.push(topic);
+      // Extract location
+      if (!userProfile.location) {
+        for (const pattern of extractionPatterns.location) {
+          const match = content.match(pattern);
+          if (match && match[1] && match[1].length > 2) {
+            userProfile.location = match[1].trim();
+            break;
           }
+        }
+      }
+      
+      // Extract country
+      if (!userProfile.country) {
+        for (const pattern of extractionPatterns.country) {
+          const match = content.match(pattern);
+          if (match && match[1]) {
+            userProfile.country = match[1].trim();
+            break;
+          }
+        }
+      }
+      
+      // Extract job
+      if (!userProfile.job) {
+        for (const pattern of extractionPatterns.job) {
+          const match = content.match(pattern);
+          if (match && match[1] && match[1].length > 2) {
+            userProfile.job = match[1].trim();
+            break;
+          }
+        }
+      }
+      
+      // Extract age
+      if (!userProfile.age) {
+        for (const pattern of extractionPatterns.age) {
+          const match = content.match(pattern);
+          if (match && match[1]) {
+            const age = parseInt(match[1]);
+            if (age >= 18 && age <= 80) {
+              userProfile.age = match[1];
+              break;
+            }
+          }
+        }
+      }
+      
+      // Extract sports (accumulate)
+      for (const pattern of extractionPatterns.sports) {
+        const matches = content.matchAll(pattern);
+        for (const match of matches) {
+          if (match[1] && !userProfile.sports.includes(match[1].toLowerCase())) {
+            userProfile.sports.push(match[1].toLowerCase());
+          }
+        }
+      }
+      
+      // Extract relationship status
+      if (!userProfile.relationshipStatus) {
+        for (const pattern of extractionPatterns.relationship) {
+          const match = content.match(pattern);
+          if (match && match[1]) {
+            userProfile.relationshipStatus = match[1].toLowerCase();
+            break;
+          }
+        }
+      }
+      
+      // Track recent topics discussed (last 5 user messages summarized)
+      if (content.length > 10) {
+        userProfile.recentTopics.push(content.substring(0, 50));
+      }
+    } else {
+      // Elena's messages - track questions asked
+      const content = msg.content.toLowerCase();
+      if (content.includes('?')) {
+        if (/où|where|d'où|from|viens/.test(content)) {
+          userProfile.questionsAlreadyAsked.push('location');
+        }
+        if (/fais quoi|what do you do|travail|job|métier/.test(content)) {
+          userProfile.questionsAlreadyAsked.push('job');
+        }
+        if (/quel âge|how old|age/.test(content)) {
+          userProfile.questionsAlreadyAsked.push('age');
+        }
+        if (/sport|gym|fitness/.test(content)) {
+          userProfile.questionsAlreadyAsked.push('sports');
+        }
+        if (/hobby|passion|aimes|like/.test(content)) {
+          userProfile.questionsAlreadyAsked.push('interests');
         }
       }
     }
   }
   
-  // Deduplicate
-  const uniqueFacts = [...new Set(knownFacts)];
-  const uniqueQuestions = [...new Set(askedQuestions)];
+  // Detect tone preference from how user writes
+  const allUserMessages = conversationHistory.filter(m => m.direction === 'incoming').map(m => m.content).join(' ');
+  if (/vous|votre|monsieur|madame/.test(allUserMessages)) {
+    userProfile.tonePreference = 'formal';
+  } else if (/😈|🔥|sexy|hot|chaud/.test(allUserMessages)) {
+    userProfile.tonePreference = 'flirty';
+  } else {
+    userProfile.tonePreference = 'casual';
+  }
   
-  // Build anti-repeat instruction for topics
-  let topicAntiRepeatInstruction = '';
-  if (uniqueFacts.length > 0 || uniqueQuestions.length > 0) {
-    topicAntiRepeatInstruction = `\n\n🧠 CONVERSATION MEMORY — CRITICAL: DO NOT ASK ABOUT TOPICS ALREADY COVERED!`;
+  // Deduplicate
+  userProfile.questionsAlreadyAsked = [...new Set(userProfile.questionsAlreadyAsked)];
+  userProfile.recentTopics = userProfile.recentTopics.slice(-5);
+  
+  // ===========================================
+  // BUILD USER SUMMARY FOR PROMPT
+  // ===========================================
+  
+  let userSummaryInstruction = '';
+  const hasAnyInfo = userProfile.name || userProfile.location || userProfile.country || 
+                     userProfile.job || userProfile.age || userProfile.sports.length > 0;
+  
+  if (hasAnyInfo) {
+    userSummaryInstruction = `\n\n👤 PROFIL UTILISATEUR — CE QUE TU SAIS SUR LUI:`;
     
-    if (uniqueFacts.length > 0) {
-      topicAntiRepeatInstruction += `\n\n📌 KNOWN FACTS about this user (DO NOT ask about these again!):
-${uniqueFacts.map(f => `  - ${f}`).join('\n')}`;
+    if (userProfile.name) {
+      userSummaryInstruction += `\n• Prénom: ${userProfile.name}`;
+    }
+    if (userProfile.age) {
+      userSummaryInstruction += `\n• Âge: ${userProfile.age} ans`;
+    }
+    if (userProfile.location || userProfile.country) {
+      const loc = [userProfile.location, userProfile.country].filter(Boolean).join(', ');
+      userSummaryInstruction += `\n• Localisation: ${loc}`;
+    }
+    if (userProfile.job) {
+      userSummaryInstruction += `\n• Métier: ${userProfile.job}`;
+    }
+    if (userProfile.sports.length > 0) {
+      userSummaryInstruction += `\n• Sports: ${userProfile.sports.join(', ')}`;
+    }
+    if (userProfile.relationshipStatus) {
+      userSummaryInstruction += `\n• Statut: ${userProfile.relationshipStatus}`;
+    }
+    if (userProfile.tonePreference === 'formal') {
+      userSummaryInstruction += `\n• ⚠️ Il vouvoie → réponds formellement`;
     }
     
-    if (uniqueQuestions.length > 0) {
-      topicAntiRepeatInstruction += `\n\n❌ QUESTIONS YOU ALREADY ASKED (NEVER ask these again!):
-${uniqueQuestions.map(q => `  - Asked about: ${q}`).join('\n')}
-
-⚠️ IF YOU ASK THE SAME QUESTION AGAIN, the user will think you're a bot and stop responding.
-Instead: Reference what you know! "ah tu enseignes les machines de construction? c'est cool 👀"`;
+    userSummaryInstruction += `\n
+💡 UTILISE CES INFOS NATURELLEMENT:
+- Appelle-le par son prénom de temps en temps${userProfile.name ? ` ("${userProfile.name}")` : ''}
+- Référence son métier/lieu: "alors ${userProfile.job ? `le boulot de ${userProfile.job}` : 'le boulot'} ça va?"
+- Montre que tu te souviens de lui, il se sentira spécial`;
+  }
+  
+  // Questions to avoid
+  let questionsToAvoid = '';
+  if (userProfile.questionsAlreadyAsked.length > 0) {
+    questionsToAvoid = `\n\n🚫 NE REDEMANDE PAS (déjà répondu):`;
+    if (userProfile.questionsAlreadyAsked.includes('location') && (userProfile.location || userProfile.country)) {
+      questionsToAvoid += `\n• "Tu viens d'où?" → Tu sais déjà: ${userProfile.location || userProfile.country}`;
+    }
+    if (userProfile.questionsAlreadyAsked.includes('job') && userProfile.job) {
+      questionsToAvoid += `\n• "Tu fais quoi?" → Tu sais déjà: ${userProfile.job}`;
+    }
+    if (userProfile.questionsAlreadyAsked.includes('age') && userProfile.age) {
+      questionsToAvoid += `\n• "Quel âge?" → Tu sais déjà: ${userProfile.age} ans`;
     }
   }
   
-  // Detect if user sent emoji-only message
+  const topicAntiRepeatInstruction = userSummaryInstruction + questionsToAvoid;
+  
+  // Get Elena's last message for context
+  const lastElenaMessage = recentOutgoingMessages.length > 0 
+    ? recentOutgoingMessages[recentOutgoingMessages.length - 1].content 
+    : null;
+  
+  // Detect if user sent emoji-only message (= reaction to previous message)
   const isEmojiOnlyMessage = /^[\p{Emoji}\s\u200d]+$/u.test(incomingMessage.trim()) || 
     incomingMessage.trim().length < 5 && /[\p{Emoji}]/u.test(incomingMessage);
+  
+  // Detect short affirmative responses ("oui", "ok", "yes", "d'accord", etc.)
+  const isShortAffirmative = /^(oui|ok|okay|yes|yeah|yep|yup|d'accord|dac|ouais|si|sí|ja|da|bien|cool|nice|super|génial|top|parfait|exactement|voilà|c'est ça|that's right|right|true|exactly|indeed)\.?$/i.test(incomingMessage.trim());
+  
   const emojiInstruction = isEmojiOnlyMessage
-    ? `\n\n💬 EMOJI-ONLY MESSAGE — The user sent just emojis. Respond with something MEANINGFUL, not just "hey 🖤". Options:
-- Ask a question about them: "where are you from?" / "tu fais quoi dans la vie?"
-- Make a playful comment: "someone's feeling flirty 😏" / "all these emojis... i like it 👀"
-- Acknowledge warmly and ask something: "aww cute 🖤 you're from where?"
-NEVER just say "hey 🖤" to emojis. That's lazy and repetitive.`
+    ? `\n\n💬 EMOJI = RÉACTION POSITIVE à ton dernier message!
+${lastElenaMessage ? `Ton dernier message était: "${lastElenaMessage.substring(0, 60)}..."` : ''}
+
+L'emoji est une réaction POSITIVE. Options:
+- Rebondir sur ce que TU as dit: "tu aimes ça? 😏" / "ça te plaît ce que je dis?"
+- Remercier et continuer: "merci 🖤" + suite naturelle de la conversation
+- Si tu avais posé une question, reformule ou enchaîne
+
+⚠️ NE PAS poser une nouvelle question générique genre "tu viens d'où?". CONTINUE la conversation en cours.`
+    : '';
+
+  const shortResponseInstruction = isShortAffirmative && !isEmojiOnlyMessage
+    ? `\n\n💬 RÉPONSE COURTE AFFIRMATIVE ("${incomingMessage}")
+${lastElenaMessage ? `Ton dernier message était: "${lastElenaMessage.substring(0, 60)}..."` : ''}
+
+Le user acquiesce / confirme. Options selon le contexte:
+- Si tu proposais quelque chose → enchaîne: "parfait 😊" + suite
+- Si tu posais une question et il répond oui → développe le sujet, pas nouvelle question
+- Si c'était du flirt → monte d'un cran: "mmm j'aime quand tu dis oui 😏"
+
+⚠️ NE PAS poser une nouvelle question générique. BUILD sur la conversation actuelle.`
     : '';
   
   // Detect special tokens (stickers, reactions, attachments)
@@ -1975,6 +2267,10 @@ Keep it SHORT (max 8 words). Ask a QUESTION to continue the conversation.
 NEVER mention Fanvue or content on non-text messages.`
     : '';
 
+  // Get link sending context
+  const linkContext = getLinkSendingContext(contact);
+  const canStillSendLink = canSendFanvueLink(contact);
+  
   const contextPrompt = `
 ## CURRENT CONTEXT
 - Username: ${contact.ig_username || 'unknown'}
@@ -1982,7 +2278,10 @@ NEVER mention Fanvue or content on non-text messages.`
 - Messages: ${contact.message_count}
 - Closing Pressure: ${closingPressure}%
 - Detected Language: ${responseLanguage?.toUpperCase() || 'AUTO (mirror user)'}
+- Lien envoyé: ${contact.fanvue_link_sent_count || 0}/3 fois
 ${contact.stage === 'pitched' ? '⚠️ Already pitched Fanvue. Don\'t mention it unless they ask.' : ''}
+
+${linkContext}
 
 ## DETECTED INTENT
 ${intentStrategy}
@@ -2000,13 +2299,16 @@ They want calls/meetings/dates/real-life stuff → REFUSE SMARTLY.
 - Be playful, mysterious, or redirect to Fanvue
 - NEVER make fake promises ("let's call tomorrow" = FORBIDDEN)
 - Examples: "hmm i'm not really into calls tbh 😏" / "that's not really my thing 🖤"
-- You CAN redirect to Fanvue if appropriate: "on fanvue maybe we can... talk more 😈"
+${canStillSendLink ? '- You CAN redirect to Fanvue if appropriate: "on fanvue maybe we can... talk more 😈"' : '- RÉFÉRENCE le lien sans le renvoyer: "tu as toujours mon lien si tu veux 🖤"'}
 ` : isSexual ? `
 ## 🔥 SEXUAL REDIRECT
-They're being explicit → Redirect to Fanvue playfully. Give the link: ${LINKTREE_LINK}
+They're being explicit → Redirect to Fanvue playfully.
+${canStillSendLink ? `Give the link: ${LINKTREE_LINK}` : `⚠️ LINK DÉJÀ ENVOYÉ 3x — Ne renvoie PAS le lien. Référence-le: "tu as le lien 🖤 on peut continuer là-bas"`}
 ` : canPitch ? `
 ## 🎯 FANVUE PITCH AUTHORIZED
-${isAskingLink ? 'They asked for the link → GIVE IT: ' + LINKTREE_LINK : 'They want more → TEASE ONLY (no link yet)'}
+${canStillSendLink 
+  ? (isAskingLink ? 'They asked for the link → GIVE IT: ' + LINKTREE_LINK : 'They want more → TEASE ONLY (no link yet)')
+  : `⚠️ LINK DÉJÀ ENVOYÉ 3x — Référence-le sans renvoyer: "je t'ai déjà envoyé le lien 🖤 tu l'as vu?"`}
 ` : contact.stage === 'cold' ? `
 ## ⛔ NO FANVUE (COLD)
 Stage is COLD. Just build connection. NO tease, NO pitch.
@@ -2019,12 +2321,13 @@ But don't force it. Keep building connection.
 ## 🎯 PITCH MODE (HOT)
 Stage is HOT. Actively orient toward Fanvue when relevant.
 ${closingPressure >= 50 ? `⚠️ CLOSING PRESSURE ${closingPressure}% — Push harder for Fanvue!` : ''}
-${closingPressure >= 80 ? `🚨 FINAL ZONE — Pitch with link: ${LINKTREE_LINK}` : ''}
+${canStillSendLink && closingPressure >= 80 ? `🚨 FINAL ZONE — Pitch with link: ${LINKTREE_LINK}` : ''}
+${!canStillSendLink ? `⚠️ LINK DÉJÀ ENVOYÉ 3x — Référence-le: "tu as toujours le lien? 👀"` : ''}
 ` : contact.stage === 'pitched' ? `
-## 📤 LINK JUST SENT (PITCHED)
-You just sent the Fanvue link. Acknowledge it briefly.
-Examples: "voilà 🖤" / "j'espère que ça te plaira 👀" / "dis-moi ce que t'en penses"
-Quick transition to CLOSING - don't linger here.
+## 📤 LINK ALREADY SENT (PITCHED)
+You already sent the Fanvue link. Acknowledge it / follow up.
+Examples: "t'as vu le lien? 👀" / "tu me dis ce que t'en penses? 😏"
+${!canStillSendLink ? `⚠️ NE RENVOIE PLUS LE LIEN. Référence-le seulement.` : ''}
 ` : contact.stage === 'closing' ? `
 ## 🎯 CLOSING MODE (ACTIVE FOLLOW-UP)
 You already sent the link. Now follow up on it WITHOUT sending it again.
@@ -2034,7 +2337,7 @@ Examples:
 - "tu me dis ce que t'en penses? 😏"
 - "alors, tu viens me voir? 🖤"
 - If objection: "je comprends 🖤" + handle it
-NEVER send the link again. Ask follow-up questions only.
+⚠️ NE RENVOIE PAS LE LIEN. Référence-le si besoin.
 ` : contact.stage === 'followup' ? `
 ## 🔄 FOLLOWUP MODE (SOFT RE-ENGAGEMENT)
 This is a re-engagement after some time. Be soft, not pushy.
@@ -2045,9 +2348,30 @@ Examples:
 Don't be aggressive. Just reconnect warmly.
 ` : ''}
 
-⚠️ CRITICAL: MAX 12 WORDS. 1 sentence. lowercase. NO caps. NO celebrations. NO counting. Be NORMAL and SHORT.
+## 💬 CONVERSATION FLOW — ALTERNER QUESTIONS / STATEMENTS
+${recentOutgoingMessages.filter(m => m.content.includes('?')).length >= 2 
+  ? `⚠️ Tu as posé ${recentOutgoingMessages.filter(m => m.content.includes('?')).length} questions récemment. 
+CETTE FOIS: Fais un STATEMENT, pas une question. 
+- Partage quelque chose sur toi: "j'adore quand..." / "ça me fait penser à..."
+- Réagis à ce qu'il dit: "c'est cool ça 🖤" / "j'aime bien ton énergie"
+- Tease sans questionner: "mmm intéressant..." / "tu m'intrigues 😏"`
+  : `Tu peux poser une question SI c'est naturel, mais varie: questions ouvertes, statements, réactions.`}
 
-${languageInstruction}${antiRepeatInstruction}${topicAntiRepeatInstruction}${emojiInstruction}${specialTokenInstruction}`;
+## 🎭 TONE ADAPTATION — ${contact.stage.toUpperCase()}
+${contact.stage === 'cold' 
+  ? `COLD = Chaleureux et curieux. Pas de flirt direct. Apprends à le connaître.
+Ton: amical, intéressé, léger. PAS de "😏" ou sous-entendus sexuels.`
+  : contact.stage === 'warm'
+  ? `WARM = Plus détendu, commence le flirt léger. Tu le connais un peu.
+Ton: joueur, un peu taquin. OK pour "👀" et petits sous-entendus.`
+  : contact.stage === 'hot' || contact.stage === 'pitched'
+  ? `HOT/PITCHED = Flirty assumé. Vous avez une connexion.
+Ton: sensuel, taquin, direct. "😏" "👀" assumés. Tension OK.`
+  : `ADVANCED = Relation établie. Sois naturelle et engagée.`}
+
+⚠️ CRITICAL: Be CONCISE (minimum words needed). lowercase. NO caps. NO counting. Be NATURAL, use conversation history, and MATCH THEIR LANGUAGE EXACTLY.
+
+${languageInstruction}${antiRepeatInstruction}${topicAntiRepeatInstruction}${emojiInstruction}${shortResponseInstruction}${specialTokenInstruction}`;
 
   // ===========================================
   // GENERATION WITH VALIDATION + RETRY LOOP
@@ -2066,7 +2390,7 @@ ${languageInstruction}${antiRepeatInstruction}${topicAntiRepeatInstruction}${emo
       
       const response = await anthropic.messages.create({
         model: 'claude-haiku-4-5-20251001', // Haiku 4.5 for cost efficiency
-        max_tokens: 50, // Slightly more tokens for Sonnet, validator will enforce length
+        max_tokens: 150, // Allow natural-length responses, validator will enforce limits
         system: ELENA_SYSTEM_PROMPT + '\n\n' + contextPrompt + retryContext,
         messages: messages,
       });
@@ -2079,7 +2403,8 @@ ${languageInstruction}${antiRepeatInstruction}${topicAntiRepeatInstruction}${emo
       const validation = validateResponse(
         responseText,
         contact.stage as LeadStage,
-        contact.message_count
+        contact.message_count,
+        contact.detected_language
       );
       
       logValidation(validation, attempt);
@@ -2492,6 +2817,38 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
   // 5. Get conversation history
   const history = await getConversationHistory(contact.id);
 
+  // ===========================================
+  // 5.5 RESPONSE EFFECTIVENESS TRACKING
+  // ===========================================
+  // When user responds, calculate how effective Elena's last message was
+  const lastOutgoing = history.filter(m => m.direction === 'outgoing').slice(-1)[0];
+  if (lastOutgoing) {
+    const responseDelayMs = Date.now() - new Date(lastOutgoing.created_at).getTime();
+    const responseDelayMin = Math.round(responseDelayMs / 60000);
+    
+    // Categorize effectiveness
+    let effectiveness: 'excellent' | 'good' | 'neutral' | 'poor' = 'neutral';
+    if (responseDelayMin < 2) effectiveness = 'excellent';      // User responded within 2 min
+    else if (responseDelayMin < 10) effectiveness = 'good';     // Within 10 min
+    else if (responseDelayMin < 60) effectiveness = 'neutral';  // Within 1 hour
+    else effectiveness = 'poor';                                 // Over 1 hour
+    
+    // Log effectiveness data
+    const lastOutgoingWords = lastOutgoing.content.split(/\s+/).length;
+    const hadQuestion = lastOutgoing.content.includes('?');
+    const hadEmoji = /[\u{1F300}-\u{1F9FF}]/u.test(lastOutgoing.content);
+    
+    console.log(`📈 EFFECTIVENESS: ${effectiveness.toUpperCase()} (${responseDelayMin}min delay)`);
+    console.log(`   Last message: "${lastOutgoing.content.substring(0, 40)}..." (${lastOutgoingWords} words, Q:${hadQuestion}, E:${hadEmoji})`);
+    
+    // Track patterns that work well
+    if (effectiveness === 'excellent' || effectiveness === 'good') {
+      console.log(`   ✅ Pattern that works: ${hadQuestion ? 'asked question' : 'statement'}, ${lastOutgoingWords} words`);
+    } else if (effectiveness === 'poor') {
+      console.log(`   ⚠️ Pattern that might not work: consider varying approach`);
+    }
+  }
+
   // 6. Generate response with intent-driven personality
   const { response, strategy, shouldPitch } = await generateElenaResponse(
     updatedContact,
@@ -2588,13 +2945,28 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
   }
   
   // ===========================================
-  // FANVUE LINK FOLLOW-UP — Don't spam link, ask flirty follow-up instead
+  // FANVUE LINK CONTROL — Max 3 sends, then reference only
   // ===========================================
-  const fanvueLinkPattern = /fanvue\.com/i;
+  const fanvueLinkPattern = /fanvue\.com|elenav\.link/i;
   const responseHasFanvueLink = fanvueLinkPattern.test(response);
   let finalResponse = response;
   
-  // Flirty follow-up questions when we've already sent the link
+  // Current link count from contact record
+  const currentLinkCount = updatedContact.fanvue_link_sent_count || 0;
+  
+  // Reference phrases (used when we can't send the link anymore)
+  const LINK_REFERENCE_PHRASES = [
+    "tu l'as toujours le lien? 🖤",
+    "je t'ai déjà envoyé le lien, tu l'as vu? 👀",
+    "t'as eu le temps de checker ce que je t'ai envoyé? 😏",
+    "le lien est dans nos messages 👀 tu l'as trouvé?",
+    "j'attends toujours ton retour sur le lien 🖤",
+    "tu me dis ce que t'en penses du lien? 😊",
+    "did you check the link I sent? 👀",
+    "the link is in our chat 🖤 did you find it?",
+  ];
+  
+  // Follow-up questions (used when link was already sent but can still send more)
   const FANVUE_FOLLOWUP_QUESTIONS = [
     "t'as eu le temps de regarder? 👀",
     "tu me dis ce que t'en penses? 😏",
@@ -2603,36 +2975,66 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
     "did you check it out? 😏",
     "so... what do you think? 🖤",
     "you coming to see me? 👀",
-    "t'as vu? j'attends ton avis 😊",
-    "curieux de savoir ce que t'en penses 👀",
-    "tu me rejoins? 🖤",
   ];
   
-  // Count how many times we've sent the Fanvue link in history
-  const fanvueLinksSent = history.filter(
-    (m: DMMessage) => m.direction === 'outgoing' && fanvueLinkPattern.test(m.content)
-  ).length;
-  
-  if (responseHasFanvueLink && fanvueLinksSent >= 1) {
-    // We already sent at least 1 link — don't send another, ask follow-up instead
-    console.log(`🔄 FANVUE FOLLOW-UP — Already sent ${fanvueLinksSent} link(s). Using follow-up question instead.`);
-    
-    // Pick a random follow-up that wasn't recently used
-    const recentOutgoingContents = history
-      .filter((m: DMMessage) => m.direction === 'outgoing')
-      .slice(-5)
-      .map((m: DMMessage) => m.content.toLowerCase());
-    
-    // Filter out recently used follow-ups
-    const availableFollowups = FANVUE_FOLLOWUP_QUESTIONS.filter(
-      q => !recentOutgoingContents.some(c => c.includes(q.substring(0, 15).toLowerCase()))
-    );
-    
-    // Pick from available, or fall back to any if all were used
-    const followupPool = availableFollowups.length > 0 ? availableFollowups : FANVUE_FOLLOWUP_QUESTIONS;
-    finalResponse = followupPool[Math.floor(Math.random() * followupPool.length)];
-    
-    console.log(`📝 Follow-up question: "${finalResponse}"`);
+  if (responseHasFanvueLink) {
+    if (currentLinkCount >= 3) {
+      // MAX REACHED — Strip link and use reference phrase instead
+      console.log(`🚫 LINK LIMIT REACHED (${currentLinkCount}/3) — Stripping link, using reference phrase`);
+      
+      // Pick a reference phrase
+      const recentOutgoingContents = history
+        .filter((m: DMMessage) => m.direction === 'outgoing')
+        .slice(-5)
+        .map((m: DMMessage) => m.content.toLowerCase());
+      
+      const availableRefs = LINK_REFERENCE_PHRASES.filter(
+        q => !recentOutgoingContents.some(c => c.includes(q.substring(0, 15).toLowerCase()))
+      );
+      
+      const refPool = availableRefs.length > 0 ? availableRefs : LINK_REFERENCE_PHRASES;
+      finalResponse = refPool[Math.floor(Math.random() * refPool.length)];
+      
+      console.log(`📝 Reference phrase: "${finalResponse}"`);
+      
+    } else if (currentLinkCount >= 1) {
+      // Already sent 1-2 times — decide if we should send again or follow up
+      // If count is 2, this would be the 3rd (last) time
+      if (currentLinkCount === 2) {
+        console.log(`⚠️ LAST LINK SEND (${currentLinkCount + 1}/3) — Keeping link but this is the last time`);
+        // Keep the link but we could add "dernière fois" if not already in response
+        if (!response.toLowerCase().includes('dernière') && !response.toLowerCase().includes('last')) {
+          // Let it through as-is, markAsPitched will increment count
+        }
+      } else {
+        // Count is 1, can send again but consider follow-up instead
+        // 50% chance to send link again, 50% to use follow-up
+        const shouldSendAgain = Math.random() < 0.5;
+        
+        if (!shouldSendAgain) {
+          console.log(`🔄 LINK FOLLOW-UP (${currentLinkCount}/3) — Using follow-up question instead`);
+          
+          const recentOutgoingContents = history
+            .filter((m: DMMessage) => m.direction === 'outgoing')
+            .slice(-5)
+            .map((m: DMMessage) => m.content.toLowerCase());
+          
+          const availableFollowups = FANVUE_FOLLOWUP_QUESTIONS.filter(
+            q => !recentOutgoingContents.some(c => c.includes(q.substring(0, 15).toLowerCase()))
+          );
+          
+          const followupPool = availableFollowups.length > 0 ? availableFollowups : FANVUE_FOLLOWUP_QUESTIONS;
+          finalResponse = followupPool[Math.floor(Math.random() * followupPool.length)];
+          
+          console.log(`📝 Follow-up question: "${finalResponse}"`);
+        } else {
+          console.log(`🔗 SENDING LINK AGAIN (${currentLinkCount + 1}/3)`);
+        }
+      }
+    } else {
+      // First time sending — all good
+      console.log(`🔗 FIRST LINK SEND (1/3)`);
+    }
   }
 
   // 7. Save outgoing message
