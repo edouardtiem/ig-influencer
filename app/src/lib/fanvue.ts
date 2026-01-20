@@ -7,7 +7,7 @@
  * Token storage: Supabase (persists across refreshes) with env vars fallback
  */
 
-import { randomBytes, createHash } from 'crypto';
+import { randomBytes, createHash, createHmac, timingSafeEqual } from 'crypto';
 import { fetchWithTimeout } from './fetch-utils';
 import { createClient } from '@supabase/supabase-js';
 
@@ -68,11 +68,17 @@ async function loadTokensFromSupabase(): Promise<FanvueTokens | null> {
       return null;
     }
     
-    console.log('[Fanvue] Tokens loaded from Supabase');
+    // Handle expires_at as either number (Unix ms) or string (ISO date)
+    const expiresAtRaw = data.expires_at;
+    const expiresAt = typeof expiresAtRaw === 'number' 
+      ? expiresAtRaw 
+      : new Date(expiresAtRaw).getTime();
+    
+    console.log('[Fanvue] Tokens loaded from Supabase (expires:', new Date(expiresAt).toISOString(), ')');
     return {
       accessToken: data.access_token,
       refreshToken: data.refresh_token,
-      expiresAt: data.expires_at,
+      expiresAt,
     };
   } catch {
     return null;
@@ -583,16 +589,60 @@ export async function sendWelcomeDM(
 
 /**
  * Verify Fanvue webhook signature
- * Returns true if signature is valid
+ * 
+ * Fanvue signature format: "t=<timestamp>,v0=<signature>"
+ * - t: Unix timestamp (seconds) when request was signed
+ * - v0: HMAC-SHA256 signature of "{timestamp}.{body}"
+ * 
+ * @param payload - Raw request body
+ * @param signatureHeader - X-Fanvue-Signature header value
+ * @param secret - Webhook signing secret from Fanvue Developer Portal
+ * @param toleranceSeconds - Max age of signature (default 5 minutes)
  */
 export function verifyWebhookSignature(
   payload: string,
-  signature: string,
-  secret: string
+  signatureHeader: string,
+  secret: string,
+  toleranceSeconds: number = 300
 ): boolean {
-  const expectedSignature = createHash('sha256')
-    .update(payload + secret)
-    .digest('hex');
-  
-  return signature === expectedSignature;
+  try {
+    // Parse the signature header: "t=1234567890,v0=abc123..."
+    const parts = signatureHeader.split(',');
+    const timestampPart = parts.find(p => p.startsWith('t='));
+    const signaturePart = parts.find(p => p.startsWith('v0='));
+    
+    if (!timestampPart || !signaturePart) {
+      console.error('[Fanvue] Invalid signature format - missing t= or v0=');
+      return false;
+    }
+    
+    const timestamp = parseInt(timestampPart.slice(2), 10);
+    const providedSignature = signaturePart.slice(3);
+    
+    // Check timestamp is recent (prevent replay attacks)
+    const now = Math.floor(Date.now() / 1000);
+    if (Math.abs(now - timestamp) > toleranceSeconds) {
+      console.error('[Fanvue] Signature timestamp too old:', now - timestamp, 'seconds');
+      return false;
+    }
+    
+    // Compute expected signature: HMAC-SHA256("{timestamp}.{body}")
+    const signedPayload = `${timestamp}.${payload}`;
+    const expectedSignature = createHmac('sha256', secret)
+      .update(signedPayload)
+      .digest('hex');
+    
+    // Timing-safe comparison to prevent timing attacks
+    const providedBuffer = Buffer.from(providedSignature, 'hex');
+    const expectedBuffer = Buffer.from(expectedSignature, 'hex');
+    
+    if (providedBuffer.length !== expectedBuffer.length) {
+      return false;
+    }
+    
+    return timingSafeEqual(providedBuffer, expectedBuffer);
+  } catch (error) {
+    console.error('[Fanvue] Signature verification error:', error);
+    return false;
+  }
 }
