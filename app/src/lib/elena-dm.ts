@@ -2065,7 +2065,7 @@ ${languageInstruction}${antiRepeatInstruction}${topicAntiRepeatInstruction}${emo
         : '';
       
       const response = await anthropic.messages.create({
-        model: 'claude-3-5-haiku-20241022', // Haiku for cost efficiency (4x cheaper)
+        model: 'claude-haiku-4-5-20251001', // Haiku 4.5 for cost efficiency
         max_tokens: 50, // Slightly more tokens for Sonnet, validator will enforce length
         system: ELENA_SYSTEM_PROMPT + '\n\n' + contextPrompt + retryContext,
         messages: messages,

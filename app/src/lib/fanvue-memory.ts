@@ -302,7 +302,7 @@ export async function extractMemoryFromConversation(
   
   try {
     const response = await anthropic.messages.create({
-      model: 'claude-3-5-haiku-20241022', // Fast and cheap for extraction
+      model: 'claude-haiku-4-5-20251001', // Haiku 4.5 - fast and cheap for extraction
       max_tokens: 1000,
       messages: [
         {
