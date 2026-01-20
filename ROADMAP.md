@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 19 janvier 2026 (DONE-076 Elena Linktree Domain + Analytics ✅)
+**Dernière mise à jour** : 19 janvier 2026 (DONE-077 DM Sticker/Reaction Handling ✅)
 
 ---
 
@@ -67,6 +67,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-077 | **📱 DM Sticker/Reaction Handling** — Gestion stickers/réactions (tokens) + Détection sémantique duplications (70%+) + Règle min 4 msgs avant pitch + Anti-exagération + Sauvegarde messages contacts stoppés | 19/01/2026 | v2.63.0 | [→](./roadmap/done/DONE-077-dm-sticker-reaction-handling.md) |
 | DONE-076 | **🔗 Elena Linktree Domain + Analytics** — Configuration domaine elenav.link (middleware Next.js) + Linktree à la racine + Mise à jour lien Instagram @elenav.paris + Vercel Analytics pour tracking visites | 19/01/2026 | v2.62.0 | [→](./roadmap/done/DONE-076-elena-linktree-domain-analytics.md) |
 | DONE-075 | **📈 Extension Funnel DM + Stages CLOSING/FOLLOWUP** — Fix bug intent `ai_question` (faux positifs) + Système anti-répétition questions + Détection "Toi"/"Et toi?" + Follow-up Fanvue (questions flirty au lieu de spam) + Nouveaux stages CLOSING/FOLLOWUP (~56 messages total) + Followup automatique +20h via GitHub Action | 19/01/2026 | v2.61.0 | [→](./roadmap/done/DONE-075-dm-funnel-extension-closing-followup.md) |
 | DONE-074 | **🔧 DM Condition Fix (ManyChat)** — Fix condition ManyChat `elena_should_send is 1` (au lieu de `true`) + Résout problème non-envoi réponses DM + Détection URLs photos Instagram + Conversion en `[IMAGE_SENT]` token | 19/01/2026 | v2.60.0 | [→](./roadmap/done/DONE-074-dm-condition-fix.md) |
