@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 20 janvier 2026 (DONE-079 Nano Banana Pro Audit & Fix ✅)
+**Dernière mise à jour** : 20 janvier 2026 (DONE-080 DM Linktree UTM Tracking ✅)
 
 ---
 
@@ -68,6 +68,7 @@ roadmap/
 
 | ID | Feature | Date | Lien |
 |----|---------|------|------|
+| DONE-080 | **🔗 DM Linktree UTM Tracking** — Router DMs vers Linktree (meilleure conversion) + URLs propres /bio et /dm avec UTM cachés + OG image pour previews | 20/01/2026 | [→](./roadmap/done/DONE-080-dm-linktree-utm-tracking.md) |
 | DONE-079 | **🔧 Nano Banana Pro Audit & Fix** — Audit filtres Google + Fix Content Brain Elena (face ref only, expressions nettoyées) → 30%→90% success rate | 20/01/2026 | [→](./roadmap/done/DONE-079-nano-banana-pro-audit-fix.md) |
 | DONE-078 | **📁 ComfyUI Output Organization** — Script réorganisation 80 images | 20/01/2026 | [→](./roadmap/done/DONE-078-comfyui-output-organization.md) |
 | DONE-077 | **📱 DM Sticker/Reaction Handling** — Gestion tokens + anti-duplication | 19/01/2026 | [→](./roadmap/done/DONE-077-dm-sticker-reaction-handling.md) |
