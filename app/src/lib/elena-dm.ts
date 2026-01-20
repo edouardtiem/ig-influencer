@@ -852,8 +852,7 @@ function validateResponse(
   // === CHECK 5: Closing objective alignment ===
   // In HOT/PITCHED stages, we WANT Fanvue mentions - no penalty
   // But we check for engagement elements (questions, hooks)
-  const hasQuestion = response.includes('?');
-  const hasEmoji = /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]/u.test(response);
+  // Note: hasQuestion and hasEmoji already defined above
   
   // Warning if no engagement in early stages
   if ((stage === 'cold' || stage === 'warm') && !hasQuestion && !hasEmoji) {
