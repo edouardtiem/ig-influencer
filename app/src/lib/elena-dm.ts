@@ -2230,7 +2230,6 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
       // This lets us see what they're saying while stopped, useful when we reactivate
       await saveMessage(contact.id, 'incoming', incomingMessage, {
         stage_at_time: contact.stage,
-        note: 'saved_while_stopped',
       });
       console.log(`💾 Saved incoming message from stopped contact (for future reference)`);
       
@@ -2691,6 +2690,8 @@ export async function getDMFunnelStats(): Promise<{
     warm: 0,
     hot: 0,
     pitched: 0,
+    closing: 0,
+    followup: 0,
     converted: 0,
     paid: 0,
   };
