@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 20 janvier 2026 (DONE-082 DM Prompt Audit & Fix ✅)
+**Dernière mise à jour** : 20 janvier 2026 (DONE-083 AI Response Generation ✅)
 
 ---
 
@@ -68,6 +68,7 @@ roadmap/
 
 | ID | Feature | Date | Lien |
 |----|---------|------|------|
+| DONE-083 | **🤖 AI Response Generation** — Remplace ~33 réponses hardcodées par génération AI contextuelle (Claude Haiku) + Templates avec exemples/guidelines + Fallback automatique | 20/01/2026 | [→](./roadmap/done/DONE-083-ai-response-generation.md) |
 | DONE-082 | **🔍 DM Prompt Audit & Fix** — Audit conversations 6h + Fix limite 12 mots → concise + Utilisation historique + Profil utilisateur + Détection langue temps réel + Limite 3 liens max | 20/01/2026 | [→](./roadmap/done/DONE-082-dm-prompt-audit-fix.md) |
 | DONE-081 | **🔄 Haiku Model Migration** — Migration claude-3-5-haiku-20241022 (deprecated) → claude-haiku-4-5-20251001 | 20/01/2026 | [→](./roadmap/done/DONE-081-haiku-model-migration.md) |
 | DONE-080 | **🔗 DM Linktree UTM Tracking** — Router DMs vers Linktree (meilleure conversion) + URLs propres /bio et /dm avec UTM cachés + OG image pour previews | 20/01/2026 | [→](./roadmap/done/DONE-080-dm-linktree-utm-tracking.md) |
