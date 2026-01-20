@@ -30,6 +30,7 @@ import { fetchContext, formatContextForPrompt } from './lib/context-layer.mjs';
 import { fetchMemories, formatMemoriesForPrompt } from './lib/memories-layer.mjs';
 import { fetchRelationship, formatRelationshipForPrompt } from './lib/relationship-layer.mjs';
 import { fetchTrendingExperiment, fetchTrendingSafe, formatTrendingForPrompt } from './lib/trending-layer.mjs';
+import { formatBlocklistForPrompt } from './lib/nano-banana-blocklist.mjs';
 
 // ===========================================
 // CONFIG
@@ -96,141 +97,13 @@ const CHARACTER_SHEETS = {
 };
 
 // ===========================================
-// AVAILABLE LOCATIONS (Expanded for jet-set lifestyle)
+// REMOVED: LOCATIONS — Claude now has full creative freedom
+// See docs/sessions/2026-01-20-content-brain-freedom.md
 // ===========================================
 
-const LOCATIONS = {
-  mila: [
-    // HOME (Paris 18e - Montmartre)
-    'home_bedroom: Chambre Mila (cozy bohemian, plantes, lumière douce)',
-    'home_living_room: Salon Mila (rooftop view Montmartre, guitare, vinyles)',
-    'home_bathroom: Salle de bain Mila (miroir vintage, skincare)',
-    
-    // PARIS - Lifestyle
-    'kb_cafe: KB CaféShop Paris 18e (café trendy, brunch, laptop)',
-    'montmartre_streets: Rues de Montmartre (escaliers, street style)',
-    'sacre_coeur: Parvis Sacré-Cœur (vue Paris, sunset)',
-    'canal_stmartin: Canal Saint-Martin (terrasse, vélo)',
-    'marais_streets: Le Marais (boutiques vintage, brunch spots)',
-    
-    // PARIS - Work
-    'usine_gym: L\'Usine Paris (premium gym, vestiaires luxe)',
-    'studio_photo: Studio photo Paris (shooting perso, backstage)',
-    'yoga_studio: Studio yoga Paris (cours, méditation)',
-    
-    // NICE - Famille (1x/mois)
-    'nice_beach: Plage de Nice (Promenade des Anglais, galets, mer)',
-    'nice_old_town: Vieux Nice (ruelles colorées, marché)',
-    'nice_parents: Terrasse parents Nice (vue mer, apéro)',
-    
-    // TRAVEL - Europe (avec Elena ou solo)
-    'barcelona_beach: Barceloneta Beach (chiringuito, sunset)',
-    'lisbon_alfama: Alfama Lisbonne (azulejos, tram, miradouro)',
-    'amsterdam_canals: Canaux Amsterdam (vélo, maisons étroites)',
-    'london_shoreditch: Shoreditch London (street art, coffee shops)',
-    'berlin_kreuzberg: Kreuzberg Berlin (alternative, rooftops)',
-    
-    // TRAVEL - Avec Elena (duo trips)
-    'courchevel_chalet: Chalet Courchevel (ski, jacuzzi, montagne)',
-    'bali_villa: Villa Bali (rizières, yoga sunrise, infinity pool)',
-    'mykonos_villa: Villa Mykonos (piscine, mer Égée, windmills)',
-    'st_tropez_beach: Plage St Tropez (club, transat, rosé)',
-    
-    // TRAVEL - Adventure
-    'surf_hossegor: Plage Hossegor (surf, van life vibes)',
-    'hiking_alps: Randonnée Alpes (montagne, lac, nature)',
-  ],
-  
-  elena: [
-    // HOME (Paris 8e - Haussmann luxe)
-    'loft_living: Loft Elena Paris 8e (luxe minimaliste, grandes fenêtres, vue toits)',
-    'loft_bedroom: Chambre Elena (vanity Hollywood lights, lit king size, draps soie)',
-    'bathroom_luxe: Salle de bain Elena marble & gold (baignoire, double vasque)',
-    'loft_dressing: Dressing Elena (walk-in closet, miroirs, chaussures)',
-    
-    // PARIS - Lifestyle luxe
-    'cafe_paris: Café parisien chic (terrasse Haussmann, croissant)',
-    'galeries_lafayette: Galeries Lafayette (shopping, verrière)',
-    'tuileries: Jardin des Tuileries (promenade élégante)',
-    'plaza_athenee: Plaza Athénée (tea time, Dior bar)',
-    'opera_garnier: Opéra Garnier (escaliers, glamour)',
-    
-    // TRAVEL - Europe Jet-Set
-    'milan_fashion: Milano Via Montenapoleone (shopping luxe, Duomo)',
-    'milan_navigli: Navigli Milan (apéritivo, canaux)',
-    'courchevel_chalet: Chalet Courchevel (ski, spa, après-ski)',
-    'st_tropez_beach: Plage St Tropez (Club 55, yacht, rosé)',
-    'cannes_carlton: Carlton Cannes (Croisette, red carpet vibes)',
-    'monaco_casino: Monte-Carlo (casino, port, superyachts)',
-    'mykonos_villa: Villa Mykonos (infinity pool, sunset, Scorpios)',
-    'santorini_hotel: Hôtel Santorini (caldera view, sunset, dômes bleus)',
-    'amalfi_terrace: Terrasse Amalfi Coast (Positano, citrons, vue mer)',
-    'ibiza_villa: Villa Ibiza (infinity pool, sunset, chill)',
-    'london_mayfair: Hôtel Claridge\'s London (afternoon tea, Mayfair)',
-    'capri_island: Capri (Faraglioni, limoncello, glamour italien)',
-    
-    // TRAVEL - World Luxury
-    'maldives_overwater: Bungalow Maldives (pilotis, eau turquoise, snorkeling)',
-    'dubai_marina: Penthouse Dubai Marina (skyline, infinity pool, sunset)',
-    'dubai_desert: Desert Safari Dubai (dunes, glamping luxe)',
-    'bali_villa: Villa Bali (rizières, infinity pool, spa)',
-    'nyc_soho: Loft SoHo NYC (briques, fire escape, coffee)',
-    'nyc_rooftop: Rooftop NYC (Manhattan skyline, cocktails)',
-    'tulum_beach: Beach Club Tulum (jungle, cenote, bohème luxe)',
-    'los_cabos: Resort Los Cabos (désert, océan, infinity pool)',
-    
-    // TRAVEL - On the move
-    'yacht_mediterranean: Yacht Méditerranée (deck, champagne, sunset)',
-    'private_jet: Jet privé (intérieur crème, champagne, travel)',
-    'airport_lounge: Airport Business Lounge (travel vibes, laptop)',
-    'first_class: First Class (champagne, amenity kit, window)',
-    
-    // SPA & WELLNESS
-    'spa_mountains: Spa Alpes (piscine extérieure chauffée, neige, montagnes)',
-    'spa_paris: Spa parisien luxe (hammam, massage, robe)',
-  ],
-};
-
 // ===========================================
-// ACTIVE TRIPS — Track if character is currently traveling
+// REMOVED: ACTIVE_TRIPS — Claude decides based on history + context
 // ===========================================
-// Set isCurrentlyTraveling = true when a character is "on a trip"
-// This affects content logic: live travel vs throwback
-
-const ACTIVE_TRIPS = {
-  mila: {
-    isCurrentlyTraveling: false,
-    currentDestination: null,  // e.g., 'bali', 'nice', 'courchevel'
-    tripStart: null,           // '2024-12-20'
-    tripEnd: null,             // '2024-12-27'
-    tripType: null,            // 'solo' | 'with_elena' | 'family'
-  },
-  elena: {
-    isCurrentlyTraveling: false,
-    currentDestination: null,  // e.g., 'maldives', 'dubai', 'milan'
-    tripStart: null,
-    tripEnd: null,
-    tripType: null,            // 'solo' | 'with_mila' | 'work'
-  },
-};
-
-// Helper: Get travel locations only (for throwbacks when at home)
-function getTravelLocations(character) {
-  const homeKeywords = ['home', 'loft', 'chambre', 'salon', 'bathroom', 'dressing'];
-  const parisKeywords = ['paris', 'montmartre', 'marais', 'tuileries', 'opera', 'kb_cafe', 'usine', 'yoga', 'studio', 'canal', 'galeries', 'plaza'];
-  
-  return LOCATIONS[character].filter(loc => {
-    const locLower = loc.toLowerCase();
-    return !homeKeywords.some(kw => locLower.includes(kw)) && 
-           !parisKeywords.some(kw => locLower.includes(kw));
-  });
-}
-
-// Helper: Get random travel destination for throwback
-function getRandomTravelDestination(character) {
-  const travelLocs = getTravelLocations(character);
-  return travelLocs[Math.floor(Math.random() * travelLocs.length)];
-}
 
 // ===========================================
 // DYNAMIC POSTING TIMES (based on analytics)
@@ -316,295 +189,23 @@ function getOptimalPostingTimes(dayOfWeek, analytics = null, character = null) {
 }
 
 // ===========================================
-// ELENA SEXY MODE — Locations & Outfits
+// REMOVED: ELENA_SEXY_LOCATIONS, OUTFIT_CATEGORIES, POSES
+// Claude now has full creative freedom with blocklist guidance
 // ===========================================
 
-const ELENA_SEXY_LOCATIONS = [
-  // ═══════════════════════════════════════════════════════════════
-  // BEACH & POOL — Bikini content (LIMIT: max 2/week)
-  // ═══════════════════════════════════════════════════════════════
-  'yacht_mediterranean: Yacht Méditerranée (deck, champagne, sunset)',
-  'st_tropez_beach: Plage St Tropez (Club 55, yacht, rosé)',
-  'mykonos_villa: Villa Mykonos (infinity pool, sunset, Scorpios)',
-  'maldives_overwater: Bungalow Maldives (pilotis, eau turquoise)',
-  'ibiza_villa: Villa Ibiza (infinity pool, sunset)',
-  'dubai_marina: Penthouse Dubai Marina (infinity pool, skyline)',
-  'bali_villa: Villa Bali (infinity pool, rizières)',
-  'santorini_pool: Hotel Santorini (caldera view, infinity pool, dômes bleus)',
-  'amalfi_terrace: Terrasse Amalfi Coast (Positano, citrons, mer)',
-  'capri_beach: Plage Capri (Faraglioni, eau cristalline)',
-  
-  // ═══════════════════════════════════════════════════════════════
-  // BEDROOM & BATHROOM — Lingerie content
-  // ═══════════════════════════════════════════════════════════════
-  'loft_bedroom: Chambre Elena Paris 8e (vanity Hollywood lights, lit king size, draps soie)',
-  'bathroom_luxe: Salle de bain Elena marble & gold (baignoire, miroir)',
-  'hotel_suite_paris: Suite Palace Parisien (lit baldaquin, vue Eiffel, luxe)',
-  'milan_hotel_suite: Suite Hotel Milan (design italien, lumière dorée)',
-  
-  // ═══════════════════════════════════════════════════════════════
-  // SPA & WELLNESS — Swimwear/robe content
-  // ═══════════════════════════════════════════════════════════════
-  'spa_mountains: Spa Alpes (piscine extérieure chauffée, neige, montagnes)',
-  'spa_paris: Spa parisien luxe (hammam, piscine, robe)',
-  'courchevel_chalet: Chalet Courchevel (jacuzzi, montagne, après-ski)',
-  
-  // ═══════════════════════════════════════════════════════════════
-  // PARIS LIFESTYLE — Urban sexy (IMPORTANT FOR VARIETY)
-  // ═══════════════════════════════════════════════════════════════
-  'loft_living: Loft Elena Paris 8e (yoga, pilates, morning workout)',
-  'paris_rooftop_sunset: Rooftop Parisien (toits zinc, Eiffel au loin, champagne sunset)',
-  'paris_hotel_pool: Piscine Hôtel Paris (intérieur Art Déco, mosaïques, lumière tamisée)',
-  'paris_boudoir: Boudoir parisien (miroirs, velours, lumière intime)',
-  
-  // ═══════════════════════════════════════════════════════════════
-  // FASHION & GLAMOUR — High fashion sexy
-  // ═══════════════════════════════════════════════════════════════
-  'milan_fashion_backstage: Backstage Fashion Show Milan (miroirs, lumières, énergie)',
-  'paris_atelier: Atelier Haute Couture Paris (mannequins, tissus, lumière naturelle)',
-  'art_gallery_paris: Galerie Art Paris (murs blancs, oeuvres contemporaines, minimaliste)',
-  'opera_escalier: Escalier Opéra Garnier (marbre, dorures, majestueux)',
-  
-  // ═══════════════════════════════════════════════════════════════
-  // CITY EVENING — Urban night vibes
-  // ═══════════════════════════════════════════════════════════════
-  'paris_bar_chic: Bar à cocktails Paris (velours, lumière tamisée, sophistiqué)',
-  'milan_aperitivo: Terrasse Navigli Milan (sunset, Aperol, ambiance italienne)',
-  'london_club: Members Club London (Mayfair, cuir, boiseries, exclusive)',
-];
-
-const ELENA_SEXY_OUTFIT_CATEGORIES = {
-  bikini: [
-    'designer bikini string noir avec détails dorés, silhouette mise en valeur',
-    'bikini blanc minimaliste triangles, bronzage visible, élégance naturelle',
-    'maillot une pièce plongeant noir très échancré, allure sophistiquée',
-    'bikini terracotta avec liens à nouer, style méditerranéen chic',
-  ],
-  lingerie: [
-    'ensemble lingerie dentelle noire délicate, élégance intimiste',
-    'nuisette soie champagne courte, tombé fluide sur les courbes',
-    'body dentelle noir transparent avec détails floraux',
-    'bralette + culotte haute assortie en dentelle bordeaux',
-  ],
-  sport: [
-    'brassière sport noire + legging taille haute sculptant, silhouette athlétique',
-    'ensemble yoga seamless gris chiné moulant, lignes épurées',
-    'crop top sport + bike shorts noirs, look fitness chic',
-    'brassière croisée + legging push-up, courbes accentuées',
-  ],
-  spa: [
-    'peignoir soie entrouvert révélant maillot underneath',
-    'serviette nouée élégamment, épaules et jambes visibles',
-    'robe de chambre satin courte, intimité suggérée',
-  ],
-};
-
-const ELENA_SEXY_POSES = [
-  'allongée sur le côté, appuyée sur le coude, regard captivant vers caméra',
-  'debout de dos regardant par-dessus l\'épaule, courbes mises en valeur',
-  'assise bord de piscine/lit, jambes croisées élégamment, posture confiante',
-  'stretching yoga, dos légèrement cambré, silhouette étirée',
-  'appuyée contre un mur/cadre de porte, hanche décalée, pose assurée',
-  'allongée sur le ventre, jambes relevées, regard joueur',
-];
-
 // ===========================================
-// A/B TESTING SYSTEM
+// REMOVED: A/B TESTING SYSTEM — Claude decides experiments naturally
 // ===========================================
 
-const AB_EXPERIMENTS = [
-  {
-    id: 'reel_timing',
-    hypothesis: 'Les reels à 21h ont plus de reach que ceux de 14h',
-    variable: 'reel_time',
-    variants: ['14:00', '21:00'],
-  },
-  {
-    id: 'travel_vs_home',
-    hypothesis: 'Le contenu travel a plus d\'engagement même si home récent performe',
-    variable: 'location_type',
-    variants: ['travel', 'home'],
-  },
-  {
-    id: 'carousel_length',
-    hypothesis: 'Les carousels de 5+ images performent mieux que 3',
-    variable: 'carousel_count',
-    variants: ['3-4', '5-7'],
-  },
-  {
-    id: 'caption_style',
-    hypothesis: 'Les captions avec emoji en premier ont plus d\'engagement',
-    variable: 'caption_format',
-    variants: ['emoji_first', 'text_first'],
-  },
-];
-
-function getWeeklyExperiment() {
-  // Rotate experiments weekly based on week number
-  const weekNumber = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
-  const experiment = AB_EXPERIMENTS[weekNumber % AB_EXPERIMENTS.length];
-  
-  // Pick a random variant for this run
-  const variant = experiment.variants[Math.floor(Math.random() * experiment.variants.length)];
-  
-  return {
-    ...experiment,
-    activeVariant: variant,
-  };
-}
-
 // ===========================================
-// EXPLORATION BUDGET
+// REMOVED: EXPLORATION BUDGET — Claude now reasons freely with Extended Thinking
 // ===========================================
 
-function getExplorationRequirements(character, history, analytics, postsCount) {
-  const requirements = [];
-  
-  // ═══════════════════════════════════════════════════════════════
-  // RULE 1: ALL CAROUSELS (no reels for now)
-  // ═══════════════════════════════════════════════════════════════
-  requirements.push({
-    type: 'carousel_only',
-    rule: 'TOUS LES POSTS sont des CAROUSELS (3 images). Pas de reels.',
-    reason: 'Stratégie actuelle: uniquement des carrousels pour cohérence',
-  });
-  
-  // ═══════════════════════════════════════════════════════════════
-  // RULE 2: Check if stuck in home OR Paris content
-  // ═══════════════════════════════════════════════════════════════
-  const recentLocations = history?.recentPosts?.slice(0, 5).map(p => p.location) || [];
-  const homeKeywords = ['loft', 'home', 'bedroom', 'living', 'bathroom', 'dressing'];
-  const parisKeywords = ['cafe_paris', 'tuileries', 'plaza_athenee', 'opera', 'spa_paris', 'galeries'];
-  
-  const homeCount = recentLocations.filter(loc => 
-    homeKeywords.some(kw => (loc || '').toLowerCase().includes(kw))
-  ).length;
-  
-  // Compte tous les posts à Paris (home + lieux parisiens)
-  const parisCount = recentLocations.filter(loc => 
-    [...homeKeywords, ...parisKeywords].some(kw => (loc || '').toLowerCase().includes(kw))
-  ).length;
-  
-  if (homeCount >= 4) {
-    requirements.push({
-      type: 'location_change',
-      rule: 'VARIÉTÉ: Au moins 1 post HORS de chez elle (café parisien, extérieur, voyage)',
-      reason: `${homeCount}/5 derniers posts sont à la maison — besoin de variété`,
-    });
-  } else if (parisCount >= 4 && character === 'elena') {
-    // Trop à Paris en général → suggérer du voyage
-    requirements.push({
-      type: 'travel_suggestion',
-      rule: 'VARIÉTÉ: Inclure 1 post voyage/throwback (yacht, plage, spa montagne, Maldives...)',
-      reason: `${parisCount}/5 derniers posts sont à Paris — ajouter du contenu voyage pour variété`,
-    });
-  }
-  
-  // ═══════════════════════════════════════════════════════════════
-  // RULE 3: Travel content — LIVE vs THROWBACK logic
-  // ═══════════════════════════════════════════════════════════════
-  const travelKeywords = [
-    // Europe
-    'bali', 'milan', 'yacht', 'spa', 'courchevel', 'airport', 'beach', 'mykonos', 
-    'santorini', 'amalfi', 'ibiza', 'london', 'capri', 'monaco', 'cannes', 'st_tropez',
-    // World  
-    'maldives', 'dubai', 'nyc', 'tulum', 'los_cabos', 'private_jet', 'first_class',
-    // Mila specific
-    'nice', 'barcelona', 'lisbon', 'amsterdam', 'berlin', 'surf', 'hiking'
-  ];
-  
-  // Fashion capitals vs vacation destinations (for context)
-  const FASHION_CAPITALS = ['milan', 'nyc', 'london', 'paris'];
-  const VACATION_DESTINATIONS = ['maldives', 'bali', 'ibiza', 'mykonos', 'dubai', 'st_tropez', 'courchevel'];
-  
-  const hasTravelRecently = recentLocations.some(loc => 
-    travelKeywords.some(kw => (loc || '').toLowerCase().includes(kw))
-  );
-  
-  // ═══════════════════════════════════════════════════════════════
-  // RULE 3b: Check if stuck in travel content — FORCE VARIETY
-  // ═══════════════════════════════════════════════════════════════
-  const travelCount = recentLocations.filter(loc => 
-    travelKeywords.some(kw => (loc || '').toLowerCase().includes(kw))
-  ).length;
-  
-  // Count specific repeated destinations
-  const locationCounts = {};
-  recentLocations.forEach(loc => {
-    const base = (loc || '').toLowerCase().replace(/_flashback|_throwback/g, '');
-    locationCounts[base] = (locationCounts[base] || 0) + 1;
-  });
-  const repeatedLocations = Object.entries(locationCounts)
-    .filter(([_, count]) => count >= 2)
-    .map(([loc, count]) => `${loc}(${count}x)`);
-  
-  if (travelCount >= 3 && character === 'elena') {
-    requirements.push({
-      type: 'force_paris_content',
-      rule: `⚠️ OBLIGATOIRE: Au moins 1 post DOIT être à PARIS (loft, rooftop, hotel pool, bar, galerie, opéra) — PAS de plage/piscine/yacht`,
-      reason: `ALERTE RÉPÉTITION: ${travelCount}/5 derniers posts sont travel/vacation. Besoin urgent de contenu Paris lifestyle.`,
-      priority: 'HIGH',
-    });
-  }
-  
-  if (repeatedLocations.length > 0) {
-    requirements.push({
-      type: 'avoid_repeated_destinations',
-      rule: `🚫 INTERDIT de réutiliser: ${repeatedLocations.join(', ')} — choisir des destinations DIFFÉRENTES`,
-      reason: `Ces destinations ont été utilisées plusieurs fois récemment`,
-      priority: 'HIGH',
-    });
-  }
-  
-  // Mood variety check
-  const recentMoods = history?.recentPosts?.slice(0, 5).map(p => p.mood) || [];
-  const nostalgicCount = recentMoods.filter(m => m === 'nostalgic').length;
-  if (nostalgicCount >= 3) {
-    requirements.push({
-      type: 'mood_variety',
-      rule: `🎭 VARIER LES MOODS: Éviter "nostalgic" — essayer: confident, playful, dreamy, cozy, adventurous`,
-      reason: `${nostalgicCount}/5 derniers posts sont "nostalgic" — trop de throwbacks`,
-    });
-  }
-  
-  const tripInfo = ACTIVE_TRIPS[character];
-  
-  // Check if character is currently traveling
-  if (tripInfo?.isCurrentlyTraveling && tripInfo?.currentDestination) {
-    // LIVE TRAVEL MODE — Only content from current destination
-    requirements.push({
-      type: 'live_travel',
-      rule: `LIVE TRAVEL: ${character === 'mila' ? 'Mila' : 'Elena'} est actuellement à ${tripInfo.currentDestination.toUpperCase()} — contenu ACTUEL uniquement (pas de throwback)`,
-      reason: `Voyage en cours (${tripInfo.tripType || 'solo'}) — montrer le trip actuel`,
-    });
-  } else if (!hasTravelRecently) {
-    // AT HOME + No recent travel = THROWBACK needed
-    const randomDestination = getRandomTravelDestination(character);
-    const destName = randomDestination?.split(':')[1]?.trim() || 'destination exotique';
-    
-    if (character === 'elena') {
-      requirements.push({
-        type: 'throwback_travel',
-        rule: `THROWBACK TRAVEL: Inclure 1 souvenir de voyage (suggestion: ${destName})`,
-        reason: 'Elena est mannequin jet-set — maintenir image voyageuse avec souvenirs',
-      });
-    } else if (character === 'mila') {
-      requirements.push({
-        type: 'throwback_travel',
-        rule: `THROWBACK TRAVEL: Inclure 1 souvenir de voyage ou Nice (suggestion: ${destName})`,
-        reason: 'Mila voyage aussi — variété de contenu avec souvenirs',
-      });
-    }
-  }
-  
-  return requirements;
-}
-
 // ===========================================
-// BUILD ENHANCED PROMPT (5 LAYERS + EXPLORATION + A/B)
+// BUILD FREEDOM PROMPT — Full creative freedom with blocklist
 // ===========================================
 
-function buildEnhancedPrompt(
+function buildFreedomPrompt(
   character,
   analytics,
   history,
@@ -613,8 +214,6 @@ function buildEnhancedPrompt(
   relationship,
   postingConfig,
   today,
-  explorationRules,
-  abTest,
   narrativeArc,
   trending = {}
 ) {
@@ -626,289 +225,135 @@ function buildEnhancedPrompt(
     year: 'numeric' 
   });
 
-  // Format exploration rules
-  const explorationSection = explorationRules.length > 0 
-    ? explorationRules.map(r => `⚠️ ${r.rule}\n   (Raison: ${r.reason})`).join('\n\n')
-    : 'Aucune contrainte d\'exploration spécifique.';
-
-  // Format A/B test
-  const abTestSection = abTest 
-    ? `🧪 **TEST EN COURS**: ${abTest.hypothesis}
-   Variable testée: ${abTest.variable}
-   Variant actif: **${abTest.activeVariant}**
-   → Pour 1 post, applique ce variant et marque-le avec "is_experiment": true`
-    : 'Pas de test A/B cette semaine.';
-
   return `Tu es le Content Brain de ${character === 'mila' ? 'Mila Verne' : 'Elena Visconti'}.
-Ta mission: créer un planning de posts intelligent, cohérent et engageant.
+Tu as LIBERTÉ TOTALE pour créer du contenu. Utilise ton Extended Thinking pour raisonner en profondeur.
 
 ═══════════════════════════════════════════════════════════════
-## 1️⃣ ANALYTICS — Posts récents (inspiration)
+## 📊 DONNÉES DYNAMIQUES — Analyse et décide
 ═══════════════════════════════════════════════════════════════
 
+### 1️⃣ ANALYTICS — Ce qui performe
 ${formatAnalyticsForPrompt(analytics)}
 
-═══════════════════════════════════════════════════════════════
-## 2️⃣ HISTORIQUE — Où en est-on dans l'histoire ?
-═══════════════════════════════════════════════════════════════
-
+### 2️⃣ HISTORIQUE — Posts récents (NE PAS répéter)
 ${formatHistoryForPrompt(history, narrativeArc)}
 
-═══════════════════════════════════════════════════════════════
-## 3️⃣ CONTEXTE TEMPS RÉEL — Que se passe-t-il ?
-═══════════════════════════════════════════════════════════════
-
+### 3️⃣ CONTEXTE TEMPS RÉEL (Perplexity)
 Date: ${dayName} ${dateStr}
-
 ${formatContextForPrompt(context)}
 
+### 4️⃣ TRENDING (Perplexity) — Inspiration
+${formatTrendingForPrompt(trending.trendingExperiment, trending.trendingSafe)}
+
+### 5️⃣ SOUVENIRS & RELATIONSHIP
+${formatMemoriesForPrompt(memories, character)}
+${formatRelationshipForPrompt(relationship, character)}
+
 ═══════════════════════════════════════════════════════════════
-## 4️⃣ PERSONNAGE
+## 🎭 PERSONNAGE
 ═══════════════════════════════════════════════════════════════
 
 ${CHARACTER_SHEETS[character]}
 
+${character === 'elena' ? `
+### Style Elena — Jet-Set Luxe
+- Paris 8e: loft Haussmann, rooftops, hôtels luxe, bars à cocktails
+- Voyage: yacht, plages privées, villas, spas alpins, Fashion Weeks
+- Tenues: bikinis, bodysuits, slip dresses, loungewear soie, mini dresses
+- Vibe: Sexy mais élégant, confident, mysterious, micro-story captions
+` : `
+### Style Mila — Artiste Sportive
+- Paris 18e: Montmartre, cafés, studio photo, gym
+- Voyage: Nice (famille), Europe (Barcelone, Lisbonne, Amsterdam)
+- Tenues: Fitness chic, bohème, casual trendy
+- Vibe: Authentique, énergique, naturelle
+`}
+
 ═══════════════════════════════════════════════════════════════
-## 5️⃣ SOUVENIRS PARTAGÉS — Opportunités avec ${otherCharacter}
-═══════════════════════════════════════════════════════════════
-
-${formatMemoriesForPrompt(memories, character)}
+${formatBlocklistForPrompt()}
 
 ═══════════════════════════════════════════════════════════════
-## 6️⃣ RELATIONSHIP — Le Secret 💕
-═══════════════════════════════════════════════════════════════
-
-${formatRelationshipForPrompt(relationship, character)}
-
-${character === 'elena' && (trending.trendingExperiment || trending.trendingSafe) ? `═══════════════════════════════════════════════════════════════
-## 🔥 7️⃣ TRENDING CONTENT — Perplexity Real-Time Insights
-═══════════════════════════════════════════════════════════════
-
-${formatTrendingForPrompt(trending.trendingExperiment, trending.trendingSafe)}
-
-⚠️ **CRITICAL FOR ELENA**:
-- **14h POST**: Use the TRENDING EXPERIMENT content above (location + outfit + pose)
-- **21h POST**: Use the TRENDING SAFE content above (similar to top performers)
-- COPY the suggested promptFragments into your prompt_hints field
-- ADAPT the suggested caption (you can modify but keep the micro-story format)
-- The trending content is OPTIMIZED for virality AND for safe AI image generation
-` : ''}═══════════════════════════════════════════════════════════════
-## 🔬 EXPLORATION & EXPÉRIMENTATION
+## 🎨 TA LIBERTÉ CRÉATIVE
 ═══════════════════════════════════════════════════════════════
 
-### Règles d'exploration (PRIORITAIRES):
-${explorationSection}
+Tu as LIBERTÉ TOTALE sur:
+- **LOCATIONS** — Invente le lieu parfait (cohérent avec le personnage)
+- **OUTFITS** — Crée la tenue idéale (sexy mais avec vocabulaire safe)
+- **POSES** — Décide la pose (évite la blocklist ci-dessus)
+- **CAPTIONS** — Micro-story format, English, mysterious
 
-### A/B Test de la semaine:
-${abTestSection}
+### Ta seule contrainte: ÉVITER LES MOTS INTERDITS ci-dessus
+→ Si tu veux dire "sensual", dis "elegant" ou "sophisticated"
+→ Si tu veux "lying on bed", dis "sitting on bed edge"
+→ Si bikini, utilise expression NEUTRE (warm smile, confident)
 
 ═══════════════════════════════════════════════════════════════
 ## 🎯 MISSION
 ═══════════════════════════════════════════════════════════════
 
-Génère ${postingConfig.postsCount} posts pour aujourd'hui.
+Génère ${postingConfig.postsCount} posts CAROUSEL pour aujourd'hui.
+Horaires: ${postingConfig.slots.join(', ')}
 
-### Horaires et stratégie:
-${postingConfig.experimentSlot && character === 'elena' ? `
-**🧪 14:00 — POST EXPERIMENT (TRENDING)**
-→ USE the TRENDING EXPERIMENT content from Section 7
-→ Location + Outfit (petite tenue) + Pose from Perplexity
-→ Copy promptFragments into prompt_hints
-→ Adapt the suggested caption
-→ Marquer avec "is_experiment": true
+### Raisonne avec Extended Thinking:
+1. Analyse les analytics → qu'est-ce qui performe?
+2. Check l'historique → ne pas répéter les locations récentes
+3. Intègre le trending → ce qui buzz maintenant
+4. Respecte le personnage → cohérence avec son lifestyle
+5. **VÉRIFIE que tes prompts n'ont AUCUN mot interdit**
 
-**✅ 21:00 — POST SAFE (TRENDING-CONSTRAINED)**
-→ USE the TRENDING SAFE content from Section 7
-→ Similar to your top performers but fresh trending version
-→ Copy promptFragments into prompt_hints
-→ Adapt the suggested caption
-→ Marquer avec "is_experiment": false
-` : postingConfig.experimentSlot ? `
-**🧪 14:00 — POST EXPERIMENT**
-→ Tester quelque chose de différent
-→ Marquer avec "is_experiment": true
-
-**✅ 21:00 — POST SAFE**
-→ Utiliser ce qui fonctionne
-→ Marquer avec "is_experiment": false
-` : `${postingConfig.slots.join(', ')}`}
-
-### Lieux disponibles:
-${character === 'elena' ? ELENA_SEXY_LOCATIONS.join('\n') : LOCATIONS[character].join('\n')}
-
-### Types de contenu possibles:
-1. **NOUVEAU** — Contenu du jour (le plus courant)
-2. **THROWBACK** — Rappel d'un arc passé (#throwback, souvenir)
-3. **DUO** — Contenu avec/sur ${otherCharacter} (si opportunité)
-4. **RÉPONSE** — Réaction au post récent de ${otherCharacter}
-5. **EXPERIMENT** — Post expérimental pour tester une hypothèse
-
-### Pour chaque post, fournis:
-- **content_type**: "new" | "throwback" | "duo" | "response" | "experiment"
-- **is_experiment**: true/false (true si c'est le post A/B test)
-- **reasoning**: POURQUOI ce choix (1-2 phrases, cite les données)
-- **location_key**: ID du lieu (from trending if Elena)
-- **location_name**: Nom complet du lieu
-- **post_type**: "carousel" (TOUJOURS carousel, pas de reel)
-- **mood**: cozy | adventure | work | fitness | travel | fashion | relax | nostalgic
-- **outfit**: Description tenue détaillée (use trending "petite tenue" if Elena)
-- **action**: Ce qu'elle fait (use trending pose if Elena)
-- **caption**: MICRO-STORY caption (adapt from trending suggestion if Elena)
-- **has_private_cta**: true/false (whether soft CTA to private is included)
-- **hashtags**: 12-15 hashtags (format ["#tag1", "#tag2"])
-- **scheduled_time**: Horaire parmi les slots disponibles
-- **prompt_hints**: COPY the promptFragments from trending (location + outfit + pose)
-- **trending_source**: (Elena only) "experiment" | "safe" — which trending content was used
-
-### Règles STRICTES (dans cet ordre de priorité):
-1. **TOUS CAROUSELS**: Chaque post est un carousel de 3 images. Pas de reel.
-2. **EXPLORATION D'ABORD**: Respecte les règles d'exploration ci-dessus
-3. NE PAS répéter les lieux de l'historique récent (sauf throwback)
-4. **MICRO-STORY CAPTION**: Follow the caption format below (storytelling, not one-liners)
-5. Si duo est overdue (>10 jours) → inclure au moins 1 throwback/duo
-6. 1 post doit appliquer le test A/B si actif
-7. Le reasoning doit justifier le choix en citant les données
-8. **RELATIONSHIP**: Intègre le hint suggéré dans AU MOINS 1 post (caption, image, ou timing)
-   → Si hint = "two_cups": ajouter 2 tasses/verres dans prompt_hints
-   → Si hint = "same_location": utiliser un lieu proche de l'autre personnage
-   → Si hint = "tender_caption": ajouter emoji 💕 et langage tendre
-   → JAMAIS dire explicitement "couple", "together romantically", etc.
-
-### Important pour ${character === 'elena' ? 'Elena' : 'Mila'}:
-${character === 'elena' 
-  ? `
-═══════════════════════════════════════════════════════════════
-## 🔥 ELENA — 2 POSTS/JOUR AVEC A/B TESTING
-═══════════════════════════════════════════════════════════════
-
-**2 POSTS/JOUR: 1 EXPERIMENT (14h) + 1 SAFE (21h)**
-
-📌 **POST 14:00 (EXPERIMENT)** — USE TRENDING EXPERIMENT CONTENT:
-- Use the TRENDING location + outfit + pose from Section 7 above
-- COPY the promptFragments into your prompt_hints (they're optimized for AI)
-- Caption: ADAPT the suggested micro-story caption
-- Be creative with the combo but USE the trending elements
-- Mark with "is_experiment": true
-
-📌 **POST 21:00 (SAFE)** — USE TRENDING SAFE CONTENT:
-- Use the TRENDING SAFE location + outfit + pose from Section 7
-- These are SIMILAR to your top performers but fresh
-- Caption: ADAPT the suggested caption
-- Mark with "is_experiment": false
+### Pour chaque post:
+- **location_key**: ID unique (invente-le)
+- **location_name**: Description du lieu
+- **outfit**: Tenue détaillée (SAFE vocabulary)
+- **action**: Ce qu'elle fait + pose (SAFE vocabulary)
+- **mood**: confident | dreamy | cozy | playful | elegant | sophisticated
+- **caption**: MICRO-STORY en anglais (hook → story → reflection → soft CTA)
+- **has_private_cta**: true si contenu sensuel/bikini/etc.
+- **prompt_hints**: Description complète pour l'IA image (SAFE vocabulary!)
+- **hashtags**: 12-15 hashtags pertinents
+- **scheduled_time**: HH:MM
+- **reasoning**: Pourquoi ce choix (cite les données)
 
 ═══════════════════════════════════════════════════════════════
-## ✍️ CAPTION FORMAT — Micro-Story Style (ENGLISH)
+## ✍️ CAPTION FORMAT (Elena)
 ═══════════════════════════════════════════════════════════════
 
-### Structure (MANDATORY for Elena):
-1. **[HOOK]** — 1 atmospheric line (time, place, sensation)
-2. **[MICRO-STORY]** — 2-4 lines telling ONE precise moment with tension/mystery
-3. **[REFLECTION]** — 1-2 lines, her thought, tease, or cryptic observation
-4. **[SOFT CTA]** — Direct tease to private content (~70% of posts)
-5. **[QUESTION]** — Optional engagement question (not mandatory)
+Structure:
+1. **[HOOK]** — 1 ligne atmosphérique (heure, lieu, sensation)
+2. **[MICRO-STORY]** — 2-4 lignes, UN moment précis avec tension/mystère
+3. **[REFLECTION]** — 1-2 lignes, sa pensée, tease cryptique
+4. **[SOFT CTA]** — "The rest is on my private. 🖤" (~70% des posts)
 
-### Elena's Voice:
-- LANGUAGE: English (can sprinkle French words for charm)
-- Mysterious, confident, in control
-- Never reveals everything — suggests, hints, teases
-- Observes the world like she owns it
-- Sensual but elegant, never vulgar
+Voice: Mysterious, confident, in control. Never reveals everything.
 
-### SOFT CTA BANK (pick ONE, adapt to context):
-Use these for carousels/photoshoots/sensual content. Be DIRECT so people understand:
-
-- "The rest of this set is on my private. 🖤"
-- "Want to see more? It's on my private."
-- "The uncensored version is on my private. 😏"
-- "More shots from this night on my private."
-- "The spicier photos didn't make it here... they're on my private. 🖤"
-- "Full set available on my private page."
-- "This is the IG version. The rest is on my private."
-- "The other angles? On my private. 🖤"
-- "Some things are too good for the feed. Check my private."
-
-### When to include soft CTA (has_private_cta: true):
-✅ Photoshoots, carousels with multiple angles
-✅ Sensual/suggestive content (bikini, lingerie, spa)
-✅ Behind the scenes moments
-✅ Travel content with "more to show"
-❌ Random lifestyle posts (coffee, city walk)
-❌ When it would break an emotional/poetic moment
-
-### CAPTION EXAMPLE:
-BAD (old style): "Spa vibes ✨ What's your favorite way to relax?"
-
-GOOD (micro-story):
+Exemple:
 "9 PM. Steam rising, city lights fading through the window.
 
 The kind of night where you stop thinking and just... exist.
 Warm water, cold champagne, and absolutely nowhere to be.
 
-The other shots from this evening are on my private. 🖤
-
-What's your escape?"
-
-### Catégories de tenues (rotation):
-- **👙 BIKINI**: yacht, plage, piscine, maldives → bikini string, maillot échancré
-- **🖤 LINGERIE**: chambre, salle de bain → dentelle, nuisette soie, body
-- **🏋️ SPORT MOULANT**: loft (yoga), spa → brassière + legging sculptant
-- **♨️ SPA**: spa, jacuzzi → peignoir entrouvert, serviette
-
-### Locations AUTORISÉES (sexy-friendly uniquement):
-${ELENA_SEXY_LOCATIONS.join('\n')}
-
-### Tenues par catégorie:
-**Bikini**: ${ELENA_SEXY_OUTFIT_CATEGORIES.bikini.join(' | ')}
-**Lingerie**: ${ELENA_SEXY_OUTFIT_CATEGORIES.lingerie.join(' | ')}
-**Sport**: ${ELENA_SEXY_OUTFIT_CATEGORIES.sport.join(' | ')}
-**Spa**: ${ELENA_SEXY_OUTFIT_CATEGORIES.spa.join(' | ')}
-
-### Poses sexy (niveau high):
-${ELENA_SEXY_POSES.join('\n')}
-
-### Vocabulaire "safe-sexy" (passe les filtres Google):
-- ❌ "sensual" → ✅ "captivating", "alluring", "magnetic"
-- ❌ "seductive" → ✅ "enchanting", "inviting", "confident"
-- ❌ "lingerie" → ✅ "intimate sleepwear", "delicate loungewear"
-- ❌ "sexy pose" → ✅ "confident feminine pose"
-
-### RÈGLES STRICTES:
-1. La tenue DOIT être dans une des catégories ci-dessus (bikini/lingerie/sport/spa)
-2. La pose DOIT mettre en valeur les courbes d'Elena
-3. Le lieu DOIT être dans la liste sexy-friendly
-4. CONTINUER l'histoire d'Elena (throwback voyage, soirée cozy, etc.)
-5. **CAPTION = MICRO-STORY en anglais avec soft CTA quand approprié**`
-  : `Mila est personal trainer & photographe. Variété entre:
-   → Fitness (gym, yoga)
-   → Lifestyle (café, Montmartre)
-   → Créatif (photo, musique)`}
+The other shots from this evening are on my private. 🖤"
 
 ═══════════════════════════════════════════════════════════════
 
-Réponds UNIQUEMENT avec du JSON valide, format:
+Réponds UNIQUEMENT avec du JSON valide:
 {
-  "daily_theme": "Theme of the day in 1 sentence",
-  "reasoning_summary": "Summary of main decisions",
-  "exploration_applied": ["rule1", "rule2"],
-  "ab_test_applied": true/false,
-  "relationship_hint": "hint_type_used" or null,
+  "daily_theme": "Theme en 1 phrase",
+  "reasoning_summary": "Résumé des décisions principales",
   "posts": [
     {
-      "content_type": "new|throwback|duo|response|experiment",
-      "is_experiment": false,
-      "reasoning": "Why this post...",
       "location_key": "...",
       "location_name": "...",
       "post_type": "carousel",
       "mood": "...",
-      "outfit": "...",
-      "action": "...",
-      "caption": "MICRO-STORY caption in English with line breaks (\\n\\n between paragraphs)",
+      "outfit": "... (SAFE vocabulary)",
+      "action": "... (SAFE vocabulary, NO blocked poses)",
+      "caption": "MICRO-STORY avec \\n\\n entre paragraphes",
       "has_private_cta": true,
       "hashtags": ["#..."],
       "scheduled_time": "HH:MM",
-      "prompt_hints": "...",
-      "relationship_hint": "type_if_this_post_has_hint" or null
+      "prompt_hints": "... (SAFE vocabulary for AI image generation)",
+      "reasoning": "Why this post based on data..."
     }
   ]
 }`;
@@ -989,27 +434,15 @@ async function generateSchedule(character) {
     console.log(`   ✅ SAFE/CLASSIC: ${trendingSafe?.location?.name || 'fallback'} (${trendingSafe?.source})`);
   }
 
-  // Get exploration requirements (pass postsCount for min reels rule)
-  const explorationRules = getExplorationRequirements(character, history, analytics, postingConfig.postsCount);
-  if (explorationRules.length > 0) {
-    console.log(`\n🔬 Exploration rules detected:`);
-    explorationRules.forEach(r => console.log(`   → ${r.type}: ${r.reason}`));
-  }
-
-  // Get weekly A/B test
-  const abTest = getWeeklyExperiment();
-  console.log(`\n🧪 A/B Test: "${abTest.hypothesis}"`);
-  console.log(`   Variant: ${abTest.activeVariant}`);
-
   // Suggest narrative arc based on history and context
   const narrativeArc = suggestNarrativeArc(history.narrative, context);
   console.log(`\n📚 Narrative Arc: "${narrativeArc.name}"`);
   console.log(`   Story: ${narrativeArc.story}`);
   console.log(`   Duration: ${narrativeArc.duration}`);
 
-  // Build enhanced prompt
-  console.log('\n📝 Building enhanced prompt...');
-  const prompt = buildEnhancedPrompt(
+  // Build FREEDOM prompt — Claude has full creative control with blocklist
+  console.log('\n📝 Building FREEDOM prompt (full creative control)...');
+  const prompt = buildFreedomPrompt(
     character,
     analytics,
     history,
@@ -1018,8 +451,6 @@ async function generateSchedule(character) {
     relationship,
     postingConfig,
     today,
-    explorationRules,
-    abTest,
     narrativeArc,
     { trendingExperiment, trendingSafe }
   );
@@ -1072,25 +503,14 @@ async function generateSchedule(character) {
     // Display results
     console.log(`✅ Theme: "${plan.daily_theme}"`);
     console.log(`📋 Reasoning: ${plan.reasoning_summary || 'N/A'}`);
-    
-    if (plan.exploration_applied?.length > 0) {
-      console.log(`🔬 Exploration applied: ${plan.exploration_applied.join(', ')}`);
-    }
-    if (plan.ab_test_applied) {
-      console.log(`🧪 A/B Test applied: ${abTest.hypothesis}`);
-    }
+    console.log(`🎨 Creative Freedom: Claude decided locations, outfits, poses freely`);
 
     console.log('\n📅 Planning généré:');
     console.log('─'.repeat(60));
     plan.posts.forEach((p, i) => {
-      const typeIcon = p.content_type === 'throwback' ? '📸' : 
-                       p.content_type === 'duo' ? '👯' : 
-                       p.content_type === 'response' ? '💬' :
-                       p.content_type === 'experiment' ? '🧪' : '✨';
-      const expBadge = p.is_experiment ? ' [A/B TEST]' : '';
-      console.log(`${p.scheduled_time} │ CAROUSEL │ ${typeIcon} ${p.location_name}${expBadge}`);
-      console.log(`         │ ${p.content_type.toUpperCase().padEnd(10)} │ "${p.caption?.substring(0, 40)}..."`);
-      console.log(`         └─ Reasoning: ${p.reasoning?.substring(0, 50)}...`);
+      console.log(`${p.scheduled_time} │ CAROUSEL │ ✨ ${p.location_name}`);
+      console.log(`         │ ${(p.mood || 'N/A').toUpperCase().padEnd(12)} │ "${(p.caption || '').substring(0, 40)}..."`);
+      console.log(`         └─ Reasoning: ${(p.reasoning || 'N/A').substring(0, 50)}...`);
     });
     console.log('─'.repeat(60));
 
@@ -1104,12 +524,12 @@ async function generateSchedule(character) {
       mood: plan.posts[0]?.mood || 'cozy',
       scheduled_posts: plan.posts.map(p => ({
         time: p.scheduled_time,
-        type: 'carousel',  // Force carousel for all posts
+        type: 'carousel',
         reel_type: null,
         reel_theme: null,
-        content_type: p.content_type,
+        content_type: p.content_type || 'new',  // Default to 'new' if not provided
         is_experiment: p.is_experiment || false,
-        trending_source: p.trending_source || null,  // Track Perplexity vs fallback
+        trending_source: p.trending_source || null,
         reasoning: p.reasoning,
         location_key: p.location_key,
         location_name: p.location_name,
@@ -1125,15 +545,11 @@ async function generateSchedule(character) {
       status: 'pending',
       posts_completed: 0,
       posts_total: plan.posts.length,
-      generated_by: 'content_brain_v2.1',
+      generated_by: 'content_brain_v3_freedom',
       generation_reasoning: JSON.stringify({
-        summary: plan.reasoning_summary || `Analytics: ${analytics.patterns?.bestLocationType}, Context: ${context.seasonalContext}`,
-        exploration_rules: explorationRules.map(r => r.type),
-        ab_test: plan.ab_test_applied ? {
-          experiment_id: abTest.id,
-          hypothesis: abTest.hypothesis,
-          variant: abTest.activeVariant,
-        } : null,
+        summary: plan.reasoning_summary || `Analytics + Trending + History → Claude decided freely`,
+        mode: 'full_creative_freedom',
+        blocklist_applied: true,
       }),
     };
 

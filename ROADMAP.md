@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 20 janvier 2026 (DONE-083 AI Response Generation ✅)
+**Dernière mise à jour** : 20 janvier 2026 (DONE-084 Content Brain Freedom Mode ✅)
 
 ---
 
@@ -68,6 +68,7 @@ roadmap/
 
 | ID | Feature | Date | Lien |
 |----|---------|------|------|
+| DONE-084 | **🎨 Content Brain V3 "Freedom Mode"** — Refonte majeure: suppression ~665 lignes hardcodées (locations, outfits, poses) → Claude décide librement avec blocklist Nano Banana Pro | 20/01/2026 | [→](./roadmap/done/DONE-084-content-brain-freedom-mode.md) |
 | DONE-083 | **🤖 AI Response Generation** — Remplace ~33 réponses hardcodées par génération AI contextuelle (Claude Haiku) + Templates avec exemples/guidelines + Fallback automatique | 20/01/2026 | [→](./roadmap/done/DONE-083-ai-response-generation.md) |
 | DONE-082 | **🔍 DM Prompt Audit & Fix** — Audit conversations 6h + Fix limite 12 mots → concise + Utilisation historique + Profil utilisateur + Détection langue temps réel + Limite 3 liens max | 20/01/2026 | [→](./roadmap/done/DONE-082-dm-prompt-audit-fix.md) |
 | DONE-081 | **🔄 Haiku Model Migration** — Migration claude-3-5-haiku-20241022 (deprecated) → claude-haiku-4-5-20251001 | 20/01/2026 | [→](./roadmap/done/DONE-081-haiku-model-migration.md) |
@@ -142,7 +143,7 @@ roadmap/
 
 ```
 Total Features:
-├── ✅ Done        : 81 (19 en janvier 2026)
+├── ✅ Done        : 82 (20 en janvier 2026)
 ├── 🚧 In Progress : 8
 ├── 📋 Todo        : 6 
 ├── 🐛 Bugs        : 2 actifs + 15 fixés
@@ -157,6 +158,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 20/01/2026 | **🎨 Content Brain V3 "Freedom Mode"** — Suppression 665 lignes hardcodées → Claude décide librement | [→](./docs/sessions/2026-01-20-content-brain-freedom.md) |
 | 20/01/2026 | **🔍 DM Prompt Audit & Fix** — Audit complet + Corrections majeures prompts (limite mots, historique, langue, liens) | [→](./docs/sessions/2026-01-20-dm-prompt-audit-fix.md) |
 | 20/01/2026 | **🔄 Haiku Model Migration** — Migration deprecated Haiku → Haiku 4.5 | [→](./docs/sessions/2026-01-20-haiku-model-migration.md) |
 | 20/01/2026 | **🔧 Nano Banana Pro Audit** — Audit filtres Google + Fix Content Brain Elena (30%→90%) | [→](./docs/sessions/2026-01-20-nano-banana-pro-audit.md) |

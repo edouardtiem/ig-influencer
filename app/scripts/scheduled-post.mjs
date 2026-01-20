@@ -17,6 +17,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
+import { sanitizePrompt, checkForBlockedTerms } from './lib/nano-banana-blocklist.mjs';
 
 const execAsync = promisify(exec);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -478,6 +479,14 @@ ${config.final_check}`;
   log(`  Setting: ${setting.substring(0, 60)}...`);
   log(`  Outfit: ${outfit.substring(0, 60)}...`);
 
+  // PRE-SANITIZE: Check and clean prompt BEFORE first attempt
+  const { isBlocked, blockedTerms } = checkForBlockedTerms(prompt);
+  let finalPrompt = prompt;
+  if (isBlocked) {
+    log(`  ⚠️ Pre-sanitizing prompt (found blocked terms: ${blockedTerms.join(', ')})`);
+    finalPrompt = sanitizePrompt(prompt, 'normal');
+  }
+
   // Prepare references - AUDIT 2026-01-20: Only use face_ref for Elena (body_ref triggers safety filters)
   const refs = [config.face_ref, config.body_ref, ...(config.extra_refs || [])].filter(Boolean);
   log(`  Converting ${refs.length} reference(s) to base64... ${character === 'elena' ? '(face only - audit fix)' : ''}`);
@@ -492,7 +501,7 @@ ${config.final_check}`;
   try {
     const output = await replicate.run(NANO_BANANA_MODEL, {
       input: {
-        prompt,
+        prompt: finalPrompt,
         negative_prompt: 'ugly, deformed, noisy, blurry, low quality, cartoon, anime, illustration, painting, drawing, watermark, text, logo, bad anatomy, extra limbs, missing limbs, mutation, disfigured, poorly drawn face, cloned face, malformed limbs, fused fingers, too many fingers, username, signature, professional studio lighting, magazine cover, stock photo, overly retouched, artificial lighting',
         aspect_ratio: aspectRatio,
         resolution: '2K',
@@ -506,36 +515,53 @@ ${config.final_check}`;
     log(`  ✅ Generated successfully`);
     return imageUrl;
   } catch (error) {
-    // Try with safer prompt if flagged - AUDIT 2026-01-20: Updated replacements
+    // Try with safer prompt if flagged — uses centralized blocklist
     if (error.message?.includes('flagged') || error.message?.includes('safety')) {
-      log(`  ⚠️ Prompt flagged, trying safer version...`);
-      const saferPrompt = prompt
-        .replace(/sensual/gi, 'elegant')
-        .replace(/sexy/gi, 'stylish')
-        .replace(/alluring/gi, 'confident')
-        .replace(/sultry/gi, 'glamorous')
-        .replace(/captivating gaze/gi, 'warm gaze')
-        .replace(/intense gaze/gi, 'confident expression')
-        .replace(/lips slightly parted/gi, 'warm smile')
-        .replace(/curves/gi, 'silhouette')
-        .replace(/looking over shoulder/gi, 'confident pose')
-        .replace(/lying on bed/gi, 'sitting on bed');
+      log(`  ⚠️ Prompt flagged, trying safer version (centralized blocklist)...`);
+      
+      // First try normal sanitization
+      let saferPrompt = sanitizePrompt(prompt, 'normal');
+      
+      try {
+        const output = await replicate.run(NANO_BANANA_MODEL, {
+          input: {
+            prompt: saferPrompt,
+            negative_prompt: 'ugly, deformed, noisy, blurry, low quality, cartoon, anime',
+            aspect_ratio: aspectRatio,
+            resolution: '2K',
+            output_format: 'jpg',
+            safety_filter_level: 'block_only_high',
+            image_input: refBase64,
+          },
+        });
 
-      const output = await replicate.run(NANO_BANANA_MODEL, {
-        input: {
-          prompt: saferPrompt,
-          negative_prompt: 'ugly, deformed, noisy, blurry, low quality, cartoon, anime',
-          aspect_ratio: aspectRatio,
-          resolution: '2K',
-          output_format: 'jpg',
-          safety_filter_level: 'block_only_high',
-          image_input: refBase64,
-        },
-      });
+        const imageUrl = Array.isArray(output) ? output[0] : output;
+        log(`  ✅ Generated with safer prompt (normal sanitization)`);
+        return imageUrl;
+      } catch (retryError) {
+        // If still blocked, try aggressive sanitization
+        if (retryError.message?.includes('flagged') || retryError.message?.includes('safety')) {
+          log(`  ⚠️ Still flagged, trying aggressive sanitization...`);
+          saferPrompt = sanitizePrompt(prompt, 'aggressive');
+          
+          const output = await replicate.run(NANO_BANANA_MODEL, {
+            input: {
+              prompt: saferPrompt,
+              negative_prompt: 'ugly, deformed, noisy, blurry, low quality, cartoon, anime',
+              aspect_ratio: aspectRatio,
+              resolution: '2K',
+              output_format: 'jpg',
+              safety_filter_level: 'block_only_high',
+              image_input: refBase64,
+            },
+          });
 
-      const imageUrl = Array.isArray(output) ? output[0] : output;
-      log(`  ✅ Generated with safer prompt`);
-      return imageUrl;
+          const imageUrl = Array.isArray(output) ? output[0] : output;
+          log(`  ✅ Generated with aggressive sanitization`);
+          return imageUrl;
+        }
+        throw retryError;
+      }
     }
     throw error;
   }
