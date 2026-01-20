@@ -171,24 +171,272 @@ const CLOSING_STARTS_AT: Record<LeadStage, number> = {
 };
 
 // ===========================================
-// EXIT MESSAGES — Natural excuses + "I'll be available on Fanvue"
+// RESPONSE TEMPLATES — Examples + Guidelines for AI generation
 // ===========================================
-// Key: Always mention that Elena WILL RESPOND on Fanvue
-// This is critical so they know the conversation continues there
-const EXIT_MESSAGES = [
-  `shooting dans 5 min 📸 mais je réponds toujours sur fanvue 🖤 → ${LINKTREE_LINK}`,
-  `je file bébé 🖤 mais on peut continuer à parler là-bas, je suis plus dispo → ${LINKTREE_LINK}`,
-  `mon manager m'appelle 😅 ici j'ai plus le temps mais je réponds sur fanvue → ${LINKTREE_LINK}`,
-  `je dois y aller 🖤 mais on se retrouve là-bas? je réponds toujours → ${LINKTREE_LINK}`,
-  `plus le temps ici sorry 🖤 mais je suis active sur fanvue, on continue? → ${LINKTREE_LINK}`,
-  `insta c'est compliqué pour moi 😅 mais sur fanvue je suis dispo, viens → ${LINKTREE_LINK}`,
-];
+// These are NOT hardcoded outputs — they guide the AI to generate unique responses
+// The hardcoded examples serve as FALLBACKS only when AI fails
+
+interface ResponseTemplate {
+  description: string;
+  guidelines: string;
+  examples_fr: string[];
+  examples_en: string[];
+  // Fallbacks are used ONLY when AI generation fails
+  fallbacks_fr: string[];
+  fallbacks_en: string[];
+}
+
+const RESPONSE_TEMPLATES: Record<string, ResponseTemplate> = {
+  exit_message: {
+    description: "Natural excuse to leave + redirect to Fanvue where Elena responds",
+    guidelines: "Excuse crédible (shooting, manager, pas le temps), mentionne que tu réponds sur Fanvue, inclus le lien, reste naturelle pas robotique",
+    examples_fr: [
+      "shooting dans 5 min 📸 mais je réponds toujours sur fanvue",
+      "je file bébé 🖤 mais on continue là-bas, je suis plus dispo",
+      "mon manager m'appelle 😅 mais je suis active sur fanvue",
+    ],
+    examples_en: [
+      "got a shoot in 5 📸 but I always reply on fanvue",
+      "gotta run babe 🖤 but let's continue there",
+      "my manager's calling 😅 but I'm always on fanvue",
+    ],
+    fallbacks_fr: [
+      `shooting dans 5 min 📸 mais je réponds toujours sur fanvue 🖤 → ${LINKTREE_LINK}`,
+      `je file bébé 🖤 mais on peut continuer à parler là-bas → ${LINKTREE_LINK}`,
+      `mon manager m'appelle 😅 mais je réponds sur fanvue → ${LINKTREE_LINK}`,
+    ],
+    fallbacks_en: [
+      `gotta run to a shoot 📸 but I always reply on fanvue 🖤 → ${LINKTREE_LINK}`,
+      `gotta go babe 🖤 but we can keep talking there → ${LINKTREE_LINK}`,
+      `my manager's calling 😅 but I'm on fanvue → ${LINKTREE_LINK}`,
+    ],
+  },
+  
+  link_reference: {
+    description: "Ask if they saw the link WITHOUT sending it again (max 3 sends reached)",
+    guidelines: "Demande s'ils ont vu/checké le lien, sois naturelle et curieuse, ne renvoie PAS le lien",
+    examples_fr: [
+      "tu l'as toujours le lien? 🖤",
+      "t'as eu le temps de checker?",
+      "le lien est dans nos messages, tu l'as trouvé?",
+    ],
+    examples_en: [
+      "did you check the link I sent? 👀",
+      "the link is in our chat 🖤 did you find it?",
+      "have you had time to look?",
+    ],
+    fallbacks_fr: [
+      "tu l'as toujours le lien? 🖤",
+      "t'as eu le temps de checker ce que je t'ai envoyé? 😏",
+      "le lien est dans nos messages 👀 tu l'as trouvé?",
+    ],
+    fallbacks_en: [
+      "did you check the link I sent? 👀",
+      "the link is in our chat 🖤 did you find it?",
+      "have you had time to look? 😏",
+    ],
+  },
+  
+  link_followup: {
+    description: "Follow up on sent link without re-sending it",
+    guidelines: "Demande s'ils ont checké/regardé, montre que tu attends leur retour, sois engageante",
+    examples_fr: [
+      "t'as eu le temps de regarder? 👀",
+      "tu me dis ce que t'en penses?",
+      "alors, tu viens me voir?",
+    ],
+    examples_en: [
+      "did you check it out? 😏",
+      "what do you think? 🖤",
+      "you coming to see me? 👀",
+    ],
+    fallbacks_fr: [
+      "t'as eu le temps de regarder? 👀",
+      "tu me dis ce que t'en penses? 😏",
+      "alors, tu viens me voir? 👀",
+    ],
+    fallbacks_en: [
+      "did you check it out? 😏",
+      "so... what do you think? 🖤",
+      "you coming to see me? 👀",
+    ],
+  },
+  
+  fallback_engage: {
+    description: "Engaging question/statement when main AI fails - to keep conversation flowing",
+    guidelines: "Question engageante ou statement avec substance, montre de l'intérêt, jamais générique comme 'hey'",
+    examples_fr: [
+      "qu'est-ce que tu fais de beau? 😊",
+      "tu viens d'où toi? 👀",
+      "tu me fais sourire 😊 c'est rare",
+      "j'aime bien ton énergie 😏 dis-m'en plus",
+    ],
+    examples_en: [
+      "what's your vibe today? 😊",
+      "where are you from? 👀",
+      "you make me smile 😊 that's rare",
+      "i like your energy 😏 tell me more",
+    ],
+    fallbacks_fr: [
+      "qu'est-ce que tu fais de beau? 😊",
+      "tu viens d'où toi? 👀",
+      "raconte-moi un peu 🖤",
+      "t'as passé une bonne journée? 😏",
+      "tu fais quoi dans la vie? 👀",
+      "je suis à Paris là 🖤 il fait beau",
+      "tu me fais sourire 😊 c'est rare",
+      "j'aime bien ton énergie 😏 dis-m'en plus",
+    ],
+    fallbacks_en: [
+      "what's your vibe today? 😊",
+      "where are you from? 👀",
+      "tell me about yourself 🖤",
+      "what do you do for fun? 😏",
+      "how's your day going? 👀",
+      "i like your energy 🖤 tell me more",
+      "you seem interesting 😏 what's your story?",
+    ],
+  },
+};
+
+// ===========================================
+// AI-POWERED CONTEXTUAL RESPONSE GENERATOR
+// ===========================================
+// Uses Claude Haiku for fast, cheap, creative responses
+// Falls back to hardcoded if AI fails
+
+interface ContextualResponseContext {
+  language: string;
+  stage?: LeadStage;
+  userName?: string | null;
+  recentMessages?: string[];
+  additionalContext?: string;
+}
+
+async function generateContextualResponse(
+  type: keyof typeof RESPONSE_TEMPLATES,
+  context: ContextualResponseContext
+): Promise<string> {
+  const template = RESPONSE_TEMPLATES[type];
+  const lang = context.language === 'fr' ? 'fr' : 'en';
+  const examples = lang === 'fr' ? template.examples_fr : template.examples_en;
+  const fallbacks = lang === 'fr' ? template.fallbacks_fr : template.fallbacks_en;
+  
+  // Filter fallbacks not recently used
+  const recentLower = (context.recentMessages || []).map(m => m.toLowerCase());
+  const availableFallbacks = fallbacks.filter(
+    fb => !recentLower.some(r => r.includes(fb.substring(0, 15).toLowerCase()))
+  );
+  const fallbackPool = availableFallbacks.length > 0 ? availableFallbacks : fallbacks;
+  
+  try {
+    const anthropic = new Anthropic();
+    
+    const systemPrompt = `Tu es Elena, 23 ans, modèle italienne à Paris. Tu textes comme une vraie personne: lowercase, naturelle, emojis parfois.
+OBJECTIF: ${template.description}
+GUIDELINES: ${template.guidelines}
+${context.additionalContext || ''}`;
+
+    const userPrompt = `Exemples de style (NE COPIE PAS, inspire-toi):
+${examples.map(e => `- "${e}"`).join('\n')}
+
+${context.userName ? `Son prénom: ${context.userName}` : ''}
+Langue: ${lang === 'fr' ? 'français' : 'english'}
+${context.stage ? `Ton: ${context.stage === 'hot' ? 'flirty/playful' : context.stage === 'warm' ? 'friendly/curious' : 'casual'}` : ''}
+
+Génère UNE réponse unique et naturelle (pas de copie des exemples).`;
+
+    const response = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 60,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }],
+    });
+    
+    const text = response.content[0].type === 'text' ? response.content[0].text : '';
+    const cleaned = text.trim().replace(/^["']|["']$/g, ''); // Remove quotes if AI added them
+    
+    // Basic validation - must have content
+    if (cleaned.length > 3 && cleaned.length < 200) {
+      // For exit_message type, ensure link is included
+      if (type === 'exit_message' && !cleaned.includes('fanvue') && !cleaned.includes(LINKTREE_LINK)) {
+        return `${cleaned} → ${LINKTREE_LINK}`;
+      }
+      return cleaned;
+    }
+    
+    // Invalid response, use fallback
+    console.log(`⚠️ AI response invalid for ${type}, using fallback`);
+    return fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
+    
+  } catch (error) {
+    console.error(`⚠️ AI generation failed for ${type}:`, error);
+    return fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
+  }
+}
 
 /**
- * Get a random exit message
+ * Get exit message - AI generated with fallback
  */
+async function getExitMessage(language: string = 'fr', userName?: string | null): Promise<string> {
+  return generateContextualResponse('exit_message', {
+    language,
+    userName,
+    additionalContext: `IMPORTANT: Inclus TOUJOURS le lien: ${LINKTREE_LINK}`,
+  });
+}
+
+/**
+ * Get link reference message (when max sends reached)
+ */
+async function getLinkReferenceMessage(
+  language: string,
+  userName?: string | null,
+  recentMessages?: string[]
+): Promise<string> {
+  return generateContextualResponse('link_reference', {
+    language,
+    userName,
+    recentMessages,
+  });
+}
+
+/**
+ * Get link follow-up message
+ */
+async function getLinkFollowupMessage(
+  language: string,
+  userName?: string | null,
+  recentMessages?: string[]
+): Promise<string> {
+  return generateContextualResponse('link_followup', {
+    language,
+    userName,
+    recentMessages,
+  });
+}
+
+/**
+ * Get fallback engagement message (when main AI fails)
+ */
+async function getFallbackEngageMessage(
+  language: string,
+  stage?: LeadStage,
+  userName?: string | null,
+  recentMessages?: string[]
+): Promise<string> {
+  return generateContextualResponse('fallback_engage', {
+    language,
+    stage,
+    userName,
+    recentMessages,
+  });
+}
+
+// Legacy sync function for backwards compatibility (uses hardcoded fallbacks directly)
 function getRandomExitMessage(): string {
-  return EXIT_MESSAGES[Math.floor(Math.random() * EXIT_MESSAGES.length)];
+  const fallbacks = RESPONSE_TEMPLATES.exit_message.fallbacks_fr;
+  return fallbacks[Math.floor(Math.random() * fallbacks.length)];
 }
 
 /**
@@ -661,36 +909,8 @@ const COUNTING_WORDS = [
   'nine', 'eight', 'seven', 'six', 'five', 'four', 'three',
 ];
 
-// Fallback responses when API fails - mix of questions AND statements to avoid loops
-// NOTE: These should be DIVERSE, ENGAGING, and never generic
-// RULE: Must have at least 3 words AND either a question or meaningful content
-const SMART_FALLBACKS = [
-  // French - engaging questions
-  "qu'est-ce que tu fais de beau? 😊",
-  "tu viens d'où toi? 👀",
-  "raconte-moi un peu 🖤",
-  "t'as passé une bonne journée? 😏",
-  "tu fais quoi dans la vie? 👀",
-  "c'est quoi ton délire? 🖤",
-  // French - statements with substance
-  "je suis à Paris là 🖤 il fait beau",
-  "je viens de finir un shooting 📸",
-  "j'adore parler avec toi 🖤 tu viens d'où?",
-  "tu me fais sourire 😊 c'est rare",
-  "t'es mignon toi 🖤 parle-moi de toi",
-  "j'aime bien ton énergie 😏 dis-m'en plus",
-  // English - engaging questions
-  "what's your vibe today? 😊",
-  "where are you from? 👀",
-  "tell me about yourself 🖤",
-  "what do you do for fun? 😏",
-  "how's your day going? 👀",
-  "what brings you here? 🖤",
-  // English - statements with substance
-  "i like your energy 🖤 tell me more",
-  "you seem interesting 😏 what's your story?",
-  "i'm curious about you 👀 where are you from?",
-];
+// SMART_FALLBACKS moved to RESPONSE_TEMPLATES.fallback_engage
+// AI now generates contextual responses, with these as fallback only
 
 /**
  * Validate a response before sending
@@ -2421,21 +2641,21 @@ ${languageInstruction}${antiRepeatInstruction}${topicAntiRepeatInstruction}${emo
     } catch (error) {
       console.error(`Error generating response (attempt ${attempt}):`, error);
       if (attempt === MAX_ATTEMPTS) {
-        // All attempts failed - use smart fallback (varied question)
+        // All attempts failed - use AI-generated contextual fallback
         const recentContents = conversationHistory
           .filter(m => m.direction === 'outgoing')
           .slice(-5)
-          .map(m => m.content.toLowerCase());
+          .map(m => m.content);
         
-        // Pick a fallback that wasn't recently used
-        const availableFallbacks = SMART_FALLBACKS.filter(
-          fb => !recentContents.some(c => c.includes(fb.substring(0, 15).toLowerCase()))
+        console.log(`⚠️ API failed. Generating contextual fallback...`);
+        const fallback = await getFallbackEngageMessage(
+          contact.detected_language || 'fr',
+          contact.stage as LeadStage,
+          contact.ig_name,
+          recentContents
         );
-        const fallback = availableFallbacks.length > 0 
-          ? availableFallbacks[Math.floor(Math.random() * availableFallbacks.length)]
-          : SMART_FALLBACKS[Math.floor(Math.random() * SMART_FALLBACKS.length)];
         
-        console.log(`⚠️ API failed. Using smart fallback: "${fallback}"`);
+        console.log(`✅ Contextual fallback: "${fallback}"`);
         return {
           response: fallback,
           strategy: 'engage',
@@ -2445,20 +2665,21 @@ ${languageInstruction}${antiRepeatInstruction}${topicAntiRepeatInstruction}${emo
     }
   }
   
-  // If all attempts failed validation, use smart fallback instead of empty
+  // If all attempts failed validation, use AI-generated contextual fallback
   if (!validatedResponse && lastValidationResult) {
-    console.log(`⚠️ All ${MAX_ATTEMPTS} attempts failed validation. Using smart fallback.`);
+    console.log(`⚠️ All ${MAX_ATTEMPTS} attempts failed validation. Generating contextual fallback...`);
     const recentContents = conversationHistory
       .filter(m => m.direction === 'outgoing')
       .slice(-5)
-      .map(m => m.content.toLowerCase());
+      .map(m => m.content);
     
-    const availableFallbacks = SMART_FALLBACKS.filter(
-      fb => !recentContents.some(c => c.includes(fb.substring(0, 15).toLowerCase()))
+    validatedResponse = await getFallbackEngageMessage(
+      contact.detected_language || 'fr',
+      contact.stage as LeadStage,
+      contact.ig_name,
+      recentContents
     );
-    validatedResponse = availableFallbacks.length > 0 
-      ? availableFallbacks[Math.floor(Math.random() * availableFallbacks.length)]
-      : SMART_FALLBACKS[Math.floor(Math.random() * SMART_FALLBACKS.length)];
+    console.log(`✅ Contextual fallback: "${validatedResponse}"`);
   }
 
   // Determine strategy based on intent
@@ -2755,10 +2976,10 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
     // This prevents other webhooks from also sending exit messages
     await markAsStopped(contact.id);
     
-    // Get random exit message (natural excuse + "I'll respond on Fanvue")
-    const exitMessage = getRandomExitMessage();
+    // Get AI-generated exit message (natural excuse + "I'll respond on Fanvue")
+    const exitMessage = await getExitMessage(contact.detected_language || 'fr', contact.ig_name);
     console.log(`🛑 Message limit reached (${contact.message_count}/${messageLimit}). Sending exit message and STOPPING.`);
-    console.log(`📝 Exit message: "${exitMessage.substring(0, 60)}..."`);
+    console.log(`📝 AI Exit message: "${exitMessage.substring(0, 60)}..."`);
     
     // Save incoming message first
     await saveMessage(contact.id, 'incoming', incomingMessage, {
@@ -2954,48 +3175,27 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
   // Current link count from contact record
   const currentLinkCount = updatedContact.fanvue_link_sent_count || 0;
   
-  // Reference phrases (used when we can't send the link anymore)
-  const LINK_REFERENCE_PHRASES = [
-    "tu l'as toujours le lien? 🖤",
-    "je t'ai déjà envoyé le lien, tu l'as vu? 👀",
-    "t'as eu le temps de checker ce que je t'ai envoyé? 😏",
-    "le lien est dans nos messages 👀 tu l'as trouvé?",
-    "j'attends toujours ton retour sur le lien 🖤",
-    "tu me dis ce que t'en penses du lien? 😊",
-    "did you check the link I sent? 👀",
-    "the link is in our chat 🖤 did you find it?",
-  ];
+  // Get recent messages for AI generation context
+  const recentOutgoingContents = history
+    .filter((m: DMMessage) => m.direction === 'outgoing')
+    .slice(-5)
+    .map((m: DMMessage) => m.content);
   
-  // Follow-up questions (used when link was already sent but can still send more)
-  const FANVUE_FOLLOWUP_QUESTIONS = [
-    "t'as eu le temps de regarder? 👀",
-    "tu me dis ce que t'en penses? 😏",
-    "t'as checké le lien? 🖤",
-    "alors, tu viens me voir? 👀",
-    "did you check it out? 😏",
-    "so... what do you think? 🖤",
-    "you coming to see me? 👀",
-  ];
+  const contactLanguage = updatedContact.detected_language || 'fr';
+  const contactName = updatedContact.ig_name;
   
   if (responseHasFanvueLink) {
     if (currentLinkCount >= 3) {
-      // MAX REACHED — Strip link and use reference phrase instead
-      console.log(`🚫 LINK LIMIT REACHED (${currentLinkCount}/3) — Stripping link, using reference phrase`);
+      // MAX REACHED — Strip link and use AI-generated reference phrase
+      console.log(`🚫 LINK LIMIT REACHED (${currentLinkCount}/3) — Generating contextual reference phrase...`);
       
-      // Pick a reference phrase
-      const recentOutgoingContents = history
-        .filter((m: DMMessage) => m.direction === 'outgoing')
-        .slice(-5)
-        .map((m: DMMessage) => m.content.toLowerCase());
-      
-      const availableRefs = LINK_REFERENCE_PHRASES.filter(
-        q => !recentOutgoingContents.some(c => c.includes(q.substring(0, 15).toLowerCase()))
+      finalResponse = await getLinkReferenceMessage(
+        contactLanguage,
+        contactName,
+        recentOutgoingContents
       );
       
-      const refPool = availableRefs.length > 0 ? availableRefs : LINK_REFERENCE_PHRASES;
-      finalResponse = refPool[Math.floor(Math.random() * refPool.length)];
-      
-      console.log(`📝 Reference phrase: "${finalResponse}"`);
+      console.log(`📝 AI Reference phrase: "${finalResponse}"`);
       
     } else if (currentLinkCount >= 1) {
       // Already sent 1-2 times — decide if we should send again or follow up
@@ -3012,21 +3212,15 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
         const shouldSendAgain = Math.random() < 0.5;
         
         if (!shouldSendAgain) {
-          console.log(`🔄 LINK FOLLOW-UP (${currentLinkCount}/3) — Using follow-up question instead`);
+          console.log(`🔄 LINK FOLLOW-UP (${currentLinkCount}/3) — Generating contextual follow-up...`);
           
-          const recentOutgoingContents = history
-            .filter((m: DMMessage) => m.direction === 'outgoing')
-            .slice(-5)
-            .map((m: DMMessage) => m.content.toLowerCase());
-          
-          const availableFollowups = FANVUE_FOLLOWUP_QUESTIONS.filter(
-            q => !recentOutgoingContents.some(c => c.includes(q.substring(0, 15).toLowerCase()))
+          finalResponse = await getLinkFollowupMessage(
+            contactLanguage,
+            contactName,
+            recentOutgoingContents
           );
           
-          const followupPool = availableFollowups.length > 0 ? availableFollowups : FANVUE_FOLLOWUP_QUESTIONS;
-          finalResponse = followupPool[Math.floor(Math.random() * followupPool.length)];
-          
-          console.log(`📝 Follow-up question: "${finalResponse}"`);
+          console.log(`📝 AI Follow-up: "${finalResponse}"`);
         } else {
           console.log(`🔗 SENDING LINK AGAIN (${currentLinkCount + 1}/3)`);
         }
