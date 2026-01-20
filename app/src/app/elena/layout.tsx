@@ -17,9 +17,23 @@ export const metadata: Metadata = {
   description: "Get exclusive access to Elena's private content. Free 7-day trial.",
   robots: "noindex, nofollow",
   openGraph: {
-    title: "Elena - Exclusive Content",
+    title: "Elena ✨",
     description: "Your secret escape 💋",
     type: "website",
+    images: [
+      {
+        url: "https://elenav.link/elena/teaser.png",
+        width: 1200,
+        height: 630,
+        alt: "Elena",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Elena ✨",
+    description: "Your secret escape 💋",
+    images: ["https://elenav.link/elena/teaser.png"],
   },
 };
 
