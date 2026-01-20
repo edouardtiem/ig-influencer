@@ -9,7 +9,7 @@ import { supabase } from './supabase';
 // TYPES
 // ===========================================
 
-export type LeadStage = 'cold' | 'warm' | 'hot' | 'pitched' | 'converted' | 'paid';
+export type LeadStage = 'cold' | 'warm' | 'hot' | 'pitched' | 'closing' | 'followup' | 'converted' | 'paid';
 
 // Extended intent types with funnel-specific intents
 export type MessageIntent = 
@@ -27,7 +27,7 @@ export type MessageIntent =
   | 'provocative';    // testing/challenging her
 
 export type MessageSentiment = 'positive' | 'neutral' | 'negative';
-export type ResponseStrategy = 'engage' | 'nurture' | 'qualify' | 'pitch' | 'handle_objection' | 'disclosure' | 'tease_fanvue' | 'give_link' | 'redirect_fanvue' | 'refuse_out_of_scope';
+export type ResponseStrategy = 'engage' | 'nurture' | 'qualify' | 'pitch' | 'closing' | 'followup' | 'handle_objection' | 'disclosure' | 'tease_fanvue' | 'give_link' | 'redirect_fanvue' | 'refuse_out_of_scope';
 
 // Personality mode to emphasize based on intent
 export type PersonalityMode = 'warm' | 'playful' | 'curious' | 'mysterious' | 'confident' | 'balanced';
@@ -68,6 +68,9 @@ export interface DMContact {
   // Stop system - prevents FINAL_MESSAGE loop
   is_stopped: boolean;
   stopped_at: string | null;
+  // Followup scheduling (for +20h re-engagement)
+  followup_scheduled_at: string | null;
+  followup_sent: boolean;
   // Language detection
   detected_language: string | null;
   language_confidence: number;
@@ -124,24 +127,40 @@ export interface ManyChateWebhookPayload {
 // Combines tracking link + free trial promo for attribution
 const FANVUE_LINK = 'https://www.fanvue.com/elenav.paris/fv-2?free_trial=a873adf0-4d08-4f84-aa48-a8861df6669f';
 
-// Message caps per stage (total messages before stop)
-// OPTIMIZED: Reduced to pitch earlier and limit post-pitch waste
+// Message caps per stage (messages in this stage before moving to next/stop)
+// EXTENDED: Allow longer conversations (50-60 total) for people who need more time
 const MESSAGE_CAPS: Record<LeadStage, number> = {
-  cold: 15,
-  warm: 20,    // Reduced from 25 - push to HOT faster
-  hot: 20,     // Reduced from 35 - force pitch within 20 msgs
-  pitched: 5,  // Reduced from 10 - max 5 msgs after pitch then stop
+  cold: 8,       // Build rapport (1-8)
+  warm: 12,      // Tease content (9-20)
+  hot: 15,       // Push for pitch (21-35)
+  pitched: 3,    // Just sent link - quick transition to closing
+  closing: 10,   // Active follow-up on link (36-48)
+  followup: 8,   // Re-engagement after +20h (49-56)
   converted: 50,
   paid: 100
 };
 
-// When closing pressure starts (message count)
-// OPTIMIZED: Start pitching earlier in HOT stage
+// Total messages per stage (cumulative) for stage transitions
+// cold: 1-8, warm: 9-20, hot: 21-35, pitched: 36-38, closing: 39-48, followup: 49-56
+const STAGE_TRANSITIONS: Record<LeadStage, number> = {
+  cold: 8,       // After 8 msgs → warm
+  warm: 20,      // After 20 msgs → hot
+  hot: 35,       // After 35 msgs OR pitch sent → pitched
+  pitched: 38,   // After 3 msgs in pitched → closing
+  closing: 48,   // After 10 msgs in closing → followup (if not converted)
+  followup: 56,  // After 8 msgs in followup → stop
+  converted: 100,
+  paid: 150
+};
+
+// When closing pressure starts (message count in current stage)
 const CLOSING_STARTS_AT: Record<LeadStage, number> = {
-  cold: 100,   // Never - cold = build rapport only
-  warm: 100,   // Never - warm = tease handled by explicit rule
-  hot: 10,     // Reduced from 12 - start pitching at msg 10 (2 msgs into HOT)
-  pitched: 1,  // Immediate closing pressure
+  cold: 100,     // Never - cold = build rapport only
+  warm: 100,     // Never - warm = tease handled by explicit rule
+  hot: 8,        // Start pushing for pitch at msg 8 of HOT
+  pitched: 1,    // Immediate - transition to closing
+  closing: 1,    // Always in closing mode
+  followup: 1,   // Soft re-pitch mode
   converted: 40,
   paid: 80
 };
@@ -172,7 +191,11 @@ function getRandomExitMessage(): string {
  * Higher = more aggressive about pitching Fanvue
  */
 function getClosingPressure(stage: LeadStage, messageCount: number): number {
-  const max = MESSAGE_CAPS[stage] || 25;
+  // For closing/followup stages, always high pressure
+  if (stage === 'closing') return 80;
+  if (stage === 'followup') return 60; // Softer in followup
+  
+  const max = STAGE_TRANSITIONS[stage] || 50;
   const closeAt = CLOSING_STARTS_AT[stage] || 15;
   
   if (messageCount < closeAt) return 0; // Build zone
@@ -183,11 +206,24 @@ function getClosingPressure(stage: LeadStage, messageCount: number): number {
 }
 
 /**
- * Check if conversation has reached its limit
+ * Check if conversation has reached its final limit (should stop)
  */
 function hasReachedLimit(stage: LeadStage, messageCount: number): boolean {
-  const max = MESSAGE_CAPS[stage] || 25;
-  return messageCount >= max;
+  // Only stop at the end of followup stage (or converted/paid limits)
+  const finalLimit = STAGE_TRANSITIONS.followup; // 56 messages total
+  
+  // For followup stage, check if we've exhausted all attempts
+  if (stage === 'followup') {
+    return messageCount >= finalLimit;
+  }
+  
+  // For converted/paid, use their specific limits
+  if (stage === 'converted' || stage === 'paid') {
+    return messageCount >= STAGE_TRANSITIONS[stage];
+  }
+  
+  // For other stages, don't stop - they'll transition to next stage
+  return false;
 }
 
 const ELENA_SYSTEM_PROMPT = `You are Elena Visconti, 24, model in Paris. Italian roots.
@@ -207,17 +243,21 @@ You're not here to be their friend forever. You're here to:
 
 | Stage | Message # | Your Goal |
 |-------|-----------|-----------|
-| COLD | 1-3 | Build rapport. Be warm. Ask about them. NO pitching yet. |
-| WARM | 4-7 | Tease your "other content". Create curiosity. Light mentions of Fanvue OK. |
-| HOT | 8-15 | They're engaged. Start pitching Fanvue more directly. |
-| PITCHED | After pitch | Close aggressively. Remind them of the free link. Limited messages left. |
+| COLD | 1-8 | Build rapport. Be warm. Ask about them. NO pitching yet. |
+| WARM | 9-20 | Tease your "other content". Create curiosity. Light mentions of Fanvue OK. |
+| HOT | 21-35 | They're engaged. Start pitching Fanvue more directly. |
+| PITCHED | 36-38 | Link just sent! Quick transition, acknowledge they got it. |
+| CLOSING | 39-48 | Active follow-up. Ask if they checked the link. Handle objections. |
+| FOLLOWUP | 49-56 | Soft re-engagement after a break. Last chance before stopping. |
 
 ## CLOSING RULES
 
 - In COLD stage: NEVER mention Fanvue. Just be warm and curious.
 - In WARM stage: Tease that you have "more content elsewhere" but don't push hard.
 - In HOT stage: Look for ANY opportunity to pitch. Sexual content? → Fanvue. Wants more? → Fanvue.
-- Once PITCHED: Use psychological techniques below. MAX 2 "no"s then soft exit.
+- In PITCHED: Acknowledge they got the link. Transition quickly to CLOSING.
+- In CLOSING: Ask if they checked it out. Handle objections. "t'as eu le temps de regarder? 👀"
+- In FOLLOWUP: Soft re-engagement. "hey ça fait un moment 🖤" - Don't be pushy.
 - The FREE link is your closing weapon. Use it wisely. It's a gift, not a sales pitch.
 
 ## 🔑 KILLER ARGUMENTS (use these!)
@@ -506,10 +546,13 @@ Match their energy but stay warm and fun.`,
 - "if you say so"
 Don't get defensive. Stay amused.`,
 
-  curious: `🎯 INTENT: CURIOUS — They're genuinely interested
-→ Lead with CURIOUS back. Share a bit, ask more.
-- Answer briefly, then flip the question
-- "j'adore [X]... et toi?"`,
+  curious: `🎯 INTENT: CURIOUS — They're asking about YOU (Elena)
+→ CRITICAL: When they ask "Toi?", "Et toi?", "What about you?", "C'est quoi tes plaisirs?" etc. → SHARE about yourself!
+- DO NOT just ask them another question. They want to know about YOU.
+- Share something personal: "je suis mannequin à Paris 🖤 j'adore le fitness et voyager"
+- Share your interests: "j'aime beaucoup le fitness, la mode... et les conversations intéressantes 😏"
+- If they asked about your pleasures: "j'aime le sport, les bons restos, et... des trucs que je peux pas montrer ici 👀"
+After sharing briefly (1 sentence), you CAN ask them back.`,
 
   // === STANDARD INTENTS ===
   greeting: `🎯 INTENT: GREETING — First contact
@@ -621,20 +664,23 @@ const COUNTING_WORDS = [
   'nine', 'eight', 'seven', 'six', 'five', 'four', 'three',
 ];
 
-// Fallback responses when API fails - varied questions to keep conversation going
+// Fallback responses when API fails - mix of questions AND statements to avoid loops
+// NOTE: These should be DIVERSE to avoid repetition
 const SMART_FALLBACKS = [
-  "tu viens d'où? 🖤",
-  "where are you from? 👀",
-  "what's your day looking like? 😊",
-  "tu fais quoi dans la vie? 👀",
-  "tell me something about you 🖤",
-  "how's your evening going? 😏",
-  "tu me racontes un peu? 👀",
-  "what brings you here? 🖤",
-  "something on your mind? 😊",
-  "so what do you do? 👀",
-  "qu'est-ce que tu fais ce soir? 😏",
-  "got any plans today? 🖤",
+  // About Elena (statements, not questions)
+  "je suis à Paris là 🖤 il fait beau aujourd'hui",
+  "je viens de finir un shooting 📸",
+  "j'adore parler avec toi 🖤",
+  "tu me fais sourire 😊",
+  "t'es mignon toi 🖤",
+  "hmm interesting 👀",
+  "j'aime bien ton énergie 😏",
+  "cute 🖤",
+  // Light questions (only ask if conversation is early)
+  "what's your vibe today? 😊",
+  "how's your day going? 🖤",
+  "what are you up to? 👀",
+  "qu'est-ce qui t'amène ici? 😏",
 ];
 
 /**
@@ -943,13 +989,40 @@ export async function updateContactAfterMessage(
   const newMessageCount = (contact.message_count || 0) + (isIncoming ? 1 : 0);
   const newOurMessageCount = (contact.our_message_count || 0) + (isIncoming ? 0 : 1);
   
-  // Calculate new stage (only upgrade, never downgrade from pitched/converted/paid)
+  // Calculate new stage based on message count and current stage
+  // Stage flow: cold → warm → hot → pitched → closing → followup → (stop or converted)
   let newStage = contact.stage;
-  if (!['pitched', 'converted', 'paid'].includes(contact.stage)) {
-    if (newMessageCount >= 8) {
-      newStage = 'hot';
-    } else if (newMessageCount >= 4) {
+  
+  // Don't auto-upgrade from these stages (they're controlled by specific events)
+  const manualStages = ['pitched', 'closing', 'followup', 'converted', 'paid'];
+  
+  if (!manualStages.includes(contact.stage)) {
+    // Auto-progression based on message count
+    if (newMessageCount >= STAGE_TRANSITIONS.warm && contact.stage === 'cold') {
       newStage = 'warm';
+    } else if (newMessageCount >= STAGE_TRANSITIONS.hot && contact.stage === 'warm') {
+      newStage = 'hot';
+    }
+    // Note: hot → pitched happens when we send the Fanvue link (markAsPitched)
+  }
+  
+  // Progress from pitched → closing after a few messages
+  if (contact.stage === 'pitched') {
+    const msgsInPitched = newMessageCount - STAGE_TRANSITIONS.hot;
+    if (msgsInPitched >= MESSAGE_CAPS.pitched) {
+      newStage = 'closing';
+      console.log(`📈 Stage upgrade: pitched → closing (${msgsInPitched} msgs in pitched)`);
+    }
+  }
+  
+  // Progress from closing → followup after max closing messages
+  // Note: followup is triggered by time (+20h), not just message count
+  // This is a fallback if they keep messaging during closing
+  if (contact.stage === 'closing') {
+    const msgsInClosing = newMessageCount - STAGE_TRANSITIONS.pitched;
+    if (msgsInClosing >= MESSAGE_CAPS.closing) {
+      newStage = 'followup';
+      console.log(`📈 Stage upgrade: closing → followup (${msgsInClosing} msgs in closing)`);
     }
   }
 
@@ -1032,6 +1105,83 @@ function shouldReactivateContact(contact: DMContact): boolean {
   
   return daysSinceStopped >= 7;
 }
+
+/**
+ * Schedule a followup for +20h from now
+ * This is used when a contact finishes CLOSING stage without converting
+ */
+export async function scheduleFollowup(contactId: string): Promise<void> {
+  const followupTime = new Date(Date.now() + 20 * 60 * 60 * 1000); // +20 hours
+  console.log(`📅 Scheduling followup for contact ${contactId} at ${followupTime.toISOString()}`);
+  
+  await supabase
+    .from('elena_dm_contacts')
+    .update({
+      followup_scheduled_at: followupTime.toISOString(),
+      followup_sent: false,
+    })
+    .eq('id', contactId);
+}
+
+/**
+ * Mark followup as sent and move to FOLLOWUP stage
+ */
+export async function markFollowupSent(contactId: string): Promise<void> {
+  console.log(`📤 Marking followup sent for contact ${contactId}`);
+  
+  await supabase
+    .from('elena_dm_contacts')
+    .update({
+      followup_sent: true,
+      stage: 'followup',
+    })
+    .eq('id', contactId);
+}
+
+/**
+ * Check if contact is ready for followup (+20h passed)
+ */
+function isReadyForFollowup(contact: DMContact): boolean {
+  if (!contact.followup_scheduled_at || contact.followup_sent) {
+    return false;
+  }
+  
+  const scheduledTime = new Date(contact.followup_scheduled_at);
+  return Date.now() >= scheduledTime.getTime();
+}
+
+/**
+ * Get contacts ready for followup (for batch processing)
+ */
+export async function getContactsReadyForFollowup(): Promise<DMContact[]> {
+  const now = new Date().toISOString();
+  
+  const { data, error } = await supabase
+    .from('elena_dm_contacts')
+    .select('*')
+    .eq('followup_sent', false)
+    .not('followup_scheduled_at', 'is', null)
+    .lte('followup_scheduled_at', now)
+    .eq('is_stopped', false);
+  
+  if (error) {
+    console.error('Error fetching followup contacts:', error);
+    return [];
+  }
+  
+  return data || [];
+}
+
+// Followup messages - soft re-engagement after +20h
+const FOLLOWUP_MESSAGES = [
+  "hey toi 🖤 ça fait un moment... tu me manques un peu 👀",
+  "coucou 😊 j'ai pensé à toi... t'es passé voir mon contenu?",
+  "hey 🖤 tu t'es perdu? je t'attends toujours là-bas 👀",
+  "salut toi 😏 tu reviens quand me voir?",
+  "hey stranger 🖤 I was thinking about you...",
+  "miss talking to you 😊 did you check out my page?",
+  "hey you 👀 come back and say hi",
+];
 
 // ===========================================
 // LANGUAGE DETECTION
@@ -1388,8 +1538,22 @@ export async function analyzeMessageIntent(message: string): Promise<IntentAnaly
   // ===========================================
   
   if (!triggerFanvuePitch && intent === 'other') {
-    const aiKeywords = ['ia', 'ai', 'robot', 'bot', 'réel', 'vraie', 'real', 'fake', 'artificial', 'human', 'humain'];
-    if (aiKeywords.some(kw => lowerMessage.includes(kw))) {
+    // IMPORTANT: Patterns to detect if user is asking about AI/bot
+    // Must NOT match French "j'ai" (I have), "vrai" (true), "training", etc.
+    const aiPatterns = [
+      /\b(ia|i\.a\.)\b/i,                    // "IA" standalone
+      /(?:^|\s)ai(?:\s|$|\?)/i,              // "AI" with spaces/start/end (not "j'ai", "training")
+      /\ban?\s+ai\b/i,                        // "an AI", "a AI"
+      /\brobot\b/i,                           // robot
+      /\bbot\b/i,                             // bot (but not "about")
+      /\b(réel|réelle|vraie?)\b.*\b(personne|fille|femme|humain)/i, // "vraie personne", "réel humain"
+      /\b(real|fake)\s+(person|girl|woman|human|account)/i,         // "real person", "fake account"
+      /\bartificial\b/i,                      // artificial
+      /\b(es-tu|are you|tu es|you are|you're)\s*(une?|a|an)?\s*(robot|bot|ia|ai|machine|program)/i, // "es-tu un robot", "are you a bot"
+      /\b(human|humain|humaine)\b.*\?/i,      // "are you human?", "t'es humain?"
+    ];
+    
+    if (aiPatterns.some(pattern => pattern.test(lowerMessage))) {
       intent = 'ai_question';
       recommendedMode = 'warm';
       modeReason = 'AI question → be warm and honest';
@@ -1453,7 +1617,34 @@ export async function analyzeMessageIntent(message: string): Promise<IntentAnaly
   }
 
   // ===========================================
-  // PRIORITY 4: STANDARD INTENTS (basic detection)
+  // PRIORITY 4: "WHAT ABOUT YOU?" DETECTION
+  // ===========================================
+  // When user says "Toi", "Et toi?", "You?", "What about you?" - they're asking about Elena
+  // Elena should talk about HERSELF, not redirect the question back
+  
+  if (intent === 'other') {
+    const askingAboutElenaPatterns = [
+      /^toi[\s?!.]*$/i,                           // Just "Toi" or "Toi?"
+      /^et toi[\s?!.]*$/i,                        // "Et toi?" / "Et toi"
+      /^you[\s?!.]*$/i,                           // Just "You" or "You?"
+      /^what about you[\s?!.]*$/i,                // "What about you?"
+      /^and you[\s?!.]*$/i,                       // "And you?"
+      /\btoi tu\b/i,                              // "Toi tu fais quoi"
+      /\b(c'est quoi|what's|what is|quels? sont?)\s+(tes|your)\b/i,  // "C'est quoi tes plaisirs", "What's your..."
+      /\btoi\s+(tu|qu'est-ce|comment|où)\b/i,    // "Toi tu...", "Toi qu'est-ce que..."
+    ];
+    
+    if (askingAboutElenaPatterns.some(p => p.test(lowerMessage))) {
+      intent = 'curious';  // They're curious about Elena
+      recommendedMode = 'warm';
+      modeReason = 'User asking about YOU (Elena) → share about yourself, don\'t redirect';
+      
+      console.log(`📌 ASKING_ABOUT_ELENA detected: "${message}" → Elena should talk about herself`);
+    }
+  }
+
+  // ===========================================
+  // PRIORITY 5: STANDARD INTENTS (basic detection)
   // ===========================================
   
   if (intent === 'other') {
@@ -1596,6 +1787,104 @@ export async function generateElenaResponse(
 ${recentOutgoingMessages.map((m, i) => `  ${i + 1}. "${m.content.substring(0, 40)}..."`).join('\n')}
 Generate something COMPLETELY DIFFERENT. If you recently said "hey 🖤", do NOT say it again. NEVER use the same greeting twice.`
     : '';
+
+  // ===========================================
+  // SMART TOPIC EXTRACTION — Prevent asking answered questions
+  // ===========================================
+  // Analyze conversation to find what we already know about the user
+  const knownFacts: string[] = [];
+  const askedQuestions: string[] = [];
+  
+  // Topic patterns to detect in incoming messages (user answers)
+  const topicPatterns = {
+    location: [
+      /\b(from|de|viens de|je suis de|i'm from|im from|live in|habite)\s+([A-Za-zÀ-ÿ\s]+)/i,
+      /\b(new york|paris|london|los angeles|la|miami|montreal|toronto|canada|usa|états[- ]unis|france|italie|italy|spain|espagne|uk|england|germany|allemagne|australia|brazil|brésil)\b/i,
+    ],
+    job: [
+      /\b(i'm a|je suis|i work|je travaille|i do|je fais|enseigne|teacher|prof|engineer|ingénieur|developer|dev|student|étudiant|nurse|doctor|médecin|lawyer|avocat|chef|artist|artiste|musician|musicien|entrepreneur|business)\b/i,
+      /\b(teach|enseigner|construction|equipment|machines?|hockey)\b/i,
+    ],
+    sport: [
+      /\b(play|joue|training|sport|gym|fitness|football|soccer|basketball|tennis|hockey|golf|swim|natation|run|course|yoga|boxe|boxing|mma|martial)\b/i,
+    ],
+    hobby: [
+      /\b(like|j'aime|love|adore|hobby|hobbies|passion|passions?|music|musique|movies?|films?|gaming|games?|jeux|travel|voyage|cook|cuisine|read|lire|art|photo|photography)\b/i,
+    ],
+    age: [
+      /\b(\d{1,2})\s*(ans|years?|yo)\b/i,
+      /\b(i'm|je suis|i am)\s*(\d{1,2})\b/i,
+    ],
+    name: [
+      /\b(i'm|je suis|je m'appelle|my name is|name's|call me)\s+([A-Za-zÀ-ÿ]+)\b/i,
+    ],
+  };
+  
+  // Question patterns to detect in outgoing messages (what Elena asked)
+  const questionPatterns = {
+    location: [/\b(where|où|d'où|from|viens|habite|live|quel pays|what country|what state|quel état)\b.*\?/i],
+    job: [/\b(what do you do|tu fais quoi|que fais-tu|work|travail|job|métier|profession|occupation)\b.*\?/i],
+    sport: [/\b(sport|gym|training|exercise|fitness|tu fais du sport)\b.*\?/i],
+    hobby: [/\b(hobby|hobbies|passion|like|aimes|adore|free time|temps libre|plaisir)\b.*\?/i],
+    tell_me: [/\b(tell me|raconte|parle-moi|tu me racontes)\b/i],
+  };
+  
+  // Scan conversation history
+  for (const msg of conversationHistory) {
+    if (msg.direction === 'incoming') {
+      // User message - extract facts
+      const content = msg.content;
+      
+      for (const [topic, patterns] of Object.entries(topicPatterns)) {
+        for (const pattern of patterns) {
+          if (pattern.test(content)) {
+            // Extract the matched info
+            const match = content.match(pattern);
+            if (match) {
+              const info = match[2] || match[1] || match[0];
+              if (info && info.length > 1) {
+                knownFacts.push(`${topic}: "${info.trim()}"`);
+              }
+            }
+          }
+        }
+      }
+    } else {
+      // Elena message - track questions asked
+      const content = msg.content;
+      
+      for (const [topic, patterns] of Object.entries(questionPatterns)) {
+        for (const pattern of patterns) {
+          if (pattern.test(content)) {
+            askedQuestions.push(topic);
+          }
+        }
+      }
+    }
+  }
+  
+  // Deduplicate
+  const uniqueFacts = [...new Set(knownFacts)];
+  const uniqueQuestions = [...new Set(askedQuestions)];
+  
+  // Build anti-repeat instruction for topics
+  let topicAntiRepeatInstruction = '';
+  if (uniqueFacts.length > 0 || uniqueQuestions.length > 0) {
+    topicAntiRepeatInstruction = `\n\n🧠 CONVERSATION MEMORY — CRITICAL: DO NOT ASK ABOUT TOPICS ALREADY COVERED!`;
+    
+    if (uniqueFacts.length > 0) {
+      topicAntiRepeatInstruction += `\n\n📌 KNOWN FACTS about this user (DO NOT ask about these again!):
+${uniqueFacts.map(f => `  - ${f}`).join('\n')}`;
+    }
+    
+    if (uniqueQuestions.length > 0) {
+      topicAntiRepeatInstruction += `\n\n❌ QUESTIONS YOU ALREADY ASKED (NEVER ask these again!):
+${uniqueQuestions.map(q => `  - Asked about: ${q}`).join('\n')}
+
+⚠️ IF YOU ASK THE SAME QUESTION AGAIN, the user will think you're a bot and stop responding.
+Instead: Reference what you know! "ah tu enseignes les machines de construction? c'est cool 👀"`;
+    }
+  }
   
   // Detect if user sent emoji-only message
   const isEmojiOnlyMessage = /^[\p{Emoji}\s\u200d]+$/u.test(incomingMessage.trim()) || 
@@ -1668,11 +1957,34 @@ But don't force it. Keep building connection.
 Stage is HOT. Actively orient toward Fanvue when relevant.
 ${closingPressure >= 50 ? `⚠️ CLOSING PRESSURE ${closingPressure}% — Push harder for Fanvue!` : ''}
 ${closingPressure >= 80 ? `🚨 FINAL ZONE — Pitch with link: ${FANVUE_LINK}` : ''}
+` : contact.stage === 'pitched' ? `
+## 📤 LINK JUST SENT (PITCHED)
+You just sent the Fanvue link. Acknowledge it briefly.
+Examples: "voilà 🖤" / "j'espère que ça te plaira 👀" / "dis-moi ce que t'en penses"
+Quick transition to CLOSING - don't linger here.
+` : contact.stage === 'closing' ? `
+## 🎯 CLOSING MODE (ACTIVE FOLLOW-UP)
+You already sent the link. Now follow up on it WITHOUT sending it again.
+Ask if they checked it out. Handle any objections.
+Examples:
+- "t'as eu le temps de regarder? 👀"
+- "tu me dis ce que t'en penses? 😏"
+- "alors, tu viens me voir? 🖤"
+- If objection: "je comprends 🖤" + handle it
+NEVER send the link again. Ask follow-up questions only.
+` : contact.stage === 'followup' ? `
+## 🔄 FOLLOWUP MODE (SOFT RE-ENGAGEMENT)
+This is a re-engagement after some time. Be soft, not pushy.
+Examples:
+- "hey toi 🖤 ça fait un moment..."
+- "tu me manques un peu 👀"
+- "t'es passé voir mon contenu?"
+Don't be aggressive. Just reconnect warmly.
 ` : ''}
 
 ⚠️ CRITICAL: MAX 12 WORDS. 1 sentence. lowercase. NO caps. NO celebrations. NO counting. Be NORMAL and SHORT.
 
-${languageInstruction}${antiRepeatInstruction}${emojiInstruction}${specialTokenInstruction}`;
+${languageInstruction}${antiRepeatInstruction}${topicAntiRepeatInstruction}${emojiInstruction}${specialTokenInstruction}`;
 
   // ===========================================
   // GENERATION WITH VALIDATION + RETRY LOOP
@@ -1782,6 +2094,10 @@ ${languageInstruction}${antiRepeatInstruction}${emojiInstruction}${specialTokenI
     strategy = 'nurture';
   } else if (contact.stage === 'hot') {
     strategy = 'qualify';
+  } else if (contact.stage === 'pitched' || contact.stage === 'closing') {
+    strategy = 'closing';
+  } else if (contact.stage === 'followup') {
+    strategy = 'followup';
   }
 
   // Check if response contains Fanvue link (for marking as pitched)
@@ -2200,35 +2516,51 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
   }
   
   // ===========================================
-  // FANVUE LINK SPAM PREVENTION — Max 2 links per conversation
+  // FANVUE LINK FOLLOW-UP — Don't spam link, ask flirty follow-up instead
   // ===========================================
   const fanvueLinkPattern = /fanvue\.com/i;
   const responseHasFanvueLink = fanvueLinkPattern.test(response);
   let finalResponse = response;
   
-  if (responseHasFanvueLink) {
-    // Count how many times we've sent the Fanvue link in history
-    const fanvueLinksSent = history.filter(
-      (m: DMMessage) => m.direction === 'outgoing' && fanvueLinkPattern.test(m.content)
-    ).length;
+  // Flirty follow-up questions when we've already sent the link
+  const FANVUE_FOLLOWUP_QUESTIONS = [
+    "t'as eu le temps de regarder? 👀",
+    "tu me dis ce que t'en penses? 😏",
+    "t'as checké le lien? 🖤",
+    "alors, tu viens me voir? 👀",
+    "did you check it out? 😏",
+    "so... what do you think? 🖤",
+    "you coming to see me? 👀",
+    "t'as vu? j'attends ton avis 😊",
+    "curieux de savoir ce que t'en penses 👀",
+    "tu me rejoins? 🖤",
+  ];
+  
+  // Count how many times we've sent the Fanvue link in history
+  const fanvueLinksSent = history.filter(
+    (m: DMMessage) => m.direction === 'outgoing' && fanvueLinkPattern.test(m.content)
+  ).length;
+  
+  if (responseHasFanvueLink && fanvueLinksSent >= 1) {
+    // We already sent at least 1 link — don't send another, ask follow-up instead
+    console.log(`🔄 FANVUE FOLLOW-UP — Already sent ${fanvueLinksSent} link(s). Using follow-up question instead.`);
     
-    if (fanvueLinksSent >= 2) {
-      console.log(`⚠️ FANVUE SPAM BLOCKED — Already sent ${fanvueLinksSent} Fanvue links. Skipping this one.`);
-      // Instead of skipping entirely, remove the link and send without it
-      const responseWithoutLink = response.replace(/→?\s*https?:\/\/[^\s]+fanvue\.com[^\s]*/gi, '').trim();
-      if (responseWithoutLink.length > 5) {
-        console.log(`📝 Sending response without Fanvue link: "${responseWithoutLink.substring(0, 60)}..."`);
-        finalResponse = responseWithoutLink;
-      } else {
-        // Response was basically just the link, skip entirely
-        return {
-          response: '',
-          contact: updatedContact,
-          strategy,
-          analysis,
-        };
-      }
-    }
+    // Pick a random follow-up that wasn't recently used
+    const recentOutgoingContents = history
+      .filter((m: DMMessage) => m.direction === 'outgoing')
+      .slice(-5)
+      .map((m: DMMessage) => m.content.toLowerCase());
+    
+    // Filter out recently used follow-ups
+    const availableFollowups = FANVUE_FOLLOWUP_QUESTIONS.filter(
+      q => !recentOutgoingContents.some(c => c.includes(q.substring(0, 15).toLowerCase()))
+    );
+    
+    // Pick from available, or fall back to any if all were used
+    const followupPool = availableFollowups.length > 0 ? availableFollowups : FANVUE_FOLLOWUP_QUESTIONS;
+    finalResponse = followupPool[Math.floor(Math.random() * followupPool.length)];
+    
+    console.log(`📝 Follow-up question: "${finalResponse}"`);
   }
 
   // 7. Save outgoing message

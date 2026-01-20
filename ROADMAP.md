@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 19 janvier 2026 (DONE-074 DM Condition Fix ✅)
+**Dernière mise à jour** : 19 janvier 2026 (DONE-075 DM Funnel Extension ✅)
 
 ---
 
@@ -67,6 +67,7 @@ roadmap/
 
 | ID | Feature | Date | Version | Lien |
 |----|---------|------|---------|------|
+| DONE-075 | **📈 Extension Funnel DM + Stages CLOSING/FOLLOWUP** — Fix bug intent `ai_question` (faux positifs) + Système anti-répétition questions + Détection "Toi"/"Et toi?" + Follow-up Fanvue (questions flirty au lieu de spam) + Nouveaux stages CLOSING/FOLLOWUP (~56 messages total) + Followup automatique +20h via GitHub Action | 19/01/2026 | v2.61.0 | [→](./roadmap/done/DONE-075-dm-funnel-extension-closing-followup.md) |
 | DONE-074 | **🔧 DM Condition Fix (ManyChat)** — Fix condition ManyChat `elena_should_send is 1` (au lieu de `true`) + Résout problème non-envoi réponses DM + Détection URLs photos Instagram + Conversion en `[IMAGE_SENT]` token | 19/01/2026 | v2.60.0 | [→](./roadmap/done/DONE-074-dm-condition-fix.md) |
 | DONE-073 | **🔄 DM Auto-Reactivation After 7 Days** — Réactivation automatique contacts stopped après 7 jours de cooldown + Stage remis à cold (fresh start) + Historique préservé + Réactivation uniquement quand utilisateur réécrit (limitation Instagram 24h) | 19/01/2026 | v2.59.0 | [→](./roadmap/done/DONE-073-dm-auto-reactivation.md) |
 | DONE-072 | **🔧 DM ManyChat Conditional Flow Fix** — Fix boucles infinies Fanvue + réponses mauvaise langue en ajoutant condition ManyChat (should_send flag) + Flow conditionnel : External Request → Condition → Send Message (si true) | 19/01/2026 | v2.58.0 | [→](./roadmap/done/DONE-072-dm-manychat-conditional-fix.md) |

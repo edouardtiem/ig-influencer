@@ -1,0 +1,35 @@
+name: DM Followup (+20h)
+
+on:
+  schedule:
+    # Every hour at minute 15 (check for contacts ready for followup)
+    - cron: '15 * * * *'
+  workflow_dispatch: # Manual trigger for testing
+
+jobs:
+  followup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: app/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: app
+        run: npm ci
+      
+      - name: Run DM Followup
+        working-directory: app
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          MANYCHAT_API_TOKEN: ${{ secrets.MANYCHAT_API_TOKEN }}
+        run: node scripts/dm-followup.mjs
