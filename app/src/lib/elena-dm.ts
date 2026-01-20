@@ -665,27 +665,39 @@ const COUNTING_WORDS = [
 ];
 
 // Fallback responses when API fails - mix of questions AND statements to avoid loops
-// NOTE: These should be DIVERSE to avoid repetition
+// NOTE: These should be DIVERSE, ENGAGING, and never generic
+// RULE: Must have at least 3 words AND either a question or meaningful content
 const SMART_FALLBACKS = [
-  // About Elena (statements, not questions)
-  "je suis à Paris là 🖤 il fait beau aujourd'hui",
+  // French - engaging questions
+  "qu'est-ce que tu fais de beau? 😊",
+  "tu viens d'où toi? 👀",
+  "raconte-moi un peu 🖤",
+  "t'as passé une bonne journée? 😏",
+  "tu fais quoi dans la vie? 👀",
+  "c'est quoi ton délire? 🖤",
+  // French - statements with substance
+  "je suis à Paris là 🖤 il fait beau",
   "je viens de finir un shooting 📸",
-  "j'adore parler avec toi 🖤",
-  "tu me fais sourire 😊",
-  "t'es mignon toi 🖤",
-  "hmm interesting 👀",
-  "j'aime bien ton énergie 😏",
-  "cute 🖤",
-  // Light questions (only ask if conversation is early)
+  "j'adore parler avec toi 🖤 tu viens d'où?",
+  "tu me fais sourire 😊 c'est rare",
+  "t'es mignon toi 🖤 parle-moi de toi",
+  "j'aime bien ton énergie 😏 dis-m'en plus",
+  // English - engaging questions
   "what's your vibe today? 😊",
-  "how's your day going? 🖤",
-  "what are you up to? 👀",
-  "qu'est-ce qui t'amène ici? 😏",
+  "where are you from? 👀",
+  "tell me about yourself 🖤",
+  "what do you do for fun? 😏",
+  "how's your day going? 👀",
+  "what brings you here? 🖤",
+  // English - statements with substance
+  "i like your energy 🖤 tell me more",
+  "you seem interesting 😏 what's your story?",
+  "i'm curious about you 👀 where are you from?",
 ];
 
 /**
  * Validate a response before sending
- * Checks: hallucinations, length, stage alignment, closing objective
+ * Checks: hallucinations, length, stage alignment, closing objective, generic responses
  */
 function validateResponse(
   response: string,
@@ -693,7 +705,55 @@ function validateResponse(
   messageCount: number
 ): ValidationResult {
   const lowerResponse = response.toLowerCase();
+  const trimmedResponse = response.trim();
   const wordCount = response.split(/\s+/).filter(w => w.length > 0).length;
+  
+  // === CHECK 0: GENERIC RESPONSE BLOCKER ===
+  // Block lazy/generic responses like "hey 🖤", "salut 🖤", etc.
+  const GENERIC_PATTERNS = [
+    /^hey\s*🖤?\s*\.{0,3}$/i,
+    /^salut\s*🖤?\s*\.{0,3}$/i,
+    /^coucou\s*🖤?\s*\.{0,3}$/i,
+    /^hello\s*🖤?\s*\.{0,3}$/i,
+    /^hi\s*🖤?\s*\.{0,3}$/i,
+    /^bonjour\s*🖤?\s*\.{0,3}$/i,
+    /^hola\s*🖤?\s*\.{0,3}$/i,
+    /^🖤\s*$/,
+    /^👀\s*$/,
+    /^😏\s*$/,
+  ];
+  
+  for (const pattern of GENERIC_PATTERNS) {
+    if (pattern.test(trimmedResponse)) {
+      return {
+        isValid: false,
+        reason: `Generic response blocked: "${trimmedResponse}" — needs more substance`,
+        severity: 'fail',
+      };
+    }
+  }
+  
+  // === CHECK 0.5: TOO SHORT RESPONSES ===
+  // Block responses that are too short to be meaningful (less than 3 words, unless it's a question)
+  const hasQuestion = trimmedResponse.includes('?');
+  if (wordCount < 3 && !hasQuestion) {
+    return {
+      isValid: false,
+      reason: `Response too short: ${wordCount} words — minimum 3 words required`,
+      severity: 'fail',
+    };
+  }
+  
+  // === CHECK 0.6: NO ENGAGEMENT CHECK ===
+  // If response has no question AND no emoji AND is short, it's probably lazy
+  const hasEmoji = /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u.test(response);
+  if (wordCount <= 4 && !hasQuestion && !hasEmoji) {
+    return {
+      isValid: false,
+      reason: `Low engagement response: no question, no emoji, only ${wordCount} words`,
+      severity: 'fail',
+    };
+  }
   
   // === CHECK 1: Forbidden words (hallucination indicators) ===
   for (const word of FORBIDDEN_WORDS) {

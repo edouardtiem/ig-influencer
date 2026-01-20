@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 20 janvier 2026 (DONE-078 ComfyUI Output Organization ✅)
+**Dernière mise à jour** : 20 janvier 2026 (IP-008 Elena LoRA Cloud Training 🚧)
 
 ---
 
@@ -23,6 +23,7 @@ roadmap/
 
 | ID | Feature | Priorité | Branche | Lien |
 |----|---------|----------|---------|------|
+| IP-008 | **🎨 Elena LoRA Cloud Training** — Training LoRA haute qualité sur RunPod (GPU A100) avec 25-30 images, rank 32, 300-500 steps pour meilleure consistance visage | 🟡 Medium | main | [→](./roadmap/in-progress/IP-008-elena-lora-cloud-training.md) |
 | IP-007 | **🔧 Hard Fix DM Bugs** — Investigation systématique + Fix 105 contacts > cap non STOPPED + Fix Elena demande anglais (multilingue) + Script diagnostic complet | 🔴 High | main | [→](./roadmap/in-progress/IP-007-dm-hard-fix.md) |
 | IP-006 | **📊 DM Funnel Progress** — Audit complet funnel DM + Tracking Fanvue attribution (fuzzy matching) + 0% conversion identifié comme problème critique | 🔴 High | main | [→](./roadmap/in-progress/IP-006-dm-funnel-progress.md) |
 | IP-005 | **💬 Auto-Reply Comments** — Backend API créé + ManyChat AI configuré pour réponses auto commentaires IG | 🔴 High | main | [→](./roadmap/in-progress/IP-005-auto-reply-comments.md) |
