@@ -1,23 +1,23 @@
-# 🤖 IG Influencer — Mila Verne
+# 🤖 IG Influencer — Elena Visconti
 
-> Influenceuse virtuelle automatisée sur Instagram, propulsée par l'IA
+> Influenceuse virtuelle automatisée sur Instagram & Fanvue, propulsée par l'IA
 
 [![Status](https://img.shields.io/badge/status-production%20ready-brightgreen)]()
 [![Pipeline](https://img.shields.io/badge/pipeline-tested-blue)]()
-[![French](https://img.shields.io/badge/langue-français-blue)]()
+[![Account](https://img.shields.io/badge/IG-@elenav.paris-E4405F)]()
 
 ---
 
 ## 🎯 Le Projet
 
-**Mila Verne** est une influenceuse virtuelle automatisée qui publie quotidiennement du contenu lifestyle/fitness sur Instagram, entièrement générée et gérée par IA.
+**Elena Visconti** (@elenav.paris) est une influenceuse virtuelle automatisée qui publie quotidiennement du contenu lifestyle/sexy sur Instagram et Fanvue, entièrement générée et gérée par IA.
 
 ### Objectifs
 
-- 🤖 **100% automatisé** - Aucune intervention manuelle quotidienne
-- 🎨 **Consistance visuelle** - Même personne reconnaissable sur tous les posts
-- 💰 **Monétisation** - Produits digitaux, subscriptions, partenariats
-- 📈 **Croissance organique** - 0 → 10K followers en 6 mois
+- 🤖 **100% automatisé** - Posts IG, DMs, Fanvue
+- 🎨 **Consistance visuelle** - LoRA training + références
+- 💰 **Monétisation** - Fanvue subscriptions + DM funnel
+- 📈 **Croissance organique** - Funnel IG → Fanvue
 
 ---
 
@@ -44,28 +44,28 @@ npm run dev
 | Composant | Technologie |
 |-----------|-------------|
 | Backend | Next.js 14 + TypeScript |
-| Génération images | 🍌 **Nano Banana Pro** (via Replicate) |
-| Consistance faciale | 4 images de référence (95%+ natif) |
+| Génération images | **Ideogram** + **ComfyUI** (LoRA) |
+| Consistance faciale | LoRA custom + IPAdapter |
 | Hébergement images | Cloudinary |
-| Publication | **Instagram Graph API** (direct) |
+| Publication IG | **Instagram Graph API** |
+| Publication Fanvue | **Fanvue API** (OAuth) |
+| DM Automation | **ManyChat** + Claude AI |
 | Hosting | Vercel |
 
-> **📍 Workflow "Copy & Adapt"** : Reproduire rapidement un post influencer pour Mila. Voir [docs/14-POST-NOW-WORKFLOW.md](docs/14-POST-NOW-WORKFLOW.md)
-
-**Coût estimé :** ~$2-5/mois (0-10K followers)
+**Coût estimé :** ~$15-25/mois
 
 ---
 
 ## 🎨 Le Personnage
 
-**Mila Verne** — 22 ans, fitness French girl de Nice installée à Paris
+**Elena Visconti** — 24 ans, modèle & créatrice de contenu parisienne
 
-- 🏋️‍♀️ **Style** : Athleisure chic (60% lifestyle, 40% fitness)
-- 🇫🇷 **Contenu** : Posts en français, hashtags mixtes
-- ⭐ **Signes distinctifs** : Cheveux cuivre, pendentif étoile
-- 📸 **Format** : 2 posts/jour
+- 🔥 **Style** : Lifestyle sexy (lingerie, bikini, boudoir)
+- 🌍 **Contenu** : Posts en anglais, audience internationale
+- ⭐ **Signes distinctifs** : Blonde, yeux bleus, 172cm
+- 📸 **Format** : 1 post IG/jour (21h) + 1 post Fanvue/jour (17h)
 
-→ Voir [docs/03-PERSONNAGE.md](docs/03-PERSONNAGE.md) pour le character sheet complet
+→ Voir [docs/characters/elena/PERSONNAGE.md](docs/characters/elena/PERSONNAGE.md) pour le character sheet complet
 
 ---
 
@@ -73,47 +73,40 @@ npm run dev
 
 ### Guides essentiels
 
-- **[⚡ Quick Start](docs/QUICKSTART.md)** — Démarrer en 5 minutes
-- **[📖 Documentation complète](docs/README.md)** — Index de toute la doc
-- **[🛠️ Implémentation](docs/04-IMPLEMENTATION.md)** — Architecture technique
-- **[📸 Workflow "Copy & Adapt"](docs/14-POST-NOW-WORKFLOW.md)** — Créer un post rapidement
+- **[📖 Documentation](docs/README.md)** — Index complet
+- **[🗺️ Roadmap](ROADMAP.md)** — Features, bugs, idées
+- **[🎨 Elena](docs/characters/elena/PERSONNAGE.md)** — Character sheet
 
-### Stratégie
+### Systèmes actifs
 
-- [PRD](docs/01-PRD.md) — Vision produit
-- [Monétisation](docs/02-MONETISATION.md) — Stratégie revenus
-- [Personnage](docs/03-PERSONNAGE.md) — Character design
-- [📍 Life Calendar](docs/07-LIFE-CALENDAR.md) — Rotation géographique & contextes
+- **[💬 DM Automation](docs/27-DM-AUTOMATION-V2.md)** — Funnel IG → Fanvue
+- **[🔥 Fanvue System](docs/fanvue/)** — Bot DM + Daily posts
+- **[🧠 Content Brain](docs/sessions/2026-01-09-content-brain-trending-layer.md)** — Auto-génération
 
 ---
 
-## 🚀 Pipeline de Génération
+## 🚀 Architecture
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│  Workflow "Copy & Adapt"                            │
-│  Screenshots post influencer → Analyse IA           │
+│  INSTAGRAM (@elenav.paris)                          │
+│  • 1 post/jour à 21h (Content Brain)                │
+│  • DM automation (ManyChat + Claude AI)             │
+│  • Funnel: Comment → DM → Fanvue                    │
 └────────────────┬────────────────────────────────────┘
                  ↓
 ┌─────────────────────────────────────────────────────┐
-│  Replicate (Nano Banana Pro)                        │
-│  • Génération image haute qualité                   │
-│  • Consistance native avec 4 références             │
-│  • Temps : ~40-60 secondes                          │
-│  • Coût : ~$0.05/image                              │
+│  FANVUE                                             │
+│  • 1 post/jour à 17h (sexy content)                 │
+│  • DM bot (Venice AI uncensored)                    │
+│  • Subscriptions + PPV                              │
 └────────────────┬────────────────────────────────────┘
                  ↓
 ┌─────────────────────────────────────────────────────┐
-│  Cloudinary                                         │
-│  • Hébergement permanent                            │
-│  • URLs publiques                                   │
-└────────────────┬────────────────────────────────────┘
-                 ↓
-┌─────────────────────────────────────────────────────┐
-│  Instagram Graph API                                │
-│  • Publication directe                              │
-│  • Carrousels supportés                             │
-│  • Post live ! 📱                                   │
+│  GÉNÉRATION IMAGES                                  │
+│  • Ideogram (safe IG content)                       │
+│  • ComfyUI + LoRA (NSFW Fanvue)                    │
+│  • Cloudinary (hosting)                             │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -121,27 +114,26 @@ npm run dev
 
 ## ✅ Status Actuel
 
-| Phase | Status |
-|-------|--------|
-| Configuration | ✅ Complété |
-| Pipeline Génération | ✅ Complété |
-| Publication Graph API | ✅ Complété |
-| Workflow "Copy & Adapt" | ✅ Complété |
-| Life Calendar System | 🚧 En cours |
-| Scheduling automatique | 📝 Planifié (Vercel Cron) |
+| Système | Status |
+|---------|--------|
+| Instagram Auto-Post | ✅ Actif (GitHub Actions) |
+| DM Automation IG | ✅ Actif (ManyChat + Claude) |
+| Fanvue Daily Post | ✅ Actif (GitHub Actions) |
+| Fanvue DM Bot | ✅ Actif (Venice AI) |
+| LoRA Training | 🚧 En cours (RunPod) |
+| Mila (2ème personnage) | ⏸️ Pause |
 
 ---
 
-## 💰 Monétisation (Roadmap)
+## 💰 Monétisation
 
-| Phase | Followers | Revenus estimés | Méthode |
-|-------|-----------|-----------------|---------|
-| Phase 1 | 0-2K | $0 | Croissance organique |
-| Phase 2 | 2K-10K | $100-500/mois | Produits digitaux + affiliés |
-| Phase 3 | 10K-25K | $500-2K/mois | Close Friends + Fanvue |
-| Phase 4 | 25K+ | $2K-10K/mois | Partenariats marques |
+| Source | Méthode |
+|--------|---------|
+| **Fanvue Subs** | Free trial → Paid ($9.99/mois) |
+| **DM Funnel** | IG comment → DM → Fanvue link |
+| **PPV Content** | Messages payants sur Fanvue |
 
-→ Voir [docs/02-MONETISATION.md](docs/02-MONETISATION.md) pour la stratégie complète
+**Objectif** : 500€/mois via Fanvue
 
 ---
 
@@ -149,16 +141,13 @@ npm run dev
 
 ```bash
 # Démarrer le serveur
-npm run dev
+cd app && npm run dev
 
-# Générer un carrousel
-node scripts/generate-cafe-backshot-carousel.mjs
+# Test DM system
+node scripts/test-dm-conversation.mjs
 
-# Publier sur Instagram
-node scripts/post-carousel-instagram.mjs
-
-# Vérifier le status
-curl http://localhost:3000/api/status
+# Audit contacts DM
+node scripts/audit-dm-contacts.mjs
 
 # Déployer sur Vercel
 cd app && vercel --prod
@@ -166,31 +155,34 @@ cd app && vercel --prod
 
 ---
 
-## 📊 Métriques Cibles
+## 📂 Structure Documentation
 
-| Métrique | Mois 1 | Mois 3 | Mois 6 |
-|----------|--------|--------|--------|
-| Followers | 500 | 5K | 10K |
-| Engagement | 5-10% | 8-12% | 10-15% |
-| Posts/jour | 2 | 2-3 | 3 |
-| Revenus | $0 | $200 | $500 |
+```
+docs/
+├── characters/elena/     # Character sheet Elena
+├── fanvue/               # Documentation Fanvue system
+├── sessions/             # Notes de session (YYYY-MM-DD-*.md)
+└── *.md                  # Docs techniques numérotées
+
+roadmap/
+├── done/                 # ✅ Features terminées (78)
+├── in-progress/          # 🚧 En cours (7)
+├── todo/                 # 📋 À faire
+├── bugs/                 # 🐛 Bugs connus
+└── ideas/                # 💡 Backlog
+
+archive/
+├── sessions/             # Anciennes sessions (< 2025)
+└── old-docs/             # Documentation obsolète
+```
 
 ---
 
 ## 📝 Changelog
 
-Voir [CHANGELOG.md](CHANGELOG.md) pour l'historique complet des versions.
+Voir [CHANGELOG.md](CHANGELOG.md) pour l'historique complet.
 
-**Version actuelle :** 3.0.0 (Graph API direct, nettoyage codebase)
-
----
-
-## 📞 Support & Contact
-
-Pour toute question sur le setup ou l'implémentation, consulter :
-- [Documentation complète](docs/README.md)
-- [Guide de démarrage](docs/QUICKSTART.md)
-- [Guide technique](docs/04-IMPLEMENTATION.md)
+**Version actuelle :** v2.63+ (DM System, Fanvue Integration, LoRA Training)
 
 ---
 
@@ -202,8 +194,8 @@ Private project — All rights reserved
 
 <div align="center">
 
-**Made with ❤️ and lots of AI**
+**Made with AI**
 
-*Propulsé par Replicate, Cloudinary & Vercel*
+*Ideogram • ComfyUI • Claude • Venice AI • Vercel*
 
 </div>

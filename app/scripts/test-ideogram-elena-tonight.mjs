@@ -30,14 +30,14 @@ layered gold necklaces with medallion pendant`,
 healthy fit Italian body type, confident posture`,
 };
 
-// Tonight's post: Evening at home (21h = post time) - SAFE VERSION
+// Tonight's post: Standing far shot in bikini at home
 const TONIGHT_POST = {
   location: 'Loft Elena Paris 8e - luxe minimaliste, grandes fenêtres avec vue sur les toits de Paris',
-  setting: 'Evening at her beautiful Parisian loft, warm ambient lighting, city lights visible through large windows, cozy luxury atmosphere',
-  outfit: 'Elegant cashmere sweater in cream color, relaxed fit, comfortable and chic at-home style',
-  action: 'Relaxing on the velvet sofa with a cup of tea, soft evening light, peaceful moment at home',
-  mood: 'Relaxed, cozy, peaceful evening moment',
-  expression: 'soft warm expression, gentle smile, peaceful and content',
+  setting: 'Her spacious Parisian loft living room, large windows, minimalist luxury interior, natural daylight',
+  outfit: 'Simple black two-piece swimwear, classic style',
+  action: 'Standing in her living room, full body visible, wide shot showing the entire room, natural confident pose',
+  mood: 'Confident, natural, at home',
+  expression: 'natural confident expression, slight smile',
 };
 
 // Elena expressions pool (from content brain)
@@ -98,11 +98,12 @@ MOOD: ${TONIGHT_POST.mood}
 
 STYLE: 
 - iPhone 15 Pro aesthetic, RAW unedited authentic look
-- Natural indoor lighting (warm lamps, ambient city lights through windows)
-- Intimate evening atmosphere, golden hour interior glow
-- Subject takes 60% of frame, natural composition
-- Natural skin texture with visible pores (not airbrushed)
-- Candid energy, authentic moment
+- Natural indoor lighting through large windows
+- WIDE SHOT - full body visible from head to feet
+- Subject takes 40% of frame, room environment visible around her
+- Distance shot, standing far from camera
+- Natural skin texture
+- Candid energy, authentic moment at home
 
 REQUIREMENTS:
 - SINGLE IMAGE ONLY - no collages, no grids
