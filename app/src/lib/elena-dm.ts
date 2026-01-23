@@ -1640,23 +1640,90 @@ function detectLanguageFromMessage(message: string): { language: DetectedLanguag
   return { language: maxScore > 0 ? detectedLang : null, isExplicit: false };
 }
 
+// Language clarification result type
+interface LanguageUpdateResult {
+  language: string | null;
+  needsClarification: boolean;
+  clarificationType: 'switch' | 'unknown' | null;
+  previousLanguage: string | null;
+  newLanguage: string | null;
+}
+
+// Messages to ask user about their language preference
+const LANGUAGE_CLARIFICATION_MESSAGES = {
+  // When user switches language mid-conversation
+  switch: {
+    fr: (prevLang: string) => `hey, tu parles quelle langue ? j'avais l'impression que tu parlais ${getLanguageName(prevLang, 'fr')} 🤔`,
+    en: (prevLang: string) => `hey, what language do you speak? i thought you were speaking ${getLanguageName(prevLang, 'en')} 🤔`,
+    // Fallback for other detected languages
+    default: () => `hey, what language do you speak? 🤔`,
+  },
+  // When we can't detect any known language
+  unknown: {
+    fr: `désolée je ne comprends pas ta langue 😅 tu parles anglais ? i speak english and french 🖤`,
+    en: `sorry i don't understand your language 😅 do you speak english? i speak english and french 🖤`,
+    default: `sorry i don't understand your language 😅 i speak english and french 🖤`,
+  },
+};
+
+// Get language name in a specific display language
+function getLanguageName(langCode: string, displayIn: string): string {
+  const names: Record<string, Record<string, string>> = {
+    en: { fr: 'anglais', en: 'English', es: 'inglés', it: 'inglese', pt: 'inglês', de: 'Englisch' },
+    fr: { fr: 'français', en: 'French', es: 'francés', it: 'francese', pt: 'francês', de: 'Französisch' },
+    es: { fr: 'espagnol', en: 'Spanish', es: 'español', it: 'spagnolo', pt: 'espanhol', de: 'Spanisch' },
+    it: { fr: 'italien', en: 'Italian', es: 'italiano', it: 'italiano', pt: 'italiano', de: 'Italienisch' },
+    pt: { fr: 'portugais', en: 'Portuguese', es: 'portugués', it: 'portoghese', pt: 'português', de: 'Portugiesisch' },
+    de: { fr: 'allemand', en: 'German', es: 'alemán', it: 'tedesco', pt: 'alemão', de: 'Deutsch' },
+    ru: { fr: 'russe', en: 'Russian', es: 'ruso', it: 'russo', pt: 'russo', de: 'Russisch' },
+  };
+  return names[langCode]?.[displayIn] || langCode;
+}
+
 /**
  * Update contact language based on message analysis
  * - If explicit: set immediately with confidence 10
  * - If detected: increment confidence, set language when >= 3
+ * - NEW: Return clarification info when language switches or is unknown
  */
 async function updateContactLanguage(
   contactId: string,
   contact: DMContact,
   message: string
-): Promise<string | null> {
+): Promise<LanguageUpdateResult> {
   const { language, isExplicit } = detectLanguageFromMessage(message);
   
+  // Default result
+  const result: LanguageUpdateResult = {
+    language: contact.detected_language,
+    needsClarification: false,
+    clarificationType: null,
+    previousLanguage: contact.detected_language,
+    newLanguage: language,
+  };
+  
+  // Case 1: No language detected from current message
   if (!language) {
-    return contact.detected_language; // No language detected, keep existing
+    // If we've had enough messages (5+) and still no confirmed language, ask them
+    // Only ask if we haven't already (check confidence isn't negative - we use -1 as "asked" flag)
+    if (contact.message_count >= 5 && !contact.detected_language && contact.language_confidence >= 0) {
+      console.log(`🌍 UNKNOWN LANGUAGE after ${contact.message_count} messages — will ask user`);
+      
+      // Set confidence to -1 to mark that we've asked (prevents asking again)
+      await supabase
+        .from('elena_dm_contacts')
+        .update({ language_confidence: -1 })
+        .eq('id', contactId);
+      
+      result.needsClarification = true;
+      result.clarificationType = 'unknown';
+      return result;
+    }
+    
+    return result; // Keep existing language
   }
   
-  // If explicit statement, set immediately with max confidence
+  // Case 2: Explicit statement (100% confidence) — set immediately
   if (isExplicit) {
     await supabase
       .from('elena_dm_contacts')
@@ -1668,12 +1735,12 @@ async function updateContactLanguage(
       .eq('id', contactId);
     
     console.log(`🌍 Language set (EXPLICIT): ${language} for contact ${contactId}`);
-    return language;
+    result.language = language;
+    return result;
   }
   
-  // If same as already detected, we're good
+  // Case 3: Same as already detected — increase confidence
   if (contact.detected_language === language) {
-    // Increase confidence if not maxed
     if (contact.language_confidence < 10) {
       await supabase
         .from('elena_dm_contacts')
@@ -1682,14 +1749,14 @@ async function updateContactLanguage(
         })
         .eq('id', contactId);
     }
-    return contact.detected_language;
+    result.language = contact.detected_language;
+    return result;
   }
   
-  // If no language set yet, track this detection
+  // Case 4: No language set yet — track and confirm after 3 messages
   if (!contact.detected_language) {
     const newConfidence = contact.language_confidence + 1;
     
-    // Set language only when confidence >= 3 (3+ messages in same language)
     if (newConfidence >= 3) {
       await supabase
         .from('elena_dm_contacts')
@@ -1701,26 +1768,41 @@ async function updateContactLanguage(
         .eq('id', contactId);
       
       console.log(`🌍 Language confirmed after ${newConfidence} messages: ${language} for contact ${contactId}`);
-      return language;
+      result.language = language;
+      return result;
     } else {
-      // Not enough confidence yet, but track the count
-      // Store tentative language in notes or just increment confidence
       await supabase
         .from('elena_dm_contacts')
-        .update({
-          language_confidence: newConfidence,
-          // Store tentatively but don't set detected_language yet
-        })
+        .update({ language_confidence: newConfidence })
         .eq('id', contactId);
       
       console.log(`🌍 Language tracking: ${language} (confidence ${newConfidence}/3) for contact ${contactId}`);
-      return null; // Not confirmed yet
+      result.language = null;
+      return result;
     }
   }
   
-  // If different language detected but already had one set, might be mixing
-  // Keep the original one (don't switch mid-conversation)
-  return contact.detected_language;
+  // Case 5: DIFFERENT language detected when we already had one set
+  // This is the key new feature: ASK the user what language they prefer
+  // Only ask if confidence is high enough that we're "sure" about the switch
+  // And only ask once (use negative confidence as flag)
+  if (contact.detected_language && language !== contact.detected_language && contact.language_confidence > 0) {
+    console.log(`🌍 LANGUAGE SWITCH DETECTED: ${contact.detected_language} → ${language} — will ask user`);
+    
+    // Reset confidence and mark as needing clarification
+    // We'll set the new language tentatively but mark confidence as -2 to indicate "switch asked"
+    await supabase
+      .from('elena_dm_contacts')
+      .update({ language_confidence: -2 })
+      .eq('id', contactId);
+    
+    result.needsClarification = true;
+    result.clarificationType = 'switch';
+    return result;
+  }
+  
+  // Default: keep existing
+  return result;
 }
 
 // ===========================================
@@ -3029,10 +3111,73 @@ export async function processDM(payload: ManyChateWebhookPayload): Promise<{
   const updatedContact = await updateContactAfterMessage(contact.id, true);
 
   // 4.5 LANGUAGE DETECTION - Update language based on incoming message
-  const detectedLanguage = await updateContactLanguage(contact.id, contact, incomingMessage);
+  const languageResult = await updateContactLanguage(contact.id, contact, incomingMessage);
   // Update the contact object with latest language info
-  if (detectedLanguage) {
-    updatedContact.detected_language = detectedLanguage;
+  if (languageResult.language) {
+    updatedContact.detected_language = languageResult.language;
+  }
+
+  // ===========================================
+  // 4.6 LANGUAGE CLARIFICATION — Ask user what language they speak
+  // ===========================================
+  if (languageResult.needsClarification) {
+    let clarificationMessage: string;
+    
+    if (languageResult.clarificationType === 'switch') {
+      // User switched language mid-conversation
+      const msgs = LANGUAGE_CLARIFICATION_MESSAGES.switch;
+      const displayLang = contact.detected_language || 'en';
+      const prevLang = languageResult.previousLanguage || 'en';
+      
+      if (displayLang === 'fr' && msgs.fr) {
+        clarificationMessage = msgs.fr(prevLang);
+      } else if (displayLang === 'en' && msgs.en) {
+        clarificationMessage = msgs.en(prevLang);
+      } else {
+        clarificationMessage = msgs.default();
+      }
+      
+      console.log(`🌍 LANGUAGE SWITCH: ${languageResult.previousLanguage} → ${languageResult.newLanguage}`);
+    } else {
+      // Unknown language — can't detect
+      const msgs = LANGUAGE_CLARIFICATION_MESSAGES.unknown;
+      // Try to respond in their previously detected language, fallback to french then english
+      const displayLang = contact.detected_language || 'fr';
+      
+      if (displayLang === 'fr') {
+        clarificationMessage = msgs.fr;
+      } else if (displayLang === 'en') {
+        clarificationMessage = msgs.en;
+      } else {
+        clarificationMessage = msgs.default;
+      }
+      
+      console.log(`🌍 UNKNOWN LANGUAGE after ${contact.message_count} messages`);
+    }
+    
+    console.log(`📝 Language clarification: "${clarificationMessage}"`);
+    
+    // Save the clarification message
+    await saveMessage(contact.id, 'outgoing', clarificationMessage, {
+      response_strategy: 'engage',
+      response_time_ms: Date.now() - startTime,
+      stage_at_time: contact.stage,
+    });
+    
+    return {
+      response: clarificationMessage,
+      contact: updatedContact,
+      strategy: 'engage' as ResponseStrategy,
+      analysis: {
+        intent: 'other',
+        sentiment: 'neutral',
+        is_question: true,
+        mentions_fanvue: false,
+        recommendedMode: 'warm',
+        modeReason: 'Language clarification needed',
+        triggerFanvuePitch: false,
+      },
+    };
   }
 
   // 5. Get conversation history
