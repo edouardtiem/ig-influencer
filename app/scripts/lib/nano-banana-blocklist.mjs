@@ -244,11 +244,12 @@ export function checkForBlockedTerms(prompt) {
   const promptLower = prompt.toLowerCase();
   const foundTerms = [];
   
-  // Check all blocked categories
-  for (const category of Object.values(BLOCKED_TERMS)) {
+  // Check all blocked categories (skip blockedCombinations which contains objects)
+  for (const [key, category] of Object.entries(BLOCKED_TERMS)) {
+    if (key === 'blockedCombinations') continue;  // Skip objects
     if (Array.isArray(category)) {
       for (const term of category) {
-        if (promptLower.includes(term.toLowerCase())) {
+        if (typeof term === 'string' && promptLower.includes(term.toLowerCase())) {
           foundTerms.push(term);
         }
       }
