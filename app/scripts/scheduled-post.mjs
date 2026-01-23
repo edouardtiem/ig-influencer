@@ -110,46 +110,31 @@ toned but not muscular, Pilates-sculpted shoulders`,
     face_ref: 'https://res.cloudinary.com/dily60mr0/image/upload/v1765967140/replicate-prediction-qh51japkxxrma0cv52x8qs7mnc_ltc9ra.png',
     body_ref: null, // DISABLED - causes safety filter blocks when combined with face_ref
     extra_refs: [], // DISABLED - back view ref also triggers filters
-    reference_instruction: `You are provided with a FACE REFERENCE image.
+    reference_instruction: `IMPORTANT: Generate the EXACT SAME PERSON as shown in IMAGE 1.
 
-**IMAGE 1 (FACE REFERENCE)**: This is Elena's face. Copy this EXACTLY:
-- Same soft round pleasant face shape (NOT angular, NOT sharp jawline)
-- Same smooth feminine jawline and rounded chin
-- Same honey brown warm almond-shaped eyes
-- Same naturally full lips nude-pink color
-- Same small beauty mark on right cheekbone (SIGNATURE MARK)
-- Same bronde hair with VISIBLE golden blonde balayage highlights (NOT solid dark brown)
-- Same naturally thick well-groomed eyebrows
+The woman in IMAGE 1 is Elena. Every generated image MUST show this same person - same face, same features, same identity.
 
-BODY DESCRIPTION (no reference image):
-- Feminine shapely figure 172cm tall
-- Large natural bust, narrow defined waist, wide feminine hips
-- Healthy fit Italian body type, confident posture
+DO NOT reinterpret or reimagine her face. Copy it exactly from IMAGE 1.
+DO NOT make her face more "model-like", angular, or different in any way.
 
-CRITICAL RULES:
-- Face MUST be identical to the reference image - same person, same features
-- Do NOT change face to look more "model-like" or angular
-- Hair MUST show visible golden blonde balayage highlights, NOT solid dark brown`,
-    face_description: `soft round pleasant face NOT angular, warm approachable features,
-smooth feminine jawline, rounded chin, soft cheekbones,
-bronde hair dark roots with golden blonde balayage, long voluminous beach waves past shoulders,
-honey brown warm almond-shaped eyes, naturally thick eyebrows well-groomed,
-small straight nose, naturally full lips nude-pink color`,
+Her body: feminine shapely figure, large natural bust, narrow waist, wide hips, Italian body type.
+Her hair: bronde with golden blonde balayage highlights (visible in IMAGE 1).
+Her signature: small beauty mark on right cheekbone, gold jewelry always visible.`,
+    face_description: `face and features exactly matching IMAGE 1 (the reference photo),
+bronde hair with golden blonde balayage as shown in IMAGE 1,
+same warm approachable expression style`,
     marks: `small beauty mark on right cheekbone (SIGNATURE),
 glowing sun-kissed Italian skin tone,
 gold chunky chain bracelet on left wrist ALWAYS visible,
 layered gold necklaces with medallion pendant ALWAYS visible`,
     body_description: `feminine shapely figure 172cm tall,
-very large natural F-cup breasts prominent and natural shape,
-narrow defined waist, wide feminine hips,
+large natural bust, narrow waist, wide hips,
 healthy fit Italian body, confident posture`,
-    final_check: `FINAL CHECK - MUST MATCH REFERENCES:
-- SINGLE IMAGE ONLY - NO collages, NO grids, NO patchwork, NO multiple photos combined
-- Face: IDENTICAL to Image 1 (soft round face, NOT angular)
-- Body: IDENTICAL to Image 2 (shapely with very large bust visible)
-- Hair: bronde with VISIBLE golden blonde balayage (NOT solid dark brown)
-- Beauty mark: on right cheekbone MUST be visible
-- Jewelry: gold chunky bracelet + layered gold necklaces`,
+    final_check: `FINAL CHECK:
+- SINGLE IMAGE ONLY - NO collages, NO grids, NO multiple photos
+- Face: MUST BE THE EXACT SAME PERSON as IMAGE 1 - do not reinterpret
+- Hair: bronde with golden balayage as shown in IMAGE 1
+- Jewelry: gold bracelet + layered gold necklaces visible`,
     instagram_token_env: 'INSTAGRAM_ACCESS_TOKEN_ELENA',
     instagram_account_env: 'INSTAGRAM_ACCOUNT_ID_ELENA',
     cloudinary_folder: 'elena-scheduled',
@@ -401,8 +386,13 @@ function log(message) {
 
 async function urlToBase64(url) {
   const response = await fetch(url);
+  const contentType = response.headers.get('content-type') || 'image/jpeg';
+  // Normalize content type (PNG, JPEG, WEBP supported)
+  const mimeType = contentType.includes('png') ? 'image/png' 
+    : contentType.includes('webp') ? 'image/webp' 
+    : 'image/jpeg';
   const buffer = await response.arrayBuffer();
-  return `data:image/jpeg;base64,${Buffer.from(buffer).toString('base64')}`;
+  return `data:${mimeType};base64,${Buffer.from(buffer).toString('base64')}`;
 }
 
 function pick(arr) {
