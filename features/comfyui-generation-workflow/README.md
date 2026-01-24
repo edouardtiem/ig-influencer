@@ -37,14 +37,44 @@ Image generation is **95% working**. Body consistency and image quality are now 
 
 | Setting | Value |
 |---------|-------|
-| **Pod ID** | `l2qs6633hmvp4c` |
+| **Pod ID** | `vm0e18rm4w72xr` |
+| **Volume** | `ijn9e5530i` (elena-comfyui, 50GB) ✅ PERSISTENT |
 | **GPU** | RTX 4090 (24GB) |
-| **ComfyUI URL** | `https://l2qs6633hmvp4c-8188.proxy.runpod.net` |
-| **SSH** | `ssh -i ~/.runpod/ssh/RunPod-Key-Go root@103.196.86.108 -p 14109` |
-| **Speed** | ~24s/image (vs 5min local) |
+| **ComfyUI URL** | `https://vm0e18rm4w72xr-8188.proxy.runpod.net` |
+| **SSH** | `ssh -i ~/.runpod/ssh/RunPod-Key-Go root@103.196.86.115 -p 13924` |
+| **Speed** | ~60s/image (with model loading) |
+| **Datacenter** | US-NC-1 |
 
-**Installed on RunPod**: SDXL Base, Elena LoRA, IP-Adapter FaceID, CLIP Vision
-**Missing**: BigLove XL (needs CivitAI token or upload from Mac)
+**Installed Models** (persistent on volume):
+- ✅ SDXL Base 1.0 (6.5GB)
+- ✅ Elena LoRA v4 (218MB)
+- ✅ IP-Adapter FaceID v2 (1.4GB)
+- ✅ CLIP Vision (2.4GB)
+- ✅ FaceID LoRA (355MB)
+- ✅ 4x-UltraSharp (64MB)
+- ✅ InsightFace buffalo_l
+- ✅ SAM vit_b
+- ✅ YOLO face_yolov8m
+- ✅ elena_face_ref.jpg
+- ✅ **Qwen2.5-VL-7B-Instruct** (16GB) - `/workspace/huggingface_cache`
+- ✅ **qwen-image-edit-2511-Q4_K_M.gguf** (12.3GB) - `/workspace/comfyui/models/unet/`
+
+**Custom Nodes**: ComfyUI_IPAdapter_plus, ComfyUI-Impact-Pack, **ComfyUI-QwenVL**, **ComfyUI-GGUF**
+
+### Quick Start RunPod
+
+```bash
+# Check status
+node app/scripts/runpod-connect.mjs --status
+
+# Connect (shows URLs)
+node app/scripts/runpod-connect.mjs
+
+# Stop pod (saves $, data preserved on volume)
+node app/scripts/runpod-connect.mjs --stop
+```
+
+**Note**: Data persists on volume. You can stop/terminate pods without losing models.
 
 ---
 
@@ -93,7 +123,7 @@ Image generation is **95% working**. Body consistency and image quality are now 
 | 004 | Qwen face refinement (85% → 95%) | 🟡 In Progress | Immediate | [→](./tasks/TASK-004-qwen-face-refinement.md) |
 | 005 | RunPod persistent setup | 🟡 In Progress | High | [→](./tasks/TASK-005-runpod-persistent-setup.md) |
 
-**Next**: Installer Qwen2.5-VL sur RunPod et tester face refinement
+**Next**: Créer workflow ComfyUI pour tester Qwen face refinement
 
 ### Backlog
 
