@@ -65,6 +65,23 @@ SDXL → QwenEdit (face) → FaceDetailer → IP-Adapter → Output
 
 ## Progress Log
 
+### 24 Jan 2026 (Session 5) — Qwen-Image-Edit WORKING ✅
+- **Nouveau pod créé** en US-TX-3 (ancien US-NC-1 indisponible - GPU shortage)
+- Pod ID: `dortewt0b3tom3`, Volume: `aml40rql5h`
+- Tous les modèles re-téléchargés via HuggingFace (plus rapide que upload local)
+- **Qwen-Image-Edit fonctionne !** Génération test réussie en ~50s
+- Modèles installés:
+  - ✅ Qwen UNet GGUF (12.3GB)
+  - ✅ Qwen Text Encoder qwen_2.5_vl_7b.safetensors (16GB)
+  - ✅ Qwen VAE qwen_image_vae.safetensors (243MB)
+  - ✅ Elena LoRA (uploadé en chunks)
+  - ✅ IP-Adapter FaceID v2
+  - ✅ 4x-UltraSharp upscaler
+  - ⏳ BigLove XL (upload en cours ~26%)
+- Script créé: `app/scripts/elena-runpod-workflow.mjs`
+- **Découverte**: Qwen face refinement sur image 4096x4096 = très lent (54s/step). Workflow optimal: générer à 1024 → Qwen refine → upscale 4x
+- **Next**: Finir upload BigLove, tester workflow complet
+
 ### 24 Jan 2026 (Session 4)
 - ComfyUI-GGUF installé ✅
 - qwen-image-edit-2511-Q4_K_M.gguf téléchargé (12.3GB) ✅
@@ -117,9 +134,9 @@ node app/scripts/runpod-connect.mjs --status
 node app/scripts/runpod-connect.mjs --stop
 ```
 
-**URLs (quand le pod tourne):**
-- ComfyUI: https://vm0e18rm4w72xr-8188.proxy.runpod.net
-- SSH: `ssh -i ~/.runpod/ssh/RunPod-Key-Go root@[IP] -p [PORT]`
+**URLs (pod actuel US-TX-3):**
+- ComfyUI: https://dortewt0b3tom3-8188.proxy.runpod.net
+- SSH: `ssh -i ~/.runpod/ssh/RunPod-Key-Go root@209.170.80.132 -p 14990`
 
 ---
 

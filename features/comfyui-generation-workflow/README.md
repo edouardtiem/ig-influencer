@@ -2,8 +2,8 @@
 
 > LoRA training, checkpoints, IP-Adapter FaceID, face consistency, and image quality
 
-**Status**: 🟡 In Progress (face refinement pending)  
-**Last updated**: 24 January 2026
+**Status**: 🟡 In Progress (BigLove upload pending, then final tests)  
+**Last updated**: 24 January 2026 (Session 5)
 
 ---
 
@@ -33,17 +33,17 @@ Image generation is **95% working**. Body consistency and image quality are now 
 - Face ref: `~/ComfyUI/input/elena_face_ref.jpg`
 - Dataset: `lora-dataset-elena-cloud/10_elena/` (35 images)
 
-### RunPod Configuration
+### RunPod Configuration (US-TX-3)
 
 | Setting | Value |
 |---------|-------|
-| **Pod ID** | `vm0e18rm4w72xr` |
-| **Volume** | `ijn9e5530i` (elena-comfyui, 50GB) ✅ PERSISTENT |
+| **Pod ID** | `dortewt0b3tom3` |
+| **Volume** | `aml40rql5h` (elena-comfyui-US-TX-3, 50GB) ✅ PERSISTENT |
 | **GPU** | RTX 4090 (24GB) |
-| **ComfyUI URL** | `https://vm0e18rm4w72xr-8188.proxy.runpod.net` |
-| **SSH** | `ssh -i ~/.runpod/ssh/RunPod-Key-Go root@103.196.86.115 -p 13924` |
-| **Speed** | ~60s/image (with model loading) |
-| **Datacenter** | US-NC-1 |
+| **ComfyUI URL** | `https://dortewt0b3tom3-8188.proxy.runpod.net` |
+| **SSH** | `ssh -i ~/.runpod/ssh/RunPod-Key-Go root@209.170.80.132 -p 14990` |
+| **Speed** | ~50s/image |
+| **Datacenter** | US-TX-3 |
 
 **Installed Models** (persistent on volume):
 - ✅ SDXL Base 1.0 (6.5GB)
@@ -52,14 +52,14 @@ Image generation is **95% working**. Body consistency and image quality are now 
 - ✅ CLIP Vision (2.4GB)
 - ✅ FaceID LoRA (355MB)
 - ✅ 4x-UltraSharp (64MB)
-- ✅ InsightFace buffalo_l
 - ✅ SAM vit_b
-- ✅ YOLO face_yolov8m
 - ✅ elena_face_ref.jpg
-- ✅ **Qwen2.5-VL-7B-Instruct** (16GB) - `/workspace/huggingface_cache`
-- ✅ **qwen-image-edit-2511-Q4_K_M.gguf** (12.3GB) - `/workspace/comfyui/models/unet/`
+- ✅ **Qwen Text Encoder** (16GB) - `qwen_2.5_vl_7b.safetensors`
+- ✅ **Qwen VAE** (243MB) - `qwen_image_vae.safetensors`
+- ✅ **Qwen-Image-Edit GGUF** (12.3GB) - `qwen-image-edit-2511-Q4_K_M.gguf`
+- ⏳ **BigLove XL** (6.5GB) - upload in progress
 
-**Custom Nodes**: ComfyUI_IPAdapter_plus, ComfyUI-Impact-Pack, **ComfyUI-QwenVL**, **ComfyUI-GGUF**
+**Custom Nodes**: ComfyUI_IPAdapter_plus, ComfyUI-Impact-Pack, **ComfyUI-GGUF**
 
 ### Quick Start RunPod
 
@@ -94,7 +94,8 @@ node app/scripts/runpod-connect.mjs --stop
 | **Batch generation** | 5 photos en ~14 min local |
 | **bf16 training** | Prevents NaN loss (vs fp16) |
 | **LR 5e-5** | Stable training (vs 1e-4 which caused NaN) |
-| **RunPod RTX 4090** | ~24s/image vs 5min local, pod `l2qs6633hmvp4c` |
+| **RunPod RTX 4090** | ~50s/image with Qwen, pod `dortewt0b3tom3` |
+| **Qwen-Image-Edit** | Works! Generation test successful (~50s for 1024x1024) |
 
 ## What Doesn't Work ❌
 

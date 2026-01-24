@@ -4,6 +4,34 @@ Chronological log of decisions made and why.
 
 ---
 
+## 2026-01-24: Qwen-Image-Edit working on new RunPod pod
+
+**Context**: Original pod (US-NC-1) unavailable due to GPU shortage. Created new pod in US-TX-3.
+
+**New pod setup**:
+- Pod ID: `dortewt0b3tom3`
+- Volume: `aml40rql5h` (elena-comfyui-US-TX-3, 50GB)
+- Datacenter: US-TX-3
+- ComfyUI URL: `https://dortewt0b3tom3-8188.proxy.runpod.net`
+
+**Qwen-Image-Edit models installed**:
+| Model | Size | Source |
+|-------|------|--------|
+| Qwen UNet GGUF | 12.3GB | HuggingFace (unsloth) |
+| Qwen Text Encoder | 16GB | HuggingFace (Comfy-Org) |
+| Qwen VAE | 243MB | HuggingFace (Comfy-Org) |
+
+**Key finding**: Qwen face refinement on 4096x4096 images is VERY slow (~54s per step). Optimal workflow:
+1. Generate at 1024x1024 with BigLove + LoRA
+2. Qwen face refinement at 1024x1024 (~30-50s)
+3. 4x-UltraSharp upscale to 4096x4096 (~10s)
+
+**Result**: Qwen-Image-Edit generation test successful (~50s for 1024x1024).
+
+**Next**: Complete BigLove XL upload, test full workflow with face refinement.
+
+---
+
 ## 2026-01-24: RunPod workflow setup
 
 **Context**: RunPod back online, need to set up full Elena workflow for fast generation
