@@ -22,27 +22,34 @@ dotenv.config({ path: path.join(__dirname, '../../.env.local') });
 const RUNPOD_API_KEY = process.env.RUNPOD_API_KEY;
 const GRAPHQL_URL = 'https://api.runpod.io/graphql';
 
-// Training configuration
+// Training configuration - V4 with NaN fixes
 const CONFIG = {
   // Pod settings
-  gpuTypeId: 'NVIDIA GeForce RTX 4090',  // 24GB VRAM, ~$0.44/hr
+  gpuTypeId: 'NVIDIA RTX A5000',  // 24GB VRAM, ~$0.16/hr
   gpuCount: 1,
   volumeInGb: 50,  // Storage for model + dataset + output
-  containerDiskInGb: 20,
+  containerDiskInGb: 40,
   
-  // Docker image with kohya_ss pre-installed
+  // Docker image with PyTorch
   imageName: 'runpod/pytorch:2.1.0-py3.10-cuda11.8.0-devel-ubuntu22.04',
   
-  // Training params (optimized for RTX 4090)
+  // Training params - FIXED for NaN issues:
+  // - bf16 instead of fp16 (more stable)
+  // - Lower learning rate (5e-5 vs 1e-4)
+  // - Alpha = Dim (32=32)
+  // - Longer warmup (200 steps)
   training: {
     resolution: '1024,1024',
     batchSize: 1,
-    maxTrainSteps: 400,      // More steps for 35 images
-    learningRate: '1e-4',
-    networkDim: 32,          // Higher rank for better quality
-    networkAlpha: 16,        // Alpha = dim/2
-    repeats: 10,             // 10 repeats per image
-    outputName: 'elena_v3_cloud'
+    gradAccumSteps: 2,
+    maxTrainSteps: 1500,      // ~4 epochs with 35 images * 10 repeats
+    unetLr: '5e-5',           // Lower LR to avoid NaN
+    textEncoderLr: '5e-6',    // Even lower for text encoder
+    networkDim: 32,
+    networkAlpha: 32,         // Alpha = Dim (important!)
+    warmupSteps: 200,         // Longer warmup
+    repeats: 10,
+    outputName: 'elena_v4_cloud'
   }
 };
 
@@ -116,13 +123,13 @@ async function createPod() {
       volumeInGb: CONFIG.volumeInGb,
       containerDiskInGb: CONFIG.containerDiskInGb,
       gpuTypeId: CONFIG.gpuTypeId,
-      name: 'elena-lora-training',
+      name: 'elena-lora-v4',
       imageName: CONFIG.imageName,
       dockerArgs: '',
       ports: '22/tcp,8888/http',  // SSH + Jupyter
       volumeMountPath: '/workspace',
       startSsh: true,
-      // Setup script to install kohya_ss
+      supportPublicIp: true,  // IMPORTANT: Pour avoir les ports TCP publics
       env: [
         { key: 'JUPYTER_PASSWORD', value: 'runpod' }
       ]
@@ -247,68 +254,64 @@ function printTrainingScript() {
   const t = CONFIG.training;
   
   console.log('\n' + '='.repeat(60));
-  console.log('📜 TRAINING SCRIPT TO RUN ON RUNPOD');
+  console.log('📜 TRAINING SCRIPT TO RUN ON RUNPOD (V4 - NaN Fixed)');
   console.log('='.repeat(60));
   console.log(`
 # 1. SSH into your pod (get SSH command from RunPod console)
+# ssh -i ~/.runpod/ssh/RunPod-Key-Go -p <PORT> root@<IP>
 
-# 2. Install kohya_ss (run once)
+# 2. Install sd-scripts (kohya) - run once
 cd /workspace
-git clone https://github.com/bmaltais/kohya_ss.git
-cd kohya_ss
-python -m venv venv
-source venv/bin/activate
+git clone https://github.com/kohya-ss/sd-scripts.git
+cd sd-scripts
 pip install -r requirements.txt
-pip install xformers
+pip install xformers bitsandbytes
 
-# 3. Download SDXL base model (or upload your own)
-mkdir -p /workspace/models
-cd /workspace/models
-# Option A: Use SDXL base
-wget https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors
+# 3. Download SDXL base model
+mkdir -p /workspace/models /workspace/output
+wget -P /workspace/models https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors
 
-# Option B: Upload your custom model (bigLust_v16.safetensors) via SCP
+# 4. Upload dataset from local machine:
+# scp -i ~/.runpod/ssh/RunPod-Key-Go -P <PORT> -r lora-dataset-elena-cloud/10_elena root@<IP>:/workspace/dataset/
 
-# 4. Upload your dataset to /workspace/dataset/
-# From your local machine:
-# scp -P <PORT> -r lora-dataset-elena root@<POD_IP>:/workspace/dataset/
+# 5. Run training with NaN-safe parameters
+cd /workspace/sd-scripts
 
-# 5. Run training
-cd /workspace/kohya_ss
-source venv/bin/activate
-
-accelerate launch --num_cpu_threads_per_process=2 sdxl_train_network.py \\
+accelerate launch --mixed_precision=bf16 sdxl_train_network.py \\
   --pretrained_model_name_or_path="/workspace/models/sd_xl_base_1.0.safetensors" \\
   --train_data_dir="/workspace/dataset" \\
   --output_dir="/workspace/output" \\
   --output_name="${t.outputName}" \\
-  --save_model_as="safetensors" \\
   --resolution="${t.resolution}" \\
   --train_batch_size=${t.batchSize} \\
+  --gradient_accumulation_steps=${t.gradAccumSteps} \\
   --max_train_steps=${t.maxTrainSteps} \\
-  --learning_rate=${t.learningRate} \\
-  --optimizer_type="AdamW8bit" \\
-  --lr_scheduler="cosine" \\
-  --lr_warmup_steps=50 \\
-  --network_module="networks.lora" \\
+  --learning_rate=${t.unetLr} \\
+  --unet_lr=${t.unetLr} \\
+  --text_encoder_lr=${t.textEncoderLr} \\
+  --lr_scheduler="cosine_with_restarts" \\
+  --lr_warmup_steps=${t.warmupSteps} \\
+  --network_module=networks.lora \\
   --network_dim=${t.networkDim} \\
   --network_alpha=${t.networkAlpha} \\
-  --mixed_precision="fp16" \\
+  --optimizer_type="AdamW" \\
+  --max_grad_norm=1.0 \\
+  --mixed_precision="bf16" \\
   --save_precision="fp16" \\
-  --cache_latents \\
+  --save_every_n_steps=300 \\
+  --save_model_as="safetensors" \\
   --caption_extension=".txt" \\
   --shuffle_caption \\
-  --seed=42 \\
-  --xformers \\
-  --gradient_checkpointing \\
+  --keep_tokens=1 \\
+  --cache_latents \\
   --enable_bucket \\
-  --min_bucket_reso=512 \\
-  --max_bucket_reso=2048 \\
-  --logging_dir="/workspace/logs"
+  --bucket_no_upscale \\
+  --gradient_checkpointing \\
+  --xformers \\
+  --seed=42
 
-# 6. Download your LoRA
-# From your local machine:
-# scp -P <PORT> root@<POD_IP>:/workspace/output/${t.outputName}.safetensors ~/ComfyUI/models/loras/
+# 6. Download your LoRA from local machine:
+# scp -i ~/.runpod/ssh/RunPod-Key-Go -P <PORT> root@<IP>:/workspace/output/${t.outputName}.safetensors ./
 
 echo "✅ Training complete! LoRA saved to /workspace/output/${t.outputName}.safetensors"
 `);

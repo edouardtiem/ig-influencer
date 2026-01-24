@@ -27,7 +27,7 @@ function buildLoraWorkflow(options = {}) {
     cfg = 3.5,
     seed = Math.floor(Math.random() * 1000000000),
     checkpoint = 'bigLust_v16.safetensors',
-    loraName = 'elena_body_face_v2.safetensors',
+    loraName = 'elena_v4_cloud.safetensors',
     loraStrength = 0.8,  // LoRA strength for body
     faceIdModel = 'faceid.plusv2.sdxl.bin',
     clipVision = 'CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors',
@@ -176,7 +176,7 @@ async function waitForCompletionPolling(promptId, maxWaitMs = 600000) {
 
 async function main() {
   console.log('============================================================');
-  console.log('ELENA LORA TEST - elena_body_face_v2.safetensors');
+  console.log('ELENA LORA TEST - elena_v4_cloud.safetensors');
   console.log('============================================================\n');
   
   const status = await checkConnection();
@@ -211,7 +211,7 @@ male, man, pale skin`,
   });
   
   console.log('Queueing LoRA + FaceID test generation...');
-  console.log('  - LoRA: elena_body_face_v2.safetensors (body)');
+  console.log('  - LoRA: elena_v4_cloud.safetensors');
   console.log('  - LoRA Strength: 0.8');
   console.log('  - FaceID: faceid.plusv2.sdxl.bin (face)');
   console.log('  - FaceID Weight: 0.7');

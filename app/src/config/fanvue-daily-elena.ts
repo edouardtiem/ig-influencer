@@ -129,7 +129,7 @@ export const FANVUE_DAILY_CALENDAR: FanvueDailyContent[] = [
     day: 1,
     id: 'morning_bed_stretch',
     name: 'Morning Stretch',
-    caption: 'Good morning from Paris... barely awake 💋',
+    caption: 'Good morning from Paris 💋\n\nhe left for Hong Kong at 5am\nI finally have the bed to myself...\n\nthe only thing missing? someone to share it with 😏',
     isPremium: true, // Subscribers only
     prompt: `${REFERENCE_INSTRUCTION}
 
@@ -154,7 +154,7 @@ ${ELENA_FINAL_CHECK}`,
     day: 2,
     id: 'bathroom_mirror_selfie',
     name: 'Mirror Moment',
-    caption: 'Just got out of the shower... 🚿✨',
+    caption: 'Just got out of the shower 🚿\n\nhe never sees me like this anymore\nhe\'s too busy working\n\nbut you do 😏💋',
     isPremium: true, // Subscribers only
     prompt: `${REFERENCE_INSTRUCTION}
 
@@ -179,7 +179,7 @@ ${ELENA_FINAL_CHECK}`,
     day: 3,
     id: 'sofa_evening',
     name: 'Sofa Vibes',
-    caption: 'Netflix and... 🍷',
+    caption: 'Netflix and... nothing 🍷\n\nanother night alone on this big sofa\nhe gives me everything except company\n\nwhat would you do if you were here? 😈',
     isPremium: true, // Subscribers only
     prompt: `${REFERENCE_INSTRUCTION}
 
@@ -204,7 +204,7 @@ ${ELENA_FINAL_CHECK}`,
     day: 4,
     id: 'vanity_getting_ready',
     name: 'Getting Ready',
-    caption: 'Getting ready for something special tonight... 💄',
+    caption: 'Getting ready for tonight 💄\n\nhe thinks I\'m staying in\nI have other plans...\n\nwedding ring on, intentions off 💍😈',
     isPremium: true, // Subscribers only
     prompt: `${REFERENCE_INSTRUCTION}
 
@@ -229,7 +229,7 @@ ${ELENA_FINAL_CHECK}`,
     day: 5,
     id: 'yoga_flexibility',
     name: 'Yoga Time',
-    caption: 'Flexibility is key 🧘‍♀️',
+    caption: 'Flexibility is key 🧘‍♀️\n\nmy personal trainer says I\'m his best student\nI wonder why he always stays late...\n\nsome stretches require assistance 😏',
     isPremium: true, // Subscribers only
     prompt: `${REFERENCE_INSTRUCTION}
 
@@ -254,7 +254,7 @@ ${ELENA_FINAL_CHECK}`,
     day: 6,
     id: 'balcony_golden_hour',
     name: 'Golden Hour',
-    caption: 'Paris sunsets hit different ✨',
+    caption: 'Paris sunsets hit different ✨\n\nthe neighbor across the street keeps his curtains open\nI keep mine open too\n\nI wonder if he\'s watching right now 👀🔥',
     isPremium: true, // Subscribers only
     prompt: `${REFERENCE_INSTRUCTION}
 
@@ -279,7 +279,7 @@ ${ELENA_FINAL_CHECK}`,
     day: 7,
     id: 'bath_self_care',
     name: 'Self-Care Sunday',
-    caption: 'Sunday self-care ritual 🛁🕯️',
+    caption: 'Sunday self-care 🛁🕯️\n\nthis bathtub is big enough for two\nbut I\'m always alone in it\n\nmaybe one day I\'ll invite someone to join... 😈💦',
     isPremium: true, // Subscribers only
     prompt: `${REFERENCE_INSTRUCTION}
 
@@ -304,7 +304,7 @@ ${ELENA_FINAL_CHECK}`,
     day: 8,
     id: 'bed_edge_confident',
     name: 'Bedroom Confidence',
-    caption: 'Feeling myself today 💋',
+    caption: 'Feeling myself today 💋\n\nliterally.\n\nwhen your husband is never home, you learn to take care of yourself 😏\n\nbut I\'d rather have some help... volunteers? 🔥',
     isPremium: true, // Subscribers only
     prompt: `${REFERENCE_INSTRUCTION}
 
@@ -329,7 +329,7 @@ ${ELENA_FINAL_CHECK}`,
     day: 9,
     id: 'oversized_sweater',
     name: 'Cozy Morning',
-    caption: 'Boyfriend sweater but no boyfriend needed 😏',
+    caption: 'His sweater, his apartment, his money 💍\n\nbut he\'s never here to enjoy any of it with me\n\nI wear this when I miss having someone to wake up next to\nwhich is every day 😔😏',
     isPremium: true, // Subscribers only
     prompt: `${REFERENCE_INSTRUCTION}
 
@@ -354,7 +354,7 @@ ${ELENA_FINAL_CHECK}`,
     day: 10,
     id: 'post_workout_glow',
     name: 'Post-Workout Glow',
-    caption: 'That after workout feeling 💪✨',
+    caption: 'Post-workout glow 💪✨\n\nthe gym trainer asked why I come every day\nI told him I have a lot of energy to burn\n\nhe offered to help with that 😏🔥\nI\'m considering it...',
     isPremium: true, // Subscribers only
     prompt: `${REFERENCE_INSTRUCTION}
 
@@ -379,7 +379,7 @@ ${ELENA_FINAL_CHECK}`,
     day: 11,
     id: 'silk_slip_evening',
     name: 'Evening Ready',
-    caption: 'Ready for tonight... or staying in? 🖤',
+    caption: 'Ready for tonight 🖤\n\nhe doesn\'t know I\'m going out\nhe doesn\'t need to know\n\nwedding ring stays on\nwhat happens after midnight... stays between us 😈',
     isPremium: true, // Subscribers only
     prompt: `${REFERENCE_INSTRUCTION}
 
@@ -404,7 +404,7 @@ ${ELENA_FINAL_CHECK}`,
     day: 12,
     id: 'lazy_bed_day',
     name: 'Lazy Day',
-    caption: 'Some days you just stay in bed 😴💕',
+    caption: 'Staying in bed all day 😴💕\n\nthis bed is way too big for one person\n300 thread count sheets and nobody to share them with\n\napplications open 😏💋',
     isPremium: true, // Subscribers only
     prompt: `${REFERENCE_INSTRUCTION}
 
@@ -429,7 +429,7 @@ ${ELENA_FINAL_CHECK}`,
     day: 13,
     id: 'fresh_from_shower',
     name: 'Fresh Out',
-    caption: 'That fresh feeling ✨🚿',
+    caption: 'Fresh out of the shower ✨🚿\n\nthe delivery guy rang while I was still wet\nI answered anyway\nhis face was worth it 😏\n\nshould I have invited him in? 🔥',
     isPremium: true, // Subscribers only
     prompt: `${REFERENCE_INSTRUCTION}
 
@@ -454,7 +454,7 @@ ${ELENA_FINAL_CHECK}`,
     day: 14,
     id: 'satin_loungewear',
     name: 'Satin Dreams',
-    caption: 'Ending the day right 🌙',
+    caption: 'Another night alone in silk 🌙\n\nhe called to say goodnight from Tokyo\nI was already in bed\n\nhe asked what I was wearing\nI lied 😈\n\nwhat I\'m actually wearing... is just for you 💋',
     isPremium: true, // Subscribers only
     prompt: `${REFERENCE_INSTRUCTION}
 

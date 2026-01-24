@@ -42,16 +42,17 @@ const CHARACTER_SHEETS: Record<CharacterName, string> = {
 - Lieux récurrents: Son appart Paris 18e, KB CaféShop, L'Usine gym, Paris streets
 - Tone of voice: Casual mais soigné, mix français/anglais, émojis avec parcimonie`,
 
-  elena: `## Elena Visconti (@elenav.paris)
-- 24 ans, Mannequin & Influenceuse Mode
-- Paris 8e (Haussmann luxe) - origines italiennes
-- Aesthetic: Sophistiquée jet-set — Luxe discret mais assumé, French-Italian elegance
-- Physique: Long dark brown hair, olive skin, striking features, elegant posture
-- Style: Designer pieces, minimalist luxe, French girl chic
-- Personnalité: Sophistiquée, mystérieuse, jet-set, aspirational mais accessible
-- Activités: Shootings mannequin, fittings, voyages travail, Fashion Week, spa/wellness
-- Lieux récurrents: Son loft Paris 8e, voyages luxe (Milan, Maldives, yacht), backstage shootings
-- Tone of voice: Élégant, inspirational, lifestyle luxe, captions courtes et impactantes`,
+  elena: `## Elena Visconti (@elenav.paris) — GLEEFUL LUXURY WIFE
+- 24 ans, mariée depuis 2 ans à un businessman (45-50 ans, toujours absent)
+- Paris 8e (grand appartement luxe Haussmannien, 300m², LIBRE)
+- Bio: "Elena 💍 24 / Bored wife. Bad decisions. / Paris 8e"
+- Physique: Bronde hair, olive skin, très généreuse poitrine naturelle, curvy
+- Style: Luxury loungewear, bikinis, slip dresses, shopping hauls
+- Personnalité: Free (30%), Gleeful (25%), Warm (20%), Flirty (15%), Complice (10%)
+- Narrative: Mari absent = PARFAIT, elle ADORE sa liberté, profite à fond, zéro culpabilité
+- Tone of voice: JOYEUX, espiègle, complice, TOUJOURS SOURIANTE, jamais triste
+- Caption style: "he's in Tokyo... perfect 😏" / "best deal I ever made 💍✨" / "bored wives make the BEST decisions"
+- EXPRESSION: Toujours sourire, playful, gleeful — JAMAIS contemplative, bored, sad`,
 };
 
 // ===========================================

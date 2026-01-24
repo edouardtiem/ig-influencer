@@ -2,7 +2,7 @@
 
 > Suivi centralisé de toutes les features, bugs et idées
 
-**Dernière mise à jour** : 20 janvier 2026 (DONE-084 Content Brain Freedom Mode ✅)
+**Dernière mise à jour** : 19 janvier 2026 (TODO-018 Workflow BigLust → Fanvue Design ✅)
 
 ---
 
@@ -49,6 +49,7 @@ roadmap/
 |----|---------|----------|------------|------|
 | ~~TODO-016~~ | ~~Elena AI Agent~~ — ✅ DONE via DONE-037 | - | - | [→](./docs/sessions/2024-12-26-dm-automation.md) |
 | ~~TODO-013~~ | ~~ManyChat Setup~~ — ✅ 2 automations LIVE | - | - | [→](./docs/sessions/2024-12-26-manychat-ai-agent.md) |
+| TODO-018 | **🎨 Workflow Automatisé BigLust → Fanvue** — Crop automatique MediaPipe + Validation humaine + Upload Fanvue avec vaults + Tracking Supabase | 🔴 High | 8-10h | [→](./roadmap/todo/TODO-018-biglust-fanvue-pipeline.md) |
 | TODO-017 | **💰 Funnel DM Routing A/B/C** — Implémenter routing ManyChat (B/BMAC, C/Fanvue, A/chat) + Tracking sources IG_BIO/IG_DM/IG_STORY | 🔴 High | 2-3h | [→](./docs/26-IG-FANVUE-BMAC-STRATEGY.md) |
 | TODO-016 | **📊 Dashboard KPI Quotidiens** — Tracking DM entrants, conversions, clics Fanvue/BMAC, abonnements, tips | 🔴 High | 3-4h | [→](./docs/26-IG-FANVUE-BMAC-STRATEGY.md) |
 | TODO-014 | **Fanvue Pack Final** — Sélection 10-12 photos + Upload Fanvue + Prix 3€ | 🔴 High | 30min | [→](./docs/sessions/2024-12-25-fanvue-pack-elena.md) |
@@ -158,6 +159,7 @@ Total Features:
 
 | Date | Focus | Lien |
 |------|-------|------|
+| 19/01/2026 | **🎨 Workflow BigLust → Fanvue Design** — Design complet pipeline automatisé avec crop MediaPipe, validation, upload Fanvue, tracking Supabase | [→](./docs/sessions/2026-01-19-biglust-fanvue-workflow-design.md) |
 | 20/01/2026 | **🎨 Content Brain V3 "Freedom Mode"** — Suppression 665 lignes hardcodées → Claude décide librement | [→](./docs/sessions/2026-01-20-content-brain-freedom.md) |
 | 20/01/2026 | **🔍 DM Prompt Audit & Fix** — Audit complet + Corrections majeures prompts (limite mots, historique, langue, liens) | [→](./docs/sessions/2026-01-20-dm-prompt-audit-fix.md) |
 | 20/01/2026 | **🔄 Haiku Model Migration** — Migration deprecated Haiku → Haiku 4.5 | [→](./docs/sessions/2026-01-20-haiku-model-migration.md) |

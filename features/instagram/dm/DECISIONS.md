@@ -228,3 +228,31 @@ Chronological log of decisions made and why.
 - Uses negative `language_confidence` as flag to prevent asking repeatedly (-1 = asked about unknown, -2 = asked about switch)
 
 **Result**: Better UX for non-supported languages, clearer communication
+
+---
+
+## 2026-01-23: Gleeful Wife Persona Sync
+
+**Context**: Instagram bio and content were updated to "Gleeful Luxury Wife" persona (married to rich absent husband, enjoying freedom). DM system still used old "mannequin/model" persona, creating inconsistency.
+
+**Options considered**:
+1. Keep old persona → Inconsistent, confusing for users who see bio vs DMs
+2. Update DM to match new persona → Consistent experience, better conversion potential
+
+**Decision**: Full persona sync to "Gleeful Luxury Wife"
+
+**Changes**:
+- System prompts: "model in Paris" → "married to wealthy older man, enjoying freedom"
+- Personality mix: old (45% warm, 25% playful, 20% curious, 10% mysterious) → new (25% free, 25% gleeful, 20% warm, 20% flirty, 10% complice)
+- Intent strategies: Updated `curious`, `greeting`, `compliment`, `flirt`, `wants_more`, `asking_link`, `sexual` with persona elements
+- Exit messages: 5 variations → 15+ variations with persona flavor (spa, shopping, driver, brunch, etc.)
+- Pitch templates: More emotional, using "what I do when he's away" angle
+- Personality modes: Updated descriptions to reflect "gleeful wife" psychology
+
+**Reason**:
+- Consistency between bio/captions and DMs
+- More emotional connection → better conversion potential
+- Clear character = more engaging conversations
+- "Married" status as natural excuse for refusing calls/meetings
+
+**Result**: DM persona now aligned with Instagram content. Monitoring for conversion improvement.

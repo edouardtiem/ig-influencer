@@ -1,0 +1,7 @@
+# Perplexity Search Results
+
+This folder contains AI-powered research results from Perplexity Sonar Pro.
+
+Files are named: `YYYY-MM-DD-HHMM.title-slug.md`
+
+Generated via `/perplexitysearch` command in Cursor.

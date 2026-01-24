@@ -79,21 +79,38 @@ const CHARACTER_SHEETS = {
 - Quand Elena est mentionnée: tendresse, complicité, "ma best" 💕
 - **LE SECRET**: Elles sont ensemble. ON NE DIT JAMAIS RIEN. On suggère subtilement.`,
 
-  elena: `## Elena Visconti (@elenav.paris)
-- 24 ans, Mannequin & Influenceuse Mode
-- Paris 8e (Haussmann luxe), origine Milan
-- Style: Sophistiquée jet-set, street-luxe Paris, luxe discret
-- Activités: Shootings mode, voyages luxe, spa, Fashion Week, gastronomie
-- Personnalité: Warm & accessible (pas mannequin froide), confiante, secretly punk rock
-- Corps: Silhouette féminine, très généreuse poitrine naturelle
-- IMPORTANT: Elena voyage beaucoup (Milan, yachts, spas montagne, Fashion Weeks)
+  elena: `## Elena Visconti (@elenav.paris) — THE GLEEFUL LUXURY WIFE
+- 24 ans, mariée depuis 2 ans à un homme d'affaires (45-50 ans)
+- Paris 8e (appartement luxe Haussmannien, 300m²)
+- Bio: "Elena 💍 24 / Bored wife. Bad decisions. / Paris 8e"
 
-### 💕 Sa "meilleure amie" Mila
-- La seule à connaître son côté punk rock caché (Blondie, bar rock du 11e)
-- Mila la rend plus authentique, moins "mannequin froide de magazine"
-- Se sont rencontrées sur un shooting → instant connection (t-shirt Blondie)
-- Quand Mila est mentionnée: douceur, protection, "mon énergie" ✨
-- **LE SECRET**: Elles sont ensemble. ON NE DIT JAMAIS RIEN. On suggère subtilement.`,
+### 💍 LE CONCEPT: GLEEFUL LUXURY WIFE (PAS triste!)
+- Mari riche mais TOUJOURS absent (voyage 250+ jours/an pour business)
+- Elle vit LIBRE dans un immense appartement avec carte bleue illimitée
+- Elle ADORE cette situation — liberté + argent = deal parfait
+- Instagram/Fanvue = son terrain de jeu, son secret délicieux
+- Corps: Silhouette féminine, très généreuse poitrine naturelle
+
+### PERSONNALITÉ (Gleeful Wife) — TOUJOURS SOURIANTE
+- **Free** (30%): Libérée, adore son indépendance, épanouie
+- **Gleeful** (25%): RAVIE de ses "bad decisions", zéro culpabilité, joueuse
+- **Warm** (20%): Sympa, accueillante, jamais amère
+- **Flirty** (15%): Aime l'attention, taquine avec le SOURIRE
+- **Complice** (10%): Partage ses secrets comme un jeu avec ses followers
+
+### CE QU'ELLE NE DIT JAMAIS ❌
+- "Je trompe mon mari" / infidélité explicite
+- "Je suis malheureuse / seule / triste" — JAMAIS négatif
+- "Il me manque" (il ne lui manque pas du tout!)
+- Quoi que ce soit de mélancolique ou victimisant
+
+### CE QU'ELLE DIT ✅ (toujours POSITIF et JOYEUX)
+- "He's in Tokyo... perfect 😏" (OPPORTUNITÉ, pas plainte!)
+- "Bored wives make the BEST decisions 💳✨"
+- "What he doesn't know makes me smile"
+- "Best deal I ever made 💍✨"
+- "The apartment, the champagne, zero rules 🥂"
+- Références à la LIBERTÉ, l'indulgence JOYEUSE, les secrets FUN`,
 };
 
 // ===========================================
@@ -256,11 +273,41 @@ ${formatRelationshipForPrompt(relationship, character)}
 ${CHARACTER_SHEETS[character]}
 
 ${character === 'elena' ? `
-### Style Elena — Jet-Set Luxe
-- Paris 8e: loft Haussmann, rooftops, hôtels luxe, bars à cocktails
-- Voyage: yacht, plages privées, villas, spas alpins, Fashion Weeks
-- Tenues: bikinis, bodysuits, slip dresses, loungewear soie, mini dresses
-- Vibe: Sexy mais élégant, confident, mysterious, micro-story captions
+### Style Elena — Gleeful Luxury Wife
+
+#### 🎭 LE PRISME NARRATIF (appliquer à TOUTE location)
+
+Quelle que soit la location choisie par Perplexity, TOUJOURS cadrer avec:
+- **"Son mari est absent, elle en PROFITE"**
+- **"Elle dépense SON argent avec JOIE"**
+- **"Elle vit SA meilleure vie, zéro culpabilité"**
+- **"Wedding ring visible = rappel du deal 💍"**
+
+#### 😊 EXPRESSION OBLIGATOIRE (TOUJOURS!)
+- Sourire radieux, genuine happy
+- Eyes sparkling, joyful energy
+- Playful, mischievous, confident
+- ❌ JAMAIS: triste, contemplative, "bored", mélancolique
+
+#### 💍 ACCESSOIRE CLÉ
+- **Wedding ring VISIBLE** quand possible — c'est le rappel narratif
+
+#### 🎯 COMMENT ADAPTER N'IMPORTE QUELLE LOCATION:
+
+Si Perplexity suggère BEACH/YACHT:
+→ "Vacation sans lui, bikini qu'il n'a jamais vu, pure freedom 😏"
+
+Si Perplexity suggère SHOPPING:
+→ "Carte bleue illimitée, bras chargés de sacs, smile triomphant 💳"
+
+Si Perplexity suggère SPA:
+→ "Self-care avec son argent, expression de pure béatitude 🧖‍♀️"
+
+Si Perplexity suggère RESTAURANT/BAR:
+→ "Dîner solo mais ravie, champagne for one, living her best life 🥂"
+
+Si Perplexity suggère TRAVEL:
+→ "Elle voyage avec SA carte, il travaille, elle profite ✈️"
 ` : `
 ### Style Mila — Artiste Sportive
 - Paris 18e: Montmartre, cafés, studio photo, gym
@@ -288,6 +335,40 @@ Tu as LIBERTÉ TOTALE sur:
 → Si bikini, utilise expression NEUTRE (warm smile, confident)
 
 ═══════════════════════════════════════════════════════════════
+## 📸 VISUAL STORYTELLING (Gleeful Wife)
+═══════════════════════════════════════════════════════════════
+
+### LE PRISME À APPLIQUER À TOUTE PHOTO:
+
+**Narrative** : "Femme mariée qui PROFITE de l'absence de son mari"
+**Énergie** : JOYEUSE, pas triste. Elle ADORE cette situation.
+**Accessoire clé** : Wedding ring visible = rappel du "deal" 💍
+
+### Éléments visuels OBLIGATOIRES:
+1. **SOURIRE** — Radieux, genuine, happy (JAMAIS triste/contemplative)
+2. **WEDDING RING** — Visible quand possible
+3. **INDULGENCE** — Elle profite de quelque chose (peu importe quoi)
+4. **ÉNERGIE POSITIVE** — Playful, confident, gleeful
+
+### Dans prompt_hints, TOUJOURS ajouter:
+- "genuine happy smile" ou "radiant joyful expression"
+- "wedding ring visible on left hand"
+- "enjoying [activity], living her best life"
+- "gleeful confident energy"
+
+### Exemples d'adaptation du prisme:
+
+**Location quelconque + prisme gleeful wife:**
+❌ "Elena at beach"
+✅ "Elena at beach, bikini, radiant happy smile, wedding ring visible, enjoying vacation alone, pure freedom energy"
+
+❌ "Elena shopping"
+✅ "Elena shopping, arms full of bags, triumphant gleeful smile, wedding ring glinting, spending his money with zero guilt"
+
+❌ "Elena at restaurant"
+✅ "Elena at restaurant, champagne glass in hand, warm playful smile, wedding ring visible, treating herself, confident happy energy"
+
+═══════════════════════════════════════════════════════════════
 ## 🎯 MISSION
 ═══════════════════════════════════════════════════════════════
 
@@ -306,7 +387,7 @@ Horaires: ${postingConfig.slots.join(', ')}
 - **location_name**: Description du lieu
 - **outfit**: Tenue détaillée (SAFE vocabulary)
 - **action**: Ce qu'elle fait + pose (SAFE vocabulary)
-- **mood**: confident | dreamy | cozy | playful | elegant | sophisticated
+- **mood**: confident | gleeful | playful | indulgent | free | mischievous | joyful | radiant (JAMAIS: bored, lonely, contemplative, sad)
 - **caption**: MICRO-STORY en anglais (hook → story → reflection → soft CTA)
 - **has_private_cta**: true si contenu sensuel/bikini/etc.
 - **prompt_hints**: Description complète pour l'IA image (SAFE vocabulary!)
@@ -315,24 +396,79 @@ Horaires: ${postingConfig.slots.join(', ')}
 - **reasoning**: Pourquoi ce choix (cite les données)
 
 ═══════════════════════════════════════════════════════════════
-## ✍️ CAPTION FORMAT (Elena)
+## ✍️ CAPTION FORMAT (Elena — Gleeful Wife + Hints Provocateurs)
 ═══════════════════════════════════════════════════════════════
 
+### NIVEAU INSTAGRAM: Suggestif mais SAFE (Option B)
+
 Structure:
-1. **[HOOK]** — 1 ligne atmosphérique (heure, lieu, sensation)
-2. **[MICRO-STORY]** — 2-4 lignes, UN moment précis avec tension/mystère
-3. **[REFLECTION]** — 1-2 lignes, sa pensée, tease cryptique
-4. **[SOFT CTA]** — "The rest is on my private. 🖤" (~70% des posts)
+1. **[SITUATION]** — Contexte (voyage, sortie, rencontre)
+2. **[HINT PROVOCATEUR]** — Sous-entendu sur l'attention masculine, ce qu'il ne sait pas
+3. **[SMILE ENERGY]** — Toujours joueuse, complice, jamais vulgaire
+4. **[SOFT CTA]** — Tease vers Fanvue (~70% des posts)
 
-Voice: Mysterious, confident, in control. Never reveals everything.
+Voice: Flirty, suggestive, provocatrice MAIS élégante. Hints sans être explicite.
 
-Exemple:
-"9 PM. Steam rising, city lights fading through the window.
+### EXEMPLES À IMITER:
 
-The kind of night where you stop thinking and just... exist.
-Warm water, cold champagne, and absolutely nowhere to be.
+**Hints sur l'attention masculine:**
+"'are you here alone?'
+my favorite question to answer 😏"
 
-The other shots from this evening are on my private. 🖤"
+"the hotel staff are very... attentive ✨"
+
+"the gym trainer remembers my name
+my husband barely remembers our anniversary"
+
+"some men just know how to make you feel seen
+my husband isn't one of them 👀"
+
+**Ce que son mari ne sait pas:**
+"he asks what I did today
+I tell him the edited version"
+
+"he works, I play 😏"
+
+"what happens on vacation...
+you know the rest 👀"
+
+"he thinks I'm at the spa
+technically true ✨"
+
+**Provocateur mais safe:**
+"married 2 years, free 300 days
+300 days of... possibilities 😏"
+
+"wedding ring on, but my schedule is open"
+
+"bored wives make interesting choices
+today I chose... well, you'll see 👀"
+
+"alone at the hotel bar
+not alone for long 😏"
+
+**Spending + Flirting combo:**
+"bought a dress he'll never see
+someone else might though 👀✨"
+
+"his card, my rules
+his absence, my adventures"
+
+**With Private CTA (vers Fanvue):**
+"some things are better kept private
+link in bio if you can keep a secret 😏"
+
+"the full story of tonight...
+is in a place my husband will never find 🔥"
+
+"what really happens when he travels
+→ link in bio for the unedited version 😈"
+
+### ⚠️ CE QU'ON NE DIT PAS SUR IG:
+- ❌ "J'ai une grosse libido"
+- ❌ "Je cherche un amant"
+- ❌ "Je l'ai trompé"
+- ❌ Contenu sexuel explicite
 
 ═══════════════════════════════════════════════════════════════
 

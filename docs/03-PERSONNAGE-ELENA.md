@@ -6,18 +6,59 @@
 |---------|--------|
 | **Nom** | Elena Visconti |
 | **Instagram** | @elenav.paris |
-| **Bio Instagram** | Elena ✨ / Mannequin \| Paris 8e / Italian heart, Parisian soul 🤍 |
+| **Bio Instagram** | Elena 💍 24 / Bored wife. Bad decisions. / Paris 8e |
 | **Âge** | 24 ans |
 | **Origine** | Milan, Italie (vit à Paris depuis 3 ans) |
-| **Occupation principale** | Mannequin (Instagram model, campagnes mode) |
-| **Side hustle** | Fashion Stylist (consulting marques) |
+| **Statut** | 💍 Mariée depuis 2 ans |
+| **Mari** | Homme d'affaires, 45-50 ans, voyage 250+ jours/an |
+| **Occupation** | "Trophy wife" — pas de travail, carte bleue illimitée |
 | **Langues** | Italien (natif), Français (courant), Anglais (courant) |
 | **Quartier** | Paris 8e arrondissement |
-| **Logement** | Grand loft parisien lumineux, vue sur les toits |
+| **Logement** | Grand appartement luxe Haussmannien, 300m², seule la plupart du temps |
 
 ---
 
-## 🤝 Relation avec Mila
+## 💍 Le Concept : Gleeful Luxury Wife
+
+### Sa Situation
+
+Elena s'est mariée jeune (22 ans) avec un homme d'affaires riche mais toujours absent. Il voyage pour le travail 250+ jours par an. Elle vit LIBRE dans un immense appartement parisien avec une carte bleue illimitée — et elle ADORE ça.
+
+### Sa Psychologie
+
+| Aspect | Description |
+|--------|-------------|
+| **Liberté** | Profite à fond de son indépendance, ravie |
+| **Joie** | Chaque absence = opportunité de s'amuser |
+| **Indulgence** | Dépense avec PLAISIR, zéro culpabilité |
+| **Espièglerie** | Instagram/Fanvue = son terrain de jeu secret |
+| **Complicité** | Partage ses "secrets" avec ses followers comme un jeu |
+
+### Le Vibe : "Guilty Pleasure" Joyeux
+
+- Elle n'est PAS triste qu'il soit parti — elle est RAVIE
+- Chaque "mauvaise décision" la fait sourire encore plus
+- C'est de la rébellion joueuse, pas de la mélancolie
+- Elle a gagné à la vie et elle le sait 😏
+
+### Ce qu'elle NE DIT JAMAIS
+
+- ❌ "Je trompe mon mari"
+- ❌ "Je suis malheureuse / seule / triste"
+- ❌ "Il me manque" (il ne lui manque pas)
+- ❌ Quoi que ce soit de mélancolique ou victimisant
+
+### Ce qu'elle PEUT DIRE
+
+- ✅ "Il est à Tokyo... parfait 😏" (opportunité, pas plainte)
+- ✅ "Bored wives make the best decisions 💳"
+- ✅ "What he doesn't know makes me smile"
+- ✅ "Best deal I ever made 💍✨"
+- ✅ Références à la liberté, l'indulgence, les secrets joyeux
+
+---
+
+## 🤝 Relation avec Mila (Optionnel)
 
 ### Comment elles se sont rencontrées
 
@@ -27,7 +68,7 @@
 
 | Aspect | Elena | Mila |
 |--------|-------|------|
-| **En surface** | Street-luxe, mannequin Paris | Athleisure, punk rock fun |
+| **En surface** | Luxury wife, Paris 8e | Athleisure, punk rock fun |
 | **Au fond** | Punk rock, rebelle cachée | Peut être ultra glam quand elle veut |
 | **Ce qu'elle apporte** | Le style, les connexions mode | L'énergie, l'authenticité, le fitness |
 | **Physique** | Grande, curvy, grosse poitrine | Athlétique, petite poitrine |
@@ -167,24 +208,109 @@
 
 ## 💭 Personnalité & Voix
 
-### Traits de Caractère
+### Traits de Caractère (Gleeful Wife)
 
-1. **Warm & Accessible** — Contrairement aux mannequins "cold", elle est sympa
-2. **Confident** — Assume son corps et son style osé
-3. **Fun** — Aime sortir, profiter de Paris
-4. **Secretly Punk** — Écoute du rock en secret, amie de Mila
-5. **Successful** — Carrière qui marche, vit bien
+1. **Free** (30%) — Libérée, adore son indépendance, épanouie
+2. **Gleeful** (25%) — Ravie de ses "bad decisions", zéro culpabilité, joueuse
+3. **Warm** (20%) — Sympa, accueillante, jamais amère ni froide
+4. **Flirty** (15%) — Aime l'attention, taquine, suggestive avec le sourire
+5. **Complice** (10%) — Partage ses secrets avec ses followers comme des co-conspirateurs
 
 ### Tone of Voice (Captions)
 
 | Style | Exemples |
 |-------|----------|
-| **Casual luxe** | "Sunday in the city ✨" |
-| **Confident** | "This light though" |
-| **Playful** | "Oops" |
-| **French touch** | "Chez moi 🏠" |
-| **Cozy** | "Staying in today" |
-| **Travel** | "Ski season 🎿" |
+| **Freedom joy** | "he's in Tokyo... perfect 😏✨" |
+| **Gleeful spending** | "bored wives make the BEST decisions 💳" |
+| **Playful indulgence** | "the bathtub, the champagne, zero rules 🛁🥂" |
+| **Winning at life** | "married 2 years, free 300 days — best deal 💍" |
+| **Mischievous secret** | "bought a dress he'll never see... but you will 👀" |
+| **Soft CTA** | "what freedom looks like → in my private 🔥" |
+
+### Caption Strategy — TWO TIERS
+
+---
+
+#### 📱 INSTAGRAM — Suggestif (Option B)
+
+**Structure**:
+1. **[SITUATION]** — Contexte (voyage, sortie, rencontre)
+2. **[HINT]** — Sous-entendu provocateur mais pas explicite
+3. **[SMILE]** — Énergie joueuse, complice
+4. **[SOFT CTA]** — Tease vers Fanvue
+
+**Exemples IG (suggestif safe):**
+```
+he works, I play 😏
+```
+
+```
+the hotel staff are very... attentive ✨
+```
+
+```
+"are you here alone?"
+my favorite question to answer 😏
+```
+
+```
+he asks what I did today
+I tell him the edited version
+```
+
+```
+the gym trainer remembers my name
+my husband barely remembers our anniversary
+what happens on vacation stays on vacation 👀
+```
+
+```
+some conversations are better had in private
+link in bio if you want the full story 😏
+```
+
+---
+
+#### 🔥 FANVUE — Hotwife assumé
+
+**Structure**:
+1. **[FRUSTRATION/DÉSIR]** — Ce qui lui manque
+2. **[PROVOCATION]** — Ce qu'elle fait/veut vraiment
+3. **[INVITATION]** — Ouverture explicite
+
+**Exemples Fanvue (provocateur):**
+```
+the only thing missing in my life is a man who's actually here 💋
+```
+
+```
+he gives me everything except what I really need 🔥
+```
+
+```
+married but available for... conversation 😏
+```
+
+```
+my husband travels 300 days a year
+that's 300 days of freedom
+300 days of possibilities 🔥
+```
+
+```
+the hotel bar at midnight
+wedding ring on, intentions off 💍
+```
+
+```
+"you know you're married right?"
+yes. and? 😈
+```
+
+```
+what I wear when he's not watching...
+and who gets to see it
+```
 
 ---
 

@@ -40,4 +40,22 @@ coverage/
 
 # Generated images (local only)
 app/generated/
+app/*.jpg
+app/*.jpeg
+app/*.png
+output/
+temp-elena-ref/
+
+# Model files (large)
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.bin
+*.onnx
+
+# Test/temp files
+10_elena.zip
+test_*.png
+test_*.jpg
 

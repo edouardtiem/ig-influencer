@@ -1,0 +1,342 @@
+# Decisions — Elena Image Generation
+
+Chronological log of decisions made and why.
+
+---
+
+## 2026-01-24: RunPod workflow setup
+
+**Context**: RunPod back online, need to set up full Elena workflow for fast generation
+
+**Setup completed**:
+- Pod: `l2qs6633hmvp4c` (RTX 4090, 24GB VRAM)
+- Image: `runpod/comfyui:latest`
+- ComfyUI URL: `https://l2qs6633hmvp4c-8188.proxy.runpod.net`
+
+**Models installed**:
+| Model | Size | Source |
+|-------|------|--------|
+| SDXL Base | 6.5GB | HuggingFace (wget on pod) |
+| Elena LoRA | 218MB | SCP from Mac |
+| IP-Adapter FaceID | 1.4GB | HuggingFace (wget on pod) |
+| CLIP Vision | 2.4GB | HuggingFace (wget on pod) |
+| Face ref | 495KB | SCP from Mac |
+
+**Custom nodes installed**:
+- ComfyUI_IPAdapter_plus
+- insightface + onnxruntime-gpu
+
+**Result**: Generation works, ~24s/image (vs 5min local). BigLove XL not installed (CivitAI requires token).
+
+**Next**: Install Qwen for face refinement, upload BigLove XL
+
+---
+
+## 2026-01-24: Voyeur silhouettes don't work in SDXL prompts
+
+**Context**: "Luxury Wife" concept with room service silhouette in background
+
+**Attempts**:
+- "blurred male silhouette in doorway"
+- "male shadow on wall"
+- "room service cart with hand visible"
+
+**Result**: SDXL ignores these elements or generates another woman instead of male silhouette.
+
+**Decision**: Voyeur effect needs compositing (add silhouette in post) rather than prompt engineering.
+
+---
+
+## 2026-01-24: FaceDetailer (Impact Pack) for skin/face enhancement
+
+**Context**: Looking for "CodeFormer for body" - something to improve skin texture quality
+
+**Options considered**:
+1. CodeFormer — Only restores faces, not body
+2. SegmentAnything + Inpainting — Complex, manual masking
+3. FaceDetailer (Impact Pack) — Auto-detects and enhances faces/skin
+
+**Decision**: Install and use FaceDetailer from ComfyUI-Impact-Pack
+
+**Reason**: 
+- Auto-detects faces using YOLO (UltralyticsDetectorProvider)
+- Can enhance both face AND body with SAM segmentation
+- Inpaints detected regions with higher detail
+- Denoise 0.4 gives subtle enhancement without changing identity
+
+**Result**: FaceDetailer working. Required Python 3.10 upgrade (3.9 incompatible due to union types syntax).
+
+**Setup required**:
+- ComfyUI-Impact-Pack
+- ComfyUI-Impact-Subpack
+- Models: `bbox/face_yolov8m.pt`, `segm/person_yolov8m-seg.pt`, `sam_vit_b_01ec64.pth`
+
+---
+
+## 2026-01-24: Python 3.10 venv upgrade
+
+**Context**: Impact Pack wouldn't load on Python 3.9
+
+**Options considered**:
+1. Downgrade Impact Pack to 3.9-compatible version — Old version, missing features
+2. Upgrade ComfyUI venv to Python 3.10 — Breaking change but future-proof
+
+**Decision**: Recreate venv with Python 3.10.19
+
+**Reason**: 
+- Impact Pack uses `type | None` syntax requiring Python 3.10+
+- Better to stay current with dependencies
+- Python 3.10 already installed via Homebrew
+
+**Result**: All Impact Pack nodes now load correctly. Old venv deleted.
+
+---
+
+## 2026-01-24: Elena "Luxury Wife" niche concept
+
+**Context**: Defining Elena's character niche for Fanvue positioning
+
+**Decision**: Combine:
+- Épouse de luxe (luxury wife)
+- Domination douce (soft domination in captions, not photos)
+- Voyeurisme/Exhibitionnisme (room service catches her)
+
+**Reason**: 
+- Creates narrative hook for captions and stories
+- Voyeur element adds intrigue without requiring complex scene generation
+- Luxury setting justifies high production value
+
+**Implementation**: Room service silhouette suggested in background (blurred shadow, cart visible at frame edge). Elena doesn't notice.
+
+**Result**: Pack generated. Voyeur element didn't render well (model ignored silhouettes). Need to refine prompts or use compositing.
+
+---
+
+## 2026-01-23: Body proportions via prompt (D cup)
+
+**Context**: Elena's body proportions needed adjustment (larger breasts)
+
+**Options considered**:
+1. Retrain LoRA with different body photos — Complex, need nude photos
+2. Use body-specific LoRA from CivitAI — Additional model to manage
+3. Prompt engineering — Simple, no extra model
+
+**Decision**: Use prompt `natural breasts D cup`
+
+**Reason**: 
+- BigLove XL understands body descriptors well
+- `DD cup` was too large, `D cup` is balanced
+- Combined with negative prompt `small breasts, flat chest`
+- No additional models needed
+
+**Result**: Body proportions consistent and controllable via prompt.
+
+---
+
+## 2026-01-23: CodeFormer not relevant for face consistency
+
+**Context**: Evaluating tools to improve face from 85% to 95%
+
+**Options considered**:
+1. CodeFormer — Restores/improves existing face quality
+2. Qwen2.5-VL — Intelligent editing with instructions
+3. ReActor — Face swap (replaces face entirely)
+
+**Decision**: Skip CodeFormer
+
+**Reason**: 
+- CodeFormer **améliore la qualité** d'un visage (netteté, détails)
+- Mais le besoin est de **copier le visage de référence** d'Elena
+- CodeFormer ne change pas l'identité, juste la qualité
+- Qwen peut potentiellement faire du face editing intelligent
+
+**Result**: Tâche CodeFormer supprimée. Focus sur Qwen pour copier/appliquer le visage de référence.
+
+---
+
+## 2026-01-23: Qwen for Face Refinement (wait for RunPod)
+
+**Context**: Face accuracy at 85%, need 95%+. RunPod in maintenance.
+
+**Options considered**:
+1. CodeFormer locally — Available now, restores/improves face
+2. Qwen2.5-VL on RunPod — Intelligent editing, best quality
+3. ReActor face swap — Replaces face entirely
+
+**Decision**: Wait for RunPod to use Qwen
+
+**Reason**: 
+- Qwen can intelligently edit the face with text instructions
+- More control than CodeFormer
+- CodeFormer only restores, doesn't fix identity issues
+- RunPod should be back soon
+
+**Result**: Task blocked, pods stopped to avoid charges. Resume when RunPod stable.
+
+---
+
+## 2026-01-23: Simplified Workflow (CFG 4.0 + LoRA 0.7 + Single IP-Adapter)
+
+**Context**: Body consistency good but grain issues, complex dual IP-Adapter setup
+
+**Options considered**:
+1. Keep current setup (CFG 7.0, LoRA 1.0, dual IP-Adapter)
+2. Simplify: Lower CFG, lower LoRA, single IP-Adapter
+3. Switch to Flux model
+
+**Decision**: Simplify the workflow
+- CFG: 7.0 → **4.0**
+- LoRA weight: 1.0 → **0.7**
+- Remove style IP-Adapter (face only)
+- Add 4x-UltraSharp upscale
+
+**Reason**: 
+- Lower CFG reduces grain on SDXL models
+- LoRA at 0.7 allows more model flexibility
+- Style can come from prompt, no need for second IP-Adapter
+- Upscale adds detail and compensates for any loss
+
+**Result**: Body consistency and image quality now excellent. Face still needs work (85% → 95% target).
+
+**New script**: `app/scripts/elena-simple-test.mjs`
+
+---
+
+## 2026-01-21: BigLove XL over BigLust
+
+**Context**: Needed better face and skin quality for Elena generations
+
+**Options considered**:
+1. BigLust v16 (current) — 85% face similarity, good but skin too saturated
+2. BigLove XL (CivitAI 897413) — Recommended for realistic skin
+3. Juggernaut — Not tested
+
+**Decision**: Switch to BigLove XL
+
+**Reason**: Perplexity search showed it's the best for realistic skin texture. Tests confirmed more natural colors and better face quality.
+
+**Result**: Face similarity improved, skin looks more natural. Grain still present (separate issue).
+
+---
+
+## 2026-01-21: InstantID post-processing instead of FaceID with LoRA
+
+**Context**: Face consistency was only 85% with LoRA alone. Needed 95%+.
+
+**Options considered**:
+1. LoRA + FaceID together during generation → Plastic/artificial faces ❌
+2. InstantID during generation → Slow, interferes with LoRA
+3. InstantID as post-processing → Two-step but works well ✅
+
+**Decision**: Generate with LoRA first, then apply InstantID to fix face
+
+**Reason**: 
+- LoRA handles body/style excellently
+- InstantID fixes face without interfering with body
+- Separating concerns = better results
+
+**Result**: 95% Elena similarity achieved. Body remains excellent.
+
+**Parameters**: InstantID weight 0.85, face ref `elena_face_ref.jpg`
+
+---
+
+## 2026-01-20: bf16 instead of fp16 for training
+
+**Context**: LoRA V3 training had NaN loss from step 1, corrupting the model
+
+**Options considered**:
+1. Keep fp16, lower learning rate
+2. Switch to bf16 (bfloat16)
+3. Use full fp32 (slower)
+
+**Decision**: Use bf16 mixed precision
+
+**Reason**: bf16 is more numerically stable than fp16, especially for gradient computations. Recommended by kohya_ss community for SDXL training.
+
+**Result**: V4 training completed without NaN. Loss stable at 0.116.
+
+---
+
+## 2026-01-20: Learning rate 5e-5 instead of 1e-4
+
+**Context**: V3 training with 1e-4 caused immediate NaN loss
+
+**Options considered**:
+1. 1e-4 (original) — Too aggressive, NaN
+2. 5e-5 (half) — More conservative
+3. 1e-5 (very low) — Might underfit
+
+**Decision**: Use 5e-5 with longer warmup (200 steps)
+
+**Reason**: Lower LR combined with bf16 should prevent NaN while still learning effectively.
+
+**Result**: Training completed successfully, loss decreased smoothly.
+
+---
+
+## 2026-01-20: Network Dim 32 (to revisit)
+
+**Context**: Choosing LoRA rank for SDXL training
+
+**Options considered**:
+1. Dim 8 (local training) — Fast but low capacity
+2. Dim 32 (used for V4) — Balance
+3. Dim 64 — Recommended for faces
+
+**Decision**: Used Dim 32 for V4
+
+**Reason**: Wanted to test if 32 was sufficient before going higher.
+
+**Result**: Body learned well, face identity not learned. **Should try Dim 64 next time.**
+
+---
+
+## 2026-01-20: Trigger word "elena" (to revisit)
+
+**Context**: Choosing trigger word for LoRA training
+
+**Options considered**:
+1. "elena" — Descriptive but common word
+2. "sks" — Rare token, commonly used for LoRA
+3. "elx" or "dcai" — Made-up rare tokens
+
+**Decision**: Used "elena"
+
+**Reason**: More intuitive to use in prompts.
+
+**Result**: Works for body/style but may contribute to face identity issues. **Should try rare token next time.**
+
+---
+
+## 2026-01-21: Do NOT use ImageSharpen on grainy images
+
+**Context**: Trying to reduce grain in generated images
+
+**Options considered**:
+1. ImageSharpen node — Post-processing sharpening
+2. Upscaler — 4x then downscale
+3. Denoising — Light denoise pass
+
+**Decision**: Avoid ImageSharpen
+
+**Reason**: Testing showed it amplifies grain instead of reducing it.
+
+**Result**: Image quality degraded when using ImageSharpen. Other methods needed.
+
+---
+
+## 2026-01-21: Use RunPod for upscaling (not local Mac)
+
+**Context**: Local upscalers (4x-UltraSharp, RealESRGAN) threw tensor errors
+
+**Options considered**:
+1. Debug local setup — Time-consuming
+2. Use RunPod GPU — Known working environment
+3. Use cloud API (Replicate) — Extra cost
+
+**Decision**: Use RunPod for all heavy processing
+
+**Reason**: Already have RunPod setup working. GPU handles these tasks easily.
+
+**Result**: Upscaling works perfectly on RunPod. 4x upscale of 832x1216 → 3328x4864 in seconds.
