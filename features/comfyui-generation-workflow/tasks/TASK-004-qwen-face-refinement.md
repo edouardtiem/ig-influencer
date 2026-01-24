@@ -71,6 +71,7 @@ SDXL → QwenEdit (face) → FaceDetailer → IP-Adapter → Output
 - Nodes GGUF disponibles: UnetLoaderGGUF, CLIPLoaderGGUF, etc. ✅
 - **Infrastructure complète** - prêt pour tests
 - Espace utilisé: ~40GB / 50GB sur volume
+- Pod stoppé pour économiser (données préservées)
 - **Next**: Créer workflow de test avec Qwen-Image-Edit
 
 ### 24 Jan 2026 (Session 3)
@@ -100,6 +101,25 @@ SDXL → QwenEdit (face) → FaceDetailer → IP-Adapter → Output
 - Pods créés (`elena-comfyui-4090`, `elena-comfyui-qwen`) mais bloqués
 - Pods stoppés pour éviter les frais
 - **Blocker**: Attendre que RunPod soit stable
+
+---
+
+## RunPod Commands
+
+```bash
+# Démarrer le pod (reprend avec tous les modèles)
+node app/scripts/runpod-connect.mjs
+
+# Vérifier le status
+node app/scripts/runpod-connect.mjs --status
+
+# Stopper le pod (économise $$$, données préservées)
+node app/scripts/runpod-connect.mjs --stop
+```
+
+**URLs (quand le pod tourne):**
+- ComfyUI: https://vm0e18rm4w72xr-8188.proxy.runpod.net
+- SSH: `ssh -i ~/.runpod/ssh/RunPod-Key-Go root@[IP] -p [PORT]`
 
 ---
 
