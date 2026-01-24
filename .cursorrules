@@ -1,0 +1,72 @@
+# Project Rules for IG-influencer
+
+## Code Standards
+- Always write production-level code
+- Write as little code as possible
+- Make sure new code doesn't break existing code
+- Prefer Tailwind over custom CSS
+- Use TypeScript strict mode
+- Follow Next.js App Router conventions
+
+## Ralph Mode Rules
+
+When operating in Ralph mode (autonomous loop):
+
+### Execution
+- Execute tasks one at a time, in order of priority
+- Don't ask for confirmation between tasks
+- Verify each task before marking complete
+- Report progress after each iteration
+
+### Safety
+- Max 20 iterations per Ralph session
+- If stuck on same task for 3+ iterations, mark as BLOCKED
+- Don't modify unrelated files
+- Always run lints after code changes
+
+### Task Status Values
+- PENDING: Not started
+- IN_PROGRESS: Currently working
+- COMPLETE: Done and verified
+- BLOCKED: Cannot proceed (explain why)
+
+### Completion Signals
+- When all tasks done: Output "EXIT_SIGNAL: true"
+- When blocked: Output "BLOCKED_SIGNAL: true" with reason
+- Always end with a summary report
+
+### Task Documentation
+- When Ralph completes a task, add a "Ralph Sessions" section
+- Include: date, summary, files modified, decisions made
+- Rename TASK-XXX.md → DONE-XXX.md when complete
+
+## File Conventions
+- Task specs go in: `features/*/tasks/TASK-XXX-slug.md`
+- Completed tasks: `features/*/tasks/DONE-XXX-slug.md`
+- Ralph launcher (temp): `RALPH-TASK.md` (points to a feature task)
+- Scripts go in: `app/scripts/`
+
+## Documentation Structure
+
+### Current Documentation (USE THIS)
+- Feature docs: `features/{platform}/{feature}/README.md`
+- Decisions: `features/{platform}/{feature}/DECISIONS.md`
+- Tests: `features/{platform}/{feature}/TESTS.md`
+- Session logs: `features/{platform}/{feature}/sessions/`
+- Roadmap: `ROADMAP-v2.md`
+- Session prompts: `SESSION-PROMPTS.md`
+
+### Archive (DO NOT USE unless asked)
+- `archive/docs-v1/` — Old documentation, outdated
+- Never read from archive unless user specifically asks
+
+### Feature Locations
+- `features/instagram/dm/` — ManyChat + Claude DM funnel
+- `features/instagram/content-brain/` — Scheduling, posting
+- `features/instagram/comments/` — Auto-reply
+- `features/fanvue/dm/` — Venice AI bot
+- `features/fanvue/posting/` — Daily posts
+- `features/fanvue/pipeline/` — BigLust → Fanvue
+- `features/comfyui-generation-workflow/` — LoRA, checkpoints, quality
+- `features/conversion-tracking/` — IG → Fanvue attribution
+- `features/elena-persona/` — Character definition

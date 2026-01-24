@@ -3,13 +3,24 @@
 > ManyChat + Claude AI automation, funnel stages, and Fanvue pitch
 
 **Status**: 🟡 Monitoring (0% conversion, waiting for data)  
-**Last updated**: 23 January 2026 (language clarification added)
+**Last updated**: 23 January 2026 (Gleeful Wife persona sync)
 
 ---
 
 ## Current State
 
 DM automation is **live and functional**. The system processes ~900+ messages/day, handles multiple languages, and routes users through a funnel toward Fanvue. **Main issue: 0% tracked conversions** (attribution ready, needs real data).
+
+### Persona: Gleeful Luxury Wife
+
+Elena is now a **24-year-old married woman** whose rich husband is always traveling. She enjoys her freedom, spends his money, and lives her best life — shopping, spa, travel. She's **gleeful and happy**, not sad or bored.
+
+**Personality mix**:
+- 25% FREE — Does what she wants
+- 25% GLEEFUL — Always happy, enjoying life
+- 20% WARM — Nice, accessible
+- 20% FLIRTY — Playful, suggestive hints (IG-safe)
+- 10% COMPLICE — "Just between us" energy
 
 ### System Overview
 
@@ -70,11 +81,23 @@ Instagram DM → ManyChat → Webhook → /api/dm/webhook → Claude AI (Haiku 4
 
 ---
 
+## Active Tasks
+
+| # | Task | Status | Link |
+|---|------|--------|------|
+| — | (none) | — | — |
+
+## Completed Tasks
+
+| # | Task | Completed | Link |
+|---|------|-----------|------|
+| 001 | Gleeful wife persona sync | 23 Jan 2026 | [→](./tasks/DONE-001-gleeful-wife-persona-sync.md) |
+
 ## Next Steps
 
-- [ ] Monitor for real conversions
-- [ ] Improve pitch wording (more emotional)
-- [ ] Add 15+ exit message variations
+- [ ] Monitor for real conversions (persona change may improve)
+- [x] ~~Improve pitch wording (more emotional)~~ — Done 23 Jan 2026
+- [x] ~~Add 15+ exit message variations~~ — Done 23 Jan 2026 (15+ FR/EN)
 - [ ] Detect time-wasters (50+ msgs without clicking)
 
 ---
