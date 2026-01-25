@@ -14,11 +14,11 @@ Configure the existing RunPod network volume (`elena-models`) with all models an
 
 ## Acceptance Criteria
 
-- [ ] Network volume configured with all models (BigLove XL, Elena LoRA, IP-Adapter, etc.)
-- [ ] Script `startup.sh` that launches ComfyUI automatically on pod start
-- [ ] Local script `runpod-connect.mjs` to start/stop pods on-demand
+- [x] Network volume configured with all models (BigLove XL, Elena LoRA, IP-Adapter, etc.)
+- [x] Script `startup.sh` that launches ComfyUI automatically on pod start
+- [x] Local script `runpod-connect.mjs` to start/stop pods on-demand
 - [ ] End-to-end test: start pod → generate image without manual intervention
-- [ ] No linter errors introduced
+- [x] No linter errors introduced
 
 ---
 
@@ -38,9 +38,9 @@ Configure the existing RunPod network volume (`elena-models`) with all models an
 
 | Resource | Status | ID |
 |----------|--------|-----|
-| **Network Volume** | ✅ Exists | `box5nuv45v` (elena-models, 50GB, US-KS-2) |
-| **Template** | ✅ Exists | `gijmo2nbr7` (elena-comfyui-worker) |
-| **Pod** | ⚠️ Not connected to volume | `l2qs6633hmvp4c` |
+| **Network Volume** | ✅ Active | `aml40rql5h` (elena-comfyui-US-TX-3, 50GB) |
+| **Pod** | ✅ Stopped (data preserved) | `adlni6ocoi3sip` |
+| **Datacenter** | US-TX-3 | RTX 4090 |
 
 ---
 
@@ -115,6 +115,25 @@ const CONFIG = {
 ---
 
 ## Progress Log
+
+### 25 Jan 2026
+- Switched to US-TX-3 volume `aml40rql5h` (previous US-NC-1 had GPU shortages)
+- Old pod `dortewt0b3tom3` terminated due to GPU unavailability on host
+- Created new pod `adlni6ocoi3sip` on same volume
+- Removed SDXL Base to free space (not needed, only BigLove XL)
+- **Uploaded BigLove XL** (6.94GB) successfully
+- Updated `runpod-connect.mjs` to use correct volume ID
+- All models now on volume:
+  - ✅ BigLove XL (6.94GB)
+  - ✅ Elena LoRA v4 (218MB)
+  - ✅ Qwen GGUF (12.3GB)
+  - ✅ Qwen Text Encoder (16GB)
+  - ✅ Qwen VAE (243MB)
+  - ✅ IP-Adapter FaceID v2 (1.4GB)
+  - ✅ CLIP Vision (2.4GB)
+  - ✅ elena_face_ref.jpg
+- Pod stopped to save costs
+- **Next**: Start pod, run ComfyUI, test generation
 
 ### 24 Jan 2026
 - Task migrated from `roadmap/ralph/RALPH-002-runpod-persistent-setup.md`

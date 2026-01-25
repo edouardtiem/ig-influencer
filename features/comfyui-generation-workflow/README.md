@@ -2,8 +2,8 @@
 
 > LoRA training, checkpoints, IP-Adapter FaceID, face consistency, and image quality
 
-**Status**: 🟡 In Progress (BigLove upload pending, then final tests)  
-**Last updated**: 24 January 2026 (Session 5)
+**Status**: 🟡 In Progress (all models uploaded, test generation pending)
+**Last updated**: 25 January 2026 (Session 6)
 
 ---
 
@@ -37,16 +37,15 @@ Image generation is **95% working**. Body consistency and image quality are now 
 
 | Setting | Value |
 |---------|-------|
-| **Pod ID** | `dortewt0b3tom3` |
+| **Pod ID** | `adlni6ocoi3sip` (stopped, resume with runpod-connect.mjs) |
 | **Volume** | `aml40rql5h` (elena-comfyui-US-TX-3, 50GB) ✅ PERSISTENT |
 | **GPU** | RTX 4090 (24GB) |
-| **ComfyUI URL** | `https://dortewt0b3tom3-8188.proxy.runpod.net` |
-| **SSH** | `ssh -i ~/.runpod/ssh/RunPod-Key-Go root@209.170.80.132 -p 14990` |
+| **ComfyUI URL** | `https://{pod-id}-8188.proxy.runpod.net` (dynamic) |
 | **Speed** | ~50s/image |
 | **Datacenter** | US-TX-3 |
 
 **Installed Models** (persistent on volume):
-- ✅ SDXL Base 1.0 (6.5GB)
+- ✅ **BigLove XL** (6.94GB) - `bigLove_xl1.safetensors`
 - ✅ Elena LoRA v4 (218MB)
 - ✅ IP-Adapter FaceID v2 (1.4GB)
 - ✅ CLIP Vision (2.4GB)
@@ -57,7 +56,6 @@ Image generation is **95% working**. Body consistency and image quality are now 
 - ✅ **Qwen Text Encoder** (16GB) - `qwen_2.5_vl_7b.safetensors`
 - ✅ **Qwen VAE** (243MB) - `qwen_image_vae.safetensors`
 - ✅ **Qwen-Image-Edit GGUF** (12.3GB) - `qwen-image-edit-2511-Q4_K_M.gguf`
-- ⏳ **BigLove XL** (6.5GB) - upload in progress
 
 **Custom Nodes**: ComfyUI_IPAdapter_plus, ComfyUI-Impact-Pack, **ComfyUI-GGUF**
 
@@ -124,7 +122,7 @@ node app/scripts/runpod-connect.mjs --stop
 | 004 | Qwen face refinement (85% → 95%) | 🟡 In Progress | Immediate | [→](./tasks/TASK-004-qwen-face-refinement.md) |
 | 005 | RunPod persistent setup | 🟡 In Progress | High | [→](./tasks/TASK-005-runpod-persistent-setup.md) |
 
-**Next**: Créer workflow ComfyUI pour tester Qwen face refinement
+**Next**: Start pod, launch ComfyUI, test Qwen face refinement workflow
 
 ### Backlog
 
