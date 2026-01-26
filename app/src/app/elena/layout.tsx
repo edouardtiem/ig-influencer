@@ -14,11 +14,11 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Elena - Exclusive Content",
-  description: "Get exclusive access to Elena's private content. Free 7-day trial.",
+  description: "Bored wife. I found how to have fun. Enter my secret life.",
   robots: "noindex, nofollow",
   openGraph: {
-    title: "Elena ✨",
-    description: "Your secret escape 💋",
+    title: "Elena 🔓",
+    description: "Where my husband never goes. Enter my secret life.",
     type: "website",
     images: [
       {
@@ -31,8 +31,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Elena ✨",
-    description: "Your secret escape 💋",
+    title: "Elena 💍",
+    description: "Where my husband never goes. Enter my secret life.",
     images: ["https://elenav.link/elena/teaser.png"],
   },
 };

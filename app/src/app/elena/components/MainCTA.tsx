@@ -29,12 +29,12 @@ export function MainCTA({ timerMinutes }: MainCTAProps) {
     >
       {/* Headline */}
       <h2 className="font-[family-name:var(--font-cormorant)] text-xl font-semibold text-white text-center mb-2">
-        Get FREE Access for 7 Days
+        Where My Husband Never Goes
       </h2>
 
       {/* Subtext */}
       <p className="font-[family-name:var(--font-inter)] text-[#A0A0A0] text-sm text-center mb-4">
-        Full access to all my content • DM me anytime 💬
+        Bored wife. I found how to have fun. This is the door he&apos;ll never open 🔓
       </p>
 
       {/* Teaser Image */}
@@ -64,7 +64,7 @@ export function MainCTA({ timerMinutes }: MainCTAProps) {
           boxShadow: "0 0 20px rgba(232, 160, 191, 0.3)",
         }}
       >
-        JOIN NOW - IT&apos;S FREE 🔓
+        ENTER MY SECRET LIFE 🔓
       </button>
 
       {/* Trust Badges */}

@@ -29,7 +29,7 @@ export function ProfileSection() {
 
       {/* Tagline */}
       <p className="font-[family-name:var(--font-inter)] text-[#E8A0BF] text-base">
-        Your secret escape 💋
+        My secret life starts here 🔓
       </p>
     </div>
   );

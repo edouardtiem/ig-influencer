@@ -2,10 +2,10 @@
 
 export function SocialProof() {
   const badges = [
-    { icon: "✨", text: "New • January 2026" },
-    { icon: "📸", text: "50+ exclusive photos" },
-    { icon: "🔥", text: "Growing fast" },
-    { icon: "💬", text: "More in DMs 😈" },
+    { icon: "💍", text: "Bored wife, Paris 8e" },
+    { icon: "🔓", text: "What he'll never find" },
+    { icon: "📸", text: "50+ private moments" },
+    { icon: "💬", text: "I reply to everyone 😏" },
   ];
 
   return (
