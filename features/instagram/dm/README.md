@@ -2,8 +2,8 @@
 
 > ManyChat + Claude AI automation, funnel stages, and Fanvue pitch
 
-**Status**: 🟡 Monitoring (0% conversion, waiting for data)  
-**Last updated**: 23 January 2026 (Gleeful Wife persona sync)
+**Status**: 🟢 Stable
+**Last updated**: 26 January 2026 (ManyChat billing outage resolved)
 
 ---
 
@@ -127,3 +127,27 @@ Instagram DM → ManyChat → Webhook → /api/dm/webhook → Claude AI (Haiku 4
 | Hot | 20 | Flirty, pitch at msg 10+ |
 | Pitched | 5 | Handle objections, exit |
 | Stopped | 0 | No more responses |
+
+---
+
+## Troubleshooting
+
+### DM system not responding
+
+**Symptoms**: No new messages in Supabase, users not getting replies
+
+**Diagnosis steps**:
+1. Check if system is paused: Query `elena_settings` table for `dm_system.paused`
+2. Test webhook directly: `curl -X POST https://ig-influencer.vercel.app/api/dm/webhook -H "Content-Type: application/json" -d '{"subscriber":{"id":"test"},"last_input_text":"test"}'`
+3. If webhook works → Problem is ManyChat, not backend
+
+**Common causes**:
+| Cause | Solution |
+|-------|----------|
+| ManyChat billing issue | Pay invoice, automations resume automatically |
+| ManyChat automation unpublished | Re-publish the automation |
+| Instagram disconnected ManyChat | Reconnect in ManyChat settings |
+| Kill switch enabled | Set `dm_system.paused = false` in Supabase |
+
+**Incident log**:
+- 26 Jan 2026: ManyChat billing issue caused ~18h outage (no backend changes needed)
