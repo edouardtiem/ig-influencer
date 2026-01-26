@@ -239,32 +239,36 @@ Bright natural daylight from window, clean and fresh atmosphere. Five-star Paris
 
 const OUTFITS = {
   loft_living: [
-    'oversized plaid blazer worn open, tiny beige crop top underneath showing generous cleavage and midriff, high-waisted beige leggings hugging curves tightly',
-    'cream oversized knit sweater falling off one shoulder revealing skin and bra strap, tiny black cotton shorts, barefoot',
-    'fitted white ribbed tank top very tight emphasizing large bust, high-waisted black leggings',
-    'silk robe loosely tied at waist, hint of lingerie underneath, sensual morning',
-    'matching beige loungewear set, cropped tank top low cut, high-waisted shorts',
-    'oversized mens white shirt unbuttoned showing black lace bralette, cycling shorts',
+    // Street vibe - lingerie visible under loose/baggy clothes
+    'oversized baggy grey sweatpants worn low on hips exposing black lace thong waistband, cropped white tank top, barefoot urban casual',
+    'extra large mens dress shirt completely unbuttoned revealing black lace bralette and high-waisted jeans, messy hair street vibe',
+    'oversized vintage band hoodie with nothing underneath except black lace panties visible at hem, bedhead hair lazy sunday',
+    'low-rise baggy cargo pants with visible g-string waistband, tight cropped tank top showing midriff, urban street style',
+    'oversized denim jacket worn open over black lace bodysuit, baggy jeans, effortless cool street aesthetic',
+    'extra large white t-shirt dress, black lace bra visible through fabric and at neckline, no pants lazy morning vibe',
   ],
   loft_bedroom: [
-    'black lace bralette visible under unbuttoned white oversized shirt, black fitted high-waisted pants',
-    'silk slip dress thin straps, fabric draping over curves, intimate elegance',
-    'matching lingerie set elegant black lace, confident boudoir energy',
-    'oversized cream sweater as dress, off-shoulder, bare legs',
-    'fitted ribbed bodysuit low cut, emphasizing silhouette',
-    'silk camisole and matching shorts set, champagne color',
+    // Street-casual meets intimate - NOT luxury boudoir
+    'oversized basketball jersey as nightshirt, black thong visible underneath, sports-luxe bedroom casual',
+    'baggy grey joggers pulled down slightly exposing lace thong waistband, cropped hoodie, lounging street vibe',
+    'oversized vintage rock band tee, no bra visible through thin fabric, boy shorts underwear, messy authentic',
+    'low-slung pajama pants revealing black lace underwear waistband, unbuttoned flannel shirt showing sports bra, cozy grunge',
+    'oversized cardigan worn open over matching black lace bralette and high-cut panties, casual intimate street mix',
+    'large mens oxford shirt half-unbuttoned showing delicate lace bralette, comfortable cotton shorts boyfriend vibes',
   ],
   bathroom_luxe: [
-    'tiny white ribbed tank top very tight showing cleavage and midriff, high-waisted black leggings',
-    'matching neutral loungewear, cropped top emphasizing bust, fitted bottoms',
-    'silk robe loosely open, tasteful hint of lingerie',
-    'fitted crop top and high-waisted joggers, casual but sexy',
+    // Casual getting-ready vibe, not luxury spa
+    'oversized white bathrobe worn loosely open revealing black sports bra and cotton underwear, wet hair towel wrapped',
+    'baggy sweatpants and sports bra only, casual morning bathroom routine authentic',
+    'oversized band tee and cotton boyshorts, brushing teeth vibe, real morning authenticity',
+    'large towel wrapped at chest, messy wet hair, natural fresh look getting ready',
   ],
   cafe_paris: [
-    'beige ribbed cropped cardigan slightly unbuttoned showing cleavage nothing underneath, high-waisted cream tailored trousers',
-    'fitted black turtleneck emphasizing curves, leather pants, chic Parisian',
-    'silk blouse slightly unbuttoned, pencil skirt, elegant sexy',
-    'fitted sundress thin straps showing décolleté, summer Paris',
+    // Street chic with visible lingerie elements
+    'oversized blazer worn with nothing underneath except black lace bralette visible, low-rise wide-leg jeans street chic',
+    'baggy vintage denim jacket, cropped tank top with bra straps visible, high-waisted mom jeans street style',
+    'oversized mens button-down tucked loosely, top buttons undone showing delicate bralette, cigarette pants',
+    'relaxed fit linen pants with visible thong line, cropped cardigan unbuttoned revealing sports bra underneath',
   ],
   spa_luxe: [
     'elegant cream one-piece swimsuit plunging deep V-neckline showing generous cleavage, high cut on hips',
@@ -809,12 +813,12 @@ async function main() {
 
     // Add framing instructions for carousel diversity (real IG style)
     const framingInstructions = [
-      // Image 1: Hero shot - medium/full body with environment
-      ', FRAMING: medium shot showing full body, subject takes 60% of frame, room/environment clearly visible around her, not perfectly centered',
-      // Image 2: Close-up portrait
+      // Image 1: HERO - Full body standing, front-facing, confident eye contact
+      ', FRAMING: full body standing pose, front-facing, subject confident and centered, takes 50-60% of frame, room environment visible, direct eye contact with camera, hero energy',
+      // Image 2: Close-up portrait - intimate face focus
       ', FRAMING: CLOSE UP from shoulders up, face fills 70% of frame, shallow depth of field, intimate portrait feel',
-      // Image 3: Candid with environment focus
-      ', FRAMING: candid angle, show environment details (messy bed, phone visible, real room), slightly imperfect framing adds authenticity',
+      // Image 3: DIFFERENT ANGLE - back/side view, NOT looking at camera, candid paparazzi vibe
+      ', FRAMING: unconventional angle - FROM BEHIND showing back of body and hair OR sitting/lying position OR side profile, subject NOT looking at camera, caught in a moment, candid paparazzi energy, real authentic feel',
     ];
     const action = baseAction + framingInstructions[i % framingInstructions.length];
 

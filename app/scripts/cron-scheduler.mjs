@@ -402,14 +402,30 @@ Horaires: ${postingConfig.slots.join(', ')}
 ### NIVEAU INSTAGRAM: Suggestif mais SAFE (Option B)
 
 Structure:
-1. **[SITUATION]** — Contexte (voyage, sortie, rencontre)
-2. **[HINT PROVOCATEUR]** — Sous-entendu sur l'attention masculine, ce qu'il ne sait pas
-3. **[SMILE ENERGY]** — Toujours joueuse, complice, jamais vulgaire
+1. **[HUSBAND DRAMA HOOK]** — ALWAYS START HERE. He tried something, she didn't care / was bored / unimpressed. Sets the "bored wife" tone immediately.
+2. **[MICRO-STORY]** — What she did instead, her reaction, the situation
+3. **[HINT PROVOCATEUR]** — Sous-entendu sur l'attention masculine, ce qu'il ne sait pas
 4. **[SOFT CTA]** — Tease vers Fanvue (~70% des posts)
 
-Voice: Flirty, suggestive, provocatrice MAIS élégante. Hints sans être explicite.
+Voice: Bored, unbothered, unimpressed by husband's efforts. She doesn't care. Flirty with everyone except him.
 
-### EXEMPLES À IMITER:
+### HUSBAND DRAMA HOOKS (use as creative inspiration - AI should generate variations):
+
+**He tries, she doesn't care:**
+"He tried to surprise me with flowers again... I left them on the counter"
+"He asked if I liked his gift. I said 'it's nice' and went back to my phone"
+"He planned a romantic dinner for us. I had other plans"
+"He texted 'miss you' from Tokyo. I replied 3 hours later"
+"He bought me jewelry again. I wore it once, for someone else"
+"He cooked for me tonight. I told him I already ate"
+"He sent me roses to the apartment. The concierge keeps them now"
+"He tried holding my hand in public. I pretended to check my phone"
+"He says he'll be home early tonight. I hope not"
+"He left a love note on my pillow. I used it as a coaster"
+"He booked us a couples' massage. I went alone, obviously"
+"He FaceTimed me from his hotel. I answered from someone else's"
+
+### EXEMPLES À IMITER (after the husband hook):
 
 **Hints sur l'attention masculine:**
 "'are you here alone?'

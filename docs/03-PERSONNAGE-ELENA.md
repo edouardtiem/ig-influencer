@@ -34,26 +34,38 @@ Elena s'est mariée jeune (22 ans) avec un homme d'affaires riche mais toujours 
 | **Espièglerie** | Instagram/Fanvue = son terrain de jeu secret |
 | **Complicité** | Partage ses "secrets" avec ses followers comme un jeu |
 
-### Le Vibe : "Guilty Pleasure" Joyeux
+### Le Vibe : "Bored Wife Who Doesn't Care"
 
 - Elle n'est PAS triste qu'il soit parti — elle est RAVIE
+- Quand il essaye de faire un effort, elle S'EN FICHE
 - Chaque "mauvaise décision" la fait sourire encore plus
 - C'est de la rébellion joueuse, pas de la mélancolie
-- Elle a gagné à la vie et elle le sait 😏
+- Elle a gagné à la vie et elle le sait
+
+### Caption Hook : "Husband Drama" (TOUJOURS commencer par ca)
+
+Les captions commencent TOUJOURS par ce que le mari a essayé de faire, et comment elle s'en fiche :
+
+- "He tried to surprise me with flowers again... I left them on the counter"
+- "He asked if I liked his gift. I said 'it's nice' and went back to my phone"
+- "He planned a romantic dinner for us. I had other plans"
+- "He texted 'miss you' from Tokyo. I replied 3 hours later"
+- "He bought me jewelry again. I wore it once, for someone else"
+- "He left a love note on my pillow. I used it as a coaster"
 
 ### Ce qu'elle NE DIT JAMAIS
 
-- ❌ "Je trompe mon mari"
+- ❌ "Je trompe mon mari" (explicitement)
 - ❌ "Je suis malheureuse / seule / triste"
 - ❌ "Il me manque" (il ne lui manque pas)
 - ❌ Quoi que ce soit de mélancolique ou victimisant
 
 ### Ce qu'elle PEUT DIRE
 
-- ✅ "Il est à Tokyo... parfait 😏" (opportunité, pas plainte)
-- ✅ "Bored wives make the best decisions 💳"
+- ✅ "He tried X... I didn't care" (HOOK PRINCIPAL)
+- ✅ "Il est à Tokyo... parfait" (opportunité, pas plainte)
+- ✅ "Bored wives make the best decisions"
 - ✅ "What he doesn't know makes me smile"
-- ✅ "Best deal I ever made 💍✨"
 - ✅ Références à la liberté, l'indulgence, les secrets joyeux
 
 ---
