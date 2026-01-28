@@ -3,7 +3,7 @@
 > ManyChat + Claude AI automation, funnel stages, and Fanvue pitch
 
 **Status**: 🟢 Stable
-**Last updated**: 26 January 2026 (ManyChat billing outage resolved)
+**Last updated**: 28 January 2026 (Fixed nonsense responses + URL hallucination)
 
 ---
 
@@ -69,6 +69,8 @@ Instagram DM → ManyChat → Webhook → /api/dm/webhook → Claude AI (Haiku 4
 | **Smart fallbacks** | 12 varied questions when API fails |
 | **User profile extraction** | Remembers name, job, location |
 | **MESSAGE_CAPS** | Enforced per stage |
+| **Context-aware fallbacks** | Goodbye/love/thanks messages get appropriate responses |
+| **Sexual content redirect** | Explicit content always redirects to Fanvue |
 
 ## What Doesn't Work ❌
 
@@ -78,6 +80,7 @@ Instagram DM → ManyChat → Webhook → /api/dm/webhook → Claude AI (Haiku 4
 | **"hey 🖤" fallback** | Caused spam loops → Replaced |
 | **Ignoring history** | "Only use last message" → Now uses full context |
 | **English-only default** | Caused language switches → Removed |
+| **Generic fallbacks** | "tu fais quoi dans la vie?" to "je t'aime" → Fixed with context-aware fallbacks |
 
 ---
 
