@@ -2,8 +2,8 @@
 
 > LoRA training, checkpoints, IP-Adapter FaceID, face consistency, and image quality
 
-**Status**: 🟡 In Progress (all models uploaded, test generation pending)
-**Last updated**: 25 January 2026 (Session 6)
+**Status**: ✅ Working (end-to-end test passed)
+**Last updated**: 28 January 2026 (Session 9)
 
 ---
 
@@ -37,12 +37,13 @@ Image generation is **95% working**. Body consistency and image quality are now 
 
 | Setting | Value |
 |---------|-------|
-| **Pod ID** | `adlni6ocoi3sip` (stopped, resume with runpod-connect.mjs) |
+| **Pod ID** | `0nfcd8w6s1f0ux` (stopped, resume with runpod-connect.mjs) |
 | **Volume** | `aml40rql5h` (elena-comfyui-US-TX-3, 50GB) ✅ PERSISTENT |
 | **GPU** | RTX 4090 (24GB) |
 | **ComfyUI URL** | `https://{pod-id}-8188.proxy.runpod.net` (dynamic) |
 | **Speed** | ~50s/image |
 | **Datacenter** | US-TX-3 |
+| **PyTorch** | 2.4.0+cu121 |
 
 **Installed Models** (persistent on volume):
 - ✅ **BigLove XL** (6.94GB) - `bigLove_xl1.safetensors`
@@ -53,23 +54,29 @@ Image generation is **95% working**. Body consistency and image quality are now 
 - ✅ 4x-UltraSharp (64MB)
 - ✅ SAM vit_b
 - ✅ elena_face_ref.jpg
-- ✅ **Qwen Text Encoder** (16GB) - `qwen_2.5_vl_7b.safetensors`
-- ✅ **Qwen VAE** (243MB) - `qwen_image_vae.safetensors`
-- ✅ **Qwen-Image-Edit GGUF** (12.3GB) - `qwen-image-edit-2511-Q4_K_M.gguf`
+- ✅ **FLUX.1 [dev] FP8** (17GB) - `flux1-dev-fp8.safetensors` (unified checkpoint)
+- ✅ **T5-XXL FP8** (4.6GB) - `t5xxl_fp8_e4m3fn.safetensors`
+- ✅ **CLIP-L** (235MB) - `clip_l.safetensors`
+- ❌ FLUX.2 Klein 9B removed (replaced by FLUX.1 [dev])
+- ❌ Qwen 3 8B removed (freed space for FLUX.1 [dev])
 
 **Custom Nodes**: ComfyUI_IPAdapter_plus, ComfyUI-Impact-Pack, **ComfyUI-GGUF**
 
 ### Quick Start RunPod
 
 ```bash
+# 1. Start pod (creates/resumes)
+node app/scripts/runpod-connect.mjs
+# Output: ComfyUI: https://{pod-id}-8188.proxy.runpod.net
+
+# 2. Generate image (replace URL from step 1)
+COMFYUI_URL=https://{pod-id}-8188.proxy.runpod.net node app/scripts/elena-simple-test.mjs
+
+# 3. Stop pod (saves $, data preserved)
+node app/scripts/runpod-connect.mjs --stop
+
 # Check status
 node app/scripts/runpod-connect.mjs --status
-
-# Connect (shows URLs)
-node app/scripts/runpod-connect.mjs
-
-# Stop pod (saves $, data preserved on volume)
-node app/scripts/runpod-connect.mjs --stop
 ```
 
 **Note**: Data persists on volume. You can stop/terminate pods without losing models.
@@ -94,6 +101,9 @@ node app/scripts/runpod-connect.mjs --stop
 | **LR 5e-5** | Stable training (vs 1e-4 which caused NaN) |
 | **RunPod RTX 4090** | ~50s/image with Qwen, pod `dortewt0b3tom3` |
 | **Qwen-Image-Edit** | Works! Generation test successful (~50s for 1024x1024) |
+| **FLUX.2 Klein 9B** | Works but "AI-clean" look - distilled model limitation |
+| **BigLove → FLUX refinement** | Two-stage pipeline: realistic base + face consistency |
+| **ReferenceLatent (FLUX)** | Injects face reference into conditioning, works well |
 
 ## What Doesn't Work ❌
 
@@ -107,6 +117,8 @@ node app/scripts/runpod-connect.mjs --stop
 | **Dual IP-Adapter (face + style)** | Unnecessary complexity, style can come from prompt |
 | **fp16 training** | Causes NaN loss |
 | **LR 1e-4** | Too high, causes NaN |
+| **FLUX.2 Klein 9B** | Rendu trop "propre", peau plastique (distilled = speed not quality) |
+| **FLUX.1 [dev] Full 32B** | Même problème de peau plastique que Klein - inherent to FLUX architecture |
 
 ## Open Questions ❓
 
@@ -119,10 +131,9 @@ node app/scripts/runpod-connect.mjs --stop
 
 | # | Task | Status | Priority | Link |
 |---|------|--------|----------|------|
-| 004 | Qwen face refinement (85% → 95%) | 🟡 In Progress | Immediate | [→](./tasks/TASK-004-qwen-face-refinement.md) |
-| 005 | RunPod persistent setup | 🟡 In Progress | High | [→](./tasks/TASK-005-runpod-persistent-setup.md) |
+| 004 | Face refinement (85% → 95%) | 🟡 In Progress | Immediate | [→](./tasks/TASK-004-qwen-face-refinement.md) |
 
-**Next**: Start pod, launch ComfyUI, test Qwen face refinement workflow
+**Next**: Focus on face refinement via FaceDetailer or other SDXL-compatible methods (FLUX abandoned for quality reasons)
 
 ### Backlog
 
@@ -131,11 +142,18 @@ node app/scripts/runpod-connect.mjs --stop
 - Retrain with Network Dim 64 (vs 32)
 - Use unique trigger word ("sks" vs "elena")
 
+## Blocked/Abandoned Tasks
+
+| # | Task | Status | Link |
+|---|------|--------|------|
+| 006 | FLUX.1 [dev] Full installation | ❌ Blocked (plastic skin) | [→](./tasks/TASK-006-flux2-dev-installation.md) |
+
 ## Completed Tasks
 
 | # | Task | Completed | Link |
 |---|------|-----------|------|
 | 001 | Grain reduction (CFG 4.0 + dpmpp_2m_sde) | 23 Jan 2026 | [→](./tasks/DONE-001-grain-reduction.md) |
+| 005 | RunPod persistent setup | 25 Jan 2026 | [→](./tasks/DONE-005-runpod-persistent-setup.md) |
 
 ---
 

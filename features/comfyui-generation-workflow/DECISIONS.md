@@ -4,6 +4,65 @@ Chronological log of decisions made and why.
 
 ---
 
+## 2026-01-28: FLUX abandonné - Peau plastique inhérente à l'architecture
+
+**Context**: Tested FLUX.1 [dev] Full (32B) après FLUX.2 Klein 9B, espérant que le modèle complet aurait une meilleure qualité de peau.
+
+**Tests effectués**:
+| Modèle | Params | Résultat |
+|--------|--------|----------|
+| FLUX.2 Klein 9B | 9B (distillé) | Peau plastique ❌ |
+| FLUX.1 [dev] Full | 32B (complet) | Peau plastique ❌ |
+| BigLove XL | SDXL | Peau réaliste ✅ |
+
+**Constat**: Le problème de peau "AI-clean" n'est PAS dû à la distillation. C'est inhérent à l'architecture FLUX elle-même. Le modèle complet 32B produit le même rendu plastique que le distillé 9B.
+
+**Decision**: Abandonner FLUX pour la génération photoréaliste
+
+**Reason**:
+- FLUX (toutes versions) = peau plastique, éclairage trop parfait
+- BigLove XL = texture de peau naturelle, imperfections, réalisme
+- Inutile d'investir plus de temps dans FLUX pour ce use case
+
+**Recommendation**:
+- Garder BigLove XL comme checkpoint principal
+- Focus sur amélioration face via FaceDetailer ou autres méthodes SDXL
+- FLUX potentiellement utile pour d'autres styles (illustrations, etc.) mais pas pour photoréalisme
+
+**Status**: Décision finale - FLUX abandonné pour Elena
+
+---
+
+## 2026-01-28: FLUX.2 [dev] Full vs Klein vs BigLove (historique)
+
+**Context**: Face refinement needs improvement. Tested FLUX.2 Klein 9B but results were "too AI-clean" (plastique skin).
+
+**Options considered**:
+1. **BigLove XL seul** — Realistic skin but face ~85% accurate
+2. **BigLove → FLUX Klein refinement** — Two-stage, realistic base + face fix
+3. **FLUX.2 Klein seul** — Fast but AI-clean look (distilled = speed not quality)
+4. **FLUX.2 [dev] Full** — 32B params, should match/exceed BigLove quality
+
+**Decision**: Install FLUX.2 [dev] Full (32B) to test
+
+**Result**: ❌ FAILED - Same plastic skin as Klein. Issue is FLUX architecture, not distillation.
+
+---
+
+## 2026-01-28: FLUX.2 Klein installed, Qwen models removed
+
+**Context**: Needed space for FLUX models on RunPod volume (50GB limit)
+
+**Action taken**:
+- Removed Qwen models (~28GB): qwen_2.5_vl_7b, qwen-image-edit GGUF, qwen_image_vae
+- Installed FLUX.2 Klein 9B FP8 (9.5GB)
+- Installed Qwen 3 8B FP8 (8.3GB) - FLUX text encoder
+- Installed flux2-vae (321MB)
+
+**Result**: ~23GB free space remaining. Enough for FLUX.2 [dev] (~16GB) if we remove Klein.
+
+---
+
 ## 2026-01-24: Qwen-Image-Edit working on new RunPod pod
 
 **Context**: Original pod (US-NC-1) unavailable due to GPU shortage. Created new pod in US-TX-3.
