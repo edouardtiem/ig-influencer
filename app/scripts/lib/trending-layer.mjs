@@ -410,10 +410,10 @@ function getFallbackTrendingSafe() {
         whyTrending: 'Intimate bedroom content performs well for engagement',
         similarTo: 'Cozy intimate top performers'
       },
-      outfit: { 
-        name: 'Delicate Loungewear', 
-        promptFragment: 'delicate silk camisole and shorts set in soft blush, intimate loungewear aesthetic, elegant at-home moment',
-        whyTrending: 'Loungewear content matches cozy aesthetic preferences'
+      outfit: {
+        name: 'Cozy Morning',
+        promptFragment: 'oversized cream sweater worn as dress off-shoulder, legs visible, cozy intimate morning',
+        whyTrending: 'Oversized sweater content matches cozy aesthetic preferences'
       },
       pose: { 
         name: 'Bed Stretch', 

@@ -4,6 +4,33 @@ Chronological log of decisions made and why.
 
 ---
 
+## 2026-01-28: Use Perplexity/Claude Decisions Directly — Stop Hardcoded Array Override
+
+**Context**: User noticed silk pajamas content kept appearing despite deciding to stop that style. Investigation revealed scheduled-post.mjs was ignoring Claude's outfit/pose decisions and randomly picking from hardcoded arrays.
+
+**Root cause**:
+- `enhanceElenaOutfit()` and similar functions would randomly select from `ELENA_SEXY_OUTFIT_DETAILS` arrays
+- This completely overrode Claude's decisions (which incorporated Perplexity's trending suggestions)
+- Flow was broken: `Perplexity → Claude ✅ → scheduled-post.mjs ❌ ignores → random array pick`
+
+**Options considered**:
+1. Keep arrays as fallback → Still overrides Perplexity
+2. Remove arrays, use Claude's decisions directly → Perplexity trends flow through
+
+**Decision**:
+- `enhanceElenaOutfit()`, `enhanceElenaAction()`, `enhanceMilaOutfit()`, `enhanceMilaAction()` now return the original value (Claude's decision)
+- Removed silk camisole/pajama entries from remaining arrays (fallback cleanup)
+- Perplexity is now "owner" of outfit/pose/location trending decisions
+
+**Changes**:
+- `scheduled-post.mjs`: enhance functions now passthrough Claude's decisions
+- `trending-layer.mjs`: Fallback "Delicate Loungewear" (silk) replaced with "Cozy Morning" (sweater)
+- `carousel-post.mjs`: Silk entries removed from outfit arrays (Mila)
+
+**Result**: Perplexity → Claude → generation chain now intact. No more random array override.
+
+---
+
 ## 2026-01-23: Fix Elena Face Consistency — Trust Images, Not Text
 
 **Context**: Post de 21h showed a completely different person than Elena. Investigation revealed Nano Banana Pro was ignoring the reference image.

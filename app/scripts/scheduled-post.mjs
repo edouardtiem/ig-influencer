@@ -223,23 +223,22 @@ const DETAIL_SHOTS = {
 // OK: silk slip, bodysuit, mini dress, cleavage (with dress), fitted, elegant
 const ELENA_SEXY_OUTFIT_DETAILS = {
   bedroom: [
-    'silk slip dress with delicate straps, elegant draping, intimate elegance',
-    'elegant silk loungewear set, confident feminine energy, sophisticated',
-    'silk camisole and matching shorts set champagne color, elegant fit',
     'oversized cream sweater worn as dress off-shoulder, legs visible, cozy intimate morning',
     'fitted black bodysuit, sleek and elegant, morning light',
+    'oversized mens dress shirt unbuttoned showing lace bralette underneath, morning light',
+    'low-rise sweatpants revealing lace underwear waistband, fitted crop top, casual sexy',
   ],
   living: [
     'fitted crop top showing midriff, high-waisted leggings, athletic chic',
     'cream oversized knit sweater falling off one shoulder, fitted black shorts',
     'fitted white ribbed tank top, high-waisted black leggings, casual elegance',
-    'silk robe elegantly tied at waist, loungewear underneath',
     'tight black mini dress, figure-hugging, confident style',
+    'oversized hoodie unzipped over lace bralette, low-rise joggers',
   ],
   bathroom: [
-    'silk robe tied elegantly, getting ready moment, feminine',
     'matching cream loungewear set, showing midriff, elegant spa moment',
     'bubble bath with only shoulders visible, relaxed spa moment',
+    'oversized towel wrapped, getting ready moment, feminine',
   ],
   default: [
     'form-fitting dress with elegant silhouette',
@@ -280,11 +279,11 @@ const ELENA_SEXY_ACTION_DETAILS = {
 
 const MILA_SEXY_OUTFIT_DETAILS = {
   bedroom: [
-    'silk champagne camisole with thin delicate straps, matching shorts, intimate elegance',
     'oversized white cotton t-shirt slipping off one shoulder, bare legs, just woke up authentic',
     'fitted ribbed gray bodysuit with thin spaghetti straps, fabric hugging curves elegantly',
     'delicate lace bralette visible under loose tank top, cozy morning',
     'oversized cream knit sweater falling off shoulder, cotton boyshort underneath',
+    'low-rise pajama pants revealing lace underwear waistband, fitted tank top',
   ],
   living: [
     'fitted ribbed bodysuit heather gray, thin straps, barefoot on sofa, relaxed allure',
@@ -348,32 +347,22 @@ function getLocationCategory(locationName) {
   return 'default';
 }
 
+// 2026-01-28: Use Claude's decisions directly (which incorporate Perplexity trends)
+// Previously these functions would randomly pick from hardcoded arrays, ignoring Claude's choices
 function enhanceElenaOutfit(originalOutfit, locationName) {
-  const category = getLocationCategory(locationName);
-  const sexyOptions = ELENA_SEXY_OUTFIT_DETAILS[category] || ELENA_SEXY_OUTFIT_DETAILS.default;
-  const sexyOutfit = sexyOptions[Math.floor(Math.random() * sexyOptions.length)];
-  return `${sexyOutfit}, ${originalOutfit}`;
+  return originalOutfit;
 }
 
 function enhanceElenaAction(originalAction, locationName) {
-  const category = getLocationCategory(locationName);
-  const sexyOptions = ELENA_SEXY_ACTION_DETAILS[category] || ELENA_SEXY_ACTION_DETAILS.default;
-  const sexyAction = sexyOptions[Math.floor(Math.random() * sexyOptions.length)];
-  return `${sexyAction}, ${originalAction}`;
+  return originalAction;
 }
 
 function enhanceMilaOutfit(originalOutfit, locationName) {
-  const category = getLocationCategory(locationName);
-  const sexyOptions = MILA_SEXY_OUTFIT_DETAILS[category] || MILA_SEXY_OUTFIT_DETAILS.default;
-  const sexyOutfit = sexyOptions[Math.floor(Math.random() * sexyOptions.length)];
-  return `${sexyOutfit}, ${originalOutfit}`;
+  return originalOutfit;
 }
 
 function enhanceMilaAction(originalAction, locationName) {
-  const category = getLocationCategory(locationName);
-  const sexyOptions = MILA_SEXY_ACTION_DETAILS[category] || MILA_SEXY_ACTION_DETAILS.default;
-  const sexyAction = sexyOptions[Math.floor(Math.random() * sexyOptions.length)];
-  return `${sexyAction}, ${originalAction}`;
+  return originalAction;
 }
 
 // ===========================================

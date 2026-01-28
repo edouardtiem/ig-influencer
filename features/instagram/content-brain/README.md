@@ -2,8 +2,8 @@
 
 > Automated content scheduling, AI-powered creative decisions, and Instagram posting
 
-**Status**: 🟢 Stable (v3 "Freedom Mode")  
-**Last updated**: 23 January 2026
+**Status**: 🟢 Stable (v3 "Freedom Mode")
+**Last updated**: 28 January 2026
 
 ---
 
@@ -46,6 +46,7 @@ Analytics + History ────┘
 | What | Details |
 |------|---------|
 | **Freedom Mode (v3)** | Claude invents locations, outfits, poses freely |
+| **Perplexity → Claude flow** | Claude's decisions (based on Perplexity trends) now used directly |
 | **Blocklist sanitization** | Pre-sanitize prompts, retry on failure |
 | **7-day avoid list** | Prevents repeating same locations |
 | **Trending layer** | Perplexity for current trends |
@@ -58,6 +59,8 @@ Analytics + History ────┘
 | What | Details |
 |------|---------|
 | **Hardcoded locations** | 90 static locations removed |
+| **Hardcoded outfit/pose arrays** | Ignored Claude's decisions → Now use Claude directly |
+| **Silk pajamas/camisoles** | Outdated style → Removed, modern styles preferred |
 | **Analytics in trending** | Caused Bali/Mykonos loop → Removed |
 | **3-day avoid list** | Too short → Extended to 7 days |
 | **Detailed face descriptions** | Override image refs → Simplified to "copy IMAGE 1" |

@@ -215,21 +215,21 @@ const OUTFITS = {
   home_bedroom: [
     'fitted ribbed gray bodysuit Skims style with thin spaghetti straps, fabric hugging curves elegantly',
     'oversized white cotton t-shirt slipping off one shoulder, bare legs, just woke up authentic',
-    'silk champagne camisole Intimissimi style with thin delicate straps, matching shorts',
     'oversized cream knit sweater falling off shoulder, Savage x Fenty cotton boyshort underneath',
     'loose mens dress shirt in white unbuttoned showing décolleté, sleeves rolled up casual',
     'matching cotton underwear set Etam style neutral tone, soft bralette and high-waisted brief',
     'fitted black ribbed tank top thin straps Alo Yoga style, high-waisted cotton panties',
     'delicate lace bralette Livy Paris style visible under loose tank top, cozy morning',
+    'low-rise sweatpants revealing lace underwear waistband, fitted crop top, morning casual',
   ],
   home_living_room: [
     'fitted ribbed bodysuit Skims style heather gray, thin straps, barefoot on sofa',
     'oversized cream sweater slipping off one shoulder revealing skin, bare legs tucked',
     'matching loungewear set Alo Yoga style, cropped top and high-waisted leggings beige',
-    'silk camisole Intimissimi style soft pink, loose pajama pants, cozy evening',
     'fitted tank top no visible bra natural silhouette, cotton shorts casual home',
     'oversized hoodie as dress Brandy Melville style, sleeves covering hands',
     'yoga set Lululemon style, fitted crop top and high-waisted leggings showing midriff',
+    'oversized hoodie unzipped over lace bralette, low-rise joggers showing hip bones',
   ],
   paris_cafe: [
     'fitted ribbed top Sézane style white, high-waisted jeans, effortless Parisian chic',
