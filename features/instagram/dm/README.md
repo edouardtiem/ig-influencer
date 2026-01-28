@@ -91,6 +91,7 @@ Instagram DM → ManyChat → Webhook → /api/dm/webhook → Claude AI (Haiku 4
 
 | # | Task | Completed | Link |
 |---|------|-----------|------|
+| 002 | Fix nonsense responses & API costs | 28 Jan 2026 | [→](./tasks/DONE-002-fix-nonsense-responses.md) |
 | 001 | Gleeful wife persona sync | 23 Jan 2026 | [→](./tasks/DONE-001-gleeful-wife-persona-sync.md) |
 
 ## Next Steps
