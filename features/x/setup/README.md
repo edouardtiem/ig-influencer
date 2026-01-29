@@ -2,7 +2,7 @@
 
 > Account creation, profile optimization, and initial configuration
 
-**Status**: 🟡 In Progress
+**Status**: ✅ Done
 **Last updated**: 29 January 2026
 
 ---
@@ -105,14 +105,15 @@ For tweets redirecting to Fanvue:
 
 ## Checklist
 
-- [ ] Create X account (@elena_verne)
-- [ ] Write bio (choose option A or B)
-- [ ] Upload profile picture
-- [ ] Upload banner image
-- [ ] Enable sensitive content setting
-- [ ] Add Fanvue link to bio
-- [ ] Create pinned tweet
-- [ ] Set account to "Creator" mode
+- [x] Create X account (@ElenaVisco46970)
+- [x] Write bio
+- [x] Upload profile picture
+- [ ] Upload banner image _(bloqué par ComfyUI)_
+- [x] Enable sensitive content setting
+- [x] Add Fanvue link to bio
+- [x] Create first tweet
+- [ ] Pin first tweet _(optionnel)_
+- [x] ~~Set account to "Creator" mode~~ _(pas nécessaire - X Premium only)_
 
 ---
 
@@ -120,7 +121,7 @@ For tweets redirecting to Fanvue:
 
 | Blocker | Status | Impact |
 |---------|--------|--------|
-| Face consistency (ComfyUI) | 🔴 Blocked | Need coherent face for profile pic |
+| Face consistency (ComfyUI) | 🔴 Blocked | Banner image (profil pic done avec placeholder) |
 
 ---
 

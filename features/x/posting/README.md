@@ -135,16 +135,16 @@ const params = {
 | Blocker | Status | Impact |
 |---------|--------|--------|
 | Face consistency (ComfyUI) | 🔴 Blocked | Need coherent images to post |
-| X account setup | 🔴 Blocked | Need account before posting |
-| X API keys | 🔵 Todo | Need developer account |
+| ~~X account setup~~ | ✅ Done | Account @ElenaVisco46970 ready |
+| ~~X API keys~~ | ✅ Done | OAuth 2.0 fonctionne |
 
 ---
 
 ## Next Steps
 
-1. [ ] Set up X developer account
-2. [ ] Get API keys
-3. [ ] Build `x-api.ts` client
-4. [ ] Build `x-post.mjs` script
-5. [ ] Create GitHub Actions workflow
-6. [ ] Test posting flow
+1. [x] Set up X developer account
+2. [x] Get API keys (OAuth 2.0)
+3. [x] Build `x-api.ts` client
+4. [x] Build posting script
+5. [ ] Create GitHub Actions workflow _(blocked by ComfyUI)_
+6. [x] Test posting flow

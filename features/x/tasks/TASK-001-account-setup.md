@@ -1,6 +1,6 @@
 # TASK-001: X Account Setup & API
 
-**Status**: ❌ Blocked (OAuth 1.0a issue)
+**Status**: ✅ Done (banner à faire plus tard)
 **Created**: 2026-01-29
 **Feature**: [X](../README.md) > [Setup](../setup/)
 
@@ -18,12 +18,12 @@ Create X/Twitter account for Elena, configure profile, and set up free tier API 
 - [x] X account created (@ElenaVisco46970)
 - [x] Bio written and set
 - [x] Profile picture uploaded
-- [ ] Banner image uploaded
-- [ ] Sensitive content setting enabled
-- [ ] Fanvue link in bio
+- [ ] Banner image uploaded _(bloqué par ComfyUI - à faire plus tard)_
+- [x] Sensitive content setting enabled
+- [x] Fanvue link in bio
 - [x] First post created
-- [ ] First post pinned
-- [ ] Account set to Creator mode
+- [ ] First post pinned _(optionnel)_
+- [x] ~~Account set to Creator mode~~ _(pas nécessaire - réservé X Premium)_
 
 ### API Setup (Pay Per Use)
 - [x] X Developer Portal account created
@@ -32,7 +32,7 @@ Create X/Twitter account for Elena, configure profile, and set up free tier API 
 - [x] User Authentication configured (Read and Write)
 - [x] API keys obtained and added to `.env.local`
 - [x] Test script created (`app/scripts/x-test-post.mjs`)
-- [ ] Basic API test works (OAuth 1.0a blocked — needs debugging)
+- [x] API posting works (OAuth 2.0 implémenté)
 
 ---
 
@@ -152,11 +152,14 @@ X_ACCESS_SECRET=your_access_secret
 - Access Token generated for wrong app (old app vs Elena2)
 - Need to ensure Access Token is generated from SAME app as Consumer Keys
 
-**Next Steps:**
-1. Go to Elena2 app specifically
-2. Regenerate Access Token from Elena2's "Keys and Tokens"
-3. Test API again
-4. If still failing, investigate Pay Per Use + OAuth 1.0a compatibility
+**Résolu:** OAuth 2.0 implémenté, posting fonctionne.
+
+### 2026-01-29 (Session finale)
+- Sensitive content setting activé
+- Lien Fanvue ajouté à la bio
+- API posting testé et fonctionne (OAuth 2.0)
+- Creator mode: pas nécessaire (réservé X Premium)
+- **Reste uniquement:** banner image (bloqué par cohérence visage ComfyUI)
 
 ---
 
