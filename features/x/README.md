@@ -6,9 +6,9 @@
 
 ---
 
-## Status: BLOCKED (API OAuth issue)
+## Status: ✅ READY (API working)
 
-> Account created, but API posting blocked by OAuth 1.0a authentication issue. Bearer Token works, user context auth fails.
+> Account created, OAuth 2.0 authentication working, can post tweets via API.
 
 ---
 
@@ -16,7 +16,7 @@
 
 | Feature | Status | Description | Link |
 |---------|--------|-------------|------|
-| **Setup** | ❌ Blocked | Account done, API OAuth issue | [→](./setup/) |
+| **Setup** | ✅ Done | Account + API working | [→](./setup/) |
 | **Posting** | 🔵 Todo | Content scheduling, 3-4 posts/day | [→](./posting/) |
 | **Replies** | 🔵 Todo | Auto-reply to comments (Claude AI) | [→](./replies/) |
 | **Engagement** | 🔵 Todo | Manual like tactics (NO automation) | [→](./engagement/) |
@@ -57,7 +57,7 @@ X teasers (3-4/day) → Profile → Bio link → Fanvue → Venice AI chat → P
 
 | Task | Title | Status | Date |
 |------|-------|--------|------|
-| TASK-001 | Account Setup & API | ❌ Blocked | 2026-01-29 |
+| TASK-001 | Account Setup & API | ✅ Done | 2026-01-29 |
 
 ---
 
@@ -65,6 +65,7 @@ X teasers (3-4/day) → Profile → Bio link → Fanvue → Venice AI chat → P
 
 | Task | Title | Status | Date |
 |------|-------|--------|------|
+| DONE-002 | X API OAuth 2.0 Connection | ✅ Complete | 2026-01-29 |
 
 ---
 
@@ -72,6 +73,7 @@ X teasers (3-4/day) → Profile → Bio link → Fanvue → Venice AI chat → P
 
 | Date | Decision | Reason |
 |------|----------|--------|
+| 2026-01-29 | Use OAuth 2.0 instead of OAuth 1.0a | OAuth 1.0a doesn't work with Pay Per Use tier |
 | 2026-01-29 | Auto-reply to OWN post comments OK | Reactive engagement is safer than proactive DMs |
 | 2026-01-29 | No mass auto-engagement | Can't auto-like/reply on OTHER accounts' posts |
 | 2026-01-29 | No DM automation | Lesson from IG ban |
@@ -88,7 +90,7 @@ X teasers (3-4/day) → Profile → Bio link → Fanvue → Venice AI chat → P
 | **Name** | Elena Visconti |
 | **Posts** | 3-4/day (target) |
 | **API Plan** | Pay Per Use ($10 credits) |
-| **API Status** | ❌ OAuth 1.0a blocked |
+| **API Status** | ✅ OAuth 2.0 working |
 
 ---
 
@@ -98,14 +100,29 @@ X teasers (3-4/day) → Profile → Bio link → Fanvue → Venice AI chat → P
 - Bio and profile picture set
 - Developer Portal account created
 - Pay Per Use credits loaded
-- Bearer Token authentication (app-only)
+- **OAuth 2.0 authentication (user context)**
+- **Posting tweets via API**
 - User lookup via API
+- Token refresh for long-term use
 
 ## What Doesn't Work ❌
 
-- OAuth 1.0a user context authentication
-- Posting tweets via API (401 Unauthorized)
-- Access Token keeps reporting "Invalid or expired token"
+- OAuth 1.0a (legacy, broken with Pay Per Use)
+
+---
+
+## API Usage
+
+```bash
+# Check auth status
+node app/scripts/x-oauth2-test.mjs --status
+
+# Post a tweet
+node app/scripts/x-oauth2-test.mjs --post
+
+# Refresh tokens (if expired)
+node app/scripts/x-oauth2-test.mjs --refresh
+```
 
 ---
 
