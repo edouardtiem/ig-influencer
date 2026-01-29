@@ -17,7 +17,7 @@
 | Feature | Status | Description | Link |
 |---------|--------|-------------|------|
 | **Setup** | ✅ Done | Account + API working | [→](./setup/) |
-| **Posting** | 🔵 Todo | Content scheduling, 3-4 posts/day | [→](./posting/) |
+| **Posting** | 🟡 Planning Done | Real-time generation, 3-4 posts/day | [→](./posting/) |
 | **Replies** | 🔵 Todo | Auto-reply to comments (Claude AI) | [→](./replies/) |
 | **Engagement** | 🔵 Todo | Manual like tactics (NO automation) | [→](./engagement/) |
 
@@ -57,6 +57,12 @@ X teasers (3-4/day) → Profile → Bio link → Fanvue → Venice AI chat → P
 
 | Task | Title | Status | Date |
 |------|-------|--------|------|
+| TASK-003 | X Auto-Posting (Content Brain) | 🔵 Todo | 2026-01-29 |
+
+## Done Tasks (not yet renamed)
+
+| Task | Title | Status | Date |
+|------|-------|--------|------|
 | TASK-001 | Account Setup & API | ✅ Done | 2026-01-29 |
 
 ---
@@ -73,6 +79,8 @@ X teasers (3-4/day) → Profile → Bio link → Fanvue → Venice AI chat → P
 
 | Date | Decision | Reason |
 |------|----------|--------|
+| 2026-01-29 | Real-time generation for posting | Generate at post time, not daily scheduler. More reactive to changes. |
+| 2026-01-29 | Text-only posts first | ComfyUI face consistency not ready. Add images later. |
 | 2026-01-29 | Use OAuth 2.0 instead of OAuth 1.0a | OAuth 1.0a doesn't work with Pay Per Use tier |
 | 2026-01-29 | Auto-reply to OWN post comments OK | Reactive engagement is safer than proactive DMs |
 | 2026-01-29 | No mass auto-engagement | Can't auto-like/reply on OTHER accounts' posts |

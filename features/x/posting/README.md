@@ -2,14 +2,23 @@
 
 > Automated content scheduling and posting to X/Twitter
 
-**Status**: 🔵 Todo
+**Status**: 🟡 Planning Complete
 **Last updated**: 29 January 2026
 
 ---
 
 ## Overview
 
-Schedule and post 3-4 teasers per day to X. Use X API (free tier) for posting — no third-party service needed.
+Post 3-4 teasers per day to X using real-time generation (generate at post time, not in advance).
+
+### Architecture Decision (2026-01-29)
+
+**Real-time generation** instead of daily scheduler:
+- Each post time (4x/day), script generates tweet based on today's history
+- If you change settings/prompts, the next post immediately uses them
+- Simpler than Instagram's scheduler + executor pattern
+
+See [TASK-003](../tasks/TASK-003-x-auto-posting.md) for implementation details.
 
 ---
 
@@ -76,20 +85,29 @@ Tell me your favorite city ⬇️
 | Posts per day | ~50 (safe: 10-20) |
 | Media uploads | Included |
 
-### Architecture
+### Architecture (Real-Time Generation)
 
 ```
-ComfyUI → Image ready → X API → Posted
-                    ↓
-              GitHub Actions (scheduler)
+GitHub Actions (4 cron triggers)
+         ↓
+   x-post-auto.mjs
+         ↓
+┌────────────────────────────┐
+│ 1. Load today's history    │
+│ 2. Get trending (Perplexity)│
+│ 3. Generate tweet (Claude)  │
+│ 4. Post to X API           │
+│ 5. Save to Supabase        │
+└────────────────────────────┘
 ```
 
 ### Workflow
 
-1. **Generate**: ComfyUI produces image
-2. **Caption**: Claude generates tweet text
-3. **Post**: X API posts with media
-4. **Track**: Log in Supabase
+1. **History**: Check what was posted today (avoid repetition)
+2. **Trending**: Get current topics via Perplexity
+3. **Generate**: Claude creates tweet (280 chars, Elena persona)
+4. **Post**: X API posts (text now, images when ComfyUI ready)
+5. **Track**: Log in Supabase `x_post_history`
 
 ---
 
@@ -97,10 +115,10 @@ ComfyUI → Image ready → X API → Posted
 
 | File | Purpose |
 |------|---------|
-| `app/scripts/x-post.mjs` | Post to X via API |
-| `app/scripts/x-scheduler.mjs` | Schedule posts |
-| `.github/workflows/x-posting.yml` | Cron trigger |
-| `app/src/lib/x-api.ts` | X API client |
+| `app/scripts/x-post-auto.mjs` | Main auto-posting script (generate + post) |
+| `app/src/lib/x-api.ts` | X API client (tokens, posting) |
+| `app/scripts/lib/x-trending-layer.mjs` | X-specific Perplexity prompts |
+| `.github/workflows/x-posting.yml` | GitHub Actions (4 cron triggers) |
 
 ---
 
