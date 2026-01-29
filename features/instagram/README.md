@@ -6,15 +6,23 @@
 
 ---
 
+## Status: ABANDONED
+
+> ⛔ **STRATEGIC PIVOT** (2026-01-29): Instagram abandoned after account block. Moving to X/Twitter as primary distribution channel.
+>
+> See [CHECKPOINT-2026-01-29-STRATEGIC-PIVOT.md](./docs/CHECKPOINT-2026-01-29-STRATEGIC-PIVOT.md) for full analysis.
+
+---
+
 ## Sub-features
 
 | Feature | Status | Description | Link |
 |---------|--------|-------------|------|
-| **DM** | 🔴 PAUSED | ManyChat + Claude AI funnel | [→](./dm/) |
-| **Content Brain** | 🔴 PAUSED | Scheduling, prompts, posting | [→](./content-brain/) |
-| **Comments** | 🔴 PAUSED | Auto-reply via ManyChat | [→](./comments/) |
+| **DM** | ⛔ ABANDONED | ManyChat + Claude AI funnel | [→](./dm/) |
+| **Content Brain** | ⛔ ABANDONED | Scheduling, prompts, posting | [→](./content-brain/) |
+| **Comments** | ⛔ ABANDONED | Auto-reply via ManyChat | [→](./comments/) |
 
-> ⚠️ **ACCOUNT BLOCKED** (2026-01-29): All Instagram automations paused. See [REACTIVATION.md](./docs/REACTIVATION.md) for recovery steps.
+> ⚠️ **ACCOUNT BLOCKED** (2026-01-29): All Instagram automations paused. See [REACTIVATION.md](./docs/REACTIVATION.md) for recovery steps (unlikely to use).
 
 ---
 
