@@ -3,7 +3,7 @@
 > LoRA training, checkpoints, IP-Adapter FaceID, face consistency, and image quality
 
 **Status**: ✅ Working (end-to-end test passed)
-**Last updated**: 28 January 2026 (Session 9)
+**Last updated**: 29 January 2026 (Session 10 - Vast.ai pivot)
 
 ---
 
@@ -104,6 +104,8 @@ node app/scripts/runpod-connect.mjs --status
 | **FLUX.2 Klein 9B** | Works but "AI-clean" look - distilled model limitation |
 | **BigLove → FLUX refinement** | Two-stage pipeline: realistic base + face consistency |
 | **ReferenceLatent (FLUX)** | Injects face reference into conditioning, works well |
+| **Z-Image Full** | **AMAZING skin quality** - natural pores, freckles, film grain (34s on RTX 4090) |
+| **Vast.ai** | Reliable RunPod alternative - RTX 4090 at $0.14/hr, actually works |
 
 ## What Doesn't Work ❌
 
@@ -119,6 +121,7 @@ node app/scripts/runpod-connect.mjs --status
 | **LR 1e-4** | Too high, causes NaN |
 | **FLUX.2 Klein 9B** | Rendu trop "propre", peau plastique (distilled = speed not quality) |
 | **FLUX.1 [dev] Full 32B** | Même problème de peau plastique que Klein - inherent to FLUX architecture |
+| **RunPod (Jan 2026)** | Platform-wide issues - pods stuck at "RUNNING" with runtime null |
 
 ## Open Questions ❓
 
@@ -131,9 +134,11 @@ node app/scripts/runpod-connect.mjs --status
 
 | # | Task | Status | Priority | Link |
 |---|------|--------|----------|------|
-| 004 | Face refinement (85% → 95%) | 🟡 In Progress | Immediate | [→](./tasks/TASK-004-qwen-face-refinement.md) |
+| 009 | Z-Image Skin Quality Test (Vast.ai) | 🟡 In Progress | **Immediate** | [→](./tasks/TASK-009-local-comfyui-mac.md) |
+| 004 | Face refinement (85% → 95%) | 🟡 In Progress | High | [→](./tasks/TASK-004-qwen-face-refinement.md) |
+| 008 | Seedream 4.5 ComfyUI Integration | 🔵 Backlog | Medium | [→](./tasks/TASK-008-seedream-45-integration.md) |
 
-**Next**: Focus on face refinement via FaceDetailer or other SDXL-compatible methods (FLUX abandoned for quality reasons)
+**Next**: Complete Z-Image testing on Vast.ai - Elena face reference, then NSFW generation
 
 ### Backlog
 

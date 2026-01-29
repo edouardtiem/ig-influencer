@@ -1,6 +1,6 @@
 # TASK-005: RunPod Persistent Setup
 
-**Status**: 🟡 In Progress
+**Status**: ✅ Done
 **Created**: 24 January 2026
 **Feature**: [ComfyUI Generation](../README.md)
 
@@ -17,7 +17,7 @@ Configure the existing RunPod network volume (`elena-models`) with all models an
 - [x] Network volume configured with all models (BigLove XL, Elena LoRA, IP-Adapter, etc.)
 - [x] Script `startup.sh` that launches ComfyUI automatically on pod start
 - [x] Local script `runpod-connect.mjs` to start/stop pods on-demand
-- [ ] End-to-end test: start pod → generate image without manual intervention
+- [x] End-to-end test: start pod → generate image without manual intervention
 - [x] No linter errors introduced
 
 ---
@@ -39,8 +39,9 @@ Configure the existing RunPod network volume (`elena-models`) with all models an
 | Resource | Status | ID |
 |----------|--------|-----|
 | **Network Volume** | ✅ Active | `aml40rql5h` (elena-comfyui-US-TX-3, 50GB) |
-| **Pod** | ✅ Stopped (data preserved) | `adlni6ocoi3sip` |
+| **Pod** | ✅ Stopped (data preserved) | `0nfcd8w6s1f0ux` |
 | **Datacenter** | US-TX-3 | RTX 4090 |
+| **PyTorch** | 2.4.0+cu121 | Upgraded from 2.1.0 |
 
 ---
 
@@ -116,7 +117,18 @@ const CONFIG = {
 
 ## Progress Log
 
-### 25 Jan 2026
+### 25 Jan 2026 (Session 2)
+- **END-TO-END TEST SUCCESSFUL**
+- Terminated old pods due to GPU shortage on original hosts
+- Created new pod `0nfcd8w6s1f0ux` on volume `aml40rql5h`
+- Upgraded PyTorch 2.1.0 → 2.4.0 (required for ComfyUI 0.10)
+- Fixed IP-Adapter filename in `elena-simple-test.mjs`
+- Updated script to use `process.env.COMFYUI_URL`
+- Generated image: `elena_simple_test_00001_.png` (22MB, 4096x4096)
+- Pod stopped (data preserved)
+- **Task complete**
+
+### 25 Jan 2026 (Session 1)
 - Switched to US-TX-3 volume `aml40rql5h` (previous US-NC-1 had GPU shortages)
 - Old pod `dortewt0b3tom3` terminated due to GPU unavailability on host
 - Created new pod `adlni6ocoi3sip` on same volume
@@ -144,7 +156,23 @@ const CONFIG = {
 
 ## Outcome
 
-_Fill when task is complete, then rename file to DONE-005-runpod-persistent-setup.md_
+**Completed 25 Jan 2026**
+
+End-to-end workflow working:
+1. `node app/scripts/runpod-connect.mjs` → Creates/resumes pod
+2. `COMFYUI_URL=https://{pod-id}-8188.proxy.runpod.net node app/scripts/elena-simple-test.mjs` → Generates image
+3. `node app/scripts/runpod-connect.mjs --stop` → Stops pod (data preserved)
+
+**Key fixes applied:**
+- PyTorch upgraded to 2.4.0 (CUDA 12.1)
+- IP-Adapter filename corrected
+- Generation script accepts COMFYUI_URL env var
+
+**Current pod configuration:**
+- Volume: `aml40rql5h` (elena-comfyui-US-TX-3, 50GB)
+- GPU: RTX 4090 (24GB)
+- ComfyUI: 0.10.0
+- PyTorch: 2.4.0+cu121
 
 ---
 
