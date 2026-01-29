@@ -2,7 +2,7 @@
 
 > All Instagram-related features for @elena_verne
 
-**Last updated**: 23 January 2026
+**Last updated**: 29 January 2026
 
 ---
 
@@ -10,9 +10,19 @@
 
 | Feature | Status | Description | Link |
 |---------|--------|-------------|------|
-| **DM** | 🟡 Monitoring | ManyChat + Claude AI funnel | [→](./dm/) |
-| **Content Brain** | 🟢 Stable | Scheduling, prompts, posting | [→](./content-brain/) |
-| **Comments** | 🟢 Stable | Auto-reply via ManyChat | [→](./comments/) |
+| **DM** | 🔴 PAUSED | ManyChat + Claude AI funnel | [→](./dm/) |
+| **Content Brain** | 🔴 PAUSED | Scheduling, prompts, posting | [→](./content-brain/) |
+| **Comments** | 🔴 PAUSED | Auto-reply via ManyChat | [→](./comments/) |
+
+> ⚠️ **ACCOUNT BLOCKED** (2026-01-29): All Instagram automations paused. See [REACTIVATION.md](./docs/REACTIVATION.md) for recovery steps.
+
+---
+
+## Completed Tasks
+
+| Task | Title | Status | Date |
+|------|-------|--------|------|
+| DONE-001 | Pause All Automations (Account Blocked) | 🟢 Completed | 2026-01-29 |
 
 ---
 

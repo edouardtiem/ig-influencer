@@ -1,10 +1,15 @@
 name: DM Followup (+20h)
 
 on:
-  schedule:
-    # Every hour at minute 15 (check for contacts ready for followup)
-    - cron: '15 * * * *'
-  workflow_dispatch: # Manual trigger for testing
+  # ⚠️ PAUSED 2026-01-29 — Instagram account blocked
+  # To reactivate: uncomment schedule section below
+  # See: features/instagram/docs/REACTIVATION.md
+  #
+  # schedule:
+  #   # Every hour at minute 15 (check for contacts ready for followup)
+  #   - cron: '15 * * * *'
+
+  workflow_dispatch: # Manual trigger for testing (STILL WORKS)
 
 jobs:
   followup:
