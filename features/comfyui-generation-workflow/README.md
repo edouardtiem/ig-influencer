@@ -111,6 +111,7 @@ node app/scripts/runpod-connect.mjs --status
 
 | What | Details |
 |------|---------|
+| **Z-Image Omni face reference** | TextEncodeZImageOmni image1/image2/image3 inputs produce severe corruption - feature is broken |
 | **CivitAI direct download** | Nécessite token API pour télécharger BigLove sur RunPod |
 | **Voyeur silhouettes in prompts** | SDXL ignore les silhouettes floues en arrière-plan |
 | **ImageSharpen** | Amplifies grain |
@@ -134,11 +135,12 @@ node app/scripts/runpod-connect.mjs --status
 
 | # | Task | Status | Priority | Link |
 |---|------|--------|----------|------|
-| 009 | Z-Image Skin Quality Test (Vast.ai) | 🟡 In Progress | **Immediate** | [→](./tasks/TASK-009-local-comfyui-mac.md) |
-| 004 | Face refinement (85% → 95%) | 🟡 In Progress | High | [→](./tasks/TASK-004-qwen-face-refinement.md) |
-| 008 | Seedream 4.5 ComfyUI Integration | 🔵 Backlog | Medium | [→](./tasks/TASK-008-seedream-45-integration.md) |
+| 010 | Z-Image Face Reference Fix | ❌ Failed | - | [→](./tasks/TASK-010-zimage-face-reference-fix.md) |
+| 009 | Z-Image Skin Quality Test (Vast.ai) | 🟡 In Progress | High | [→](./tasks/TASK-009-local-comfyui-mac.md) |
+| 004 | Face refinement (85% → 95%) | 🟡 In Progress | Medium | [→](./tasks/TASK-004-qwen-face-refinement.md) |
+| 008 | Seedream 4.5 ComfyUI Integration | ❌ Blocked | Low | [→](./tasks/TASK-008-seedream-45-integration.md) |
 
-**Next**: Complete Z-Image testing on Vast.ai - Elena face reference, then NSFW generation
+**Next**: Test 8 TextEncodeZImageOmni configurations to find working face reference
 
 ### Backlog
 
