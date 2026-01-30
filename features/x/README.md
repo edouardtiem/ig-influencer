@@ -58,6 +58,7 @@ X teasers (3-4/day) → Profile → Bio link → Fanvue → Venice AI chat → P
 | Task | Title | Status | Date |
 |------|-------|--------|------|
 | TASK-003 | X Auto-Posting (Content Brain) | 🔵 Todo | 2026-01-29 |
+| TASK-004 | Temporary Cloudinary Posting | 🟡 In Progress | 2026-01-30 |
 
 ## Done Tasks (not yet renamed)
 
@@ -112,10 +113,12 @@ X teasers (3-4/day) → Profile → Bio link → Fanvue → Venice AI chat → P
 - **Posting tweets via API**
 - User lookup via API
 - Token refresh for long-term use
+- **Text-only posting from Cloudinary catalog** (33 images cataloged with captions)
 
 ## What Doesn't Work ❌
 
 - OAuth 1.0a (legacy, broken with Pay Per Use)
+- **Media upload via OAuth 2.0** (needs `media.write` scope, X Dev Portal currently down)
 
 ---
 
@@ -130,6 +133,11 @@ node app/scripts/x-oauth2-test.mjs --post
 
 # Refresh tokens (if expired)
 node app/scripts/x-oauth2-test.mjs --refresh
+
+# Post from Cloudinary catalog (TASK-004)
+node app/scripts/x-post-cloudinary.mjs --list          # List all 33 images
+node app/scripts/x-post-cloudinary.mjs --id 2 --dry    # Preview post
+node app/scripts/x-post-cloudinary.mjs --id 2          # Post (text-only until media.write enabled)
 ```
 
 ---
