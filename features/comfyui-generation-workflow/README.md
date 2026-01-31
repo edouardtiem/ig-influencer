@@ -3,7 +3,7 @@
 > LoRA training, checkpoints, IP-Adapter FaceID, face consistency, and image quality
 
 **Status**: ✅ Working (end-to-end test passed)
-**Last updated**: 29 January 2026 (Session 10 - Vast.ai pivot)
+**Last updated**: 31 January 2026 (Z-Image Full FIXED - official model works)
 
 ---
 
@@ -106,12 +106,14 @@ node app/scripts/runpod-connect.mjs --status
 | **ReferenceLatent (FLUX)** | Injects face reference into conditioning, works well |
 | **Z-Image Full** | **AMAZING skin quality** - natural pores, freckles, film grain (34s on RTX 4090) |
 | **Vast.ai** | Reliable RunPod alternative - RTX 4090 at $0.14/hr, actually works |
+| **Z-Image Official Model** | 12.3GB from Comfy-Org/z_image HuggingFace - WORKING (previous 7.9GB was wrong) |
 
 ## What Doesn't Work ❌
 
 | What | Details |
 |------|---------|
 | **Z-Image Omni face reference** | TextEncodeZImageOmni image1/image2/image3 inputs produce severe corruption - feature is broken |
+| **Elena LoRA v2 on Z-Image Full** | LoRA trained on ostris/Z-Image-De-Turbo - incompatible architecture with Comfy-Org model |
 | **CivitAI direct download** | Nécessite token API pour télécharger BigLove sur RunPod |
 | **Voyeur silhouettes in prompts** | SDXL ignore les silhouettes floues en arrière-plan |
 | **ImageSharpen** | Amplifies grain |
@@ -135,12 +137,13 @@ node app/scripts/runpod-connect.mjs --status
 
 | # | Task | Status | Priority | Link |
 |---|------|--------|----------|------|
+| 011 | Z-Image Elena LoRA Training | 🔵 Todo (need retrain for official model) | **High** | [→](./tasks/TASK-011-zimage-elena-lora-training.md) |
 | 010 | Z-Image Face Reference Fix | ❌ Failed | - | [→](./tasks/TASK-010-zimage-face-reference-fix.md) |
 | 009 | Z-Image Skin Quality Test (Vast.ai) | 🟡 In Progress | High | [→](./tasks/TASK-009-local-comfyui-mac.md) |
 | 004 | Face refinement (85% → 95%) | 🟡 In Progress | Medium | [→](./tasks/TASK-004-qwen-face-refinement.md) |
 | 008 | Seedream 4.5 ComfyUI Integration | ❌ Blocked | Low | [→](./tasks/TASK-008-seedream-45-integration.md) |
 
-**Next**: Test 8 TextEncodeZImageOmni configurations to find working face reference
+**Status**: Z-Image Full model NOW WORKS (official 12.3GB model). Elena LoRA needs retraining on official architecture.
 
 ### Backlog
 
@@ -159,6 +162,7 @@ node app/scripts/runpod-connect.mjs --status
 
 | # | Task | Completed | Link |
 |---|------|-----------|------|
+| 013 | Z-Image Official Models Debug | 31 Jan 2026 | [→](./tasks/DONE-013-zimage-official-models-debug.md) |
 | 001 | Grain reduction (CFG 4.0 + dpmpp_2m_sde) | 23 Jan 2026 | [→](./tasks/DONE-001-grain-reduction.md) |
 | 005 | RunPod persistent setup | 25 Jan 2026 | [→](./tasks/DONE-005-runpod-persistent-setup.md) |
 
