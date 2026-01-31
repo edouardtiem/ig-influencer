@@ -2,7 +2,7 @@
 
 > Distribution channel for @ElenaVisco46970 — traffic source to Fanvue
 
-**Last updated**: 29 January 2026
+**Last updated**: 31 January 2026
 
 ---
 
@@ -58,7 +58,7 @@ X teasers (3-4/day) → Profile → Bio link → Fanvue → Venice AI chat → P
 | Task | Title | Status | Date |
 |------|-------|--------|------|
 | TASK-003 | X Auto-Posting (Content Brain) | 🔵 Todo | 2026-01-29 |
-| TASK-004 | Temporary Cloudinary Posting | 🟡 In Progress | 2026-01-30 |
+| TASK-004 | Temporary Cloudinary Posting | ⏸️ Paused | 2026-01-30 |
 
 ## Done Tasks (not yet renamed)
 
@@ -113,12 +113,13 @@ X teasers (3-4/day) → Profile → Bio link → Fanvue → Venice AI chat → P
 - **Posting tweets via API**
 - User lookup via API
 - Token refresh for long-term use
-- **Text-only posting from Cloudinary catalog** (33 images cataloged with captions)
+- **Image posting via v2 API** (OAuth 2.0 + `media.write` scope)
+- **33 Cloudinary images ready to post** (with captions)
 
 ## What Doesn't Work ❌
 
-- OAuth 1.0a (legacy, broken with Pay Per Use)
-- **Media upload via OAuth 2.0** (needs `media.write` scope, X Dev Portal currently down)
+- OAuth 1.0a (legacy, broken with Pay Per Use tier)
+- v1.uploadMedia (requires OAuth 1.0a, use v2.uploadMedia instead)
 
 ---
 

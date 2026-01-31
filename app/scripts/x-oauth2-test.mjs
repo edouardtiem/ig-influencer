@@ -46,9 +46,8 @@ console.log('🔑 OAuth 2.0 credentials loaded');
 const CALLBACK_URL = 'http://127.0.0.1:3333/callback';
 
 // Scopes needed for posting
-// Scopes for posting - add 'media.write' after enabling in X Developer Portal
-const SCOPES = ['tweet.read', 'tweet.write', 'users.read', 'offline.access'];
-// TODO: Add 'media.write' scope once enabled in Developer Portal for image uploads
+// Scopes for posting with media upload
+const SCOPES = ['tweet.read', 'tweet.write', 'users.read', 'offline.access', 'media.write'];
 
 // Create OAuth 2.0 client
 const client = new TwitterApi({

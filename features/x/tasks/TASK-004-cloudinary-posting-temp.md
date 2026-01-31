@@ -1,6 +1,6 @@
 # TASK-004: Temporary X Posting with Existing Cloudinary Content
 
-**Status**: 🟡 In Progress
+**Status**: ⏸️ Paused (manual posting works, scheduling next)
 **Created**: 2026-01-30
 **Feature**: [X](../README.md) > [Posting](../posting/)
 
@@ -16,11 +16,12 @@ This is a **temporary side workflow** — not the main auto-posting system (TASK
 
 ## Acceptance Criteria
 
-- [ ] Script to post image + caption to X from Cloudinary URL
+- [x] Script to post image + caption to X from Cloudinary URL
 - [x] Curated list of usable Cloudinary images (33 images cataloged)
 - [x] Captions in Elena's voice (33 pre-generated, ready for review)
-- [ ] Can post manually or semi-automatically
-- [ ] Sets `possibly_sensitive: true` for NSFW content
+- [x] Can post manually or semi-automatically
+- [ ] Automated scheduling (GitHub Actions) — NEXT
+- [x] Sensitive content handled (X v2 API handles via account settings)
 
 ---
 
@@ -97,20 +98,32 @@ This is a **temporary side workflow** — not the main auto-posting system (TASK
 
 ## Technical Notes
 
-### X Media Upload Flow
+### X Media Upload Flow (v2 API + OAuth 2.0)
 
 ```javascript
-// 1. Download image from Cloudinary
-// 2. Upload to X media endpoint
-const mediaId = await client.v1.uploadMedia(imageBuffer, { mimeType: 'image/png' });
+// 1. Create OAuth 2.0 client with media.write scope
+const client = new TwitterApi(accessToken);
 
-// 3. Post tweet with media
+// 2. Download image from Cloudinary
+const imageBuffer = await fetch(url).then(r => r.arrayBuffer());
+
+// 3. Upload to X v2 media endpoint
+const mediaId = await client.v2.uploadMedia(Buffer.from(imageBuffer), {
+  media_type: 'image/jpeg',
+  media_category: 'tweet_image'
+});
+
+// 4. Post tweet with media
 await client.v2.tweet({
   text: caption,
-  media: { media_ids: [mediaId] },
-  possibly_sensitive: isNSFW
+  media: { media_ids: [mediaId] }
 });
 ```
+
+### Key Discovery
+- v1.uploadMedia requires OAuth 1.0a (doesn't work with Pay Per Use tier)
+- v2.uploadMedia works with OAuth 2.0 + `media.write` scope
+- Must use `media_type` not `mimeType` parameter
 
 ---
 
@@ -149,10 +162,33 @@ await client.v2.tweet({
 - `app/scripts/data/elena-x-captions-review.md` — Human-readable review doc
 - `app/scripts/data/elena-cloudinary-catalog.json` — Full image metadata
 
+### 2026-01-31 (Session 2)
+- X Developer Portal back up
+- Re-authenticated with `media.write` scope added
+- Discovered v1.uploadMedia still fails (403) — requires OAuth 1.0a
+- OAuth 1.0a tokens invalid (Pay Per Use tier doesn't support it)
+- Researched X API v2 media upload — works with OAuth 2.0!
+- Fixed twitter-api-v2 usage: `media_type` not `mimeType`
+- **IMAGE POSTING NOW WORKS**
+- Test posts with images:
+  - SFW #17: https://x.com/elenav_paris/status/2017593745609208125
+  - Spicy #1: https://x.com/elenav_paris/status/2017593786411504120
+- Cleaned up script, removed OAuth 1.0a fallback code
+- **Next**: Set up GitHub Actions for automated 3-4 posts/day
+
+**Usage (ready now):**
+```bash
+node app/scripts/x-post-cloudinary.mjs --list          # See all 33 images
+node app/scripts/x-post-cloudinary.mjs --id 5 --dry    # Preview
+node app/scripts/x-post-cloudinary.mjs --id 5          # Post!
+```
+
 ---
 
 ## Outcome
 
-_Fill when task is complete_
+**Manual posting complete.** Script works for posting any of the 33 Cloudinary images with captions to X.
+
+**Remaining:** GitHub Actions for automated scheduling (3-4 posts/day).
 
 ---

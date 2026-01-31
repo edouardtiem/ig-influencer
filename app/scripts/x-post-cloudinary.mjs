@@ -95,71 +95,41 @@ async function postToX(imageData, dryRun = false) {
   console.log('\n🚀 Posting to X...');
 
   try {
-    // Create client
+    // Create OAuth 2.0 client (v2 media upload works with OAuth 2.0 + media.write scope)
     const client = new TwitterApi(tokens.accessToken);
 
     // 1. Fetch image
     const imageBuffer = await fetchImageBuffer(imageData.url);
     console.log(`   ✅ Image fetched (${(imageBuffer.length / 1024).toFixed(1)} KB)`);
 
-    // 2. Upload media - try direct method first (works with OAuth 2.0 user context)
-    console.log('   📤 Uploading to X media endpoint...');
-    let mediaId;
-    try {
-      // Try the direct uploadMedia method (may work with OAuth 2.0 on newer API versions)
-      mediaId = await client.v1.uploadMedia(imageBuffer, {
-        mimeType: 'image/jpeg'
-      });
-    } catch (uploadError) {
-      // If v1 fails (403), try posting without image as fallback
-      if (uploadError.code === 403 || uploadError.message?.includes('403')) {
-        console.log('   ⚠️  Media upload requires OAuth 1.0a (not supported with current auth)');
-        console.log('   📝 Posting text-only tweet instead...');
-
-        const tweet = await client.v2.tweet({
-          text: imageData.caption + '\n\n📸 ' + imageData.url
-        });
-
-        const tweetId = tweet.data?.id;
-        const tweetUrl = `https://x.com/${tokens.username}/status/${tweetId}`;
-
-        console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('⚠️  POSTED (TEXT ONLY - media upload not available)');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log(`\n🔗 ${tweetUrl}\n`);
-        console.log('💡 To post with images, OAuth 1.0a credentials are needed.');
-
-        return { success: true, tweetId, url: tweetUrl, textOnly: true };
-      }
-      throw uploadError;
-    }
+    // 2. Upload media using v2 API (OAuth 2.0 with media.write scope)
+    console.log('   📤 Uploading to X media endpoint (v2)...');
+    const mediaId = await client.v2.uploadMedia(imageBuffer, {
+      media_type: 'image/jpeg',
+      media_category: 'tweet_image'
+    });
     console.log(`   ✅ Media uploaded (ID: ${mediaId})`);
 
     // 3. Build caption with hashtags
     const fullCaption = imageData.caption;
 
-    // 4. Post tweet - use v1 for possibly_sensitive support
+    // 4. Post tweet using v2 API
     console.log('   ✏️  Posting tweet...');
 
-    let tweet;
+    // Note: For sensitive content, the media is marked sensitive at upload time
+    // or through account settings. v2 API handles this automatically.
+    const tweet = await client.v2.tweet({
+      text: fullCaption,
+      media: { media_ids: [mediaId] }
+    });
+
     if (imageData.sensitive) {
-      // Use v1 API for sensitive content (has possibly_sensitive param)
-      tweet = await client.v1.tweet(fullCaption, {
-        media_ids: mediaId,
-        possibly_sensitive: true
-      });
-      console.log(`   ✅ Tweet posted with sensitive flag`);
+      console.log(`   ✅ Tweet posted (spicy content)`);
     } else {
-      // Use v2 API for normal content
-      tweet = await client.v2.tweet({
-        text: fullCaption,
-        media: { media_ids: [mediaId] }
-      });
       console.log(`   ✅ Tweet posted`);
     }
 
-    // Get tweet ID (different structure for v1 vs v2)
-    const tweetId = tweet.data?.id || tweet.id_str;
+    const tweetId = tweet.data?.id;
     const tweetUrl = `https://x.com/${tokens.username}/status/${tweetId}`;
 
     console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -171,14 +141,19 @@ async function postToX(imageData, dryRun = false) {
 
   } catch (error) {
     console.error('\n❌ POSTING FAILED');
-    console.error('   Error:', error.message);
+    console.error('   Error:', error.message || error);
 
     if (error.data) {
       console.error('   Details:', JSON.stringify(error.data, null, 2));
     }
 
+    if (error.stack) {
+      console.error('   Stack:', error.stack.split('\n').slice(0, 3).join('\n'));
+    }
+
     // Check for token expiry
-    if (error.code === 401 || error.message?.includes('401')) {
+    const errMsg = String(error.message || '');
+    if (error.code === 401 || errMsg.includes('401')) {
       console.error('\n💡 Token may have expired. Try:');
       console.error('   node x-oauth2-test.mjs --refresh');
     }
