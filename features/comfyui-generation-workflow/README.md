@@ -137,13 +137,14 @@ node app/scripts/runpod-connect.mjs --status
 
 | # | Task | Status | Priority | Link |
 |---|------|--------|----------|------|
-| 011 | Z-Image Elena LoRA Training | 🔵 Todo (need retrain for official model) | **High** | [→](./tasks/TASK-011-zimage-elena-lora-training.md) |
+| **014** | **Elena LoRA on Comfy-Org Z-Image** | ⏸️ Training (3500 steps, ~4h) | **HIGH** | [→](./tasks/TASK-014-elena-lora-comfyorg-zimage.md) |
+| 011 | Z-Image Elena LoRA Training (ostris) | ❌ Incompatible | - | [→](./tasks/TASK-011-zimage-elena-lora-training.md) |
 | 010 | Z-Image Face Reference Fix | ❌ Failed | - | [→](./tasks/TASK-010-zimage-face-reference-fix.md) |
 | 009 | Z-Image Skin Quality Test (Vast.ai) | 🟡 In Progress | High | [→](./tasks/TASK-009-local-comfyui-mac.md) |
 | 004 | Face refinement (85% → 95%) | 🟡 In Progress | Medium | [→](./tasks/TASK-004-qwen-face-refinement.md) |
 | 008 | Seedream 4.5 ComfyUI Integration | ❌ Blocked | Low | [→](./tasks/TASK-008-seedream-45-integration.md) |
 
-**Status**: Z-Image Full model NOW WORKS (official 12.3GB model). Elena LoRA needs retraining on official architecture.
+**Status**: Z-Image Full model WORKS. TASK-014 training in progress on Vast.ai pod (3500 steps, ETA ~4h from 13:24 UTC).
 
 ### Backlog
 
